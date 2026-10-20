@@ -311,7 +311,16 @@ function Runner:run(options: { exit: boolean?, silent: boolean?, filter: string?
 
 	local useOnly = self._hasOnly
 
-	local function visit(suite, depth: number, inheritedSkip: boolean, inheritedOnly: boolean)
+	local function suiteHasTests(suite): boolean
+		for _, item in suite.items do
+			if item.kind == "test" or suiteHasTests(item.suite) then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function visit(suite, depth: number, inheritedSkip: boolean, inheritedOnly: boolean, inheritedError: any?)
 		local indent = string.rep("  ", depth)
 		if suite.parent then
 			out(indent .. suite.name)
@@ -319,24 +328,29 @@ function Runner:run(options: { exit: boolean?, silent: boolean?, filter: string?
 		local skipSuite = inheritedSkip or suite.skip
 		local onlySuite = inheritedOnly or suite.only
 
-		-- beforeAll solo si hay algo que ejecutar
+		-- beforeAll se ejecuta de forma perezosa: solo si hay algo que correr dentro de la suite
 		local ranBeforeAll = false
-		local beforeAllError = nil
+		local beforeAllError = inheritedError
 
 		local function ensureBeforeAll()
 			if ranBeforeAll then
 				return
 			end
 			ranBeforeAll = true
-			local ok, err = runHooks(suite.beforeAll, "beforeAll", suite.name)
-			if not ok then
-				beforeAllError = err
+			if beforeAllError == nil then
+				local ok, err = runHooks(suite.beforeAll, "beforeAll", suite.name)
+				if not ok then
+					beforeAllError = err
+				end
 			end
 		end
 
 		for _, item in suite.items do
 			if item.kind == "suite" then
-				visit(item.suite, depth + 1, skipSuite, onlySuite)
+				if suiteHasTests(item.suite) and not skipSuite then
+					ensureBeforeAll()
+				end
+				visit(item.suite, depth + 1, skipSuite, onlySuite, beforeAllError)
 			else
 				local name = fullName(suite, item.name)
 				local skipped = skipSuite or item.skip or (useOnly and not (onlySuite or item.only))

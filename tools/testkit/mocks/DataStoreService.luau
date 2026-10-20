@@ -36,21 +36,24 @@ DataStoreService.Limits = {
 	maxKeyLength = 50,
 	maxNameLength = 50,
 	maxValueBytes = 4 * 1024 * 1024,
-	-- peticiones por minuto: base + perPlayer * jugadores (token bucket continuo)
+	-- Presupuesto por minuto del servidor: base + perPlayer * jugadores (token bucket continuo).
+	-- Valores por defecto segun roblox-dev/references/datastore-persistence.md (2026-10) [TERCERO].
+	-- Se ignora la categoria List (no se simula ListKeysAsync & co.).
 	budgets = {
-		Get = { base = 60, perPlayer = 10 },
-		Set = { base = 60, perPlayer = 10 },
-		Remove = { base = 60, perPlayer = 10 },
+		Get = { base = 60, perPlayer = 40 },
+		Set = { base = 60, perPlayer = 40 },
+		Remove = { base = 60, perPlayer = 40 },
 	},
 	writeCooldownSeconds = 6,
 }
 
-local OP_CATEGORY = {
-	GetAsync = "Get",
-	SetAsync = "Set",
-	UpdateAsync = "Set",
-	IncrementAsync = "Set",
-	RemoveAsync = "Remove",
+-- UpdateAsync consume presupuesto de lectura Y de escritura.
+local OP_CATEGORIES = {
+	GetAsync = { "Get" },
+	SetAsync = { "Set" },
+	UpdateAsync = { "Get", "Set" },
+	IncrementAsync = { "Set" },
+	RemoveAsync = { "Remove" },
 }
 
 ----------------------------------------------------------------------------
@@ -295,28 +298,38 @@ function DataStoreService:ResetLog()
 	self.log = {}
 end
 
-function DataStoreService:_budgetCheck(category: string): string?
+-- Comprueba todas las categorias y solo consume si TODAS tienen presupuesto.
+function DataStoreService:_budgetCheck(categories: { string }): string?
 	if not self._enforceBudgets then
 		return nil
 	end
-	local cfg = self.Limits.budgets[category]
-	if not cfg then
-		return nil
-	end
 	local players = self._players and #self._players:GetPlayers() or 0
-	local perMinute = cfg.base + cfg.perPlayer * players
 	local now = self:_time()
-	local bucket = self._tokens[category]
-	if not bucket then
-		bucket = { value = perMinute, last = now }
-		self._tokens[category] = bucket
+	local buckets = {}
+	for _, category in categories do
+		local cfg = self.Limits.budgets[category]
+		if cfg then
+			local perMinute = cfg.base + cfg.perPlayer * players
+			local bucket = self._tokens[category]
+			if not bucket then
+				bucket = { value = perMinute, last = now }
+				self._tokens[category] = bucket
+			end
+			bucket.value = math.min(perMinute, bucket.value + (now - bucket.last) * (perMinute / 60))
+			bucket.last = now
+			if bucket.value < 1 then
+				return "301: DataStore request was throttled ("
+					.. category
+					.. " budget of "
+					.. perMinute
+					.. "/min exhausted)"
+			end
+			table.insert(buckets, bucket)
+		end
 	end
-	bucket.value = math.min(perMinute, bucket.value + (now - bucket.last) * (perMinute / 60))
-	bucket.last = now
-	if bucket.value < 1 then
-		return "301: DataStore request was throttled (" .. category .. " budget of " .. perMinute .. "/min exhausted)"
+	for _, bucket in buckets do
+		bucket.value -= 1
 	end
-	bucket.value -= 1
 	return nil
 end
 
@@ -369,7 +382,7 @@ function DataStoreService:_begin(store, op: string, key: any, isWrite: boolean)
 		fail("502: [mock] random simulated DataStore failure")
 	end
 
-	local budgetError = self:_budgetCheck(OP_CATEGORY[op])
+	local budgetError = self:_budgetCheck(OP_CATEGORIES[op])
 	if budgetError then
 		fail(budgetError)
 	end

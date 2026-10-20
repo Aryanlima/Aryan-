@@ -39,6 +39,9 @@ end
 EnumMock.define = define
 
 define("ProductPurchaseDecision", { PurchaseGranted = 0, NotProcessedYet = 1 })
+-- Valores numericos arbitrarios del mock; los nombres vienen de roblox-dev/references/monetization.md [TERCERO].
+define("ReceiptType", { DeveloperProduct = 0 })
+define("ReceiptDecision", { Processed = 0, NotProcessedYet = 1 })
 define("InfoType", { Asset = 0, Product = 1, GamePass = 2, Subscription = 3, Bundle = 4 })
 define("CurrencyType", { Default = 0, Robux = 1, Tix = 2 })
 define("MembershipType", { None = 0, BuildersClub = 1, TurboBuildersClub = 2, OutrageousBuildersClub = 3, Premium = 4 })

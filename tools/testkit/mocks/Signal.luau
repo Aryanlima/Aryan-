@@ -9,7 +9,8 @@
 	  signal:DisconnectAll() / signal:Destroy()
 
 	Opciones: `spawn(fn, ...)` para lanzar handlers (p. ej. clock.task.spawn, para que
-	un handler que llama a task.wait use el reloj simulado).
+	un handler que llama a task.wait use el reloj simulado); `quiet = true` no hace warn()
+	de los errores de handlers (siguen en `signal.errors`).
 	Los errores de handlers se acumulan en `signal.errors` (no se propagan, igual que en Roblox).
 ]]
 
@@ -26,17 +27,21 @@ function Signal.new(options: { spawn: ((any, ...any) -> any)? }?)
 	local self = setmetatable({}, Signal)
 	self._handlers = {}
 	self._spawn = options and options.spawn or nil
+	self._quiet = options ~= nil and options.quiet == true
 	self.errors = {}
 	return self
 end
 
 function Signal:_run(fn, ...)
 	local errors = self.errors
+	local quiet = self._quiet
 	local wrapped = function(...)
 		local ok, err = pcall(fn, ...)
 		if not ok then
 			table.insert(errors, tostring(err))
-			warn("[mock Signal] error en handler: " .. tostring(err))
+			if not quiet then
+				warn("[mock Signal] error en handler: " .. tostring(err))
+			end
 		end
 	end
 	if self._spawn then
