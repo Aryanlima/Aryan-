@@ -48,29 +48,34 @@ En Windows sin modo desarrollador, `.claude/skills/roblox-dev` llega como un arc
 Arreglo sin tocar el repo: una junction `C:\Users\Administrator\.claude\skills\roblox-dev` → `ROBLOX\skills\roblox-dev`.
 Claude Code ya la detecta, y se actualiza sola con `git pull`.
 
-## MCP de Roblox Studio
+## MCP de Roblox Studio: FUNCIONA
 
 - Registrado en Claude Code (usuario): `claude mcp add --scope user Roblox_Studio -- cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat`.
-- Probado a mano por stdio: `initialize` responde (`RobloxStudio 1.0.0`) y `list_roblox_studios` devuelve `{"studios":[]}`,
-  porque **falta encender "Enable Studio as MCP server"** en Studio. No se puede activar sin la interfaz.
+- "Enable Studio as MCP server" está **encendido**. Lo activó Claude con clics automáticos sobre la pantalla, con permiso de Aryan.
+  En esta versión de Studio la ruta es: ícono **AI Assistant** (arriba a la derecha) → **⋯ → Settings → MCP Servers**.
+- Prueba de punta a punta por stdio: `list_roblox_studios` → `rojo-prueba`; `tools/list` → 28 herramientas;
+  `search_game_tree` ve `ReplicatedStorage.Shared.Hello` y `ServerScriptService.Server`. Es decir: disco → Rojo → Studio → MCP.
+- Studio tarda unos segundos en conectarse al proxy MCP: si se pregunta enseguida, la lista sale vacía.
 - El plugin oficial `Roblox/roblox-studio-agent-plugin` (v0.2.2, MIT) existe y solo trae configuración y una skill de instalación.
   No aparece en ningún catálogo que la CLI pueda ver (`claude-plugins-official`, `anthropic-plugin-directory`). Hace lo mismo que el registro manual,
   así que no se instaló, para no tener el servidor duplicado.
 
-## Pruebas
+## Pruebas y lint (Git Bash, con la nube hasta `a469340`)
 
-No existe `tools/test.sh`. Se corrió cada `*.spec.luau` con `lune run <archivo>` desde la raíz:
+`tools/test.sh`: **8 specs, 212 tests: todos pasan.**
 
-| Archivo | Resultado |
-|---|---|
-| `ROBLOX/tests/Economy.spec.luau` | 22 pasan, 0 fallan |
-| `ROBLOX/tests/Net.spec.luau` | 20 pasan, 0 fallan |
-| `ROBLOX/tests/Odds.spec.luau` | 27 pasan, 0 fallan |
-| `tools/examples/ReceiptHandler.spec.luau` | 9 pasan, 0 fallan |
-| `tools/testkit/mocks/mocks.spec.luau` | 40 pasan, 0 fallan |
-| `tools/testkit/testkit.spec.luau` | 16 pasan, 0 fallan |
+`tools/lint.sh`: **FALLA**, por el código y no por la PC:
+- selene: 0 errores, 5 avisos de variables sin usar.
+- `stylua --check`: sin formatear `ROBLOX/packages/{Economy,LiveOps,Shop,Data}.luau` y `ROBLOX/tests/{Odds,Shop}.spec.luau` (basta con `tools/format.sh`).
+- `luau-lsp analyze` con tipos de Roblox: 11 errores. Por ejemplo: `Data.luau` 546, 669 y 818; `Economy.luau` 120; `Net.luau` 342, 359, 387 y 483; `Shop.luau` 507 y 582;
+  `tests/Data.spec.luau` 88 (`Key 'sfx' not found`). Los "Function only returns 1 value, but 2 are required" y "TokenBucket and nil cannot be compared" se repiten.
 
-Total: **134 pasan, 0 fallan** (corrido con la nube hasta `a47220b`). `selene tools`: 0 errores, 0 avisos.
+Arreglos del entorno Windows que hicieron falta (no tocan código):
+- **Saltos de línea:** Git para Windows trae `core.autocrlf=true` (sistema), así que los `.luau` salían con CRLF y `stylua.toml` pide `line_endings = "Unix"`: todo daba "Diff".
+  En este clon: `git config --local core.autocrlf false` y `core.eol lf`, más una nueva extracción de los archivos. **Recomendación para la nube:** añadir `.gitattributes` con `* text=auto eol=lf`.
+- **Tipos de Lune:** `lune setup` (corrido fuera del repo) generó `~/.lune/.typedefs/0.11.0/`, que pide el alias `lune` de `.luaurc`.
+- **Tipos de Roblox:** `ROBLOX/.toolchain/share/globalTypes.d.luau` bajado de `JohnnyMorganz/luau-lsp/main/scripts/` (lo usa `lint.sh`).
+- **`rokit.toml`** nuevo en la raíz, con las versiones de `tools/setup.sh` (selene 0.31.0, no 0.32.0). `rokit install` funciona en Windows.
 
 ## Recomendaciones para la nube (de la investigación)
 
@@ -84,6 +89,8 @@ Total: **134 pasan, 0 fallan** (corrido con la nube hasta `a47220b`). `selene to
 
 - [x] Instalar Roblox Studio e iniciar sesión.
 - [x] Conectar Rojo en Studio (Plugins → Rojo → Connect).
-- [ ] En Studio: **Assistant → ⋯ → Manage MCP Servers → Enable Studio as MCP server**. Después, en una sesión nueva de Claude Code, `/mcp` debe mostrar `Roblox_Studio` conectado.
+- [x] Encender "Enable Studio as MCP server" (lo hizo Claude).
+- [ ] Abrir una sesión nueva de Claude Code en `Aryan-` y comprobar con `/mcp` que `Roblox_Studio` sale conectado (esta sesión se abrió antes de registrarlo).
+- [ ] **Urgente (según `CLAUDE.md`): impuestos de DevEx antes del 31-oct-2026** (Creator Hub → Finances → Taxes). Ver `pc-investigacion/verificacion-monetizacion.md`.
 - [ ] (Cuando haga falta publicar) Crear en create.roblox.com un place de pruebas y una API key de Open Cloud con permisos mínimos.
       Guardarla en una variable de entorno de Windows, nunca en archivos ni en el chat.
