@@ -64,7 +64,7 @@ fi
 if [ $do_types -eq 1 ]; then
 	if command -v luau-lsp >/dev/null 2>&1 && [ -f "$GLOBAL_TYPES" ]; then
 		step "luau-lsp analyze (tipos + definiciones de Roblox)"
-		luau-lsp analyze --definitions="$GLOBAL_TYPES" --settings="$TOOLS_DIR/luau-lsp-settings.json" "${files[@]}" || failed=1
+		luau-lsp analyze --definitions="$GLOBAL_TYPES" "${files[@]}" || failed=1
 	elif command -v luau-analyze >/dev/null 2>&1; then
 		step "luau-analyze (solo tools/: Luau puro, sin tipos de Roblox)"
 		mapfile -t pure < <(printf '%s\n' "${files[@]}" | grep -E "^$ROOT/tools/" || true)

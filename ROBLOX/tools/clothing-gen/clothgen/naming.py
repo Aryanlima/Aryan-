@@ -52,7 +52,7 @@ def random_params(pattern, rng: random.Random):
     if pattern == "gradient":
         return {"axis": rng.choice(["v", "u"]), "bands": rng.choice([0, 0, 6, 9])}
     if pattern == "tiedye":
-        return {"centers": rng.choice([2, 3, 4]), "ring": rng.choice([22, 30, 40]), "warp": rng.choice([0.4, 0.6, 0.8])}
+        return {"centers": rng.choice([3, 4, 6]), "ring": rng.choice([10, 14, 20]), "warp": rng.choice([0.6, 0.9, 1.2])}
     if pattern == "camo":
         return {"cell": rng.choice([36, 52, 72]), "block": rng.choice([0, 0, 8])}
     if pattern in ("checks", "gingham"):

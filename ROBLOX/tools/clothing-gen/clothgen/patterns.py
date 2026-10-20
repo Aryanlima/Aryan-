@@ -117,7 +117,7 @@ def stripes(U, V, C, H, pal, seed=0, orient="v", size=24, wrap_v=False, **kw):
         j = max(1, round(j))
         sign = 1 if orient == "d" else -1
         phase = phase + sign * j * V / H
-    return pick(np.floor(phase), pal)
+    return pick(np.floor(phase + 1e-4), pal)  # eps: evita parpadeos de redondeo justo en el borde
 
 
 def gradient(U, V, C, H, pal, seed=0, axis="v", noise=0.12, bands=0, wrap_v=False, **kw):
@@ -133,13 +133,16 @@ def gradient(U, V, C, H, pal, seed=0, axis="v", noise=0.12, bands=0, wrap_v=Fals
     return ramp(t, pal, cyclic=False)
 
 
-def tiedye(U, V, C, H, pal, seed=0, centers=3, ring=34, warp=0.55, wrap_v=False, soft=True, **kw):
-    """Tie-dye: anillos concentricos deformados por ruido, con paleta ciclica."""
+def tiedye(U, V, C, H, pal, seed=0, centers=4, ring=15, warp=0.9, wrap_v=False, edge=0.35, **kw):
+    """Tie-dye: anillos concentricos (bullseye) deformados por ruido; ring = ancho de cada color (px).
+
+    edge = anchura de la transicion entre colores (0 = bordes duros, 1 = degradado suave).
+    """
     rng = np.random.default_rng(seed)
-    n1 = fractal(U, V, C, H, 90, seed + 1, 3, wrap_v)
-    n2 = fractal(U, V, C, H, 90, seed + 2, 3, wrap_v)
-    Uw = (U + (n1 - 0.5) * warp * ring * 3.0) % C
-    Vw = V + (n2 - 0.5) * warp * ring * 3.0
+    n1 = fractal(U, V, C, H, 70, seed + 1, 3, wrap_v)
+    n2 = fractal(U, V, C, H, 70, seed + 2, 3, wrap_v)
+    Uw = (U + (n1 - 0.5) * warp * ring * 5.0) % C
+    Vw = V + (n2 - 0.5) * warp * ring * 5.0
     d = np.full(U.shape, 1e9)
     for _ in range(centers):
         cx = rng.uniform(0, C)
@@ -151,10 +154,19 @@ def tiedye(U, V, C, H, pal, seed=0, centers=3, ring=34, warp=0.55, wrap_v=False,
             dv = np.abs(dv) % H
             dv = np.minimum(dv, H - dv)
         d = np.minimum(d, np.hypot(du, dv))
-    phase = d / (ring * len(pal))
-    if soft:
-        return ramp(phase, pal, cyclic=True)
-    return pick(np.floor(phase * len(pal)), pal)
+    x = d / ring                      # cada unidad = un color
+    i = np.floor(x)
+    f = x - i
+    # mantiene el color en el centro de la banda y transiciona en el borde (edge)
+    w = max(1e-3, float(edge))
+    t = np.clip((f - (1 - w) / 2) / w, 0, 1)
+    t = t * t * (3 - 2 * t)
+    p = pal_arr(pal)
+    n = len(p)
+    c0 = p[i.astype(int) % n]
+    c1 = p[(i.astype(int) + 1) % n]
+    # la transicion ocurre en la mitad superior de la banda hacia el siguiente color
+    return c0 * (1 - t[..., None]) + c1 * t[..., None]
 
 
 def camo(U, V, C, H, pal, seed=0, cell=52, block=0, wrap_v=False, **kw):
@@ -188,8 +200,8 @@ def diamonds(U, V, C, H, pal, seed=0, size=48, wrap_v=False, **kw):
     nu += nu % 2
     cell = C / nu
     s, t = U / cell, V / cell
-    a = np.floor(s + t) % 2
-    b = np.floor(s - t) % 2
+    a = np.floor(s + t + 1e-4) % 2
+    b = np.floor(s - t + 1e-4) % 2
     return pick(a * 2 + b, pal)
 
 
@@ -211,8 +223,9 @@ def dots(U, V, C, H, pal, seed=0, size=28, radius=0.28, wrap_v=False, **kw):
     nu = fit(size, C)
     cell = C / nu
     if wrap_v:
-        rows = fit(cell, H)
-        rows += rows % 2
+        m = max(1, len(pal) - 1)
+        step = int(np.lcm(2, m))  # filas multiplo de 2 (escalonado) y del ciclo de colores
+        rows = max(step, int(round(fit(cell, H) / step)) * step)
         cell_v = H / rows
     else:
         cell_v = cell

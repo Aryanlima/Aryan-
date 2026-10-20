@@ -176,8 +176,8 @@ red/escritura (seccion 3.2), y solo entonces cambiar el numero.
 ### 3.5 Resultados observados
 
 - Sobre una muestra sintetica con `:connect()` y `wait()`: los detecta (2 hallazgos, codigo 1).
-- Sobre `ROBLOX/packages` (14:26 UTC, solo habia `Odds.luau`, otro agente la esta construyendo): **limpio, 0
-  hallazgos, codigo 0.** No se modifico nada. Repetir cuando haya mas codigo.
+- Sobre `ROBLOX/packages` (14:30 UTC: `Net.luau`, `Economy.luau` y `Odds.luau`; otro agente lo esta
+  construyendo): **limpio, 0 hallazgos, codigo 0.** No se modifico nada. Repetir cuando haya mas codigo.
 - Sobre `tools/testkit` y `tools/examples` (solo lectura): da **falsos positivos esperables**: la regla de
   "`ProcessReceipt` asignado en varios archivos" salta con los mocks y specs, y marca un `UpdateAsync` de un
   spec de mocks. Conclusion: ejecutarlo sobre codigo de juego (`ROBLOX/packages`, `ROBLOX/games/*/src`), no

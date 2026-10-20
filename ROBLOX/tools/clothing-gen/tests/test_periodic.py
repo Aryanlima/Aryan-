@@ -13,35 +13,43 @@ from clothgen.palettes import PALETTES, get_palette  # noqa: E402
 from clothgen.patterns import PATTERNS, render_pattern  # noqa: E402
 
 
+def _grid(C, H, width):
+    u = np.arange(width, dtype=np.float64) + 0.5
+    v = np.arange(H, dtype=np.float64) + 0.5
+    return np.meshgrid(u, v)
+
+
 class Periodic(unittest.TestCase):
-    def test_pattern_wraps_in_u(self):
-        """render con origen desplazado exactamente un periodo C == render normal."""
+    def test_pattern_is_periodic_in_u(self):
+        """f(U + C) == f(U), llamando al patron DIRECTAMENTE (sin el U % C de render_pattern)."""
         for part in L.BELTS:
             _, C, H = L.belt_geometry(part)
-            for name in PATTERNS:
+            for name, fn in PATTERNS.items():
                 pal = get_palette("sunset")
-                a = render_pattern(name, pal, C, H, origin_u=0, seed=3, grain=0)
-                b = render_pattern(name, pal, C, H, origin_u=C, seed=3, grain=0)
-                self.assertTrue(np.array_equal(a, b), f"{name}/{part}: no periodico en u")
+                U, V = _grid(C, H, 2 * C)          # dos vueltas completas
+                out = fn(U, V, float(C), float(H), pal, seed=3)
+                self.assertTrue(np.allclose(out[:, :C], out[:, C:], atol=1e-6),
+                                f"{name}/{part}: NO periodico en u (habria costura al dar la vuelta)")
 
-    def test_pattern_continuity_across_wrap(self):
-        """Un render desplazado k px es el render original rodado k px (sin costura oculta)."""
-        for name in PATTERNS:
-            pal = get_palette("ocean")
-            C, H = 384, 128
-            a = render_pattern(name, pal, C, H, origin_u=0, seed=5, grain=0)
-            for k in (37, 130):
-                b = render_pattern(name, pal, C, H, origin_u=k, seed=5, grain=0)
-                self.assertTrue(np.array_equal(np.roll(a, -k, axis=1), b), f"{name}: roll k={k}")
+    def test_pattern_is_not_degenerate(self):
+        """Evita que el test de arriba pase por patrones constantes."""
+        U, V = _grid(384, 128, 384)
+        for name, fn in PATTERNS.items():
+            if name == "solid":
+                continue
+            out = fn(U, V, 384.0, 128.0, get_palette("ocean"), seed=4)
+            self.assertGreater(out.std(), 5.0, f"{name}: casi constante")
 
     def test_tile_wraps_in_v(self):
-        for name in PATTERNS:
+        """Para teselas (wrap_v=True): f(V + H) == f(V)."""
+        for name, fn in PATTERNS.items():
             pal = get_palette("candy")
-            a = render_pattern(name, pal, 256, 256, seed=2, grain=0, wrap_v=True)
-            # continuidad vertical: la fila de cierre difiere como mucho lo que difieren filas vecinas
-            d_int = np.abs(np.diff(a.astype(int), axis=0)).mean(axis=(1, 2)).max()
-            d_seam = np.abs(a[-1].astype(int) - a[0].astype(int)).mean()
-            self.assertLessEqual(d_seam, d_int * 1.05 + 2, f"{name}: costura vertical")
+            C = H = 256
+            u = np.arange(C, dtype=np.float64) + 0.5
+            v = np.arange(2 * H, dtype=np.float64) + 0.5
+            U, V = np.meshgrid(u, v)
+            out = fn(U, V, float(C), float(H), pal, seed=2, wrap_v=True)
+            self.assertTrue(np.allclose(out[:H], out[H:], atol=1e-6), f"{name}: NO periodico en v")
 
 
 class Layout(unittest.TestCase):
