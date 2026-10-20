@@ -1,4 +1,5 @@
 --!nonstrict
+--!nolint DeprecatedApi
 -- Tests de los mocks de servicios de Roblox (Clock, Signal, Players, RunService, DataStore, Marketplace).
 
 local testkit = require("@testkit")
@@ -490,6 +491,41 @@ describe("MarketplaceService", function()
 		local receipt = market:SimulatePurchase(alice, 1)
 		market:SimulateRedelivery(receipt.PurchaseId)
 		expect(count).toBe(1)
+	end)
+
+	it("BindReceiptHandler tiene prioridad sobre ProcessReceipt y respeta el filtro de productos", function()
+		local legacyCalls = 0
+		market.ProcessReceipt = function()
+			legacyCalls += 1
+			return env.Enum.ProductPurchaseDecision.PurchaseGranted
+		end
+		local unbind = market:BindReceiptHandler(env.Enum.ReceiptType.DeveloperProduct, function()
+			return env.Enum.ReceiptDecision.Processed
+		end, { 1 })
+
+		local r1, d1 = market:SimulatePurchase(alice, 1) -- lo toma el handler enlazado
+		expect(d1).toBe(env.Enum.ProductPurchaseDecision.PurchaseGranted)
+		expect(legacyCalls).toBe(0)
+		local _, d2 = market:SimulatePurchase(alice, 2) -- fuera del filtro: cae a ProcessReceipt
+		expect(d2).toBe(env.Enum.ProductPurchaseDecision.PurchaseGranted)
+		expect(legacyCalls).toBe(1)
+		expect(market:GetReceiptStatus(r1.PurchaseId)).toBe("granted")
+
+		unbind()
+		market:SimulatePurchase(alice, 1)
+		expect(legacyCalls).toBe(2)
+	end)
+
+	it("RetryPending(userId) solo reintenta los recibos de ese jugador", function()
+		local bob = env.Players:AddPlayer(11, "Bob")
+		market:SimulatePurchase(alice, 1) -- sin callback: pendiente
+		market:SimulatePurchase(bob, 1)
+		market.ProcessReceipt = function()
+			return env.Enum.ProductPurchaseDecision.PurchaseGranted
+		end
+		expect(market:RetryPending(bob.UserId)).toBe(1)
+		expect(#market:GetPendingReceipts()).toBe(1)
+		expect(market:GetPendingReceipts()[1].PlayerId).toBe(alice.UserId)
 	end)
 
 	it("GetProductInfo devuelve lo registrado y falla con ids desconocidos", function()

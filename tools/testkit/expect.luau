@@ -201,22 +201,42 @@ end
 
 function matchers.toBeGreaterThan(self, n)
 	numeric(self, "toBeGreaterThan")
-	check(self, self._actual > n, format(self._actual) .. " is not > " .. format(n), format(self._actual) .. " is > " .. format(n))
+	check(
+		self,
+		self._actual > n,
+		format(self._actual) .. " is not > " .. format(n),
+		format(self._actual) .. " is > " .. format(n)
+	)
 end
 
 function matchers.toBeGreaterThanOrEqual(self, n)
 	numeric(self, "toBeGreaterThanOrEqual")
-	check(self, self._actual >= n, format(self._actual) .. " is not >= " .. format(n), format(self._actual) .. " is >= " .. format(n))
+	check(
+		self,
+		self._actual >= n,
+		format(self._actual) .. " is not >= " .. format(n),
+		format(self._actual) .. " is >= " .. format(n)
+	)
 end
 
 function matchers.toBeLessThan(self, n)
 	numeric(self, "toBeLessThan")
-	check(self, self._actual < n, format(self._actual) .. " is not < " .. format(n), format(self._actual) .. " is < " .. format(n))
+	check(
+		self,
+		self._actual < n,
+		format(self._actual) .. " is not < " .. format(n),
+		format(self._actual) .. " is < " .. format(n)
+	)
 end
 
 function matchers.toBeLessThanOrEqual(self, n)
 	numeric(self, "toBeLessThanOrEqual")
-	check(self, self._actual <= n, format(self._actual) .. " is not <= " .. format(n), format(self._actual) .. " is <= " .. format(n))
+	check(
+		self,
+		self._actual <= n,
+		format(self._actual) .. " is not <= " .. format(n),
+		format(self._actual) .. " is <= " .. format(n)
+	)
 end
 
 -- |actual - expected| < 10^-digits / 2   (digits por defecto 2)
@@ -241,8 +261,8 @@ function matchers.toBeType(self, typeName)
 	)
 end
 
-function matchers.toContain(self, item)
-	local actual = self._actual
+function matchers.toContain(self, item: any)
+	local actual: any = self._actual
 	local found = false
 	if type(actual) == "string" then
 		found = string.find(actual, tostring(item), 1, true) ~= nil
@@ -256,7 +276,12 @@ function matchers.toContain(self, item)
 	else
 		fail("toContain: expected a string or table, got " .. format(actual))
 	end
-	check(self, found, format(actual) .. " does not contain " .. format(item), format(actual) .. " contains " .. format(item))
+	check(
+		self,
+		found,
+		format(actual) .. " does not contain " .. format(item),
+		format(actual) .. " contains " .. format(item)
+	)
 end
 
 function matchers.toHaveLength(self, n)
@@ -265,7 +290,12 @@ function matchers.toHaveLength(self, n)
 		fail("toHaveLength: expected a string or table, got " .. format(actual))
 	end
 	local length = #actual
-	check(self, length == n, "expected length " .. tostring(n) .. " but got " .. tostring(length), "expected length not to be " .. tostring(n))
+	check(
+		self,
+		length == n,
+		"expected length " .. tostring(n) .. " but got " .. tostring(length),
+		"expected length not to be " .. tostring(n)
+	)
 end
 
 -- Patron de Luau (string.find), no regex.
@@ -291,7 +321,12 @@ function matchers.toHaveProperty(self, key, ...)
 	if select("#", ...) > 0 then
 		has = has and deepEqual(actual[key], (...))
 	end
-	check(self, has, format(actual) .. " does not have property " .. format(key), format(actual) .. " has property " .. format(key))
+	check(
+		self,
+		has,
+		format(actual) .. " does not have property " .. format(key),
+		format(actual) .. " has property " .. format(key)
+	)
 end
 
 --[[
@@ -299,7 +334,7 @@ end
 	toThrow("texto")             el mensaje contiene el texto (busqueda literal)
 	toThrow(function(err) ... end) predicado sobre el error (true = ok)
 ]]
-function matchers.toThrow(self, expected)
+function matchers.toThrow(self, expected: any)
 	if type(self._actual) ~= "function" then
 		fail("toThrow: expected a function, got " .. format(self._actual))
 	end
@@ -308,7 +343,7 @@ function matchers.toThrow(self, expected)
 	local matches = threw
 	local detail = ""
 	if threw and expected ~= nil then
-		local message = type(err) == "table" and (err.message or format(err)) or tostring(err)
+		local message: string = type(err) == "table" and tostring(err.message or format(err)) or tostring(err)
 		if type(expected) == "string" then
 			matches = string.find(message, expected, 1, true) ~= nil
 			detail = " containing " .. format(expected) .. " (got " .. format(message) .. ")"
@@ -325,7 +360,12 @@ function matchers.toHaveBeenCalled(self)
 	if not Spy.isSpy(spy) then
 		fail("toHaveBeenCalled: expected a spy (testkit.fn)")
 	end
-	check(self, spy.callCount > 0, "expected spy to have been called", "expected spy not to have been called (called " .. spy.callCount .. " times)")
+	check(
+		self,
+		spy.callCount > 0,
+		"expected spy to have been called",
+		"expected spy not to have been called (called " .. spy.callCount .. " times)"
+	)
 end
 
 function matchers.toHaveBeenCalledTimes(self, n)
@@ -333,7 +373,12 @@ function matchers.toHaveBeenCalledTimes(self, n)
 	if not Spy.isSpy(spy) then
 		fail("toHaveBeenCalledTimes: expected a spy (testkit.fn)")
 	end
-	check(self, spy.callCount == n, "expected spy to be called " .. n .. " times but was called " .. spy.callCount, "expected spy not to be called " .. n .. " times")
+	check(
+		self,
+		spy.callCount == n,
+		"expected spy to be called " .. n .. " times but was called " .. spy.callCount,
+		"expected spy not to be called " .. n .. " times"
+	)
 end
 
 function matchers.toHaveBeenCalledWith(self, ...)

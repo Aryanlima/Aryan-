@@ -364,6 +364,7 @@ export async function compileSpec(raw, { specDir, opts = {} }) {
   const fonts = (spec.fonts || []).map((f) => ({ family: f.family, weight: f.weight, src: ctx.fileUrl(f.file, 'fonts') })).filter((f) => f.src);
 
   const music = musicCfg ? { style: 'hype', ...musicCfg } : null;
+  if (music && music.file) music.file = ctx.absPath(music.file);
   if (music && !music.file) { const S = STYLES[music.style]; if (!S) { warns.push(`audio.music.style "${music.style}" desconocido; uso hype`); music.style = 'hype'; } music.bpm = music.bpm || STYLES[music.style].bpm; }
   const beat = music && !music.file && A.beatPulse !== false ? { bpm: music.bpm, offset: 0, amp: num(A.beatAmp, 0.014) } : null;
 

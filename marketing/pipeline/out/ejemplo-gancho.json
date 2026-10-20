@@ -1,0 +1,21 @@
+{
+  "id": "cubo-rush-gancho",
+  "out": "out/ejemplo-gancho.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 19,
+  "frames": 570,
+  "size_mb": 11.51,
+  "workers": 4,
+  "capture_fps": 14.7,
+  "timings_ms": {
+    "compilar+TTS+clips": 5,
+    "captura": 40591,
+    "audio": 0,
+    "codificar": 36204,
+    "total": 76923
+  }
+}

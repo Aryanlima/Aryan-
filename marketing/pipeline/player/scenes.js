@@ -142,6 +142,7 @@
   /* ================= RANK (top / lista) ================= */
   K.rank = function (sc, C) {
     const { fit } = C;
+    fit.classList.add('top');
     const total = sc.total || 5;
     const dots = $('div', '', fit);
     dots.style.cssText = `display:flex;gap:${px(C, 14)}px;margin-bottom:${px(C, 6)}px`;
@@ -419,7 +420,7 @@
     const bw = $('div', '', fit); bw.style.cssText = `position:relative;margin-top:${px(C, 12)}px`;
     const btn = $('div', 'pill big', bw, sc.button || '¡JUEGA GRATIS!'); btn.style.cssText += `font-size:${px(C, 72)}px;padding:${px(C, 30)}px ${px(C, 70)}px;overflow:hidden;position:relative;background:linear-gradient(180deg,${sc.accent},${sc.accent2});`;
     const shine = $('div', '', btn); shine.style.cssText = 'position:absolute;top:0;bottom:0;width:30%;left:0;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.65),transparent)';
-    const hand = $('div', 'emoji', bw, '👆'); hand.style.cssText += `position:absolute;right:${px(C, -40)}px;top:${px(C, 70)}px;font-size:${px(C, 120)}px`;
+    const hand = $('div', 'emoji', bw, '👆'); hand.style.cssText += `position:absolute;right:${px(C, 10)}px;top:${px(C, 78)}px;font-size:${px(C, 120)}px`;
     let code = null, handle = null;
     if (sc.code) { code = $('div', 'pill dark', fit, ''); code.innerHTML = `<span class="small" style="opacity:.8">${sc.codeLabel || 'CÓDIGO'}</span><span style="color:${sc.accent};font-family:'JetBrains Mono','DejaVu Sans Mono',monospace;letter-spacing:.06em">${sc.code}</span>`; }
     if (sc.handle) handle = $('div', 'body', fit, sc.handle);

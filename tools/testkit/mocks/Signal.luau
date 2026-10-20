@@ -14,6 +14,8 @@
 	Los errores de handlers se acumulan en `signal.errors` (no se propagan, igual que en Roblox).
 ]]
 
+local stdio = require("@lune/stdio")
+
 local Signal = {}
 Signal.__index = Signal
 
@@ -40,7 +42,7 @@ function Signal:_run(fn, ...)
 		if not ok then
 			table.insert(errors, tostring(err))
 			if not quiet then
-				warn("[mock Signal] error en handler: " .. tostring(err))
+				stdio.ewrite("[mock Signal] error en handler: " .. tostring(err) .. "\n")
 			end
 		end
 	end

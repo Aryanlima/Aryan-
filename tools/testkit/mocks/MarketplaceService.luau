@@ -48,6 +48,7 @@ function MarketplaceService.new(options)
 	self._passes = {} -- userId -> { [gamePassId] = true }
 	self._products = {} -- infoType.Name .. ":" .. id -> info
 	self._failQueue = {}
+	self._bound = {} -- handlers de BindReceiptHandler
 	self._spawn = spawn
 	self.ProcessReceipt = nil
 	self.prompts = {} -- historial de Prompt* llamados desde el juego
@@ -63,7 +64,10 @@ end
 ----------------------------------------------------------------------------
 
 function MarketplaceService:FailNext(count: number, message: string?)
-	table.insert(self._failQueue, { remaining = count or 1, message = message or "[mock] simulated MarketplaceService web failure" })
+	table.insert(
+		self._failQueue,
+		{ remaining = count or 1, message = message or "[mock] simulated MarketplaceService web failure" }
+	)
 end
 
 function MarketplaceService:_maybeFail()
@@ -141,7 +145,29 @@ end
 -- Developer products / ProcessReceipt
 ----------------------------------------------------------------------------
 
-function MarketplaceService:PromptProductPurchase(player, productId: number, _equipIfPurchased: boolean?, _currencyType: any?)
+--[[
+	BindReceiptHandler(receiptType, handler, filter?): ruta "nueva" que la referencia presenta frente
+	al ProcessReceipt "legacy" [NO VERIFICADO aqui]. `handler(receiptInfo)` devuelve
+	Enum.ReceiptDecision.Processed | NotProcessedYet; `filter` = lista de ProductId (nil = todos).
+	Un handler enlazado tiene prioridad sobre ProcessReceipt. Devuelve una funcion para desenlazar.
+]]
+function MarketplaceService:BindReceiptHandler(_receiptType: any, handler: (any) -> any, filter: { number }?)
+	local binding = { handler = handler, filter = filter }
+	table.insert(self._bound, binding)
+	return function()
+		local index = table.find(self._bound, binding)
+		if index then
+			table.remove(self._bound, index)
+		end
+	end
+end
+
+function MarketplaceService:PromptProductPurchase(
+	player,
+	productId: number,
+	_equipIfPurchased: boolean?,
+	_currencyType: any?
+)
 	table.insert(self.prompts, { kind = "Product", player = player, id = productId })
 	if self._autoApprove then
 		self:SimulatePurchase(player, productId)
@@ -172,8 +198,26 @@ function MarketplaceService:_deliver(purchaseId: string)
 	record.attempts += 1
 	local decisionEnum = self._enum.ProductPurchaseDecision
 	local callback = self.ProcessReceipt
+	local bound = nil
+	for _, binding in self._bound do
+		if binding.filter == nil or table.find(binding.filter, record.receipt.ProductId) then
+			bound = binding.handler
+			break
+		end
+	end
 	local decision
-	if callback == nil then
+	if bound ~= nil then
+		-- BindReceiptHandler tiene prioridad sobre ProcessReceipt (segun la referencia) [NO VERIFICADO]
+		local ok, result = pcall(bound, table.clone(record.receipt))
+		if ok and result == self._enum.ReceiptDecision.Processed then
+			decision = decisionEnum.PurchaseGranted
+		else
+			if not ok then
+				table.insert(self.processErrors, tostring(result))
+			end
+			decision = decisionEnum.NotProcessedYet
+		end
+	elseif callback == nil then
 		decision = decisionEnum.NotProcessedYet
 	else
 		-- copia para que el juego no pueda alterar el recibo guardado
@@ -214,12 +258,16 @@ function MarketplaceService:SimulateRedelivery(purchaseId: string)
 	return self:_deliver(purchaseId)
 end
 
--- Roblox reintenta todos los recibos pendientes (NotProcessedYet). Devuelve cuantos se concedieron.
-function MarketplaceService:RetryPending(): number
+--[[
+	Roblox reintenta los recibos pendientes (NotProcessedYet). En la realidad ocurre cuando el
+	jugador vuelve a entrar [TERCERO]; aqui lo disparas tu. `userId` opcional limita a un jugador.
+	Devuelve cuantos se concedieron.
+]]
+function MarketplaceService:RetryPending(userId: number?): number
 	local granted = 0
 	for _, purchaseId in table.clone(self._receiptOrder) do
 		local record = self._receipts[purchaseId]
-		if record.status == "pending" then
+		if record.status == "pending" and (userId == nil or record.receipt.PlayerId == userId) then
 			if self:_deliver(purchaseId) == self._enum.ProductPurchaseDecision.PurchaseGranted then
 				granted += 1
 			end

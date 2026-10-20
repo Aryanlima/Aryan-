@@ -196,7 +196,7 @@
     for (let b = -2; b < FAR / BAND + 2; b++) {
       const z0 = Math.max(-0.2, b * BAND - off), z1 = Math.min(FAR, (b + 1) * BAND - off);
       if (z1 <= z0) continue;
-      const c = (b & 1) ? shade(mix(pal.bg2, pal.bg1, 0.5), 0.02) : shade(mix(pal.bg2, pal.bg1, 0.5), 0.12);
+      const c = (b & 1) ? shade(mix(pal.bg2, '#101030', 0.35), 0.1) : shade(mix(pal.bg2, '#101030', 0.35), 0.26);
       poly(ctx, [[XS(-1.55, z0), Y(z0)], [XS(1.55, z0), Y(z0)], [XS(1.55, z1), Y(z1)], [XS(-1.55, z1), Y(z1)]], c);
     }
     // rieles neón
