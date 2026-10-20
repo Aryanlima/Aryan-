@@ -169,6 +169,21 @@ def tiedye(U, V, C, H, pal, seed=0, centers=4, ring=15, warp=0.9, wrap_v=False, 
     return c0 * (1 - t[..., None]) + c1 * t[..., None]
 
 
+_Q_CACHE = {}
+
+
+def _noise_threshold(q: float) -> float:
+    """Cuantil q de fractal() medido una vez sobre una muestra grande y fija (reproducible)."""
+    if "tab" not in _Q_CACHE:
+        u = np.arange(768, dtype=np.float64) + 0.5
+        U, V = np.meshgrid(u, u)
+        n = np.concatenate([fractal(U, V, 768.0, 768.0, 52, sd, 3, True).ravel() for sd in (1, 2, 3)])
+        qs = np.linspace(0, 1, 101)
+        _Q_CACHE["tab"] = (qs, np.quantile(n, qs))
+    qs, vals = _Q_CACHE["tab"]
+    return float(np.interp(q, qs, vals))
+
+
 def camo(U, V, C, H, pal, seed=0, cell=52, block=0, wrap_v=False, **kw):
     """Camuflaje de manchas organicas. pal[0]=fondo, el resto = capas. block>0 -> pixelado."""
     if block:
@@ -177,11 +192,10 @@ def camo(U, V, C, H, pal, seed=0, cell=52, block=0, wrap_v=False, **kw):
     out = np.empty(U.shape + (3,))
     out[...] = pal_arr(pal)[0]
     layers = pal[1:]
-    thr = np.linspace(0.46, 0.60, len(layers)) if layers else []
+    cover = np.linspace(0.44, 0.24, len(layers)) if layers else []   # fraccion que pinta cada capa
     for i, col in enumerate(layers):
         n = fractal(U, V, C, H, cell, seed + 31 * (i + 1), 3, wrap_v)
-        m = n > thr[i]
-        out[m] = col
+        out[n > _noise_threshold(1.0 - cover[i])] = col   # umbral FIJO (no depende del tamano de la rejilla)
     return out
 
 
@@ -288,7 +302,7 @@ def gingham(U, V, C, H, pal, seed=0, size=24, wrap_v=False, **kw):
     return out
 
 
-def speckle(U, V, C, H, pal, seed=0, density=0.04, wrap_v=False, **kw):
+def speckle(U, V, C, H, pal, seed=0, density=0.10, wrap_v=False, **kw):
     """Fondo pal[0] con motitas de las demas (tipo 'terrazo')."""
     out = np.empty(U.shape + (3,))
     out[...] = pal_arr(pal)[0]
@@ -301,6 +315,37 @@ def speckle(U, V, C, H, pal, seed=0, density=0.04, wrap_v=False, **kw):
     m = h < density
     out[m] = pick(np.floor(_hash2(ix % nu + 5, iy + 9, seed) * len(pal)), pal)[m]
     return out
+
+
+def _lum(c):
+    r, g, b = c
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+TWO_COLOR = {"checks", "gingham"}
+BG_PLUS_ACCENTS = {"dots", "speckle"}
+
+
+def prep_palette(name, pal):
+    """Reordena la paleta para que los patrones de 2 colores tengan contraste legible.
+
+    checks/gingham: el par con mayor diferencia de luminancia pasa a ser (0, 1).
+    dots/speckle: el fondo es el color extremo (mas oscuro o mas claro) y los acentos
+    se ordenan por contraste decreciente contra el fondo.
+    """
+    pal = list(pal)
+    if name in TWO_COLOR and len(pal) > 2:
+        best = max(((i, j) for i in range(len(pal)) for j in range(i + 1, len(pal))),
+                   key=lambda ij: abs(_lum(pal[ij[0]]) - _lum(pal[ij[1]])))
+        rest = [c for k, c in enumerate(pal) if k not in best]
+        return [pal[best[0]], pal[best[1]]] + rest
+    if name in BG_PLUS_ACCENTS and len(pal) > 2:
+        lums = [_lum(c) for c in pal]
+        bg_i = lums.index(min(lums)) if (sum(lums) / len(lums)) > 110 else lums.index(max(lums))
+        bg = pal[bg_i]
+        acc = sorted((c for k, c in enumerate(pal) if k != bg_i), key=lambda c: -abs(_lum(c) - _lum(bg)))
+        return [bg] + acc
+    return pal
 
 
 PATTERNS = {
@@ -320,6 +365,7 @@ def render_pattern(name, pal, C, H, origin_u=0.0, seed=0, grain=2.0, wrap_v=Fals
     v = np.arange(H_i, dtype=np.float64) + 0.5
     U, V = np.meshgrid(u + origin_u, v)
     U = U % C
+    pal = prep_palette(name, pal)
     rgb = PATTERNS[name](U, V, float(C), float(H), pal, seed=seed, wrap_v=wrap_v, **params)
     if grain:
         # grano de tela periodico en u: ruido determinista por pixel

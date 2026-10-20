@@ -25,7 +25,7 @@ local function defaultSpawn(fn, ...)
 	return thread, ok, err
 end
 
-function Signal.new(options: { spawn: ((any, ...any) -> any)? }?)
+function Signal.new(options: { spawn: ((any, ...any) -> any)?, quiet: boolean? }?)
 	local self = setmetatable({}, Signal)
 	self._handlers = {}
 	self._spawn = options and options.spawn or nil

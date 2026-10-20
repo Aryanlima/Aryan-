@@ -1,0 +1,21 @@
+{
+  "id": "cubo-rush-oferta",
+  "out": "out/ejemplo-oferta.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 16.2,
+  "frames": 486,
+  "size_mb": 9.29,
+  "workers": 4,
+  "capture_fps": 21.6,
+  "timings_ms": {
+    "compilar+TTS+clips": 230,
+    "captura": 24008,
+    "audio": 1,
+    "codificar": 20005,
+    "total": 44311
+  }
+}

@@ -18,32 +18,49 @@ Los binarios viven en `ROBLOX/.toolchain/bin/` (ignorado por git; ver `CLAUDE.md
 | `selene` | 0.31.0 | Linter | `cargo install selene --locked` |
 | `rojo` | 7.7.1 | Proyectos Rojo (`rojo build`, `rojo serve`) | `cargo install rojo --locked` |
 | `luau-analyze` (+ `luau`, `luau-compile`) | Luau del 2026-10-10 (`8387cfb461b3`) | Comprobador de tipos Luau, REPL y compilador | Compilado desde fuente (ver 2) |
-| `luau-lsp` | ver estado en 1.1 | Analizador con tipos de Roblox / servidor LSP | Compilado desde fuente (ver 2) |
+| `luau-lsp` | 1.70.1 (commit del 2026-10-10) | Analizador con tipos de Roblox / servidor LSP | Compilado desde fuente (ver 2) |
 | `globalTypes.d.luau` | del repo luau-lsp (2026-10-10) | Definiciones de tipos de la API de Roblox | Sale del codigo fuente de luau-lsp |
 
 Smoke tests ejecutados (todos OK): `lune --version`, `stylua --version`, `selene --version`,
 `rojo --version`; un script Luau con tipos ejecutado con `lune run`; `rojo build` de un proyecto minimo
-a `.rbxlx`; `luau-analyze` sobre todo `tools/` (0 errores); y los 65 tests propios (`tools/test.sh`).
+a `.rbxlx`; `luau-analyze` y `luau-lsp analyze` sobre todo `tools/` (0 errores); y los 65 tests propios
+(`tools/test.sh`; con los specs de otros ayudantes de `ROBLOX/tests` el total fue 134, todos en verde).
 
 ### 1.1 Estado de `luau-lsp`
 
-ESTADO_LSP
+**Instalado y funcionando** (luau-lsp 1.70.1, compilado con clang 18 desde el commit `6f90396fa8f6` del
+2026-10-10 sobre el Luau `8387cfb461b3`). `tools/lint.sh` lo usa para la comprobacion de tipos con las
+definiciones de Roblox: se probo que entiende la API (`game:GetService("Players")` es un `Players`, marca
+`Key 'NoSuchMethod' not found in external type 'Players'` y asignar un `string` a un `number`) y que `tools/`
+sale limpio. Uso directo:
+
+```bash
+luau-lsp analyze --definitions=ROBLOX/.toolchain/share/globalTypes.d.luau ruta/archivo.luau
+```
+
+Notas: solo hace falta `--sourcemap` (de `rojo sourcemap`) cuando el codigo usa `require(script.Parent.X)` por
+instancias; con `require("./ruta")` por cadena no. La primera compilacion con GCC 13 fallo por un falso positivo de
+`-Werror`, por eso `setup.sh` prefiere `clang++`. Al analizar `ROBLOX/` el 2026-10-20 aparecieron 11 errores de tipos
+reales en `ROBLOX/packages/{Data,Economy,Net,Shop}.luau` y `ROBLOX/tests/Data.spec.luau` (p. ej. funciones que
+devuelven 1 valor donde el tipo declarado exige 2); no se corrigieron (no son de este toolchain).
 
 ### 1.2 Reproducir la instalacion
 
 ```bash
 tools/setup.sh                 # instala lo que falte (idempotente); --check solo verifica
-tools/setup.sh --skip-lsp      # omite luau-lsp (la compilacion mas lenta, ~10-15 min)
+tools/setup.sh --skip-lsp      # omite luau-lsp (la compilacion mas lenta, ~10-20 min)
 tools/setup.sh --only lune,stylua
 JOBS=2 tools/setup.sh          # hilos de compilacion (por defecto nproc, maximo 4)
 ```
 
 Requisitos del sistema: `cargo`, `cmake`, `curl`, `python3` y `clang++` o `g++` (`ninja` es opcional).
-El primer `setup.sh` completo tarda unos 20-30 min (lune ~10 min, Luau ~3 min, luau-lsp ~10 min). Las
+El primer `setup.sh` completo tarda del orden de 20-30 min con 4 hilos (medido aqui: lune ~6 min, stylua+selene+rojo
+~9 min en paralelo con lune, Luau ~3 min, luau-lsp bastante mas; la maquina compartia CPU con otros procesos). Las
 versiones estan fijadas al principio de `tools/setup.sh`.
 
 Hosts de red que usa `setup.sh` (todos permitidos por la politica actual):
-`index.crates.io`, `static.crates.io`, `proxy.golang.org`.
+`index.crates.io`, `static.crates.io`, `proxy.golang.org` y `sum.golang.org` (verificacion de hashes; si no
+responde, `setup.sh` avisa y sigue sin verificar).
 
 ## 2. Como se consiguio cada binario (y por que no se bajaron binarios precompilados)
 
@@ -53,8 +70,10 @@ Hosts de red que usa `setup.sh` (todos permitidos por la politica actual):
   si es alcanzable: el **proxy de modulos de Go** (`proxy.golang.org`) es un espejo de repos de GitHub y sirve
   el zip de `github.com/luau-lang/luau` sin pasar por `github.com`
   (`https://proxy.golang.org/github.com/luau-lang/luau/@v/v0.0.0-20261010001518-8387cfb461b3.zip`).
-  Se compila con cmake (`Luau.Analyze.CLI`). Es el mismo codigo que el repo oficial, pero **no se verifico su
-  firma/commit** contra GitHub (el proxy de Go no sirve el checksum desde aqui: `sum.golang.org` no se uso).
+  Se compila con cmake (`Luau.Analyze.CLI`). La integridad se comprueba contra la base de checksums de Go
+  (`sum.golang.org`, tambien permitido): el hash `h1:` del zip coincide con el registrado (verificado para los dos
+  zips y automatizado en `setup.sh`). Ojo: eso prueba que es lo que el proxy de Go sirve para ese commit, no que se
+  haya comparado con una firma de GitHub.
 - **luau-lsp**: igual, `github.com/JohnnyMorganz/luau-lsp` desde el proxy de Go. El zip no incluye submodulos,
   asi que se le copia el codigo de Luau en `./luau`. Se compila con `clang++` porque GCC 13 falla con `-Werror`
   por un falso positivo en `CallHierarchy.cpp`. Ese mismo repo trae `scripts/globalTypes.d.luau` (866 KB con
@@ -179,7 +198,8 @@ servidor; 9 tests).
   peticiones (aqui un presupuesto agotado falla al instante con `301`), `OrderedDataStore`, `ListKeysAsync` ni
   `MemoryStoreService`. `Players:AddPlayer` crea un stub, no una instancia real.
 - **Lune no es Roblox.** En Lune 0.11 `task` no es global (se importa con `require("@lune/task")`; los mocks
-  traen su propio `task`), no existen `game`, `Enum`, `Random` ni `warn` globales, y `require` funciona por
+  traen su propio `task`), no existen `game`, `Enum` ni `Random` como globales (`warn` si existe, pero `luau-analyze` no lo
+  conoce), y `require` funciona por
   rutas de cadena (`require("./Modulo")`, alias `@testkit`) en vez de `require(script.Parent.Modulo)`. Dentro de
   un `init.luau`, los hijos se piden con `@self/hijo` (un `./` apunta a la carpeta padre).
   Para codigo con `require(script.Parent.X)` usa inyeccion de dependencias o un adaptador fino.

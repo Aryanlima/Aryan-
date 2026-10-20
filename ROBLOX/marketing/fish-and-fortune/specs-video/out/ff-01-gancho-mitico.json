@@ -1,0 +1,21 @@
+{
+  "id": "ff-01-gancho-mitico",
+  "out": "out/ff-01-gancho-mitico.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 18.2,
+  "frames": 546,
+  "size_mb": 7.14,
+  "workers": 4,
+  "capture_fps": 23.6,
+  "timings_ms": {
+    "compilar+TTS+clips": 3,
+    "captura": 24798,
+    "audio": 0,
+    "codificar": 12956,
+    "total": 37826
+  }
+}

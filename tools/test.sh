@@ -37,6 +37,8 @@ require_tool lune || exit 2
 specs=()
 if [ "${#targets[@]}" -eq 0 ]; then
 	targets=("$ROOT")
+else
+	mapfile -t targets < <(abs_paths "${targets[@]}")
 fi
 for target in "${targets[@]}"; do
 	if [ -f "$target" ]; then

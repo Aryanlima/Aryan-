@@ -20,7 +20,7 @@ Opciones:
   --scale X                    Escala de render (0.5 = mitad de resolución, para previews rápidas)
   --workers N                  Procesos de captura en paralelo (def. min(4, CPUs))
   --crf N                      Calidad x264 (def. 18; más alto = más pequeño)
-  --preset NAME                Preset x264 (def. medium)
+  --preset NAME                Preset x264 (def. veryfast; usa slow para entrega final)
   --max SEG                    Renderiza solo los primeros SEG segundos
   --png                        Captura PNG sin pérdida (más lento) en vez de JPEG q94
   --no-audio                   Sin música/SFX/narración
@@ -98,7 +98,7 @@ async function renderOne(specFile, outFile, o) {
     const args = ['-y', '-v', 'error', '-framerate', String(resolved.fps), '-i', path.join(frames, `f_%06d.${cap.ext}`)];
     if (aud) args.push('-i', aud.file);
     const enc = raw.encode || {};
-    args.push('-vf', vf, '-c:v', 'libx264', '-preset', o.preset || enc.preset || 'medium', '-crf', String(o.crf != null ? o.crf : enc.crf != null ? enc.crf : 18), '-profile:v', 'high', '-pix_fmt', 'yuv420p',
+    args.push('-vf', vf, '-c:v', 'libx264', '-preset', o.preset || enc.preset || 'veryfast', '-crf', String(o.crf != null ? o.crf : enc.crf != null ? enc.crf : 18), '-profile:v', 'high', '-pix_fmt', 'yuv420p',
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-g', String(resolved.fps * 2), '-movflags', '+faststart');
     if (aud) args.push('-c:a', 'aac', '-b:a', '192k', '-ar', '44100', '-ac', '2');
     else args.push('-an');

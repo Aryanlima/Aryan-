@@ -1,0 +1,96 @@
+{
+  "id": "ff-03-zonas-progresion",
+  "template": "progression",
+  "title": "Fish & Fortune — del lago a la costa: progresión por zonas (9:16, ~17 s)",
+  "_nota": "Video de marca (NO es gameplay). Las 3 zonas (Lago, Río, Costa) son las 3 primeras del concepto 1 (el MVP trae 3 de 6); confirmar con el juego real y reordenar/renombrar. El contador grande muestra el número de zona, no estadísticas inventadas.",
+  "aspect": "9:16",
+  "fps": 30,
+  "palette": {
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
+  },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
+  "fonts": [
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
+  ],
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "hook": {
+    "kicker": "🗺️ EXPLORA",
+    "text": "Del *LAGO* a la *COSTA*",
+    "emoji": "🌅",
+    "sub": "una zona nueva en cada paso",
+    "duration": 2.4
+  },
+  "scenes": [
+    {
+      "id": "zonas",
+      "kind": "stages",
+      "text": "Tu camino de *pescador*",
+      "duration": 10.0,
+      "prefix": "ZONA ",
+      "stages": [
+        {
+          "label": "Lago tranquilo",
+          "value": 1,
+          "emoji": "🏞️"
+        },
+        {
+          "label": "Río",
+          "value": 2,
+          "emoji": "🌊"
+        },
+        {
+          "label": "Costa",
+          "value": 3,
+          "emoji": "🏖️"
+        }
+      ],
+      "narration": "Empieza en el lago, sigue por el río y llega a la costa.",
+      "bg": {
+        "type": "grid",
+        "particles": "stars"
+      },
+      "captions": false
+    }
+  ],
+  "cta": {
+    "text": "Empieza *hoy*",
+    "sub": "Fish & Fortune · gratis en Roblox",
+    "button": "▶ JUGAR EN ROBLOX",
+    "emoji": "🎣"
+  },
+  "subtitles": {
+    "enabled": true,
+    "y": 0.8
+  },
+  "audio": {
+    "music": {
+      "style": "epic",
+      "volume": 0.45
+    },
+    "sfx": true
+  },
+  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
+}

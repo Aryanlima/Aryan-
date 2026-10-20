@@ -70,7 +70,7 @@ def mock(shirt: Image.Image | None, pants: Image.Image | None, scale=2) -> Image
     return out.resize((out.width * scale, out.height * scale), Image.NEAREST)
 
 
-def contact_sheet(images: list[tuple[str, Image.Image]], cols=4, cell=(300, 380), pad=8) -> Image.Image:
+def contact_sheet(images: list[tuple[str, Image.Image]], cols=4, cell=(300, 190), pad=8) -> Image.Image:
     rows = (len(images) + cols - 1) // cols
     W = cols * (cell[0] + pad) + pad
     H = rows * (cell[1] + pad + 14) + pad

@@ -1,0 +1,95 @@
+{
+  "id": "ff-06-tutorial-15s",
+  "template": "custom",
+  "title": "Fish & Fortune — 3 tips para pescar mejor (tutorial de ~15 s, 9:16)",
+  "_nota": "Video de marca (NO es gameplay). Los 3 tips se basan en el bucle del concepto 1 (lanzar con 'hold', minijuego de ~3 s, bestiario): confirmar cada tip contra el juego real antes de publicar; si cambian los controles, editar el texto. Ideal: sustituir el fondo por 3 clips reales cortos (bg {type:'video',src:...}).",
+  "aspect": "9:16",
+  "fps": 30,
+  "palette": {
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
+  },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
+  "fonts": [
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
+  ],
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "bg": {
+    "type": "gradient",
+    "particles": "sparks"
+  },
+  "hook": {
+    "kicker": "🎣 TUTORIAL EXPRESS",
+    "text": "3 tips para *pescar mejor*",
+    "emoji": "💡",
+    "duration": 2.4
+  },
+  "scenes": [
+    {
+      "id": "tips",
+      "kind": "bullets",
+      "text": "Prueba esto",
+      "duration": 8.6,
+      "items": [
+        {
+          "emoji": "👆",
+          "text": "Mantén pulsado para lanzar más lejos",
+          "at": 0.8
+        },
+        {
+          "emoji": "🎯",
+          "text": "Sigue el ritmo del minijuego",
+          "at": 3.2
+        },
+        {
+          "emoji": "📖",
+          "text": "Revisa tu bestiario antes de vender",
+          "at": 5.6
+        }
+      ],
+      "narration": "Mantén pulsado para lanzar más lejos, sigue el ritmo del minijuego y revisa tu bestiario antes de vender.",
+      "captions": false
+    }
+  ],
+  "cta": {
+    "text": "Pruébalo *gratis*",
+    "sub": "Fish & Fortune en Roblox",
+    "button": "▶ JUGAR EN ROBLOX",
+    "emoji": "🎣",
+    "duration": 4.0
+  },
+  "subtitles": {
+    "enabled": true,
+    "y": 0.8
+  },
+  "audio": {
+    "music": {
+      "style": "chill",
+      "volume": 0.5
+    },
+    "sfx": true
+  },
+  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
+}

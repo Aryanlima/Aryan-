@@ -24,7 +24,12 @@ export function findChromium() {
 
 const PLAYER_URL = pathToFileURL(path.join(PIPE_DIR, 'player', 'index.html')).href;
 
-async function openWorker(browser, resolved, idx) {
+const LAUNCH_ARGS = ['--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
+  '--allow-file-access-from-files', '--disable-dev-shm-usage', '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows'];
+
+// Un navegador POR worker: con contextos de un mismo navegador el proceso de composición/captura es compartido y no escala (medido: 14 fps vs 22 fps con 4 workers).
+async function openWorker(resolved, idx) {
+  const browser = await chromium.launch({ executablePath: findChromium(), headless: true, args: LAUNCH_ARGS });
   const ctx = await browser.newContext({ viewport: { width: resolved.vw, height: resolved.vh }, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
   const logs = [];
@@ -36,7 +41,7 @@ async function openWorker(browser, resolved, idx) {
   const err = await page.evaluate('window.__error || null');
   if (err) throw new Error('Error en el player:\n' + err);
   const cdp = await ctx.newCDPSession(page);
-  return { ctx, page, cdp, logs, idx };
+  return { browser, ctx, page, cdp, logs, idx };
 }
 
 async function shot(w, format, quality) {
@@ -49,15 +54,11 @@ export async function captureFrames(resolved, outDir, { workers = 4, format = 'j
   mkdirp(outDir);
   const N = Math.round(resolved.duration * resolved.fps);
   const ext = format === 'png' ? 'png' : 'jpg';
-  const browser = await chromium.launch({
-    executablePath: findChromium(), headless: true,
-    args: ['--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--disable-lcd-text',
-      '--allow-file-access-from-files', '--disable-dev-shm-usage', '--disable-background-timer-throttling', '--disable-renderer-backgrounding', '--disable-backgrounding-occluded-windows'],
-  });
+  let ws = [];
   const t0 = Date.now();
   try {
     const nW = Math.max(1, Math.min(workers, N));
-    const ws = await Promise.all(Array.from({ length: nW }, (_, i) => openWorker(browser, resolved, i)));
+    ws = await Promise.all(Array.from({ length: nW }, (_, i) => openWorker(resolved, i)));
     const tReady = Date.now() - t0;
     let next = 0, done = 0, msEval = 0, msShot = 0, msWrite = 0;
     const CH = 8;
@@ -80,16 +81,15 @@ export async function captureFrames(resolved, outDir, { workers = 4, format = 'j
     const logs = ws.flatMap((w) => w.logs);
     return { frames: N, ext, ms: Date.now() - t0 - tReady, startMs: tReady, workers: nW, logs: [...new Set(logs)].slice(0, 10), perFrameMs: { render: +(msEval / N).toFixed(1), screenshot: +(msShot / N).toFixed(1), write: +(msWrite / N).toFixed(1) } };
   } finally {
-    await browser.close();
+    await Promise.all(ws.map((w) => w.browser.close().catch(() => {})));
   }
 }
 
 /** Captura fotogramas sueltos (PNG) en los tiempos pedidos → rutas. Útil para revisar el diseño sin renderizar todo. */
 export async function captureStills(resolved, times, outDir, prefix = 'still') {
   mkdirp(outDir);
-  const browser = await chromium.launch({ executablePath: findChromium(), headless: true, args: ['--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--force-color-profile=srgb', '--font-render-hinting=none', '--allow-file-access-from-files', '--disable-dev-shm-usage'] });
+  const w = await openWorker(resolved, 0);
   try {
-    const w = await openWorker(browser, resolved, 0);
     const files = [];
     for (const t of times) {
       await w.page.evaluate((tt) => window.renderFrame(tt), t);
@@ -98,5 +98,5 @@ export async function captureStills(resolved, times, outDir, prefix = 'still') {
       files.push(f);
     }
     return { files, logs: [...new Set(w.logs)] };
-  } finally { await browser.close(); }
+  } finally { await w.browser.close(); }
 }

@@ -1,6 +1,6 @@
 # Informe maestro: juegos de Roblox con microtransacciones e IA
 
-Para: Aryan. Fecha de los datos: 2026-10-20. Base: los informes 01 a 07 de `../research/` (y 08/09 sobre ropa, ver sección 9).
+Para: Aryan. Fecha de los datos: 2026-10-20. Base: los informes 01 a 08 de `../research/` (09, sobre producir ropa con IA, está pendiente; ver sección 9).
 Este documento resume y decide; no repite las investigaciones. Cada dato lleva su etiqueta y un enlace al informe de origen.
 
 ## 0. Cómo leer este documento
@@ -21,13 +21,14 @@ Enlaces: `[02 §2.1]` significa informe 02, sección 2.1. Las definiciones está
 ## 1. Veredicto honesto (lectura de 1 minuto)
 
 1. **Esto es una lotería de boletos baratos, no un plan de ingresos.** La IA abarata el boleto (menos horas y menos dinero por juego), pero **no mejora la probabilidad de ganar**. [IDEA PROPIA] apoyada en [01 §1][r01], [02 §6][r02] y [07 §0][r07].
-2. **Planifica para el caso "mediana o menos".** La mediana de los creadores que ya cobran es de unos 1.500 USD **al año**, y el 1 % de arriba se lleva casi todo (sección 2). [TERCERO]
+2. **Planifica para el caso "mediana o menos".** La mediana de los creadores que ya cobran es de unos 1.500 USD **al año**, y los 1.000 primeros (de más de 42.000, el ~2 % de arriba) se llevan ≈ 76 a 82 % del total (sección 2). [TERCERO]
 3. **Si un juego despega, caerá.** Los virales pierden 90 a 99 % de su pico en semanas o meses (sección 2). Hay que cobrar mientras suben y no vivir de eso. [TERCERO]
 4. **Comprar visitas casi seguro pierde dinero.** Cada visita comprada cuesta más (unos 4 a 12 Robux) de lo que suele dejar (0,5 a 2 Robux por visita). Los anuncios sirven para medir, no para ganar. [TERCERO] + cálculo [IDEA PROPIA], sección 2.4.
 5. **Lo que sí está en nuestras manos:** retención a 28 días, gasto pequeño y recurrente, jugar con amigos, eventos con calendario fijo, marketing con clips reales y mejorar rápido con datos (sección 3). [OFICIAL/TERCERO según fila]
 6. **Recomendación: seguir, pero como experimento de 90 días con puertas de parada** (matar, iterar o invertir) y con un tope de pérdida que decidas tú. Ver [plan-90-dias.md](plan-90-dias.md) y [preguntas-para-aryan.md](preguntas-para-aryan.md).
 7. **Lo urgente es administrativo, no técnico:** el formulario fiscal **W-8BEN antes del 31-oct-2026** (11 días). Si no, puede aplicarse hasta 24 % de retención sobre todo el pago desde el 1-nov. [OFICIAL] ([03 §5.4][r03]).
 8. **Primer juego: Fish & Fortune** (pesca idle y colección). Segundo y tercero: Rumble Rotation y Plot Defenders. No hacemos 100 juegos: Roblox lo encarece y lo castiga (sección 4).
+9. **Ropa y accesorios de avatar: línea secundaria, por etapas.** Rinde menos por Robux gastado (0,114 USD por 100 R$ en el Marketplace frente a 0,266 en un juego), cobra más lento y arrastra riesgo de IP sobre la misma cuenta que cobra los juegos. Se prueba primero **dentro de tus propios juegos** (70 %). Sección 9.
 
 ---
 
@@ -120,7 +121,7 @@ Implicación: asumir **menos gasto por jugador que en 2025** y diseñar para ret
 | **Marketing y creadores** | Streamers y YouTubers están detrás de casi todos los hits recientes. Un dato "interno" habla de 35 a 45 % de sesiones nuevas desde creadores en juegos grandes | Mecánicas "clipables" (captura rara, anuncio global), códigos, micro-creadores a cambio de código o servidor VIP, no pagos fijos | [TERCERO] / [NO VERIFICADO] la cifra [07 §3.6][r07] |
 | **Socios con audiencia** | Grow a Garden: creador del prototipo + estudio con audiencia y operaciones | Valorar un socio con audiencia (pregunta 13 de [preguntas-para-aryan.md](preguntas-para-aryan.md)) | [TERCERO] [01 §7][r01] |
 | **Iteración rápida con datos propios** | Mercado que cambia en semanas (Steal An Egg: 56 días hasta el pico) | Kit reutilizable (datos, compras, tienda, eventos, analítica), puertas G0 a G5, A/B con `Experiments` (útil solo con volumen: por debajo de ~1.000 DAU puede no haber significancia) | [OFICIAL] el A/B [06 §7.3][r06]; el resto [IDEA PROPIA] |
-| **Monetizar por hora, no solo ganar horas** | Roblox lo señala como causa de su caída de bookings | Público 13+ y adultos de EE. UU. (18 a 34 crece ~40 a 50 % y gasta >50 % más que menores) con avatar R15 para optar a 0,0054 | [TERCERO] [02 §4.1][r02]; la tarifa [OFICIAL] |
+| **Monetizar por hora, no solo ganar horas** | Roblox lo señala como causa de su caída de bookings | Público 13+ y adultos de EE. UU. (en EE. UU., los de 18 a 34 crecen ~40 a 50 % interanual y gastan >50 % más que los menores de 18) con avatar R15 para optar a 0,0054 | [TERCERO] [02 §4.1][r02]; la tarifa [OFICIAL] |
 | **Honestidad de tienda** | Roblox exige descuentos reales, temporizadores reales, lenguaje neutro. Una tienda agresiva daña retención y descubrimiento | Ver sección 4 | [OFICIAL] [03 §2.3][r03] |
 
 **Lo que la IA sí cambia:** más prototipos por hora, texto y código más baratos, balance y análisis más rápidos. **Lo que no cambia:** que el juego sea divertido, que Roblox lo recomiende, que un creador lo quiera enseñar. [IDEA PROPIA]
@@ -159,15 +160,16 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | D2 | **Primer juego** | **Fish & Fortune** (pesca idle + colección, lagos compartidos, banner global cuando alguien pesca un mítico) | Raid the Museum ("Steal a X"): saturado y ventana de 4 a 6 semanas | [07 §8.1][r07] |
 | D3 | **Segundo y tercer candidato** | **2º Rumble Rotation** (party de minijuegos, 1 minijuego nuevo por semana). **3º Plot Defenders** (tower defense co-op, unidades originales) | Night Shift Cabin (techo alto, mayor coste y competencia). Reserva barata: Deep Dig Co-op o Brew & Bloom (reutilizan casi todo el kit, pero cuidado: "casi idéntico" se castiga) | [07 §8.1][r07] |
 | D4 | Código | **Luau puro `--!strict`**, archivos + Git, **Claude Code + MCP integrado de Studio + Rojo** (Script Sync como alternativa simple). Assistant de Studio solo para 3D, materiales, bocetos | roblox-ts (capa extra), Knit y TestEZ (archivados), pesde (esperar), DataStore2 | [04 §10][r04], [06 §3][r06] |
-| D5 | Datos y compras | **ProfileStore**; un único `ProcessReceipt` idempotente (`PurchaseRouter`); `PolicyService` en un solo módulo; `ConfigService` para eventos; revisión humana de todo lo de dinero | Código de compras sin revisar (la IA falla aquí de forma sutil) | [04 §0][r04], [06 §1-2, §4][r06] |
+| D5 | Datos y compras | **ProfileStore** para el juego real (el módulo `Data` del repositorio es una implementación propia probada con simulaciones y él mismo recomienda sustituirlo); un único `ProcessReceipt` idempotente; `PolicyService` en un solo módulo; `ConfigService` para eventos; revisión humana de todo lo de dinero | Código de compras sin revisar (la IA falla aquí de forma sutil) | [04 §0][r04], [06 §1-2, §4][r06] |
 | D6 | UI y analítica | React Lua para UI; Creator Analytics + `AnalyticsService` + API de consulta de analítica (panel único) | Fusion (no mezclar) | [06 §3, §7][r06] |
 | D7 | Calidad automática | StyLua, Selene, luau-lsp, tests en Lune, CI en GitHub Actions + Open Cloud; universo de pruebas separado; publicar en producción solo con aprobación manual | Publicar directo desde CI | [04 §11][r04], [06 §4.3][r06] |
 | D8 | Assets | Generación de Studio + Blender (mallas bajo 20.000 triángulos); audio del Creator Store; Meshy o Tripo **solo en plan de pago** y solo cuando haga falta | Hunyuan3D (prohibido en UE, Reino Unido y Corea del Sur: **depende de tu país**), Cube 3D abierto (solo investigación), Suno/Udio | [05 §0, §2, §10][r05] |
-| D9 | Monetización de la v1 de F&F | Pack de inicio, 2x dinero, auto-pesca, slots, cosméticos, VIP mensual, pase de temporada. **Sin venta de "suerte" ni cajas con Robux en la v1** (provisional) | Vender suerte desde el día 1: obliga a odds dinámicas, `PolicyService` y alternativa por país; se añade en v1.1 cuando esté probado | [02 §7][r02], [03 §2.1][r03], [07 §8][r07] |
+| D9 | Monetización de la v1 de F&F | Pack de inicio, 2x dinero, auto-pesca, slots, cosméticos, VIP mensual, pase de temporada. **Sin venta de "suerte" ni cajas con Robux en la v1** (provisional) | Vender suerte desde el día 1: obliga a odds dinámicas, `PolicyService` y alternativa por país; se añade más tarde (v1.5 en el [plan](plan-90-dias.md)) cuando esté probado | [02 §7][r02], [03 §2.1][r03], [07 §8][r07] |
 | D10 | Publicación | Activar Plus o Premium cuanto antes (la exención de la tarifa exige **2 meses seguidos**); si el 1.er lanzamiento llega antes, pagar la tarifa de 1.000 Robux (reembolsable) o lanzar solo para 16+ (provisional) | Lanzar sin decidir: por defecto un juego nuevo solo llega a 16+ verificados | [03 §3.3][r03], [02 §2.3][r02] |
 | D11 | Público e idioma | Diseñar para 13+ y avatar R15 estándar (opta a 0,0054 si hay adultos de EE. UU.); sin chat libre ni "hangouts" para conservar etiqueta suave. Texto EN + ES; marketing según tus canales (provisional) | Público infantil como objetivo: es el que menos monetiza por hora y el más regulado | [03 §3.4][r03], [05 §7.3][r05], [07 §2][r07] |
 | D12 | Cuenta | **Una sola cuenta o grupo** del creador, con 2FA, correo verificado y verificación de edad. Claves de Open Cloud: una por juego, permisos mínimos | Repartir juegos en varias cuentas | [03 §8][r03], [06 §4.3][r06] |
 | D13 | Presupuesto | Herramientas 0 a 40 USD/mes al empezar; subir al stack de ~150 a 170 USD/mes solo si un juego pasa G2. Anuncios: tope que fijas tú (ver plan) | Stack caro desde el día 1 | [05 §10][r05] |
+| D14 | **Juegos vs ropa** | **Juegos como motor (≈ 75 a 80 % del esfuerzo)**; ropa 3D y tienda de avatar dentro de tus juegos como línea secundaria con criterios de parada (sección 9) | Ropa 2D como negocio en el Marketplace, Limiteds pagados y máscara emisiva | [08 §6][r08] |
 
 ---
 
@@ -187,10 +189,13 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | ID gubernamental para DevEx general | [NO VERIFICADO] (sí se exige para Audience Expansion y acceso pagado en dinero real) | [02 §2.4][r02] |
 | **Países donde está disponible DevEx** y método de cobro en países hispanohablantes | [NO VERIFICADO]. Roblox dice "más de cien países"; no se pudo abrir la lista | [03 §5.3][r03] |
 | Tipalti descuenta comisión según método y 1,9 a 3 % si cambias moneda | [OFICIAL] | [03 §5.2][r03] |
-| Los "Premium Payouts" ya no existen; hoy hay Creator Rewards (5 Robux por jugador activo con gasto reciente; captación exige ~100 DAU de media) | [OFICIAL] vía resumen | [02 §3][r02] |
-| Anuncios con recompensa: hasta ~3 % de ingresos del creador al inicio (cifras de 5 a 15 % de terceros contradicen) | [OFICIAL] vía resumen / [NO VERIFICADO] las cifras altas | [02 §3][r02] |
+| Los "Premium Payouts" ya no existen; hoy hay Creator Rewards (5 Robux por jugador activo con gasto reciente; captación exige ~100 DAU de media) | [TERCERO] (resumen de página oficial) | [02 §3][r02] |
+| Anuncios con recompensa: hasta ~3 % de ingresos del creador al inicio (cifras de 5 a 15 % de terceros contradicen) | [TERCERO] (resumen de página oficial) / [NO VERIFICADO] las cifras altas | [02 §3][r02] |
 | Venta de pases/productos **entre juegos** desactivada desde el 30-may-2026 | [OFICIAL] | [03 §2.4][r03] |
-| Ropa 2D: el reparto para quien crea la prenda pasó de 70 % a ~30 % (jul-2026) y ~40 % al dueño de la experiencia donde se vende | [TERCERO]; matices [NO VERIFICADO] | [02 §2.3][r02] |
+| Ropa 2D desde el 14-jul-2026: el creador cobra 30 % en el Marketplace (antes 70 %); dentro de un juego, 30 % creador + 40 % dueño del juego (antes 60 % + 10 %). Quien vende su propia ropa en su propio juego se queda con el 70 % | **[OFICIAL]** (historial del repositorio de documentación, leído en 08; el informe 02 lo daba como tercero) | [08 §2.5][r08], [02 §2.3][r02] |
+| Los ítems de avatar son Robux ganados elegibles para DevEx a **0,0038** (no a 0,0054) y tienen 30 días de retención en cada venta | **[OFICIAL]** | [08 §2.6][r08] |
+| Ropa y accesorios: vendedores activos, medianas, ventas por ítem | [TERCERO débil] / [NO VERIFICADO]: Roblox no publica pagos por ítems de avatar | [08 §3.1][r08] |
+| Si el reparto progresivo del Marketplace (30 a 70 % según el precio sobre el "suelo") aplica también a la ropa 2D | [NO VERIFICADO] | [08 §2.4][r08] |
 
 ### 6.2 Impuestos
 
@@ -210,7 +215,7 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | Hecho | Estado | Fuente |
 |---|---|---|
 | Sin pagar tarifa (1.000 Robux por juego, reembolsable) ni mantener Plus o Premium **2 meses seguidos**, un juego nuevo solo llega a usuarios de **16+** con edad verificada | [OFICIAL] | [03 §3.3][r03] |
-| Roblox Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) | [OFICIAL] vía resumen | [02 §2.3][r02] |
+| Roblox Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) | [TERCERO] (resumen de página oficial) | [02 §2.3][r02] |
 | Para Kids (5-8) y Select (9-15): cuestionario, 2FA, verificación y **250 jugadas únicas de usuarios verificados en 60 días** (un blog dice 500) | [OFICIAL] 250 / [NO VERIFICADO] 500 | [03 §3.3][r03], [02 §2.3][r02] |
 | Condiciones exactas de reembolso de la tarifa (25 jugadores muy comprometidos 60 días vs 90 días) | [NO VERIFICADO] (las páginas se contradicen) | [03 §3.3][r03] |
 | Si hace falta Plus para *actualizar* (no solo publicar) juegos antiguos; si "Premium deja de venderse" | [NO VERIFICADO] | [02 §2.3][r02] |
@@ -227,7 +232,7 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | Benchmarks de retención de GameAnalytics 2026: D1 10,3 %, D7 1,6 %, D30 0,5 % (muestra de juegos grandes, supervivientes) | [TERCERO] | [02 §4.3][r02], [07 §7][r07] |
 | Blogs que dan D1 20 a 35 % o D7 ≥ 20 % como "bueno" | [NO VERIFICADO] (definiciones distintas, vendedores de promoción); no usar para decidir | [07 §7][r07] |
 | Coste por visita en anuncios (4 a 12 Robux) y mínimos de campaña (10 créditos en 2023, ~35 USD en un blog 2026, ninguno en la doc actual) | [TERCERO] / [NO VERIFICADO] el mínimo | [05 §7.2][r05], [07 §3.5][r07] |
-| 1 crédito de anuncios = 263 Robux | [OFICIAL] vía resumen | [07 §3.5][r07] |
+| 1 crédito de anuncios = 263 Robux | [TERCERO] (resumen de página oficial) | [07 §3.5][r07] |
 | Claves de Open Cloud: una por aplicación, permisos mínimos, se caducan tras 60 días sin uso | [OFICIAL] | [06 §4.3][r06] |
 | La API de publicación no actualiza `SurfaceAppearance`, `EditableMesh`, `PartOperation`, etc. | [OFICIAL] | [04 §6.4][r04] |
 | Luau Execution API (tests de motor en CI): estado y límites reales | [NO VERIFICADO] | [06 §4.3][r06] |
@@ -261,6 +266,7 @@ Probabilidad (P) e impacto (I): A = alta, M = media, B = baja. [IDEA PROPIA] sal
 | 16 | **Fuga de claves** (Open Cloud) o abuso del MCP de Studio (ejecuta código en tu lugar abierto) | B | A | Claves solo en variables de entorno o secretos de GitHub, una por juego y con permiso mínimo; MCP solo con clientes de confianza; guardar versión antes de cada tarea grande | Aryan crea, Claude cumple |
 | 17 | Agotamiento: pocas horas semanales para tareas manuales (probar, grabar, publicar, responder) | A | M | Plan según tus horas (pregunta 9); automatizar lo demás | Aryan |
 | 18 | Competencia directa: **Fisch** sigue vigente en oct-2026 ([01 §3][r01]); el informe 07 no verificó su estado | M | M | Diferenciar F&F: lagos compartidos, banner global, bestiario, giro co-op; vigilar sus datos en trackers | Claude |
+| 19 | **Contagio de la ropa a la cuenta de los juegos**: una retirada por IP en un ítem de avatar puede acabar en sanciones a la cuenta y a DevEx | B | Muy A | Ropa solo con originales; revisar cada imagen contra marcas; no abrir cuentas alternas; ropa en piloto pequeño | Ambos |
 
 ---
 
@@ -278,21 +284,81 @@ Probabilidad (P) e impacto (I): A = alta, M = media, B = baja. [IDEA PROPIA] sal
 
 ## 9. Juegos vs ropa
 
-> **Pendiente de 08 y 09.** Los informes `08-ropa-vs-juegos.md` y `09-ropa-produccion-con-ia.md` no existían cuando se escribió este documento. Lo de abajo es un análisis provisional que solo usa lo que dicen 02 y 03. Se sustituirá al llegar 08/09.
+> **Estado de 09:** el informe `09-ropa-produccion-con-ia.md` (cómo producir ropa con IA) no existía cuando se escribió esta sección. Lo marcado "pendiente de 09" se completará al llegar. El informe 08 (comparación) sí está integrado.
 
-| Aspecto | Juegos (lo que ya sabemos) | Ropa y avatar (solo con 02 y 03) |
-|---|---|---|
-| Qué se vende | Pases, productos, suscripciones dentro de tu juego | Prendas y accesorios en el Marketplace o dentro de tu experiencia |
-| Reparto del creador | 70 % de las ventas propias, a 0,0038 USD por Robux (0,0054 con jugadores de EE. UU. 18+) [OFICIAL] | 3D: ~70 % pero vigente [NO VERIFICADO]. **2D: de 70 % a ~30 % para el creador de la prenda** desde jul-2026; ~40 % al dueño de la experiencia donde se vende; quien vende su propia ropa en su propio juego conserva ~70 % [TERCERO]. La tarifa 18+ **no** cubre ítems de avatar [OFICIAL] ([02 §2.3][r02]) |
-| Requisitos del creador | 13+ para DevEx; W-8; cuenta en buen estado | Creator Store: 18+ (o 13 a 17 con consentimiento parental), 2FA, país soportado, cuenta individual [OFICIAL] ([03 §5.1][r03]) |
-| Riesgo de IP | Alto con memes y marcas | Alto: logos y estilos de marca; las copias alteradas con IA pueden denunciarse [OFICIAL] ([03 §4.1][r03]) |
-| Tiempo hasta saber si funciona | 4 a 8 semanas para pasar G2 | Pendiente de 08/09 |
-| Concentración de ingresos | Extrema (top 1.000 ≈ 76 a 82 %) | Pendiente de 08/09 |
-| Coste de producción con IA | Código y arte, semanas por juego | Pendiente de 08/09 |
+### 9.1 Veredicto
 
-Existe una herramienta de plantillas de ropa en `../tools/clothing-gen/` (en construcción por otro agente). Que exista no significa que la ropa sea mejor negocio: esa comparación es lo que debe resolver 08. [IDEA PROPIA]
+**Juegos como motor (≈ 75 a 80 % del tiempo y del dinero); ropa y accesorios como línea secundaria, por etapas y con criterios de parada.** Confianza media, ~65 % según el propio informe 08 ([08 §6.1][r08]). [IDEA PROPIA]
 
-**Regla provisional:** hasta tener 08/09 y la respuesta de Aryan (pregunta 11), el plan es **juegos primero**, porque es lo que ya está construido y medido por informes; la ropa se trata como línea secundaria.
+**Dinero por cada 100 Robux que paga el comprador** (a 0,0038 USD por Robux ganado) [08 §4.1][r08]:
+
+| Canal | % para ti | USD por 100 R$ | Etiqueta |
+|---|---:|---:|---|
+| Juego: pase, producto o suscripción | 70 % | **0,266** | [OFICIAL] + cálculo |
+| Juego, gasto de EE. UU. 18+ verificado (0,0054) | 70 % | **0,378** | [OFICIAL] + cálculo |
+| Ítem propio vendido **en tu propio juego** | 70 % (30 + 40) | **0,266** | [OFICIAL] + cálculo |
+| Ítem propio en el Marketplace, precio = "suelo" | 30 % | **0,114** | [OFICIAL] + cálculo |
+| Marketplace a 2x el suelo | 50 % | 0,190 | [OFICIAL] + cálculo |
+| Marketplace a 6x el suelo o más | 70 % | 0,266 | [OFICIAL] + cálculo |
+| Ítem ajeno vendido en tu juego (solo comisión) | 40 % | 0,152 | [OFICIAL] + cálculo |
+
+Los ítems de avatar **no** cobran la tarifa 0,0054. Solo igualas a un juego vendiendo en tu propio juego. Cinco razones para ordenar así:
+
+1. **Dinero por Robux gastado:** en el Marketplace a precio suelo ganas menos de la mitad que en un juego (0,114 frente a 0,266).
+2. **Techo y datos:** en juegos hay evidencia de lanzamientos con millones de jugadores; en ropa solo hay anécdotas y estimaciones de terceros débiles. [08 §5][r08]
+3. **Cobro lento:** 30 días de retención por venta y 30.000 R$ de mínimo. Con ventas modestas el primer dinero real tarda de 2 a 7 meses o más. [08 §4.4][r08] [IDEA PROPIA] (cálculo)
+4. **Riesgo de plataforma ya materializado:** el recorte del 14-jul-2026 y 9 cambios en la página oficial de tarifas entre el 7-jul y el 9-oct. [08 §1, §2.5][r08]
+5. **Riesgo de contagio:** una infracción de IP o de normas en ropa puede costarte los Robux del ítem y hasta DevEx, **que es la misma cuenta que cobra tus juegos**. [OFICIAL] [08 §4.7][r08]
+
+### 9.2 Comparación
+
+| Aspecto | Juegos | Ropa y accesorios de avatar | Fuente |
+|---|---|---|---|
+| Ingreso esperado | Mediana ~1.500 USD/año de quienes ya cobran; top 1.000 ≈ 76 a 82 % | **Sin distribución oficial.** Terceros débiles: mediana de vendedor < 5.000 R$/mes (< 19 USD/mes); ~120.000 vendedores | [02 §4.2][r02], [08 §3.1][r08] |
+| Capital inicial | Plus 4,99 USD/mes o 1.000 R$ por juego + anuncios de prueba | Plus o Premium + ID verificado + **680 R$ por prenda 3D en capas** (80 de subida + 600 de anticipo, ≈ 2,58 USD al valor DevEx o ≈ 6,80 USD si compras Robux); 90 R$ por prenda clásica; 30 prendas ≈ 20.400 R$ | [08 §2.3, §4.4][r08] |
+| Requisitos del creador | 13+ para DevEx; 2FA y verificación para todas las edades | ID verificado (propio, o de un padre o tutor vinculado), 2FA, y **Plus o Premium activo para publicar y mantener a la venta** | [OFICIAL] [08 §2.2][r08] |
+| Tiempo hasta el primer ingreso | Semanas para un prototipo | 1 a 2 días a la venta (moderación hasta 24 h), pero primer **cobro** en 2 a 7+ meses | [08 §5][r08] |
+| Habilidad | Luau, diseño de juego, operación en vivo | Blender, rig y jaulas (3D) o casi nada (2D); ojo para el estilo | [08 §5][r08] |
+| Apalancamiento de IA | **Alto** (código, UI, datos) | **Medio**: texturas fáciles; malla y jaula necesitan limpieza y verificación visual; las mallas de IA suelen fallar la validación de Roblox (más de 4.000 triángulos, jaula, UV) | [08 §4.5][r08] |
+| Riesgo de IP | Medio (memes, marcas) | **Muy alto**: la IA reproduce logos, marcas y personajes con facilidad; el aviso de IP quita los Robux del ítem | [OFICIAL] [08 §4.7][r08] |
+| Saturación | Alta en formatos virales | Alta: ~12.000 ítems nuevos por semana [TERCERO débil] y regla de "no demasiado similares" | [08 §3.3][r08] |
+| Sinergia | Da tráfico propio para vender ítems a 70 % | Aporta cosméticos y marca a tus juegos | [08 §6.2][r08] |
+
+Tamaño de cartera de ropa para llegar a 100 USD netos al mes: ~877 unidades vendidas al mes a precio suelo, ~428 a 1,5x el suelo, ~263 a 2x [08 §4.4][r08] [IDEA PROPIA] (cálculo con un suelo hipotético de 100 R$, porque el real no se pudo ver: está en el panel de Creator Hub).
+
+### 9.3 Cómo entra la ropa en nuestro plan
+
+| Fase | Cuándo | Qué | Condición |
+|---|---|---|---|
+| 0. Verificar | Semana 0 (15 minutos) | Comprobar en Creator Hub el suelo de precio, si el reparto progresivo vale para 2D, el precio de Plus/Premium en tu país y si el ID verificado está disponible a tu edad | Siempre ([08 §7][r08]) |
+| 1. Tienda de avatar **dentro de Fish & Fortune** | Cuando el juego tenga ≥ 100 a 200 jugadores diarios | 5 a 10 ítems propios exclusivos del juego (70 % en lugar de 30 %), más 40 % de comisión por ítems de otros comprados en tu juego | Pasa G4 ([08 §6.2][r08]) |
+| 2. Piloto en el Marketplace | Desde S6, solo si respondes "ropa" o "las dos" en la pregunta 11 y tienes horas | **5 ítems 3D** (≈ 3.400 R$) con una sola base validada: medir tiempo por ítem, aprobación y suelo real | Plus activo; ID verificado |
+| 3. Escalar | Semanas 6 a 16 | 20 a 30 ítems en total | Solo si cumple los criterios de 9.4 |
+
+**No recomendado** al principio [08 §6.1][r08]: ropa clásica 2D como negocio en el Marketplace (a 5 R$ por prenda se cobra ~1,5 R$ por venta y hacen falta ~54 ventas solo para recuperar subida y anticipo), Limiteds pagados (5.000 a 20.000 R$ de anticipo) y accesorios con máscara emisiva (anticipo x5).
+
+### 9.4 Criterios para matar o duplicar la ropa
+
+Heurísticas [IDEA PROPIA] del informe 08 ([08 §6.3][r08]), con mínimo 20 ítems publicados y medidos a 30 y 60 días. Se calibran con tus datos.
+
+| Decisión | Condición |
+|---|---|
+| **Matar** la ropa en el Marketplace | Ventas medianas < 3 unidades por ítem y mes y ingresos acumulados < 1,0x lo gastado en el 60 % de los ítems; o una retirada por IP o normas |
+| **Mantener** | ≥ 50 % de los ítems con ≥ 5 unidades al mes y > 60 R$ por venta de media |
+| **Duplicar** | Un ítem con ≥ 100 unidades al mes a ≥ 1,5x el suelo, o 3 ítems con ≥ 30 unidades al mes: crear una colección diferenciada (5 a 8 piezas) |
+| **Matar la tienda dentro del juego** | Con ≥ 500 jugadores diarios durante 30 días, si las ventas de ítems son < 5 % de los Robux del juego |
+
+### 9.5 Pendiente de 09
+
+| Tema | Estado |
+|---|---|
+| Flujo de producción de ropa con IA (herramientas, tiempos, calidad, validación) | **Pendiente de 09** |
+| Costes de herramientas de ropa con IA | Pendiente de 09; mientras tanto, [05 §10][r05] da el stack general |
+| Plantillas oficiales y herramienta `clothing-gen` del repositorio (en `../tools/clothing-gen/`, en construcción) | Pendiente de 09 y del otro agente |
+
+Existe una carpeta con plantillas de ropa clásica en `../tools/clothing-gen/`. Que exista no hace de la ropa un mejor negocio: esa comparación ya está hecha arriba.
+
+**Regla vigente:** **juegos primero**, ropa como línea secundaria. La respuesta de Aryan a la pregunta 11 de [preguntas-para-aryan.md](preguntas-para-aryan.md) puede cambiarlo.
 
 ---
 
@@ -315,7 +381,8 @@ Existe una herramienta de plantillas de ropa en `../tools/clothing-gen/` (en con
 | Herramientas de IA para arte, audio y marketing; stacks de coste | [05 IA para assets y marketing][r05] |
 | Arquitectura técnica, compras, datos, CI, analítica | [06 stack técnico][r06] |
 | Descubrimiento, diseño, portafolio, puertas, 10 conceptos | [07 diseño, crecimiento y conceptos][r07] |
-| Ropa vs juegos y producción de ropa con IA | 08 y 09 (pendientes) |
+| Ropa vs juegos (reglas, reparto, economía, recomendación) | [08 ropa vs juegos][r08] |
+| Producción de ropa con IA | 09 (pendiente) |
 
 [r01]: ../research/01-mejores-juegos.md
 [r02]: ../research/02-monetizacion-y-economia.md
@@ -324,3 +391,4 @@ Existe una herramienta de plantillas de ropa en `../tools/clothing-gen/` (en con
 [r05]: ../research/05-ia-assets-y-marketing.md
 [r06]: ../research/06-stack-tecnico.md
 [r07]: ../research/07-diseno-crecimiento-y-conceptos.md
+[r08]: ../research/08-ropa-vs-juegos.md

@@ -1,0 +1,110 @@
+{
+  "id": "ff-04-evento-semanal",
+  "template": "custom",
+  "title": "Fish & Fortune — anuncio de evento semanal (16:9 para Discord/YouTube comunidad, ~16 s)",
+  "_nota": "Video de marca (NO es gameplay). Nombre, fechas y premios del evento son un EJEMPLO coherente con el plan (evento 1 = 15 dic, v1.2): cambiar por los datos reales del evento antes de publicar. Fechas SIEMPRE reales (sin urgencia falsa): inicio y fin deben coincidir con el config del juego.",
+  "aspect": "16:9",
+  "fps": 30,
+  "palette": {
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
+  },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
+  "fonts": [
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
+  ],
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "bg": {
+    "type": "gradient",
+    "particles": "sparks"
+  },
+  "hook": {
+    "kicker": "📅 NUEVO EVENTO",
+    "text": "Evento *Marea Brillante*",
+    "emoji": "🌟",
+    "chip": "Del 15 al 22 de diciembre",
+    "duration": 2.4
+  },
+  "scenes": [
+    {
+      "id": "que-hay",
+      "kind": "bullets",
+      "text": "Qué trae el *evento*",
+      "duration": 6.5,
+      "items": [
+        {
+          "emoji": "🐠",
+          "text": "Criaturas exclusivas del evento"
+        },
+        {
+          "emoji": "📖",
+          "text": "Nuevas entradas en el bestiario"
+        },
+        {
+          "emoji": "🎣",
+          "text": "Se pesca jugando, sin pagar"
+        }
+      ],
+      "narration": "Criaturas exclusivas, nuevas entradas en el bestiario y todo se consigue jugando.",
+      "captions": false
+    },
+    {
+      "id": "fechas",
+      "kind": "caption",
+      "text": "Del *15* al *22 de diciembre*",
+      "duration": 4.0,
+      "bg": {
+        "type": "rays",
+        "particles": "confetti"
+      },
+      "stickers": [
+        {
+          "emoji": "🗓️",
+          "at": 0.6,
+          "x": 0.5,
+          "y": 0.5,
+          "size": 240,
+          "rot": -6
+        }
+      ],
+      "narration": "Disponible del quince al veintidós de diciembre."
+    }
+  ],
+  "cta": {
+    "text": "¡Nos vemos en el *lago*!",
+    "sub": "Fish & Fortune · gratis en Roblox",
+    "button": "▶ JUGAR EN ROBLOX",
+    "emoji": "🎣"
+  },
+  "subtitles": false,
+  "audio": {
+    "music": {
+      "style": "chill",
+      "volume": 0.5
+    },
+    "sfx": true
+  },
+  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
+}
