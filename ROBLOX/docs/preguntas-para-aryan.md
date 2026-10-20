@@ -1,5 +1,11 @@
 # Preguntas para Aryan
 
+> **Actualización 2026-10-20: respuestas de Aryan.** Vive en **EE. UU.**, tiene **18 años o más**, publicará **como persona** y comprará las herramientas de IA que se recomienden.
+> Consecuencias: (1) el formulario fiscal que le toca es el **W-9**, no el W-8BEN (ese es para quienes no son de EE. UU.). Según la documentación oficial, con un W-9 válido en archivo no se exige retención de EE. UU. Se presenta en Creator Hub, en Finances > Taxes, y el 31-oct-2026 sigue siendo la fecha límite de los términos actuales. [OFICIAL] ([03 §5.4](../research/03-politicas-y-cumplimiento.md)).
+> (2) DevEx es para contribuyentes de EE. UU. con W-9; la tarifa mejorada de 0,0054 depende de que el JUGADOR sea de EE. UU., 18+ y verificado, no de dónde vive el creador.
+> (3) Al ser mayor de edad puede verificar su identidad él mismo, sin cuenta parental.
+> (4) Donde este documento diga «W-8BEN», léase **W-9** para Aryan; el resto de los datos no cambia. Pendiente: que un contador le confirme sus propios impuestos como creador de EE. UU. (esto no es asesoría fiscal).
+
 Estas son las cosas que **solo tú puedes responder** y que cambian decisiones del [informe maestro](informe-maestro.md) y del [plan de 90 días](plan-90-dias.md). Cada pregunta dice por qué importa y qué decidiremos según tu respuesta.
 
 Cómo responder: contesta en el chat o rellena la hoja del final. Una respuesta corta basta ("España, 24 años, persona"). Si no lo sabes, di "no sé" y lo averiguamos juntos.
