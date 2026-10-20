@@ -261,14 +261,10 @@ end
 
 function matchers.toHaveLength(self, n)
 	local actual = self._actual
-	local length
-	if type(actual) == "string" then
-		length = #actual
-	elseif type(actual) == "table" then
-		length = #actual
-	else
+	if type(actual) ~= "string" and type(actual) ~= "table" then
 		fail("toHaveLength: expected a string or table, got " .. format(actual))
 	end
+	local length = #actual
 	check(self, length == n, "expected length " .. tostring(n) .. " but got " .. tostring(length), "expected length not to be " .. tostring(n))
 end
 

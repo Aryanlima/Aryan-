@@ -107,21 +107,17 @@ function Players:AddPlayer(userId: number, name: string?, props: { [string]: any
 end
 
 function Players:RemovePlayer(player)
-	for i, candidate in self._list do
-		if candidate == player then
-			self.PlayerRemoving:Fire(player)
-			-- el evento corre antes de quitarlo (como en Roblox); si el handler ya lo quito, no repetir
-			for j, other in self._list do
-				if other == player then
-					table.remove(self._list, j)
-					break
-				end
-			end
-			player.Parent = nil
-			return true
-		end
+	if table.find(self._list, player) == nil then
+		return false
 	end
-	return false
+	-- PlayerRemoving se dispara con el jugador aun presente (como en Roblox)
+	self.PlayerRemoving:Fire(player)
+	local index = table.find(self._list, player)
+	if index then
+		table.remove(self._list, index)
+	end
+	player.Parent = nil
+	return true
 end
 
 function Players:GetPlayers()

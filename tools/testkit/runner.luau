@@ -366,10 +366,10 @@ function Runner:run(options: { exit: boolean?, silent: boolean?, filter: string?
 					local ms = (os.clock() - t0) * 1000
 					if ok then
 						record(name, "passed", nil, ms)
-						out(string.format("%s  \u{2713} %s (%.0fms)", indent, item.name, ms))
+						out(string.format("%s  ✓ %s (%.0fms)", indent, item.name, ms))
 					else
 						record(name, "failed", err, ms)
-						out(string.format("%s  \u{2717} %s", indent, item.name))
+						out(string.format("%s  ✗ %s", indent, item.name))
 						for line in string.gmatch(tostring(err.message) .. "\n", "(.-)\n") do
 							out(indent .. "      " .. line)
 						end
@@ -387,7 +387,7 @@ function Runner:run(options: { exit: boolean?, silent: boolean?, filter: string?
 			local ok, err = runHooks(suite.afterAll, "afterAll", suite.name)
 			if not ok then
 				record(fullName(suite, "(afterAll)"), "failed", err, 0)
-				out(indent .. "  \u{2717} (afterAll) " .. tostring(err.message))
+				out(indent .. "  ✗ (afterAll) " .. tostring(err.message))
 			end
 		end
 	end

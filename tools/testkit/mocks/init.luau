@@ -111,7 +111,7 @@ function Mocks.new(options)
 		if not okSet then
 			return false
 		end
-		function env:restoreGlobals()
+		env.restoreGlobals = function()
 			globalEnv.Enum = previous.Enum
 			globalEnv.game = previous.game
 			globalEnv.task = previous.task
