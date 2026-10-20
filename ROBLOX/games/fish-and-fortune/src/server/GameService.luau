@@ -106,9 +106,12 @@ function GameService.start(m: any)
 
 	-- En Studio sin acceso a la API de DataStores se usa un almacen en memoria (SIN persistencia) para poder jugar.
 	local function pickDataStore(): any
-		local realStore = DataStoreService:GetDataStore(DATASTORE_NAME)
+		-- GetDataStore tambien lanza en un lugar sin publicar: va dentro del pcall.
+		local gotStore, realStore = pcall(function()
+			return DataStoreService:GetDataStore(DATASTORE_NAME)
+		end)
 		if RunService:IsStudio() then
-			local reachable = pcall(function()
+			local reachable = gotStore and pcall(function()
 				realStore:GetAsync("__studio_probe")
 			end)
 			if not reachable then
@@ -116,6 +119,8 @@ function GameService.start(m: any)
 				return m.StudioMemoryStore.new()
 			end
 			warn("[Data] Studio con acceso a la API: se escribe en el DataStore REAL. Usa un lugar de pruebas.")
+		elseif not gotStore then
+			error(realStore, 0) -- un servidor real sin DataStores no debe arrancar con datos en memoria
 		end
 		return realStore
 	end
