@@ -1,0 +1,20 @@
+{
+  "name": "roblox-promo-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Renderizador de videos promocionales dirigido por datos (spec JSON -> HTML/Canvas -> Playwright -> ffmpeg MP4).",
+  "bin": { "render": "./render.mjs" },
+  "scripts": {
+    "render": "node render.mjs",
+    "example": "node render.mjs specs/ejemplo-gancho.json out/ejemplo-gancho.mp4",
+    "examples": "node render.mjs --all specs out"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  },
+  "optionalDependencies": {
+    "mespeak": "2.0.2"
+  }
+}
