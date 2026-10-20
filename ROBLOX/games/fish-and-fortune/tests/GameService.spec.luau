@@ -656,3 +656,126 @@ describe("GameService: arranque y personaje", function()
 		env.clock:assertNoErrors()
 	end)
 end)
+
+----------------------------------------------------------------------------
+-- Arte generado (opcional): GameService solo delega en m.ArtDirector (ver server/ArtDirector.luau)
+----------------------------------------------------------------------------
+
+local function fakeArtDirector(attachResult)
+	local director = { provider = { isFakeProvider = true }, rods = {}, catches = {}, statusLogged = 0 }
+	director.attachRod = function(rodId, hand, character)
+		table.insert(director.rods, { rodId = rodId, hand = hand, character = character })
+		return attachResult
+	end
+	director.showCatch = function(info)
+		table.insert(director.catches, info)
+		return true
+	end
+	director.logStatus = function()
+		director.statusLogged += 1
+	end
+	return director
+end
+
+local function castUntilMythic(world, player)
+	for _ = 1, 4 do
+		world.fire(player, "Cast")
+		world.env.clock:advance(0.8)
+		local started = world.sentTo("CastStarted")
+		world.fire(player, "Reel", started[#started].args[1].id, 0.8)
+		world.env.clock:advance(1.2)
+	end
+end
+
+describe("GameService con arte generado (ArtDirector opcional)", function()
+	it("SIN ArtDirector: WorldBuilder no recibe proveedor y la cana es la procedural de siempre", function()
+		local world = buildWorld()
+		expect(world.builtWithArt).toBeNil()
+		local player = world.join()
+		local character = fakeCharacter()
+		player.Character = character
+		player.CharacterAdded:Fire(character)
+		world.env.clock:advance(0.1)
+		expect(lastRodColor(world)).toEqual(rodColor(world, "driftwood"))
+		world.env.clock:assertNoErrors()
+	end)
+
+	it("CON ArtDirector: entrega su proveedor a WorldBuilder y registra el resumen de arranque una vez", function()
+		local director = fakeArtDirector(false)
+		local world = buildWorld({ artDirector = director })
+		expect(world.builtWithArt).toBe(director.provider)
+		expect(director.statusLogged).toBe(1)
+	end)
+
+	it("cana de arte: si attachRod devuelve true NO se crea la cana procedural", function()
+		local director = fakeArtDirector(true)
+		local world = buildWorld({ artDirector = director })
+		local player = world.join()
+		local data = world.api.manager:get(USER).data
+		data.rod = "reed"
+		local character = fakeCharacter()
+		player.Character = character
+		player.CharacterAdded:Fire(character)
+		world.env.clock:advance(0.1)
+		expect(#director.rods >= 1).toBe(true)
+		local last = director.rods[#director.rods]
+		expect(last.rodId).toBe("reed")
+		expect(last.character).toBe(character)
+		expect(last.hand.Name).toBe("RightHand")
+		expect(lastRodColor(world)).toBeNil() -- ninguna Part "FishingRod" procedural
+		world.env.clock:assertNoErrors()
+	end)
+
+	it("cana sin arte valido: attachRod devuelve false y se usa el respaldo procedural", function()
+		local director = fakeArtDirector(false)
+		local world = buildWorld({ artDirector = director })
+		local player = world.join()
+		local character = fakeCharacter()
+		player.Character = character
+		player.CharacterAdded:Fire(character)
+		world.env.clock:advance(0.1)
+		expect(#director.rods >= 1).toBe(true)
+		expect(lastRodColor(world)).toEqual(rodColor(world, "driftwood"))
+	end)
+
+	it("captura Mitica: showCatch recibe zona, criatura, rareza, punto de lanzamiento y auto=false", function()
+		local director = fakeArtDirector(false)
+		local world = buildWorld({
+			artDirector = director,
+			random = function()
+				return 0.99999
+			end,
+		})
+		local player = world.join()
+		castUntilMythic(world, player)
+		local catches = world.sentTo("Catch")
+		expect(catches[4].args[1].rarity).toBe("Mythic")
+		expect(#director.catches).toBe(4) -- una llamada por captura (el director decide si la muestra)
+		local mythic = director.catches[4]
+		expect(mythic.rarity).toBe("Mythic")
+		expect(mythic.zone).toBe("lake")
+		expect(mythic.creatureId).toBe(catches[4].args[1].id)
+		expect(mythic.position).toEqual({ castOf = "lake" })
+		expect(mythic.auto).toBe(false)
+		world.env.clock:assertNoErrors()
+	end)
+
+	it("si showCatch falla, la captura, el banner y el guardado siguen intactos", function()
+		local director = fakeArtDirector(false)
+		director.showCatch = function()
+			error("fallo del escaparate")
+		end
+		local world = buildWorld({
+			artDirector = director,
+			random = function()
+				return 0.99999
+			end,
+		})
+		local player = world.join()
+		castUntilMythic(world, player)
+		expect(world.sentTo("Catch")[4].args[1].rarity).toBe("Mythic")
+		expect(#world.sentTo("Banner") >= 1).toBe(true)
+		expect(world.api.manager:get(USER).data.bestiary ~= nil).toBe(true)
+		world.env.clock:assertNoErrors()
+	end)
+end)

@@ -55,14 +55,18 @@ local function withText(
 end
 
 function Catalog.build(
-	ids: { passes: { [string]: number }, products: { [string]: number } },
+	ids: {
+		passes: { [string]: number },
+		products: { [string]: number },
+		passAssetIds: { [string]: number }?,
+	},
 	balance: any,
 	flags: { paidLuckEnabled: boolean }?,
 	text: Text?
 ): any
 	local products = balance.products
 	local paidLuckEnabled = flags ~= nil and flags.paidLuckEnabled == true -- por defecto APAGADO (v1)
-	return {
+	local catalog = {
 		priceLadder = Catalog.ladder,
 		passes = {
 			auto_fish = withText(text, "pass.auto_fish", { hours = balance.offline.autoFishCapSeconds / 3600 }, {
@@ -170,6 +174,23 @@ function Catalog.build(
 			}),
 		},
 	}
+
+	-- REVIEW(money): alias opcional por pase (ProductIds.passAssetIds): el assetId del pase cuando difiere de su TargetId.
+	-- Solo sirve para reconocer PromptGamePassPurchaseFinished y como respaldo de precios; nunca para vender ni conceder.
+	if ids.passAssetIds ~= nil then
+		for key, assetId in ids.passAssetIds do
+			local pass = catalog.passes[key]
+			if pass ~= nil then
+				pass.assetId = assetId
+			else
+				-- Clave desconocida (error al pegar IDs): queda visible para Shop.validateCatalog en lugar de ignorarse.
+				local alias = "unknown_asset_alias_" .. key
+				catalog.passes[alias] =
+					{ key = alias, id = 0, assetId = assetId, name = "", description = "", enabled = false }
+			end
+		end
+	end
+	return catalog
 end
 
 return Catalog

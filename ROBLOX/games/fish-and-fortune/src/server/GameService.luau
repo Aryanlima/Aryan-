@@ -52,7 +52,12 @@ function GameService.start(m: any)
 			name = spanish("zone." .. zoneId .. ".name"),
 		})
 	end
-	local world = m.WorldBuilder.build(zoneList)
+	-- Arte generado (opcional): sin `m.ArtDirector` el mundo, la cana y las capturas son los procedurales de siempre.
+	local art = m.ArtDirector
+	local world = m.WorldBuilder.build(zoneList, if art ~= nil then art.provider else nil)
+	if art ~= nil then
+		art.logStatus()
+	end
 
 	----------------------------------------------------------------------------
 	-- Paquetes
@@ -437,7 +442,7 @@ function GameService.start(m: any)
 		end)
 	end
 
-	local function onCatch(player: Player, profile: any, result: any)
+	local function onCatch(player: Player, profile: any, result: any, isAuto: boolean?)
 		profile:markDirty()
 		local data = profile.data
 		net:fireClient("Catch", player, {
@@ -457,6 +462,17 @@ function GameService.start(m: any)
 		end
 		if result.rarity == "Mythic" then
 			announceMythic(player, result)
+		end
+		local castPosition = world.castTargets[result.zone]
+		if art ~= nil and castPosition ~= nil then
+			-- Escaparate de la criatura (solo si hay arte de ella; ver ArtDirector). Nunca debe afectar a la captura.
+			pcall(art.showCatch, {
+				zone = result.zone,
+				creatureId = result.creatureId,
+				rarity = result.rarity,
+				position = castPosition,
+				auto = isAuto == true,
+			})
 		end
 		markDirty(player)
 	end
@@ -507,6 +523,9 @@ function GameService.start(m: any)
 		local hand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
 		if hand == nil or not hand:IsA("BasePart") then
 			return
+		end
+		if art ~= nil and art.attachRod(rodId, hand, character) then
+			return -- cana de arte generado; si no hay (o se rechaza), sigue el respaldo procedural
 		end
 		local part = Instance.new("Part")
 		part.Name = "FishingRod"
@@ -928,7 +947,7 @@ function GameService.start(m: any)
 					runtime.nextAutoAt = now + logic:autoInterval(profile.data)
 					local result = logic:autoCast(profile.data, context(player))
 					if result ~= nil then
-						onCatch(player, profile, result)
+						onCatch(player, profile, result, true)
 					end
 				end
 			end

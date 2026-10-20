@@ -214,12 +214,15 @@ local function buildWorld(overrides)
 		FeatureFlags = opts.flags or load(GAME .. "shared/FeatureFlags.luau"),
 		GameLogic = load(GAME .. "server/GameLogic.luau"),
 		Catalog = load(GAME .. "server/Catalog.luau"),
-		ProductIds = FAKE_IDS,
+		ProductIds = opts.productIds or FAKE_IDS, -- opts.productIds: IDs a probar (p. ej. los REALES de ProductIds.luau)
 		Schema = load(GAME .. "server/Schema.luau"),
 		WorldBuilder = {
-			build = function(zones)
+			build = function(zones, art)
+				world.builtWithArt = art -- opts.artDirector: el proveedor de arte que GameService entrega a WorldBuilder
 				local spawns = {}
+				local castTargets = {}
 				for _, zone in zones do
+					castTargets[zone.id] = if opts.artDirector then { castOf = zone.id } else nil
 					-- Vector3 falso: `spawn + Vector3.new(...)` devuelve { zone = id } para poder comprobar a donde se viaja
 					spawns[zone.id] = setmetatable({ zone = zone.id }, {
 						__add = function(self)
@@ -227,11 +230,12 @@ local function buildWorld(overrides)
 						end,
 					})
 				end
-				return { spawns = spawns, castTargets = {} }
+				return { spawns = spawns, castTargets = castTargets }
 			end,
 		},
 		StudioMemoryStore = load(GAME .. "server/StudioMemoryStore.luau"),
 		LiveOpsDefaults = load(GAME .. "server/LiveOpsDefaults.luau"),
+		ArtDirector = opts.artDirector, -- opcional (nil = sin arte generado, como siempre)
 	}
 	local GameService = load(GAME .. "server/GameService.luau")
 	world.api = GameService.start(m)

@@ -1,0 +1,671 @@
+{
+  "$comment": "Manifiesto de arte generado de Fish & Fortune. Fuente de los PROMPTS; los perfiles de tiempo de ejecucion estan en src/shared/ArtProfiles.luau (tests/ArtProfiles.spec.luau comprueba que coinciden). Ver ROBLOX/docs/arte-con-ia-en-studio.md.",
+  "version": 1,
+  "game": "fish-and-fortune",
+  "updated": "2026-10-20",
+  "folders": {
+    "root": "ServerStorage/Art",
+    "layout": "ServerStorage/Art/<category>/<id>  (Model con el nombre exacto del id; creatures | rods | props)",
+    "materials": "MaterialService/FF_<id>  (MaterialVariant)",
+    "repoModels": "art/models/<category>/<id>.rbxm  (opcional: ver docs)"
+  },
+  "tools": {
+    "mesh": "generate_mesh",
+    "material": "generate_material",
+    "toolInputs": "Documentado [OFICIAL leido 2026-10-20, assistant/guide.md]: texto O imagen (no ambos), Part opcional como caja contenedora, recuento maximo de triangulos opcional (por defecto 10.000). Los nombres exactos de los parametros del MCP NO estan documentados: leer el esquema de la herramienta antes de llamarla."
+  },
+  "limits": {
+    "hardMaxTrianglesPerMesh": 20000,
+    "toolDefaultMaxTriangles": 10000,
+    "materialsPerMesh": 1,
+    "uvSetsPerMesh": 1,
+    "proceduralModelsPer24h": 50,
+    "meshGenerationQuota": "NO DOCUMENTADA. Limite propio prudente: 12 llamadas a generate_mesh por dia (cuentan los reintentos) y 8 a generate_material; parar al primer aviso de limite y seguir 24 h despues.",
+    "retriesPerPiece": 2
+  },
+  "styleBlock": "stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object",
+  "paletteBlock": "accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white",
+  "constraintsBlock": "Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces",
+  "negative": [
+    "text",
+    "logos",
+    "coins",
+    "money",
+    "dice",
+    "playing cards",
+    "casino look",
+    "weapons",
+    "blood",
+    "scary look",
+    "human faces",
+    "real brands",
+    "copyrighted characters",
+    "base plate",
+    "floating pieces"
+  ],
+  "materialStyleBlock": "stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+  "acceptance": [
+    "Legible a distancia: la silueta se reconoce desde ~40 studs (captura con screen_capture a esa distancia)",
+    "Estilo coherente con el brand kit: 3D cartoon suave, redondeado, colores saturados sin neon",
+    "Triangulos <= maxTriangles de la pieza (y siempre < 20.000)",
+    "Un solo material/textura por malla y un solo juego de UV; sin partes sueltas ni flotando",
+    "Sin texto, logos, monedas, dados, cartas ni estetica de casino; sin rostros humanos; sin parecido con personajes o marcas conocidas",
+    "Frente hacia -Z, alto en Y, sin girar (orientacion 0,0,0); si sale de lado, anotar la rotacion necesaria en el informe",
+    "Solo clases permitidas dentro del modelo (Model, Folder, MeshPart, Part, WedgePart, SurfaceAppearance, Decal, Texture, Attachment, WeldConstraint) y NINGUN script"
+  ],
+  "batches": [
+    {
+      "id": "lote-1",
+      "day": 1,
+      "theme": "Miticos y muelle (mayor impacto visual)",
+      "meshCalls": 12,
+      "pieces": [
+        "lake_spirit",
+        "river_queen",
+        "tide_leviathan",
+        "pier",
+        "lantern",
+        "rowboat"
+      ]
+    },
+    {
+      "id": "lote-2",
+      "day": 2,
+      "theme": "Criaturas representativas (Epico a Poco comun)",
+      "meshCalls": 12,
+      "pieces": [
+        "moon_koi",
+        "ancient_carp",
+        "crystal_pike",
+        "manta",
+        "golden_trout",
+        "bluegill"
+      ]
+    },
+    {
+      "id": "lote-3",
+      "day": 3,
+      "theme": "Pez comun y las 5 canas",
+      "meshCalls": 12,
+      "pieces": [
+        "minnow",
+        "driftwood",
+        "reed",
+        "fiberglass",
+        "carbon",
+        "golden"
+      ]
+    },
+    {
+      "id": "lote-4",
+      "day": 4,
+      "theme": "Arboles y materiales (+ reintentos pendientes)",
+      "meshCalls": 12,
+      "materialCalls": 8,
+      "pieces": [
+        "pine_tree",
+        "palm_tree",
+        "ground_lake",
+        "ground_river",
+        "ground_coast",
+        "pier_wood"
+      ]
+    }
+  ],
+  "pieces": [
+    {
+      "id": "lake_spirit",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Mythic",
+      "priority": 1,
+      "targetSize": [
+        3.5,
+        4.0,
+        10.0
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 8000,
+      "maxParts": 8,
+      "subject": "A giant gentle whale-like lake spirit, smooth rounded body, kind calm eyes, glowing magenta and teal bioluminescent patterns painted along its flanks, translucent soft fins",
+      "prompt": "A giant gentle whale-like lake spirit, smooth rounded body, kind calm eyes, glowing magenta and teal bioluminescent patterns painted along its flanks, translucent soft fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A giant gentle whale-like creature, smooth rounded body, kind eyes, magenta and teal glowing stripes along the body. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A giant gentle whale-like creature, smooth rounded body, kind eyes, magenta and teal glowing stripes along the body. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Mitico del Lago Calmo (la estrella del banner global). Los brillos van PINTADOS en el cuerpo, sin particulas sueltas.",
+      "batch": "lote-1"
+    },
+    {
+      "id": "river_queen",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "river",
+      "rarity": "Mythic",
+      "priority": 1,
+      "targetSize": [
+        3.0,
+        3.6,
+        9.0
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 8000,
+      "maxParts": 8,
+      "subject": "A graceful royal river fish with a long flowing veil-like tail, pearly white and lagoon teal scales, a small elegant crest of fins on its head, gentle serene eyes",
+      "prompt": "A graceful royal river fish with a long flowing veil-like tail, pearly white and lagoon teal scales, a small elegant crest of fins on its head, gentle serene eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A graceful long river fish with a flowing tail, pearly white and teal scales, small fin crest on the head. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A graceful long river fish with a flowing tail, pearly white and teal scales, small fin crest on the head. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Mitico del Rio Cristal. Que no parezca una persona ni lleve corona de verdad: la 'corona' es una cresta de aletas.",
+      "batch": "lote-1"
+    },
+    {
+      "id": "tide_leviathan",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "coast",
+      "rarity": "Mythic",
+      "priority": 1,
+      "targetSize": [
+        5.0,
+        5.0,
+        15.0
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 8000,
+      "maxParts": 8,
+      "subject": "A colossal but friendly sea serpent-whale of the tides, long rounded body, coral orange and deep ocean blue stripes, kind eyes, glowing teal ridges along its back fins",
+      "prompt": "A colossal but friendly sea serpent-whale of the tides, long rounded body, coral orange and deep ocean blue stripes, kind eyes, glowing teal ridges along its back fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A huge friendly sea creature with a long rounded body, orange and blue stripes, kind eyes, teal fin ridges. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A huge friendly sea creature with a long rounded body, orange and blue stripes, kind eyes, teal fin ridges. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Mitico de la Costa Dorada; el mas grande (15 studs). Debe verse amigable, no amenazante.",
+      "batch": "lote-1"
+    },
+    {
+      "id": "pier",
+      "category": "props",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 1,
+      "batch": "lote-1",
+      "targetSize": [
+        8,
+        5,
+        44
+      ],
+      "fit": "contain",
+      "pivot": "bottom",
+      "maxTriangles": 8000,
+      "maxParts": 12,
+      "subject": "A long narrow wooden fishing pier with weathered planks on top, thick wooden support posts going down underneath, small rope detail on the posts, flat walkable deck",
+      "prompt": "A long narrow wooden fishing pier with weathered planks on top, thick wooden support posts going down underneath, small rope details on the posts, flat walkable deck, long side along the front-back axis, deck about 70 percent of the way up from the bottom of the posts. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 5 x 44 studs so the pier keeps its long narrow proportions. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple long wooden pier, flat plank deck and chunky support posts underneath, long narrow shape. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 5 x 44 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A very simple toy-like wooden dock, one long flat deck of planks on chunky posts, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 5 x 44 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Sustituye el muelle procedural. Es SOLO visual: la cubierta por la que se camina sigue siendo una parte invisible propia a la altura de siempre (y=1,7). Revisar que la cubierta del modelo quede a esa altura (+-0,5) y, si no, ajustar `offset` en ArtProfiles/manifest."
+    },
+    {
+      "id": "lantern",
+      "category": "props",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 1,
+      "batch": "lote-1",
+      "targetSize": [
+        1.2,
+        4.2,
+        1.2
+      ],
+      "fit": "height",
+      "pivot": "bottom",
+      "maxTriangles": 1500,
+      "maxParts": 6,
+      "subject": "A small wooden lamp post with a warm glowing glass lantern on top, simple metal cap, cozy",
+      "prompt": "A small wooden lamp post with a warm glowing glass lantern on top, simple metal cap, cozy golden glow painted into the glass, narrow and tall. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 1.2 x 4.2 x 1.2 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple lamp post: thin wooden pole with a chunky glowing lantern box on top. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 1.2 x 4.2 x 1.2 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A toy-like lamp post, short pole and one big round warm glowing lantern, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 1.2 x 4.2 x 1.2 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Farola decorativa (6 por muelle). No existe version procedural: sin arte NO aparece. Una sola malla ligera (< 1.500 triangulos) porque se clona 6 veces por zona."
+    },
+    {
+      "id": "rowboat",
+      "category": "props",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-1",
+      "targetSize": [
+        3.6,
+        1.8,
+        8.5
+      ],
+      "fit": "contain",
+      "pivot": "bottom",
+      "maxTriangles": 3000,
+      "maxParts": 8,
+      "subject": "A small wooden rowboat with two oars resting inside, painted teal stripe along the side, rounded cartoon hull",
+      "prompt": "A small wooden rowboat with two oars resting inside, a lagoon teal stripe painted along the side, rounded cartoon hull, bow pointing forward. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 3.6 x 1.8 x 8.5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple small wooden rowboat, rounded hull, oars lying inside. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 3.6 x 1.8 x 8.5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A toy-like little boat, chunky rounded hull and a bench, no oars, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 3.6 x 1.8 x 8.5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Barca amarrada junto al muelle (una por zona). Sin version procedural. Debe quedar con la quilla justo en el agua (base en y=0,15)."
+    },
+    {
+      "id": "moon_koi",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Epic",
+      "priority": 2,
+      "targetSize": [
+        1.6,
+        2.0,
+        4.4
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 4000,
+      "maxParts": 8,
+      "subject": "A pale moon-colored koi fish with violet shimmer patterns and crescent-shaped markings on its flanks, long flowing translucent fins",
+      "prompt": "A pale moon-colored koi fish with violet shimmer patterns and crescent-shaped markings on its flanks, long flowing translucent fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A pale cream-white koi fish with violet crescent markings, flowing fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A pale cream-white koi fish with violet crescent markings, flowing fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Epico del Lago. Referencia visual: plata lunar + violeta (#A66BFF).",
+      "batch": "lote-2"
+    },
+    {
+      "id": "ancient_carp",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Legendary",
+      "priority": 2,
+      "targetSize": [
+        2.2,
+        2.8,
+        6.0
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 6000,
+      "maxParts": 8,
+      "subject": "An ancient golden carp with moss patches on its scales and long flowing whisker-like barbels, wise calm expression",
+      "prompt": "An ancient golden carp with moss patches on its scales and long flowing whisker-like barbels, wise calm expression. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A big golden carp with green moss patches and long whiskers, calm eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A big golden carp with green moss patches and long whiskers, calm eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Legendaria del Lago. Dorado (#FFB020) con musgo verde.",
+      "batch": "lote-2"
+    },
+    {
+      "id": "crystal_pike",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "river",
+      "rarity": "Epic",
+      "priority": 2,
+      "targetSize": [
+        1.6,
+        2.0,
+        4.4
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 4000,
+      "maxParts": 8,
+      "subject": "A sleek pike fish with translucent crystal-blue scales and softly faceted fins, long streamlined body, gentle expression",
+      "prompt": "A sleek pike fish with translucent crystal-blue scales and softly faceted fins, long streamlined body, gentle expression. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A sleek long fish with light blue crystal-looking scales, friendly eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A sleek long fish with light blue crystal-looking scales, friendly eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Epico del Rio. Aspecto cristalino sin ser puntiagudo ni amenazante.",
+      "batch": "lote-2"
+    },
+    {
+      "id": "manta",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "coast",
+      "rarity": "Epic",
+      "priority": 2,
+      "targetSize": [
+        6.0,
+        1.5,
+        4.5
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 4000,
+      "maxParts": 8,
+      "subject": "A friendly manta ray with wide rounded wing-like fins, dark teal back with soft white spots, small smiling mouth, long thin tail",
+      "prompt": "A friendly manta ray with wide rounded wing-like fins, dark teal back with soft white spots, small smiling mouth, long thin tail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A friendly flat manta ray with wide rounded wings, dark teal back with white spots. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A friendly flat manta ray with wide rounded wings, dark teal back with white spots. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Epico de la Costa. Silueta ancha y plana (6 studs de envergadura).",
+      "batch": "lote-2"
+    },
+    {
+      "id": "golden_trout",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Rare",
+      "priority": 2,
+      "targetSize": [
+        1.2,
+        1.5,
+        3.4
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 3000,
+      "maxParts": 8,
+      "subject": "A trout with golden speckled scales, olive green back and a soft blue glow along its fins, friendly eyes",
+      "prompt": "A trout with golden speckled scales, olive green back and a soft blue glow along its fins, friendly eyes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A round trout with golden speckles and blue-tinted fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A round trout with golden speckles and blue-tinted fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Rara del Lago.",
+      "batch": "lote-2"
+    },
+    {
+      "id": "bluegill",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Uncommon",
+      "priority": 2,
+      "targetSize": [
+        1.0,
+        1.3,
+        2.8
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 2000,
+      "maxParts": 8,
+      "subject": "A bluegill-like sunfish with bright blue gill covers and a green-striped olive body, round body, big friendly eye",
+      "prompt": "A bluegill-like sunfish with bright blue gill covers and a green-striped olive body, round body, big friendly eye. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A round sunfish with a blue cheek patch and green stripes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A round sunfish with a blue cheek patch and green stripes. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Poco comun del Lago.",
+      "batch": "lote-2"
+    },
+    {
+      "id": "minnow",
+      "category": "creatures",
+      "kind": "mesh",
+      "zone": "lake",
+      "rarity": "Common",
+      "priority": 2,
+      "targetSize": [
+        0.8,
+        1.0,
+        2.2
+      ],
+      "fit": "contain",
+      "pivot": "center",
+      "maxTriangles": 1500,
+      "maxParts": 8,
+      "subject": "A small round silver minnow fish, plain pale belly, tiny friendly eye, simple smooth fins",
+      "prompt": "A small round silver minnow fish, plain pale belly, tiny friendly eye, simple smooth fins. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A tiny round silver fish, simple fins, one big friendly eye. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, very simple low-poly friendly shape. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A tiny round silver fish, simple fins, one big friendly eye. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. The fish faces forward (nose toward the front), belly down, fins slightly spread, symmetrical left to right, chunky toy-like proportions, big readable shapes, minimal detail. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Comun del Lago; la que mas se ve. Debe ser MUY ligera.",
+      "batch": "lote-3"
+    },
+    {
+      "id": "driftwood",
+      "category": "rods",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-3",
+      "targetSize": [
+        0.6,
+        0.9,
+        5.0
+      ],
+      "fit": "length",
+      "pivot": "back",
+      "maxTriangles": 1500,
+      "maxParts": 8,
+      "subject": "A simple fishing rod made of weathered driftwood, slightly curved, grip wrapped with twine, small plain wooden reel",
+      "prompt": "A simple fishing rod made of weathered driftwood, slightly curved, grip wrapped with twine, small plain wooden reel. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Very long and thin, laid out straight along the front-back axis with the grip at the back and the tip at the front, a small reel under the grip, tiny line guides. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple curved wooden fishing rod with a twine-wrapped grip. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Long and thin, straight, grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A plain long straight fishing rod with a chunky grip and a simple reel, toy-like, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Cana inicial (la que ven todos los jugadores nuevos). La punta debe verse aunque sea fina."
+    },
+    {
+      "id": "reed",
+      "category": "rods",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-3",
+      "targetSize": [
+        0.6,
+        0.9,
+        5.0
+      ],
+      "fit": "length",
+      "pivot": "back",
+      "maxTriangles": 1500,
+      "maxParts": 8,
+      "subject": "A fishing rod made of green bamboo-like reed segments with small knots, leaf-green wrapped handle, small brass-colored reel",
+      "prompt": "A fishing rod made of green bamboo-like reed segments with small knots, leaf-green wrapped handle, small brass-colored reel. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Very long and thin, laid out straight along the front-back axis with the grip at the back and the tip at the front, a small reel under the grip, tiny line guides. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A green bamboo fishing rod with a small reel. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Long and thin, straight, grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A plain long straight fishing rod with a chunky grip and a simple reel, toy-like, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Cana de Junco (120 monedas)."
+    },
+    {
+      "id": "fiberglass",
+      "category": "rods",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-3",
+      "targetSize": [
+        0.6,
+        0.9,
+        5.0
+      ],
+      "fit": "length",
+      "pivot": "back",
+      "maxTriangles": 2000,
+      "maxParts": 8,
+      "subject": "A bright ocean-blue modern fishing rod with white wraps and a small cartoon reel, glossy finish",
+      "prompt": "A bright ocean-blue modern fishing rod with white wraps and a small cartoon reel, glossy finish. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Very long and thin, laid out straight along the front-back axis with the grip at the back and the tip at the front, a small reel under the grip, tiny line guides. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A bright blue fishing rod with a white grip and a small reel. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Long and thin, straight, grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A plain long straight fishing rod with a chunky grip and a simple reel, toy-like, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Cana de Fibra (2.500 monedas)."
+    },
+    {
+      "id": "carbon",
+      "category": "rods",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-3",
+      "targetSize": [
+        0.6,
+        0.9,
+        5.0
+      ],
+      "fit": "length",
+      "pivot": "back",
+      "maxTriangles": 2500,
+      "maxParts": 8,
+      "subject": "A sleek matte dark-gray carbon fishing rod with silver accents, streamlined reel, teal wrapped grip",
+      "prompt": "A sleek matte dark-gray carbon fishing rod with silver accents, streamlined reel, teal wrapped grip. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Very long and thin, laid out straight along the front-back axis with the grip at the back and the tip at the front, a small reel under the grip, tiny line guides. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A sleek dark gray fishing rod with silver details and a teal grip. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Long and thin, straight, grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A plain long straight fishing rod with a chunky grip and a simple reel, toy-like, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Cana de Carbono (30.000 monedas)."
+    },
+    {
+      "id": "golden",
+      "category": "rods",
+      "kind": "mesh",
+      "zone": "all",
+      "priority": 2,
+      "batch": "lote-3",
+      "targetSize": [
+        0.6,
+        0.9,
+        5.0
+      ],
+      "fit": "length",
+      "pivot": "back",
+      "maxTriangles": 3500,
+      "maxParts": 8,
+      "subject": "An ornate fishing rod with a golden shine, teal wrapped grip, a small star-shaped decoration at the tip and a shell-shaped reel",
+      "prompt": "An ornate fishing rod with a golden shine, teal wrapped grip, a small star-shaped decoration at the tip and a shell-shaped reel. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Very long and thin, laid out straight along the front-back axis with the grip at the back and the tip at the front, a small reel under the grip, tiny line guides. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A shiny golden fishing rod with a teal grip and a small star near the tip. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Long and thin, straight, grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A plain long straight fishing rod with a chunky grip and a simple reel, toy-like, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Grip at the back, tip at the front. Use a bounding box Part of 0.6 x 0.9 x 5 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Cana Dorada (400.000 monedas): la mas deseada. Nada de monedas ni dinero en el diseno: el dorado es solo el color."
+    },
+    {
+      "id": "pine_tree",
+      "category": "props",
+      "kind": "mesh",
+      "zone": "lake,river",
+      "priority": 3,
+      "batch": "lote-4",
+      "targetSize": [
+        7,
+        14,
+        7
+      ],
+      "fit": "height",
+      "pivot": "bottom",
+      "maxTriangles": 1500,
+      "maxParts": 4,
+      "subject": "A cartoon pine tree with a thick brown trunk and three layered rounded green branch tiers",
+      "prompt": "A cartoon pine tree with a thick brown trunk and three layered rounded green branch tiers, soft and bushy, trunk base flat at the bottom. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 7 x 14 x 7 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple cartoon pine tree, trunk and three chunky green tiers. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 7 x 14 x 7 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A toy-like tree: short trunk and a big layered green cone, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 7 x 14 x 7 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Arbol del Lago y del Rio (16 por zona, con giro y tamano aleatorios). Muy ligero (< 1.500 triangulos): se repite 32 veces."
+    },
+    {
+      "id": "palm_tree",
+      "category": "props",
+      "kind": "mesh",
+      "zone": "coast",
+      "priority": 3,
+      "batch": "lote-4",
+      "targetSize": [
+        8,
+        13,
+        8
+      ],
+      "fit": "height",
+      "pivot": "bottom",
+      "maxTriangles": 2000,
+      "maxParts": 4,
+      "subject": "A cartoon palm tree with a slightly curved brown trunk and a crown of big green fronds",
+      "prompt": "A cartoon palm tree with a slightly curved brown trunk with ring marks and a crown of big rounded green fronds, no coconuts, trunk base flat at the bottom. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 13 x 8 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+      "retryPrompts": [
+        "A simple cartoon palm tree, curved trunk, six chunky green fronds. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 13 x 8 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces.",
+        "A toy-like palm tree, straight trunk and a round crown of fat green leaves, minimal detail. stylized 3D cartoon game asset, soft rounded shapes, smooth shading, bright cozy look, saturated but not neon, clean silhouette readable from far away, one single connected object. accent colors where natural: navy blue, ocean blue, teal, sunlit gold, coral orange, white. Use a bounding box Part of 8 x 13 x 8 studs. Avoid: text, logos, coins, money, dice, playing cards, casino look, weapons, blood, scary look, human faces, real brands, copyrighted characters, base plate, floating pieces."
+      ],
+      "notes": "Arbol de la Costa Dorada (16 por zona). Sin cocos (evita parecer fruta/objeto suelto)."
+    },
+    {
+      "id": "ground_lake",
+      "category": "materials",
+      "kind": "material",
+      "baseMaterial": "Grass",
+      "priority": 3,
+      "batch": "lote-4",
+      "variantName": "FF_ground_lake",
+      "subject": "lush stylized cartoon grass with tiny clover leaves, soft green",
+      "prompt": "lush stylized cartoon grass with tiny clover leaves, soft green, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+      "retryPrompts": [
+        "soft green cartoon grass, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+        "very simple soft green cartoon grass, big soft shapes, few colors, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text"
+      ],
+      "notes": "Suelo del Lago Calmo. Guardar como MaterialVariant FF_ground_lake con material base Grass."
+    },
+    {
+      "id": "ground_river",
+      "category": "materials",
+      "kind": "material",
+      "baseMaterial": "Grass",
+      "priority": 3,
+      "batch": "lote-4",
+      "variantName": "FF_ground_river",
+      "subject": "mossy ground with small smooth pebbles, soft green and teal",
+      "prompt": "mossy ground with small smooth pebbles, soft green and teal, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+      "retryPrompts": [
+        "soft green moss with a few pebbles, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+        "very simple soft green moss with a few pebbles, big soft shapes, few colors, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text"
+      ],
+      "notes": "Suelo del Rio Cristal. FF_ground_river, base Grass."
+    },
+    {
+      "id": "ground_coast",
+      "category": "materials",
+      "kind": "material",
+      "baseMaterial": "Sand",
+      "priority": 3,
+      "batch": "lote-4",
+      "variantName": "FF_ground_coast",
+      "subject": "warm beige sand with tiny shell fragments, soft ripples",
+      "prompt": "warm beige sand with tiny shell fragments, soft ripples, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+      "retryPrompts": [
+        "warm beige sand, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+        "very simple warm beige sand, big soft shapes, few colors, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text"
+      ],
+      "notes": "Suelo de la Costa Dorada. FF_ground_coast, base Sand."
+    },
+    {
+      "id": "pier_wood",
+      "category": "materials",
+      "kind": "material",
+      "baseMaterial": "WoodPlanks",
+      "priority": 3,
+      "batch": "lote-4",
+      "variantName": "FF_pier_wood",
+      "subject": "weathered warm brown wooden planks with visible grain, small nail dots",
+      "prompt": "weathered warm brown wooden planks with visible grain, small nail dots, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+      "retryPrompts": [
+        "warm brown wooden planks, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text",
+        "very simple warm brown wooden planks, big soft shapes, few colors, stylized hand-painted game texture, soft colors, simple, seamless tileable, top down, flat lighting, no objects, no text"
+      ],
+      "notes": "Madera del muelle PROCEDURAL (solo se usa si no hay malla de muelle). FF_pier_wood, base WoodPlanks."
+    }
+  ]
+}

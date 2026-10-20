@@ -10,7 +10,8 @@
         "Odds": { "$path": "../../packages/Odds.luau" },
         "Net": { "$path": "../../packages/Net.luau" },
         "UI": { "$path": "../../packages/UI.luau" },
-        "Locale": { "$path": "../../packages/Locale.luau" }
+        "Locale": { "$path": "../../packages/Locale.luau" },
+        "Art": { "$path": "../../packages/Art.luau" }
       },
       "Shared": { "$path": "src/shared" }
     },
@@ -26,6 +27,16 @@
         "Analytics": { "$path": "../../packages/Analytics.luau" }
       },
       "Server": { "$path": "src/server" }
+    },
+
+    "ServerStorage": {
+      "$className": "ServerStorage",
+      "Art": {
+        "$className": "Folder",
+        "creatures": { "$path": "art/models/creatures", "$ignoreUnknownInstances": true },
+        "rods": { "$path": "art/models/rods", "$ignoreUnknownInstances": true },
+        "props": { "$path": "art/models/props", "$ignoreUnknownInstances": true }
+      }
     },
 
     "StarterPlayer": {

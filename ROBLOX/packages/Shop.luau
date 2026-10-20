@@ -33,6 +33,7 @@ export type Receipt = {
 export type PassDef = {
 	key: string,
 	id: number, -- 0 = placeholder TODO_ID: no se puede comprar hasta rellenarlo
+	assetId: number?, -- REVIEW(money): alias opcional (assetId del pase si difiere de su TargetId). Solo reconoce eventos y respalda precios
 	name: string,
 	description: string,
 	nameKey: string?, -- clave de localizacion (el cliente traduce); `name`/`description` son el texto de respaldo
@@ -259,6 +260,22 @@ function Shop.validateCatalog(
 		else
 			seenIds[item.id] = label
 		end
+		-- REVIEW(money): alias opcional del pase (assetId distinto de su TargetId); ver ProductIds.luau.
+		if item.assetId ~= nil then
+			if type(item.assetId) ~= "number" or item.assetId <= 0 or item.assetId % 1 ~= 0 then
+				problem(label .. ": assetId invalido")
+			elseif item.id == 0 then
+				problem(
+					label .. ": tiene assetId pero su id esta en 0 (o la clave de passAssetIds no existe en passes)"
+				)
+			elseif item.assetId == item.id then
+				problem(label .. ": assetId igual al id (sobra: quitalo de passAssetIds)")
+			elseif seenIds[item.assetId] ~= nil then
+				problem(label .. ": assetId " .. item.assetId .. " repetido con " .. seenIds[item.assetId])
+			else
+				seenIds[item.assetId] = label .. " (assetId)"
+			end
+		end
 		local price = Shop.resolvePrice(catalog, item)
 		if price == nil then
 			problem(label .. ": sin precio (ni priceRobux ni tier valido)")
@@ -370,6 +387,14 @@ function Shop.new(config: Config): Shop
 		if pass.id ~= 0 then
 			assert(passesById[pass.id] == nil, "Shop.new: id de pase repetido " .. tostring(pass.id))
 			passesById[pass.id] = pass
+		end
+	end
+	-- REVIEW(money): los alias (assetId) se indexan DESPUES de los IDs principales: un alias nunca puede pisar el ID de
+	-- otro pase (conceder el pase equivocado) y dos alias iguales tampoco. Solo sirve para reconocer el evento del prompt.
+	for _, pass in config.catalog.passes do
+		if pass.id ~= 0 and pass.assetId ~= nil and pass.assetId ~= pass.id then
+			assert(passesById[pass.assetId] == nil, "Shop.new: assetId de pase repetido " .. tostring(pass.assetId))
+			passesById[pass.assetId] = pass
 		end
 	end
 	local data: ShopData = {
@@ -734,7 +759,13 @@ end
 
 function ShopImpl._onPassPromptFinished(self: Shop, player: any, passId: number, wasPurchased: boolean)
 	local pass = self.passesById[passId]
-	if pass == nil or pass.enabled == false then
+	if pass == nil then
+		-- REVIEW(money): un ID que no es de ningun pase del catalogo NI un alias (passAssetIds). Si ocurre con una compra real, el
+		-- pase comprado no se reconocera hasta reentrar: es la senal de que el ID cableado no es el que usa el motor (guia, "TargetId o assetId").
+		self:_log("PromptGamePassPurchaseFinished con un ID de pase DESCONOCIDO: " .. tostring(passId))
+		return
+	end
+	if pass.enabled == false then
 		return
 	end
 	if not wasPurchased then
@@ -892,6 +923,9 @@ function ShopImpl.refreshPrices(self: Shop)
 	for key, pass in self.catalog.passes do
 		if pass.id ~= 0 and pass.enabled ~= false then
 			local price = fetch(pass.id, types.GamePass)
+			if price == nil and pass.assetId ~= nil then
+				price = fetch(pass.assetId, types.GamePass) -- respaldo: solo para MOSTRAR el precio
+			end
 			if price then
 				self.priceCache["pass:" .. key] = price
 			end

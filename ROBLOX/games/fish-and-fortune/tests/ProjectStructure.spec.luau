@@ -143,8 +143,10 @@ local EXPECTED = {
 		Net = "ModuleScript",
 		UI = "ModuleScript",
 		Locale = "ModuleScript",
+		Art = "ModuleScript",
 	},
 	["ReplicatedStorage.Shared"] = {
+		ArtProfiles = "ModuleScript",
 		Balance = "ModuleScript",
 		ClientLogic = "ModuleScript",
 		FeatureFlags = "ModuleScript",
@@ -170,6 +172,13 @@ local EXPECTED = {
 		WorldBuilder = "ModuleScript",
 		StudioMemoryStore = "ModuleScript",
 		LiveOpsDefaults = "ModuleScript",
+		ArtDirector = "ModuleScript",
+	},
+	-- Plantillas de arte generado (carpetas vacias en el repo; se llenan con .rbxm o desde Studio). Ver README, seccion Arte.
+	["ServerStorage.Art"] = {
+		creatures = "Folder",
+		rods = "Folder",
+		props = "Folder",
 	},
 	["StarterPlayer.StarterPlayerScripts.Client"] = {
 		Main = "LocalScript",
@@ -185,6 +194,8 @@ local SERVICES = {
 	ServerScriptService = "ServerScriptService",
 	Workspace = "Workspace",
 	Lighting = "Lighting",
+	ServerStorage = "ServerStorage",
+	["ServerStorage.Art"] = "Folder",
 	StarterPlayer = "StarterPlayer",
 	["StarterPlayer.StarterPlayerScripts"] = "StarterPlayerScripts",
 }

@@ -1,0 +1,170 @@
+{
+  "_comentario": "Generado por ROBLOX/tools/dump-store-items.luau. NO editar a mano.",
+  "items": [
+    {
+      "description": {
+        "en": "Fishes automatically while you play and raises the offline earnings limit to 6 hours.",
+        "es": "Pesca automáticamente mientras juegas y sube a 6 horas el límite de ganancias sin conexión."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/auto_fish.png",
+      "key": "auto_fish",
+      "kind": "pass",
+      "name": {
+        "en": "Auto-Fishing Pass",
+        "es": "Pase Auto-Pesca"
+      },
+      "price": 299,
+      "tier": "standard"
+    },
+    {
+      "description": {
+        "en": "Doubles the coins you earn when selling. Stacks with other bonuses, up to a cap.",
+        "es": "Duplica las monedas que ganas al vender. Se suma a otros bonus, con un tope."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/double_coins.png",
+      "key": "double_coins",
+      "kind": "pass",
+      "name": {
+        "en": "2x Coins Pass",
+        "es": "Pase 2x Dinero"
+      },
+      "price": 249,
+      "tier": "plus"
+    },
+    {
+      "description": {
+        "en": "Unlocks the Season 1 premium track: fixed rewards, no randomness.",
+        "es": "Desbloquea la pista premium de la Temporada 1: premios fijos, sin azar."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/season_pass.png",
+      "key": "season_pass",
+      "kind": "pass",
+      "name": {
+        "en": "Season 1 Pass",
+        "es": "Pase de Temporada 1"
+      },
+      "price": 399,
+      "tier": "strong"
+    },
+    {
+      "description": {
+        "en": "One-time purchase: 600 coins, 10 pearls and 10 inventory slots.",
+        "es": "Pago único: 600 monedas, 10 perlas y 10 espacios de inventario."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/starter.png",
+      "key": "starter",
+      "kind": "pass",
+      "name": {
+        "en": "Starter Pack",
+        "es": "Pack de inicio"
+      },
+      "price": 99,
+      "tier": "basic"
+    },
+    {
+      "description": {
+        "en": "VIP tag, +10% coins and 5 pearls per day.",
+        "es": "Etiqueta VIP, +10% de monedas y 5 perlas al día."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/vip.png",
+      "key": "vip",
+      "kind": "pass",
+      "name": {
+        "en": "VIP Pass",
+        "es": "Pase VIP"
+      },
+      "price": 199,
+      "tier": "value"
+    },
+    {
+      "description": {
+        "en": "Doubles sale coins for 15 minutes (stacks with other bonuses, up to a cap).",
+        "es": "Duplica las monedas de venta durante 15 minutos (suma con otros bonus, con tope)."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/coin_boost_15.png",
+      "key": "coin_boost_15",
+      "kind": "product",
+      "name": {
+        "en": "Coin Boost (15 min)",
+        "es": "Boost de Monedas (15 min)"
+      },
+      "price": 49,
+      "tier": "impulse"
+    },
+    {
+      "description": {
+        "en": "80,000 coins.",
+        "es": "80.000 monedas."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/coin_pack_large.png",
+      "key": "coin_pack_large",
+      "kind": "product",
+      "name": {
+        "en": "Large Coin Pack",
+        "es": "Pack de monedas grande"
+      },
+      "price": 1999,
+      "tier": "anchor"
+    },
+    {
+      "description": {
+        "en": "15,000 coins.",
+        "es": "15.000 monedas."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/coin_pack_medium.png",
+      "key": "coin_pack_medium",
+      "kind": "product",
+      "name": {
+        "en": "Medium Coin Pack",
+        "es": "Pack de monedas mediano"
+      },
+      "price": 499,
+      "tier": "major"
+    },
+    {
+      "description": {
+        "en": "2,500 coins.",
+        "es": "2.500 monedas."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/coin_pack_small.png",
+      "key": "coin_pack_small",
+      "kind": "product",
+      "name": {
+        "en": "Small Coin Pack",
+        "es": "Pack de monedas pequeño"
+      },
+      "price": 99,
+      "tier": "basic"
+    },
+    {
+      "description": {
+        "en": "30 pearls to expand your inventory.",
+        "es": "30 perlas para ampliar tu inventario."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/pearl_pack.png",
+      "key": "pearl_pack",
+      "kind": "product",
+      "name": {
+        "en": "Pearl Pack",
+        "es": "Pack de perlas"
+      },
+      "price": 199,
+      "tier": "value"
+    },
+    {
+      "description": {
+        "en": "Adds 10 slots to your inventory.",
+        "es": "Suma 10 espacios a tu inventario."
+      },
+      "icon": "marketing/fish-and-fortune/assets/products/slot_pack.png",
+      "key": "slot_pack",
+      "kind": "product",
+      "name": {
+        "en": "More Space (+10)",
+        "es": "Más espacio (+10)"
+      },
+      "price": 99,
+      "tier": "basic"
+    }
+  ]
+}

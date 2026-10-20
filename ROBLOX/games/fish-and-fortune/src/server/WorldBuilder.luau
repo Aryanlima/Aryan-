@@ -9,6 +9,12 @@
 	  Workspace.World/<zona>/Sign         cartel con el nombre (SurfaceGui)
 
 	Si un mapa nuevo respeta ese contrato (y el servidor lee `build()`), nada mas cambia.
+
+	ARTE GENERADO (opcional): `build(zonas, art)` recibe el proveedor de arte (packages/Art). Para cada pieza que tiene perfil
+	(muelle, farolas, barca, arboles) pide el modelo generado; si no existe o no es valido usa el generador procedural de
+	siempre como RESPALDO (farolas y barca no tienen respaldo: sin arte no aparecen). Los materiales generados
+	(MaterialVariant) se aplican al suelo y al muelle procedural. El arte es solo visual: lo que se pisa (la cubierta del
+	muelle) sigue siendo una parte propia e invisible. Sin `art` el resultado es identico al de siempre.
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -17,6 +23,24 @@ local Workspace = game:GetService("Workspace")
 export type WorldInfo = {
 	spawns: { [string]: Vector3 },
 	castTargets: { [string]: Vector3 },
+}
+
+-- Lo que WorldBuilder necesita del proveedor de arte (packages/Art.Provider); `self: any` porque es un objeto con metatabla.
+export type ArtLike = {
+	place: (
+		self: any,
+		category: string,
+		id: string,
+		options: {
+			parent: Instance,
+			cframe: CFrame,
+			name: string?,
+			anchored: boolean?,
+			scale: number?,
+			fallback: ((parent: Instance, cframe: CFrame) -> Instance?)?,
+		}
+	) -> { source: string, instance: Instance?, reason: string? },
+	materialFor: (self: any, id: string) -> { baseMaterial: Enum.Material, variantName: string }?,
 }
 
 type ZoneStyle = {
@@ -29,6 +53,7 @@ type ZoneStyle = {
 	waterColor: Color3,
 	waterShape: string, -- "disc" | "river" | "sea"
 	treeColor: Color3,
+	treeArt: string, -- id del arbol generado en props ("pine_tree" | "palm_tree")
 	seed: number,
 }
 
@@ -61,6 +86,18 @@ local function invisible(part: Part): Part
 	part.CanQuery = false
 	part.CanTouch = false
 	return part
+end
+
+-- Aplica el MaterialVariant generado (si existe) a una parte procedural.
+local function applyVariant(part: Part, art: ArtLike?, materialId: string)
+	if art == nil then
+		return
+	end
+	local choice = art:materialFor(materialId)
+	if choice ~= nil then
+		part.Material = choice.baseMaterial
+		part.MaterialVariant = choice.variantName
+	end
 end
 
 local function buildWater(folder: Folder, style: ZoneStyle)
@@ -101,11 +138,21 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 	water.CanQuery = false
 end
 
-local function buildPier(folder: Folder, style: ZoneStyle)
-	local wood = Color3.fromRGB(150, 110, 70)
+local PIER_WOOD = Color3.fromRGB(150, 110, 70)
+
+-- Muelle procedural de siempre (respaldo del arte "pier"): cubierta + postes.
+local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local darkWood = Color3.fromRGB(110, 80, 50)
 	local origin = style.origin
-	newPart(folder, "Pier", Vector3.new(8, 1, 44), origin + Vector3.new(0, 1.2, -18), wood, Enum.Material.WoodPlanks)
+	local deck = newPart(
+		folder,
+		"Pier",
+		Vector3.new(8, 1, 44),
+		origin + Vector3.new(0, 1.2, -18),
+		PIER_WOOD,
+		Enum.Material.WoodPlanks
+	)
+	applyVariant(deck, art, "pier_wood")
 	for index = 0, 4 do
 		local z = -36 + index * 9
 		newPart(
@@ -125,11 +172,65 @@ local function buildPier(folder: Folder, style: ZoneStyle)
 			Enum.Material.Wood
 		)
 	end
-	local spawn = invisible(newPart(folder, "Spawn", Vector3.new(4, 1, 4), origin + Vector3.new(0, 6, 12), wood, nil))
+end
+
+local function buildPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
+	local origin = style.origin
+	if art == nil then
+		buildProceduralPier(folder, style, nil)
+	else
+		-- La base del modelo queda donde acaban los postes (y = -2) y centrado en la cubierta; si no hay arte valido, el respaldo.
+		local result = art:place("props", "pier", {
+			parent = folder,
+			cframe = CFrame.new(origin + Vector3.new(0, -2, -18)),
+			name = "PierArt",
+			fallback = function(): Instance?
+				buildProceduralPier(folder, style, art)
+				return nil
+			end,
+		})
+		if result.source == "art" then
+			-- El arte es solo visual: por donde se camina sigue siendo una cubierta propia (invisible), a la altura de siempre.
+			local walkway = newPart(
+				folder,
+				"Pier",
+				Vector3.new(8, 1, 44),
+				origin + Vector3.new(0, 1.2, -18),
+				PIER_WOOD,
+				Enum.Material.WoodPlanks
+			)
+			walkway.Transparency = 1
+			walkway.CanQuery = false
+		end
+	end
+	local spawn =
+		invisible(newPart(folder, "Spawn", Vector3.new(4, 1, 4), origin + Vector3.new(0, 6, 12), PIER_WOOD, nil))
 	spawn.Name = "Spawn"
-	local target =
-		invisible(newPart(folder, "CastTarget", Vector3.new(1, 1, 1), origin + Vector3.new(0, 0.9, -52), wood, nil))
+	local target = invisible(
+		newPart(folder, "CastTarget", Vector3.new(1, 1, 1), origin + Vector3.new(0, 0.9, -52), PIER_WOOD, nil)
+	)
 	target.Name = "CastTarget"
+end
+
+-- Farolas y barca: SOLO existen con arte generado (no hay respaldo: sin arte el mundo es el de siempre).
+local function buildArtOnlyProps(folder: Folder, style: ZoneStyle, art: ArtLike)
+	local origin = style.origin
+	local index = 0
+	for _, z in { -34, -20, -6 } do
+		for _, side in { -1, 1 } do
+			index += 1
+			art:place("props", "lantern", {
+				parent = folder,
+				cframe = CFrame.new(origin + Vector3.new(side * 3.5, 1.7, z)),
+				name = "Lantern" .. index,
+			})
+		end
+	end
+	art:place("props", "rowboat", {
+		parent = folder,
+		cframe = CFrame.new(origin + Vector3.new(-9, 0.15, -30)) * CFrame.Angles(0, math.rad(20), 0),
+		name = "Rowboat",
+	})
 end
 
 local function buildSign(folder: Folder, style: ZoneStyle)
@@ -166,8 +267,9 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 	)
 end
 
-local function buildDecor(folder: Folder, style: ZoneStyle)
+local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local rng = Random.new(style.seed)
+	local artRng = Random.new(style.seed + 1000)
 	local origin = style.origin
 	for index = 1, 16 do
 		-- arboles en la parte de tierra (z > 20) y a los lados
@@ -177,23 +279,39 @@ local function buildDecor(folder: Folder, style: ZoneStyle)
 			x += 20
 		end
 		local height = rng:NextNumber(7, 11)
-		newPart(
-			folder,
-			"TreeTrunk" .. index,
-			Vector3.new(2, height, 2),
-			origin + Vector3.new(x, height / 2, z),
-			Color3.fromRGB(110, 78, 50),
-			Enum.Material.Wood
-		)
-		local crown = newPart(
-			folder,
-			"TreeCrown" .. index,
-			Vector3.new(9, 9, 9),
-			origin + Vector3.new(x, height + 3, z),
-			style.treeColor,
-			Enum.Material.Grass
-		)
-		crown.Shape = Enum.PartType.Ball
+		local function proceduralTree(): Instance?
+			newPart(
+				folder,
+				"TreeTrunk" .. index,
+				Vector3.new(2, height, 2),
+				origin + Vector3.new(x, height / 2, z),
+				Color3.fromRGB(110, 78, 50),
+				Enum.Material.Wood
+			)
+			local crown = newPart(
+				folder,
+				"TreeCrown" .. index,
+				Vector3.new(9, 9, 9),
+				origin + Vector3.new(x, height + 3, z),
+				style.treeColor,
+				Enum.Material.Grass
+			)
+			crown.Shape = Enum.PartType.Ball
+			return crown
+		end
+		if art == nil then
+			proceduralTree()
+		else
+			-- variedad (giro y tamano) con un generador APARTE: no altera la secuencia del procedural
+			art:place("props", style.treeArt, {
+				parent = folder,
+				cframe = CFrame.new(origin + Vector3.new(x, -0.2, z))
+					* CFrame.Angles(0, artRng:NextNumber(0, math.pi * 2), 0),
+				name = "Tree" .. index,
+				scale = 0.8 + 0.4 * artRng:NextNumber(),
+				fallback = proceduralTree,
+			})
+		end
 	end
 	for index = 1, 10 do
 		local x = rng:NextNumber(-85, 85)
@@ -211,10 +329,10 @@ local function buildDecor(folder: Folder, style: ZoneStyle)
 	end
 end
 
-local function buildZone(world: Folder, style: ZoneStyle)
+local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	local folder = Instance.new("Folder")
 	folder.Name = style.id
-	newPart(
+	local ground = newPart(
 		folder,
 		"Ground",
 		Vector3.new(200, 4, 200),
@@ -222,10 +340,14 @@ local function buildZone(world: Folder, style: ZoneStyle)
 		style.groundColor,
 		style.groundMaterial
 	)
+	applyVariant(ground, art, "ground_" .. style.id)
 	buildWater(folder, style)
-	buildPier(folder, style)
+	buildPier(folder, style, art)
 	buildSign(folder, style)
-	buildDecor(folder, style)
+	buildDecor(folder, style, art)
+	if art ~= nil then
+		buildArtOnlyProps(folder, style, art)
+	end
 	folder.Parent = world
 end
 
@@ -263,8 +385,9 @@ end
 --[[
 	Construye el mundo y devuelve los puntos de aparicion y de lanzamiento por zona.
 	`zones` = lista ordenada de { id, name, nameKey } (Balance.zoneOrder; `name` en espanol y `nameKey` = clave de Strings).
+	`art` = proveedor de arte opcional (packages/Art); nil = todo procedural, como siempre.
 ]]
-function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string } }): WorldInfo
+function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string } }, art: ArtLike?): WorldInfo
 	local existing = Workspace:FindFirstChild("World")
 	if existing then
 		existing:Destroy()
@@ -283,6 +406,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			waterColor = Color3.fromRGB(70, 150, 220),
 			waterShape = "disc",
 			treeColor = Color3.fromRGB(70, 140, 70),
+			treeArt = "pine_tree",
 			seed = 11,
 		},
 		river = {
@@ -295,6 +419,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			waterColor = Color3.fromRGB(90, 200, 215),
 			waterShape = "river",
 			treeColor = Color3.fromRGB(50, 120, 90),
+			treeArt = "pine_tree",
 			seed = 22,
 		},
 		coast = {
@@ -307,6 +432,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			waterColor = Color3.fromRGB(40, 130, 200),
 			waterShape = "sea",
 			treeColor = Color3.fromRGB(95, 170, 80),
+			treeArt = "palm_tree",
 			seed = 33,
 		},
 	}
@@ -317,7 +443,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 		if style then
 			style.name = zone.name
 			style.nameKey = zone.nameKey
-			buildZone(world, style)
+			buildZone(world, style, art)
 			info.spawns[zone.id] = style.origin + Vector3.new(0, 6, 12)
 			info.castTargets[zone.id] = style.origin + Vector3.new(0, 0.9, -52)
 		end
