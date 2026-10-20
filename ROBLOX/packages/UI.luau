@@ -12,6 +12,9 @@
 	    se abre con un boton con TEXTO ("Probabilidades"), no solo un icono.
 	  * Sin dependencias de otros paquetes (los tipos de las vistas son estructurales, compatibles con
 	    Odds.DisplayView y Shop.Offer).
+	  * Textos: cada texto propio del paquete tiene una CLAVE (`ui.close`, `ui.reason.owned`...) y un texto por defecto en
+	    espanol. `UI.setTranslator(t)` lo sustituye por un traductor (packages/Locale); sin traductor funciona igual en
+	    espanol. Las ofertas pueden traer `nameKey`/`descriptionKey`/`textArgs` para traducirse; sin ellos se usa `name`.
 	  * Las instancias se tipan como `any` porque se crean por nombre de clase (frontera con el motor).
 	    Las funciones puras (formatNumber, formatDuration, ...) no tocan el motor y se prueban con Lune.
 	    Los constructores aceptan un entorno inyectable (UI.setEnvironment) para probarlos con la
@@ -41,6 +44,9 @@ export type OfferView = {
 	key: string,
 	name: string,
 	description: string,
+	nameKey: string?, -- clave traducible del nombre (si hay traductor); `name` es el respaldo
+	descriptionKey: string?,
+	textArgs: { [string]: any }?,
 	priceRobux: number?,
 	priceIsApproximate: boolean,
 	available: boolean,
@@ -57,6 +63,8 @@ export type Environment = {
 	Enum: any,
 	task: any?,
 }
+
+export type Translate = (key: string, args: { [string]: any }?) -> string
 
 export type Handle = {
 	root: any,
@@ -95,6 +103,65 @@ UI.theme = {
 	corner = 12,
 	padding = 12,
 }
+
+----------------------------------------------------------------------------
+-- Textos (traducibles)
+----------------------------------------------------------------------------
+
+-- Textos por defecto (espanol) del paquete, con marcadores {nombre}. Un juego los sustituye con UI.setTranslator.
+local DEFAULT_TEXT: { [string]: string } = {
+	["ui.close"] = "Cerrar",
+	["shop.title"] = "Tienda",
+	["ui.odds_title"] = "Probabilidades",
+	["ui.price"] = "R$ {price}",
+	["ui.price_approx"] = "~R$ {price}",
+	["ui.price_unavailable"] = "Precio no disponible",
+	["ui.buy"] = "Ver compra",
+	["ui.reason.owned"] = "Ya lo tienes",
+	["ui.reason.unavailable"] = "No disponible por ahora",
+	["ui.reason.loading"] = "Cargando tus datos...",
+	["ui.reason.restricted"] = "No disponible en tu region",
+	["ui.reason.left"] = "No disponible",
+	["ui.reason.cooldown"] = "Espera un momento",
+	["ui.reason.maxed"] = "Ya tienes el maximo acumulado",
+	["ui.reason.unknown"] = "No disponible",
+	["ui.odds_luck_default"] = "Tu suerte activa cambia estas probabilidades. La columna 'base' muestra los valores sin suerte.",
+	["ui.odds_with_base"] = "{percent} (base {base})",
+	["ui.odds_total"] = "Total: {total}",
+	["ui.odds_rounding"] = "Los porcentajes estan redondeados para sumar exactamente {total}.",
+}
+
+local translator: Translate? = nil
+
+-- Sustituye los textos por defecto por un traductor (p. ej. Locale:translator(...)). nil restablece el espanol por defecto.
+function UI.setTranslator(newTranslator: Translate?)
+	translator = newTranslator
+end
+
+local function tr(key: string, args: { [string]: any }?): string
+	local active = translator
+	if active ~= nil then
+		return active(key, args)
+	end
+	local template = DEFAULT_TEXT[key] or key
+	local result = string.gsub(template, "{[%a_][%w_]*}", function(placeholder: string): string
+		local value = if args ~= nil then args[string.sub(placeholder, 2, -2)] else nil
+		if value == nil then
+			return placeholder
+		end
+		return tostring(value)
+	end)
+	return result
+end
+
+-- Nombre/descripcion de una oferta: traducidos por clave si hay traductor; si no, el texto que trae la oferta.
+local function offerText(offer: OfferView, field: string): string
+	local key = if field == "name" then offer.nameKey else offer.descriptionKey
+	if translator ~= nil and key ~= nil then
+		return translator(key, offer.textArgs)
+	end
+	return if field == "name" then offer.name else offer.description
+end
 
 ----------------------------------------------------------------------------
 -- Funciones puras
@@ -147,35 +214,36 @@ end
 -- Texto de precio: "R$ 199" (o "~R$ 199" si es aproximado) / "Precio no disponible".
 function UI.priceText(offer: OfferView): string
 	if offer.priceRobux == nil then
-		return "Precio no disponible"
+		return tr("ui.price_unavailable")
 	end
-	local prefix = if offer.priceIsApproximate then "~R$ " else "R$ "
-	return prefix .. tostring(offer.priceRobux)
+	return tr(if offer.priceIsApproximate then "ui.price_approx" else "ui.price", { price = offer.priceRobux })
 end
 
 -- Motivo por el que una oferta no esta disponible, en lenguaje neutro.
 function UI.reasonText(reason: string?): string
-	local texts: { [string]: string } = {
-		owned = "Ya lo tienes",
-		unavailable = "No disponible por ahora",
-		loading = "Cargando tus datos...",
-		restricted = "No disponible en tu region",
-		left = "No disponible",
-		cooldown = "Espera un momento",
-		unknown = "No disponible",
+	local known: { [string]: boolean } = {
+		owned = true,
+		unavailable = true,
+		loading = true,
+		restricted = true,
+		left = true,
+		cooldown = true,
+		maxed = true,
+		unknown = true,
 	}
-	return texts[reason or "unknown"] or "No disponible"
+	local code = reason or "unknown"
+	return tr("ui.reason." .. (if known[code] then code else "unknown"))
 end
 
 -- Etiqueta del boton de compra. Neutra a proposito (ROBLOX/research/03 2.3: "View Item", nunca "BUY NOW").
 function UI.buyButtonText(offer: OfferView): string
 	if offer.owned then
-		return "Ya lo tienes"
+		return tr("ui.reason.owned")
 	end
 	if not offer.available then
 		return UI.reasonText(offer.reason)
 	end
-	return "Ver compra"
+	return tr("ui.buy")
 end
 
 function UI.rarityColorName(rarity: string?): string
@@ -364,7 +432,7 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 	title.Name = "Title"
 
 	local closeButton = UI.button({
-		text = options.closeText or "Cerrar",
+		text = options.closeText or tr("ui.close"),
 		colorName = "row",
 		size = e.UDim2.new(1, 0, 0, UI.theme.minTouchHeight),
 		onActivated = options.onClose,
@@ -410,8 +478,8 @@ local function offerRow(offer: OfferView, onBuy: (kind: string, key: string) -> 
 		corner(),
 		padding(),
 		listLayout(6),
-		UI.label({ text = offer.name, bold = true, layoutOrder = 1 }),
-		UI.label({ text = offer.description, colorName = "textMuted", layoutOrder = 2 }),
+		UI.label({ text = offerText(offer, "name"), bold = true, layoutOrder = 1 }),
+		UI.label({ text = offerText(offer, "description"), colorName = "textMuted", layoutOrder = 2 }),
 		UI.label({ text = UI.priceText(offer), colorName = "positive", bold = true, layoutOrder = 3 }),
 		UI.button({
 			text = buyText,
@@ -435,7 +503,7 @@ export type ShopPanelOptions = {
 function UI.shopPanel(parent: any, options: ShopPanelOptions): Handle
 	local root, content = UI.panel(parent, {
 		name = "ShopPanel",
-		title = options.title or "Tienda",
+		title = options.title or tr("shop.title"),
 		onClose = options.onClose,
 	})
 	local function render(offers: { OfferView })
@@ -473,7 +541,7 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 	local e = env()
 	local root, content = UI.panel(parent, {
 		name = "OddsPanel",
-		title = options.title or "Probabilidades",
+		title = options.title or tr("ui.odds_title"),
 		onClose = options.onClose,
 	})
 	local function render(view: OddsView)
@@ -490,8 +558,7 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 		end
 		if view.luckActive then
 			add(UI.label({
-				text = options.luckExplanation
-					or "Tu suerte activa cambia estas probabilidades. La columna 'base' muestra los valores sin suerte.",
+				text = options.luckExplanation or tr("ui.odds_luck_default"),
 				colorName = "textMuted",
 			}))
 		end
@@ -512,7 +579,7 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 			name.Position = e.UDim2.new(0, 10, 0, 0)
 			local value = UI.label({
 				text = if view.luckActive
-					then row.percentText .. " (base " .. row.basePercentText .. ")"
+					then tr("ui.odds_with_base", { percent = row.percentText, base = row.basePercentText })
 					else row.percentText,
 				size = e.UDim2.new(0.5, -10, 1, 0),
 				alignX = e.Enum.TextXAlignment.Right,
@@ -522,9 +589,9 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 			value.Position = e.UDim2.new(0.5, 0, 0, 0)
 			add(frame)
 		end
-		add(UI.label({ text = "Total: " .. view.totalPercentText, bold = true }))
+		add(UI.label({ text = tr("ui.odds_total", { total = view.totalPercentText }), bold = true }))
 		add(UI.label({
-			text = "Los porcentajes estan redondeados para sumar exactamente " .. view.totalPercentText .. ".",
+			text = tr("ui.odds_rounding", { total = view.totalPercentText }),
 			colorName = "textMuted",
 			textSize = 14,
 		}))

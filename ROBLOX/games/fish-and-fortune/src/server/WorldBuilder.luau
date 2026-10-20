@@ -21,7 +21,8 @@ export type WorldInfo = {
 
 type ZoneStyle = {
 	id: string,
-	name: string,
+	name: string, -- los pone WorldBuilder.build desde la lista de zonas (texto en espanol + clave de Strings)
+	nameKey: string,
 	origin: Vector3,
 	groundColor: Color3,
 	groundMaterial: Enum.Material,
@@ -147,7 +148,9 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 	local label = Instance.new("TextLabel")
 	label.Size = UDim2.fromScale(1, 1)
 	label.BackgroundTransparency = 1
-	label.Text = style.name
+	label.Text = style.name -- respaldo (espanol); el cliente lo cambia al idioma del jugador usando LocaleKey
+	label:SetAttribute("LocaleKey", style.nameKey)
+	gui.AutoLocalize = false -- el texto lo localiza el juego (Strings), no la traduccion automatica de Roblox
 	label.TextColor3 = Color3.fromRGB(255, 240, 210)
 	label.Font = Enum.Font.GothamBold
 	label.TextScaled = true
@@ -259,9 +262,9 @@ end
 
 --[[
 	Construye el mundo y devuelve los puntos de aparicion y de lanzamiento por zona.
-	`zones` = lista ordenada de { id, name } (Balance.zoneOrder / Balance.zones).
+	`zones` = lista ordenada de { id, name, nameKey } (Balance.zoneOrder; `name` en espanol y `nameKey` = clave de Strings).
 ]]
-function WorldBuilder.build(zones: { { id: string, name: string } }): WorldInfo
+function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string } }): WorldInfo
 	local existing = Workspace:FindFirstChild("World")
 	if existing then
 		existing:Destroy()
@@ -272,7 +275,8 @@ function WorldBuilder.build(zones: { { id: string, name: string } }): WorldInfo
 	local styles: { [string]: ZoneStyle } = {
 		lake = {
 			id = "lake",
-			name = "Lago Calmo",
+			name = "",
+			nameKey = "",
 			origin = Vector3.new(0, 0, 0),
 			groundColor = Color3.fromRGB(104, 170, 98),
 			groundMaterial = Enum.Material.Grass,
@@ -283,7 +287,8 @@ function WorldBuilder.build(zones: { { id: string, name: string } }): WorldInfo
 		},
 		river = {
 			id = "river",
-			name = "Rio Cristal",
+			name = "",
+			nameKey = "",
 			origin = Vector3.new(400, 0, 0),
 			groundColor = Color3.fromRGB(120, 160, 110),
 			groundMaterial = Enum.Material.Grass,
@@ -294,7 +299,8 @@ function WorldBuilder.build(zones: { { id: string, name: string } }): WorldInfo
 		},
 		coast = {
 			id = "coast",
-			name = "Costa Dorada",
+			name = "",
+			nameKey = "",
 			origin = Vector3.new(800, 0, 0),
 			groundColor = Color3.fromRGB(232, 210, 150),
 			groundMaterial = Enum.Material.Sand,
@@ -310,6 +316,7 @@ function WorldBuilder.build(zones: { { id: string, name: string } }): WorldInfo
 		local style = styles[zone.id]
 		if style then
 			style.name = zone.name
+			style.nameKey = zone.nameKey
 			buildZone(world, style)
 			info.spawns[zone.id] = style.origin + Vector3.new(0, 6, 12)
 			info.castTargets[zone.id] = style.origin + Vector3.new(0, 0.9, -52)

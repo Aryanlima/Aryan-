@@ -66,8 +66,7 @@ function FishingRules.entriesFor(self: Rules, zoneId: string): { any }
 	for _, creature in self:creaturesOf(zoneId) do
 		local rarity = self.balance.rarities[creature.rarity]
 		table.insert(entries, {
-			id = creature.id,
-			label = creature.name,
+			id = creature.id, -- sin `label`: el nombre visible lo pone el cliente (Strings: creature.<id>)
 			weight = creature.weight,
 			rarity = creature.rarity,
 			luckFactor = rarity.luckFactor,

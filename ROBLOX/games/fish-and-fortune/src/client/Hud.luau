@@ -5,6 +5,8 @@
 	Codigos), eventos activos con cuenta atras EXACTA y la guia del tutorial (primeros 60 s).
 
 	Todo lo que muestra viene del ultimo estado del servidor (Store); los botones solo envian solicitudes.
+	Textos: todos por clave (ctx.L, shared/Strings.luau) en el idioma del jugador; se reponen en cada refresco, asi un cambio de
+	idioma se aplica solo.
 ]]
 
 local TweenService = game:GetService("TweenService")
@@ -23,6 +25,8 @@ function Hud.start(ctx: any): any
 	local menus = ctx.menus
 	local minigame = ctx.minigame
 	local ClientLogic = ctx.ClientLogic
+	local L = ctx.L
+	local fmt = ctx.fmt
 	local gui: ScreenGui = ctx.gui
 
 	----------------------------------------------------------------------------
@@ -91,7 +95,7 @@ function Hud.start(ctx: any): any
 		Parent = gui,
 	}, { UI.create("UISizeConstraint", { MaxSize = Vector2.new(560, 80) }) })
 	local actionButton = UI.button({
-		text = "LANZAR",
+		text = L("hud.cast"),
 		size = UDim2.new(0.62, 0, 1, 0),
 		onActivated = function()
 			minigame.action()
@@ -101,7 +105,7 @@ function Hud.start(ctx: any): any
 	actionButton.Name = "ActionButton"
 	actionButton.TextSize = 26
 	local sellButton = UI.button({
-		text = "VENDER",
+		text = L("hud.sell"),
 		colorName = "positive",
 		size = UDim2.new(0.36, 0, 1, 0),
 		onActivated = function()
@@ -130,9 +134,11 @@ function Hud.start(ctx: any): any
 	}, { UI.create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) }) })
 
 	local menuButtons: { [string]: TextButton } = {}
-	local function menuButton(order: number, id: string, text: string)
+	local menuKeys: { [string]: string } = {}
+	local function menuButton(order: number, id: string, key: string)
+		menuKeys[id] = key
 		local button = UI.button({
-			text = text,
+			text = L(key),
 			colorName = "row",
 			size = UDim2.new(1, -6, 0, UI.theme.minTouchHeight),
 			layoutOrder = order,
@@ -144,15 +150,15 @@ function Hud.start(ctx: any): any
 		button.TextSize = 16
 		menuButtons[id] = button
 	end
-	menuButton(1, "shop", "Tienda")
-	menuButton(2, "rods", "Canas")
-	menuButton(3, "bestiary", "Bestiario")
-	menuButton(4, "season", "Temporada")
-	menuButton(5, "odds", "Probabilidades")
-	menuButton(6, "codes", "Codigos")
+	menuButton(1, "shop", "menu.shop")
+	menuButton(2, "rods", "menu.rods")
+	menuButton(3, "bestiary", "menu.bestiary")
+	menuButton(4, "season", "menu.season")
+	menuButton(5, "odds", "menu.odds")
+	menuButton(6, "codes", "menu.codes")
 
 	local autoButton = UI.button({
-		text = "Auto-pesca: NO",
+		text = L("hud.auto_off"),
 		colorName = "row",
 		size = UDim2.new(1, -6, 0, UI.theme.minTouchHeight),
 		layoutOrder = 7,
@@ -204,13 +210,23 @@ function Hud.start(ctx: any): any
 	----------------------------------------------------------------------------
 	local function modifiersText(modifiers: { [string]: number }): string
 		local parts = {}
-		if modifiers.coins then
-			table.insert(parts, ("monedas x%s"):format(tostring(modifiers.coins)))
+		if type(modifiers.coins) == "number" then
+			table.insert(parts, L("hud.effect_coins", { value = modifiers.coins }))
 		end
-		if modifiers.luck then
-			table.insert(parts, ("suerte +%s"):format(tostring(modifiers.luck)))
+		if type(modifiers.luck) == "number" then
+			table.insert(parts, L("hud.effect_luck", { value = modifiers.luck }))
 		end
 		return table.concat(parts, ", ")
+	end
+
+	-- Nombre del evento: con clave propia en Strings (event.<id>.name) se traduce; si viene de la configuracion remota sin
+	-- traduccion, se muestra el nombre configurado.
+	local function eventName(event: any): string
+		local key = "event." .. tostring(event.id) .. ".name"
+		if ctx.locale:has(key) then
+			return L(key)
+		end
+		return ctx.serverText(event.name, "?")
 	end
 
 	local function refreshTimers()
@@ -224,7 +240,11 @@ function Hud.start(ctx: any): any
 				ClientLogic.remainingSeconds(event.endsAt, state.serverNow, store:receivedAt(), os.clock())
 			table.insert(
 				lines,
-				("%s (%s): %s"):format(event.name, modifiersText(event.modifiers), UI.formatDuration(remaining))
+				L("hud.event_line", {
+					name = eventName(event),
+					effects = modifiersText(event.modifiers),
+					time = UI.formatDuration(remaining),
+				})
 			)
 		end
 		eventsLabel.Text = table.concat(lines, "\n")
@@ -232,14 +252,14 @@ function Hud.start(ctx: any): any
 
 	local function refreshAction()
 		local state = store:get()
-		actionButton.Text = if minigame.isCasting() then "RECOGER" else "LANZAR"
+		actionButton.Text = if minigame.isCasting() then L("hud.reel") else L("hud.cast")
 		actionButton.BackgroundColor3 = if minigame.isCasting()
 			then rgb(UI.theme.colors.positive)
 			else rgb(UI.theme.colors.accent)
 		if state ~= nil then
 			local hint = ClientLogic.ftueHint(state, balance, minigame.isCasting())
 			if hint ~= nil then
-				hintLabel.Text = hint.text
+				hintLabel.Text = L(hint.key)
 				hintLabel.Visible = true
 				hintStroke.Parent = hintTargets[hint.target]
 			else
@@ -250,13 +270,19 @@ function Hud.start(ctx: any): any
 	end
 
 	local function refresh(state: any)
-		coinsLabel.Text = "Monedas: " .. UI.formatNumber(state.coins)
-		pearlsLabel.Text = "Perlas: " .. UI.formatNumber(state.pearls)
-		bagLabel.Text = ("Mochila: %d / %d"):format(state.inventoryCount, state.capacity)
-		zoneLabel.Text = balance.zones[state.zone].name .. (if state.isPrivateServer then " - Servidor privado" else "")
+		for id, button in menuButtons do
+			button.Text = L(menuKeys[id])
+		end
+		coinsLabel.Text = L("hud.coins", { amount = fmt.compact(state.coins) })
+		pearlsLabel.Text = L("hud.pearls", { amount = fmt.compact(state.pearls) })
+		bagLabel.Text = L("hud.bag", { used = state.inventoryCount, capacity = state.capacity })
+		local zoneName = L("zone." .. state.zone .. ".name")
+		zoneLabel.Text = if state.isPrivateServer then L("hud.zone_private", { zone = zoneName }) else zoneName
 		autoButton.Visible = state.passes.auto_fish == true
-		autoButton.Text = if state.autoFish then "Auto-pesca: SI" else "Auto-pesca: NO"
-		sellButton.Text = if state.inventoryCount > 0 then ("VENDER (%d)"):format(state.inventoryCount) else "VENDER"
+		autoButton.Text = if state.autoFish then L("hud.auto_on") else L("hud.auto_off")
+		sellButton.Text = if state.inventoryCount > 0
+			then L("hud.sell_count", { count = state.inventoryCount })
+			else L("hud.sell")
 		refreshTimers()
 		refreshAction()
 	end

@@ -7,6 +7,10 @@
 	Autoridad del servidor: todos los remotos del cliente solo SOLICITAN; aqui se valida (packages/Net)
 	y se decide. Nada de lo que envia el cliente se usa como cantidad.
 
+	Textos: el servidor NUNCA envia texto traducido al cliente: envia CLAVES con argumentos validados (`toast`, banner;
+	packages/Locale + shared/Strings.luau) y el cliente las traduce al idioma del jugador. Solo las expulsiones (Kick) se
+	arman aqui, con ES y EN juntos, porque el servidor no sabe el idioma del jugador antes de que cargue su cliente.
+
 	// REVIEW(money): onPurchaseGranted / Shop.start / handlers de concesion / Data.attach tocan dinero real
 	// y datos de jugador. Revisar con una persona antes de publicar. No se ha probado en Studio.
 ]]
@@ -31,6 +35,8 @@ local LIVEOPS_TOPIC = "FishFortune_LiveOpsUpdated"
 -- Todos los modulos llegan inyectados (`m`): asi este archivo no depende de rutas de instancias.
 function GameService.start(m: any)
 	local balance = m.Balance
+	local locale = m.Locale.new(m.Strings)
+	local spanish = locale:translator("es") -- textos del servidor para logs, validacion del catalogo y respaldo
 	local random = Random.new()
 	local isPrivateServer = game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
 	local jobId = if game.JobId ~= "" then game.JobId else HttpService:GenerateGUID(false)
@@ -40,7 +46,11 @@ function GameService.start(m: any)
 	----------------------------------------------------------------------------
 	local zoneList = {}
 	for _, zoneId in balance.zoneOrder do
-		table.insert(zoneList, { id = zoneId, name = balance.zones[zoneId].name })
+		table.insert(zoneList, {
+			id = zoneId,
+			nameKey = "zone." .. zoneId .. ".name",
+			name = spanish("zone." .. zoneId .. ".name"),
+		})
 	end
 	local world = m.WorldBuilder.build(zoneList)
 
@@ -51,6 +61,14 @@ function GameService.start(m: any)
 	local analytics = m.Analytics.new({ service = AnalyticsService, enums = Enum })
 
 	local rules = m.FishingRules.new(balance, m.Odds)
+
+	-- REVIEW(money) ANALYTICS-01: el evento de economia de una compra con Robux (IAP) NO se envia al conceder (en memoria),
+	-- sino DESPUES de guardar, en onPurchaseGranted. Si el guardado falla, Roblox reintenta el recibo y el evento sale una
+	-- sola vez al confirmar; antes se contaba al conceder y se duplicaba si la concesion se repetia.
+	-- Cola por jugador: userId -> eventos IAP concedidos aun sin confirmar (tope por jugador).
+	local pendingIap: { [number]: { any } } = {}
+	local MAX_PENDING_IAP = 20
+
 	local logic = m.GameLogic.new({
 		balance = balance,
 		rules = rules,
@@ -61,9 +79,21 @@ function GameService.start(m: any)
 		clock = os.clock,
 		flags = flags,
 		onTransaction = function(tx: any)
-			if tx.player ~= nil then
-				analytics:economy(tx.player, tx.flow, tx.currency, tx.amount, tx.endingBalance, tx.reason, tx.sku)
+			if tx.player == nil then
+				return
 			end
+			if tx.reason == "IAP" then
+				local queue = pendingIap[tx.player.UserId]
+				if queue == nil then
+					queue = {}
+					pendingIap[tx.player.UserId] = queue
+				end
+				if #queue < MAX_PENDING_IAP then
+					table.insert(queue, tx)
+				end
+				return
+			end
+			analytics:economy(tx.player, tx.flow, tx.currency, tx.amount, tx.endingBalance, tx.reason, tx.sku)
 		end,
 	})
 
@@ -90,6 +120,13 @@ function GameService.start(m: any)
 		schema = schema,
 		jobId = jobId,
 		autosaveSeconds = 120,
+		-- Expulsiones: ES y EN juntos (el servidor no conoce el idioma del jugador antes de que cargue su cliente).
+		messages = {
+			loadFailed = locale:joined("kick.load_failed"),
+			locked = locale:joined("kick.locked"),
+			newerVersion = locale:joined("kick.newer_version"),
+			lockLost = locale:joined("kick.lock_lost"),
+		},
 	})
 
 	-- LiveOps: configuracion remota SIN republicar (ConfigService), con valores por defecto en Balance.
@@ -117,7 +154,7 @@ function GameService.start(m: any)
 		end,
 	})
 
-	local catalog = m.Catalog.build(m.ProductIds, balance, flags)
+	local catalog = m.Catalog.build(m.ProductIds, balance, flags, spanish)
 	local grants = logic:shopHandlers(os.time)
 	for _, problem in m.Shop.validateCatalog(catalog, grants) do
 		warn("[Shop] catalogo: " .. problem)
@@ -135,6 +172,8 @@ function GameService.start(m: any)
 	local runtimes: { [number]: any } = {}
 	local dirty: { [number]: boolean } = {}
 	local funnelSessions: { [number]: string } = {}
+	-- OFFLINE-01: jugadores cuyo calculo offline de la entrada ya se pago; solo entonces se refresca lastSeen.
+	local offlineReady: { [number]: boolean } = {}
 
 	local function profileOf(player: Player): any?
 		local profile = manager:get(player.UserId)
@@ -189,8 +228,14 @@ function GameService.start(m: any)
 		}
 	end
 
-	local function toast(player: Player, text: string)
-		net:fireClient("Toast", player, text)
+	-- Aviso al jugador: se envia { key, args } validado (lista blanca de prefijos y de argumentos), nunca texto traducido.
+	local function toast(player: Player, key: string, args: { [string]: any }?)
+		local message = locale:message(key, args)
+		if message == nil then
+			warn("[Locale] mensaje invalido descartado: " .. key)
+			return
+		end
+		net:fireClient("Toast", player, message)
 	end
 
 	local function ftue(player: Player, data: any, step: number, name: string)
@@ -308,6 +353,30 @@ function GameService.start(m: any)
 		end,
 		onPurchaseGranted = function(player: Player, product: any, receipt: any)
 			-- Solo corre DESPUES de confirmar el guardado.
+			local queue = pendingIap[player.UserId]
+			if queue ~= nil then
+				local waiting = {}
+				for _, tx in queue do
+					if tx.sku == product.key then
+						analytics:economy(
+							tx.player,
+							tx.flow,
+							tx.currency,
+							tx.amount,
+							tx.endingBalance,
+							tx.reason,
+							tx.sku
+						)
+					else
+						table.insert(waiting, tx)
+					end
+				end
+				if #waiting > 0 then
+					pendingIap[player.UserId] = waiting
+				else
+					pendingIap[player.UserId] = nil
+				end
+			end
 			analytics:funnel(player, "shop", 3, "purchase_granted", funnelSessions[player.UserId])
 			analytics:custom(
 				player,
@@ -315,7 +384,7 @@ function GameService.start(m: any)
 				1,
 				{ CustomField01 = tostring(receipt.CurrencySpent or 0) }
 			)
-			toast(player, "Compra recibida: " .. product.name)
+			toast(player, "toast.purchase_received", { item = { key = "product." .. product.key .. ".name" } })
 			markDirty(player)
 		end,
 		onPassChanged = function(player: Player, _pass: any, _owned: boolean)
@@ -335,13 +404,14 @@ function GameService.start(m: any)
 	local function announceMythic(player: Player, result: any)
 		analytics:custom(player, "mythic_caught", 1, { CustomField01 = result.creatureId })
 		local isVip = shop:ownsPass(player, "vip")
-		local payload = {
+		local banner = locale:message(if isVip then "banner.mythic_vip" else "banner.mythic", {
 			player = player.DisplayName,
-			creature = result.name,
-			zone = balance.zones[result.zone].name,
-			vip = isVip,
-		}
-		net:fireAllClients("Banner", payload)
+			creature = { key = "creature." .. result.creatureId },
+			zone = { key = "zone." .. result.zone .. ".name" },
+		})
+		if banner ~= nil then
+			net:fireAllClients("Banner", banner)
+		end
 		if isPrivateServer then
 			return
 		end
@@ -372,7 +442,6 @@ function GameService.start(m: any)
 		local data = profile.data
 		net:fireClient("Catch", player, {
 			id = result.creatureId,
-			name = result.name,
 			rarity = result.rarity,
 			value = result.value,
 			isNew = result.isNew,
@@ -405,12 +474,14 @@ function GameService.start(m: any)
 					if creature == nil or type(data.p) ~= "string" or not utf8.len(data.p) or #data.p > 100 then
 						return
 					end
-					net:fireAllClients("Banner", {
+					local banner = locale:message(if data.v == true then "banner.mythic_vip" else "banner.mythic", {
 						player = data.p,
-						creature = creature.name,
-						zone = balance.zones[creature.zone].name,
-						vip = data.v == true,
+						creature = { key = "creature." .. creature.id },
+						zone = { key = "zone." .. creature.zone .. ".name" },
 					})
+					if banner ~= nil then
+						net:fireAllClients("Banner", banner)
+					end
 				end)
 			end)
 			if not ok then
@@ -526,12 +597,12 @@ function GameService.start(m: any)
 		handler = withProfile(function(player: Player, profile: any)
 			local earned, count = logic:sellAll(profile.data, context(player))
 			if count == 0 then
-				toast(player, "No tienes nada que vender.")
+				toast(player, "toast.nothing_to_sell")
 				return
 			end
 			profile:markDirty()
 			ftue(player, profile.data, 4, "first_sale")
-			toast(player, ("Vendiste %d capturas por %d monedas."):format(count, earned))
+			toast(player, "toast.sold", { count = count, coins = earned })
 			markDirty(player)
 		end),
 	})
@@ -541,7 +612,7 @@ function GameService.start(m: any)
 		validators: { any },
 		rate: any,
 		action: (player: Player, profile: any, ...any) -> (boolean, string?),
-		okText: string?
+		okKey: string?
 	)
 		net:event(name, {
 			args = validators,
@@ -550,8 +621,8 @@ function GameService.start(m: any)
 				local ok, reason = action(player, profile, ...)
 				if ok then
 					profile:markDirty()
-					if okText then
-						toast(player, okText)
+					if okKey then
+						toast(player, okKey)
 					end
 				else
 					net:fireClient("CastFailed", player, reason or "error")
@@ -575,7 +646,7 @@ function GameService.start(m: any)
 			end
 			return ok, reason
 		end,
-		"Cana comprada y equipada."
+		"toast.rod_bought"
 	)
 
 	simpleAction(
@@ -599,7 +670,7 @@ function GameService.start(m: any)
 		function(player: Player, profile: any, zoneId: string)
 			return logic:unlockZone(profile.data, zoneId, player)
 		end,
-		"Zona desbloqueada."
+		"toast.zone_unlocked"
 	)
 
 	local function teleportToZone(player: Player, zoneId: string)
@@ -629,7 +700,7 @@ function GameService.start(m: any)
 		rate = slowRate,
 		handler = withProfile(function(player: Player, profile: any, enabled: boolean)
 			if enabled and not shop:ownsPass(player, "auto_fish") then
-				toast(player, "La pesca automatica necesita el Pase Auto-Pesca.")
+				toast(player, "toast.autofish_needs_pass")
 				return
 			end
 			profile.data.autoFish = enabled
@@ -649,7 +720,7 @@ function GameService.start(m: any)
 		function(player: Player, profile: any, rewardId: string)
 			return logic:claimBestiary(profile.data, rewardId, player)
 		end,
-		"Recompensa del bestiario reclamada."
+		"toast.bestiary_claimed"
 	)
 
 	simpleAction(
@@ -659,23 +730,24 @@ function GameService.start(m: any)
 		function(player: Player, profile: any, tier: number, track: string)
 			return logic:claimSeason(profile.data, tier, track, context(player))
 		end,
-		"Recompensa de temporada reclamada."
+		"toast.season_claimed"
 	)
 
 	simpleAction("ClaimDaily", {}, slowRate, function(player: Player, profile: any)
 		return logic:claimDaily(profile.data, context(player))
-	end, "Perlas diarias VIP reclamadas.")
+	end, "toast.daily_claimed")
 
 	simpleAction("BuySlotsWithPearls", {}, slowRate, function(player: Player, profile: any)
 		return logic:buySlotsWithPearls(profile.data, player)
-	end, "Espacio de inventario ampliado.")
+	end, "toast.slots_expanded")
 
+	-- Resultado de LiveOps.redeemCode -> clave de texto
 	local codeMessages: { [string]: string } = {
-		invalid = "Ese codigo no es valido.",
-		unknown = "Ese codigo no existe.",
-		notStarted = "Ese codigo todavia no esta activo.",
-		expired = "Ese codigo ha caducado.",
-		already = "Ya canjeaste ese codigo.",
+		invalid = "toast.code_invalid",
+		unknown = "toast.code_unknown",
+		notStarted = "toast.code_not_started",
+		expired = "toast.code_expired",
+		already = "toast.code_already",
 	}
 	net:event("RedeemCode", {
 		args = { t.string({ minLength = 1, maxLength = 32 }) },
@@ -683,7 +755,7 @@ function GameService.start(m: any)
 		handler = withProfile(function(player: Player, profile: any, code: string)
 			local result = liveOps:redeemCode(profile.data.redeemedCodes, code, os.time())
 			if not result.ok then
-				toast(player, codeMessages[result.reason or "invalid"] or "Codigo no valido.")
+				toast(player, codeMessages[result.reason or "invalid"] or "toast.code_invalid")
 				return
 			end
 			local granted, grantErr =
@@ -692,12 +764,12 @@ function GameService.start(m: any)
 				-- Premio mal formado en la configuracion remota: no se "gasta" el codigo del jugador sin pagarle.
 				profile.data.redeemedCodes[result.code :: string] = nil
 				warn("[LiveOps] el premio del codigo " .. tostring(result.code) .. " fallo: " .. tostring(grantErr))
-				toast(player, "Ese codigo no se pudo canjear ahora. Prueba mas tarde.")
+				toast(player, "toast.code_failed")
 				return
 			end
 			profile:markDirty()
 			analytics:custom(player, "code_redeemed", 1)
-			toast(player, "Codigo canjeado.")
+			toast(player, "toast.code_redeemed")
 			markDirty(player)
 			task.spawn(function()
 				profile:save() -- guarda ya: un codigo canjeado no debe perderse si el servidor cae
@@ -754,14 +826,21 @@ function GameService.start(m: any)
 			local season = liveOps:getSeason(c.now)
 			logic:seasonSync(data, if season then season.id else 0)
 			local earned, seconds = logic:applyOffline(data, c)
+			offlineReady[player.UserId] = true -- applyOffline ya dejo lastSeen = ahora: desde aqui se puede refrescar
 			if earned > 0 then
-				toast(player, ("Mientras no estabas (%d min): +%d monedas."):format(math.floor(seconds / 60), earned))
+				toast(player, "toast.offline", { minutes = math.floor(seconds / 60), coins = earned, count = earned })
 			end
 			-- 3. bienvenida (una vez por id)
 			local welcome = liveOps:getWelcome(data.seenWelcome, c.now)
 			if welcome then
 				data.seenWelcome = welcome.id
-				toast(player, welcome.message)
+				-- Bienvenida: con clave propia (welcome.<id>) se traduce; si viene de la configuracion remota sin traduccion,
+				-- se muestra su texto tal cual (en el idioma en que se escribio).
+				if locale:has("welcome." .. welcome.id) then
+					toast(player, "welcome." .. welcome.id)
+				else
+					toast(player, "toast.raw", { text = welcome.message })
+				end
 			end
 			ftue(player, data, 1, "joined")
 			if not data.ftue.joinLogged then
@@ -796,6 +875,8 @@ function GameService.start(m: any)
 			runtimes[player.UserId] = nil
 			dirty[player.UserId] = nil
 			funnelSessions[player.UserId] = nil
+			offlineReady[player.UserId] = nil
+			pendingIap[player.UserId] = nil -- compra concedida que no llego a confirmarse antes de salir: se prefiere no contar
 		end,
 	})
 	manager:startAutosave()
@@ -823,6 +904,12 @@ function GameService.start(m: any)
 			local now = os.clock()
 			for _, player in Players:GetPlayers() do
 				local profile = profileOf(player)
+				-- REVIEW(money) OFFLINE-01: lastSeen (base de las ganancias offline) se mantiene "vivo" en memoria; el
+				-- autosave y cualquier otro guardado lo persisten. Antes solo se fijaba al salir: tras un crash se pagaba como
+				-- offline tambien el tiempo jugado (acotado por el tope). Solo tras pagar el offline de la entrada.
+				if profile ~= nil and offlineReady[player.UserId] then
+					profile.data.lastSeen = os.time()
+				end
 				local runtime = runtimes[player.UserId]
 				if profile ~= nil and runtime ~= nil and profile.data.autoFish and now >= runtime.nextAutoAt then
 					runtime.nextAutoAt = now + logic:autoInterval(profile.data)

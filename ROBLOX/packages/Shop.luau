@@ -35,6 +35,9 @@ export type PassDef = {
 	id: number, -- 0 = placeholder TODO_ID: no se puede comprar hasta rellenarlo
 	name: string,
 	description: string,
+	nameKey: string?, -- clave de localizacion (el cliente traduce); `name`/`description` son el texto de respaldo
+	descriptionKey: string?,
+	textArgs: { [string]: any }?, -- argumentos de las plantillas de texto (importes...)
 	tier: string?, -- escalon de la escalera de precios
 	priceRobux: number?, -- si falta, se resuelve desde `tier`
 	priceOverride: boolean?, -- true: precio fuera de la escalera (revisar a mano)
@@ -49,6 +52,9 @@ export type ProductDef = {
 	id: number, -- 0 = placeholder TODO_ID
 	name: string,
 	description: string,
+	nameKey: string?,
+	descriptionKey: string?,
+	textArgs: { [string]: any }?,
 	kind: string, -- clave del handler de concesion
 	grant: { [string]: any }, -- datos para el handler
 	tier: string?,
@@ -327,6 +333,7 @@ type ShopData = {
 	nowFn: () -> number,
 	randomFn: () -> number,
 	owned: { [number]: { [string]: boolean } }, -- userId -> passKey -> poseido
+	ownershipUnknown: { [number]: { [string]: boolean } }, -- userId -> passKey: la consulta de propiedad FALLO (PASS-01)
 	policies: { [number]: any },
 	policyRetryAt: { [number]: number }, -- tras un fallo de PolicyService no se reintenta antes de esta hora
 	lastPrompt: { [number]: number },
@@ -378,6 +385,7 @@ function Shop.new(config: Config): Shop
 			return math.random()
 		end,
 		owned = {},
+		ownershipUnknown = {},
 		policies = {},
 		policyRetryAt = {},
 		lastPrompt = {},
@@ -614,6 +622,23 @@ function ShopImpl._checkOwnership(self: Shop, player: any, pass: PassDef): (bool
 	return false, false
 end
 
+-- REVIEW(money) PASS-01: recuerda que la consulta de propiedad de un pase fallo (propiedad DESCONOCIDA, no "no poseido").
+function ShopImpl._markOwnershipUnknown(self: Shop, userId: number, passKey: string, unknown: boolean)
+	local byPlayer = self.ownershipUnknown[userId]
+	if unknown then
+		if byPlayer == nil then
+			byPlayer = {}
+			self.ownershipUnknown[userId] = byPlayer
+		end
+		byPlayer[passKey] = true
+	elseif byPlayer ~= nil then
+		byPlayer[passKey] = nil
+		if next(byPlayer) == nil then
+			self.ownershipUnknown[userId] = nil
+		end
+	end
+end
+
 function ShopImpl._setOwned(self: Shop, player: any, pass: PassDef, owned: boolean)
 	local userId = player.UserId
 	local byPlayer = self.owned[userId]
@@ -623,6 +648,7 @@ function ShopImpl._setOwned(self: Shop, player: any, pass: PassDef, owned: boole
 	end
 	local before = byPlayer[pass.key] == true
 	byPlayer[pass.key] = owned
+	self:_markOwnershipUnknown(userId, pass.key, false) -- ya se conoce
 	if before ~= owned and self.cfg.onPassChanged then
 		local ok, err = pcall(self.cfg.onPassChanged, player, pass, owned)
 		if not ok then
@@ -682,6 +708,7 @@ function ShopImpl.loadPlayer(self: Shop, player: any)
 						self:_applyOneTimeGrant(player, pass)
 					end
 				else
+					self:_markOwnershipUnknown(player.UserId, pass.key, true)
 					self:_log("no se pudo comprobar el pase " .. pass.key .. " de " .. tostring(player.UserId))
 				end
 				pending -= 1
@@ -699,6 +726,7 @@ end
 function ShopImpl.unloadPlayer(self: Shop, player: any)
 	local userId = player.UserId
 	self.owned[userId] = nil
+	self.ownershipUnknown[userId] = nil
 	self.policies[userId] = nil
 	self.policyRetryAt[userId] = nil
 	self.lastPrompt[userId] = nil
@@ -706,7 +734,23 @@ end
 
 function ShopImpl._onPassPromptFinished(self: Shop, player: any, passId: number, wasPurchased: boolean)
 	local pass = self.passesById[passId]
-	if pass == nil or pass.enabled == false or not wasPurchased then
+	if pass == nil or pass.enabled == false then
+		return
+	end
+	if not wasPurchased then
+		-- REVIEW(money) PASS-01: si la consulta de entrada FALLO, el dueno real figura como "no poseido" (y se le ofrece comprarlo otra vez;
+		-- Roblox cierra ese prompt sin compra). Se aprovecha para re-verificar. Solo en ese caso: con la propiedad ya conocida,
+		-- cancelar un prompt no cuesta llamadas a Roblox.
+		local unknown = self.ownershipUnknown[player.UserId]
+		if unknown ~= nil and unknown[pass.key] == true then
+			local ok, owns = self:_checkOwnership(player, pass)
+			if ok then
+				self:_setOwned(player, pass, owns)
+				if owns and pass.oneTimeGrant then
+					self:_applyOneTimeGrant(player, pass)
+				end
+			end
+		end
 		return
 	end
 	-- Re-verificar (la cache de UserOwnsGamePassAsync se actualiza con este evento). Si la
@@ -860,10 +904,13 @@ export type Offer = {
 	key: string,
 	name: string,
 	description: string,
+	nameKey: string?, -- claves de localizacion + argumentos: el cliente traduce en el idioma del jugador
+	descriptionKey: string?,
+	textArgs: { [string]: any }?,
 	priceRobux: number?,
 	priceIsApproximate: boolean,
 	available: boolean,
-	reason: string?, -- por que no esta disponible ("owned" | "restricted" | "unavailable" | "loading")
+	reason: string?, -- por que no esta disponible ("owned" | "restricted" | "unavailable" | "loading" | "maxed")
 	owned: boolean,
 }
 
@@ -882,6 +929,9 @@ function ShopImpl.getOffers(self: Shop, player: any): { Offer }
 			key = key,
 			name = item.name,
 			description = item.description,
+			nameKey = item.nameKey,
+			descriptionKey = item.descriptionKey,
+			textArgs = item.textArgs,
 			priceRobux = price,
 			priceIsApproximate = cached == nil,
 			available = available,

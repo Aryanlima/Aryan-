@@ -7,6 +7,8 @@ local FeatureFlags = require("../src/shared/FeatureFlags")
 local ProductIds = require("../src/server/ProductIds")
 local Shop = require("../../../packages/Shop")
 local GameLogic = require("../src/server/GameLogic")
+local Locale = require("../../../packages/Locale")
+local Strings = require("../src/shared/Strings")
 
 local describe, it, expect = testkit.describe, testkit.it, testkit.expect
 
@@ -25,8 +27,12 @@ local function countKeys(tbl)
 	return n
 end
 
+-- Nombre y descripcion viven en Strings (claves); el catalogo del servidor los rellena en espanol con este traductor.
+local locale = Locale.new(Strings)
+local spanish = locale:translator("es")
+
 describe("Catalog", function()
-	local catalog = Catalog.build(ProductIds, Balance, FeatureFlags)
+	local catalog = Catalog.build(ProductIds, Balance, FeatureFlags, spanish)
 
 	it("es valido (precios en la escalera, sin ids repetidos, sin lenguaje de presion)", function()
 		expect(Shop.validateCatalog(catalog, handlers())).toEqual({})

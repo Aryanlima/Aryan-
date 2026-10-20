@@ -24,6 +24,7 @@ Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games
 | `Economy` | Monedas blanda/dura (enteros acotados), multiplicadores combinables con tope (aditivos), boosts temporales con tope de acumulación, ganancias offline con tope. | servidor | `tests/Economy.spec.luau` |
 | `Shop` | Catálogo por configuración (pases, productos, boosts, packs), `ProcessReceipt` único e idempotente, caché de propiedad de pases, prompts seguros, gating por `PolicyService`, escalera de precios, validación del catálogo (sin urgencia ni descuentos falsos), elementos `enabled = false`. | servidor | `tests/Shop.spec.luau` |
 | `Odds` | UNA tabla de probabilidades que genera la tirada del servidor (RNG inyectable) y los datos de la UI de probabilidades (suman 100 %, sin "nada", pity solo si es visible, gating por política). | ambos | `tests/Odds.spec.luau` |
+| `Locale` | Localización ES/EN (ampliable): claves → texto con marcadores `{nombre}`, plural, respaldo al idioma por defecto del juego (EN en Fish & Fortune), elección de idioma por `LocaleId`, formatos de número (solo cambian separadores) y validación con lista blanca de los mensajes `{ key, args }` que envía el servidor. Pura. | ambos | `tests/Locale.spec.luau` |
 | `Net` | Registro de RemoteEvent/Function con validadores (rechaza NaN/inf, cadenas enormes, aridad), token bucket por jugador y remoto (`os.clock`), límite global, detección de abuso. | ambos | `tests/Net.spec.luau` |
 | `LiveOps` | Ventanas de eventos y rotación, códigos con caducidad y un uso por jugador, bienvenida, temporada; configuración remota (ConfigService/DataStore, inyectada) validada antes de aplicarla. | servidor | `tests/LiveOps.spec.luau` |
 | `Analytics` | Envoltorio de `AnalyticsService` (economía, embudo FTUE, eventos propios): no-op sin servicio, valida y respeta los límites documentados. | servidor | `tests/Analytics.spec.luau` |
@@ -31,7 +32,8 @@ Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games
 
 | Juego (`games/fish-and-fortune/src/`) | Qué es |
 |---|---|
-| `shared/Balance.luau` | **Todo el balance** (rarezas, 3 zonas, 25 criaturas, 5 cañas, minijuego, inventario, offline, FTUE, bestiario, temporada, VIP, importes de productos). Datos puros. |
+| `shared/Balance.luau` | **Todo el balance** (rarezas, 3 zonas, 25 criaturas, 5 cañas, minijuego, inventario, offline, FTUE, bestiario, temporada, VIP, importes de productos). Datos puros, **sin textos**. |
+| `shared/Strings.luau` | **Todos los textos visibles** (ES + EN lado a lado). Datos puros; `tests/Strings.spec.luau` cruza el archivo con el código y los datos del juego. |
 | `shared/FeatureFlags.luau` | Flags de funciones con riesgo de cumplimiento (`paidLuckEnabled = false` en la v1). |
 | `shared/FishingRules.luau` | Reglas puras: tabla de odds por zona (vía `Odds`), elección de captura (con tutorial garantizado), minijuego (onda triangular, evaluación del tiempo). |
 | `shared/{Remotes,ClientLogic,Store}.luau` | Nombres de remotos; guía del tutorial y textos del cliente; contenedor de estado. |
@@ -43,8 +45,8 @@ Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games
 Mapa Rojo (`default.project.json`):
 
 ```
-ReplicatedStorage   Packages {Odds, Net, UI}            <- seguros para el cliente
-                    Shared   {Balance, FeatureFlags, FishingRules, Remotes, ClientLogic, Store}
+ReplicatedStorage   Packages {Odds, Net, UI, Locale}    <- seguros para el cliente
+                    Shared   {Balance, Strings, FeatureFlags, FishingRules, Remotes, ClientLogic, Store}
 ServerScriptService ServerPackages {Data, Economy, Shop, LiveOps, Analytics}   <- SOLO servidor
                     Server   {Main (Script), GameService, GameLogic, Catalog, ProductIds, Schema,
                               LiveOpsDefaults, WorldBuilder, StudioMemoryStore}
@@ -146,6 +148,9 @@ En la v1 **no se vende suerte ni azar de pago**. Con el flag apagado:
 * La suerte **gratuita** (cañas, lanzamiento perfecto, eventos) sigue funcionando y la UI de probabilidades la muestra junto a la columna base.
 * La lógica de v1.5 (PolicyService, odds dinámicas con suerte de pago) se conserva y se prueba con el flag encendido.
 
+### 6.4 Textos e idiomas
+El servidor no envía texto: envía claves y argumentos (`Locale.message`) y el cliente los valida y traduce al idioma del jugador (ver README del juego, sección 10). Los textos de tienda, tutorial y probabilidades se revisan una sola vez en `Strings.luau`, en ES y EN, con la misma prueba de lenguaje de presión.
+
 ---
 
 ## 7. Red (`Net`)
@@ -189,7 +194,7 @@ En la v1 **no se vende suerte ni azar de pago**. Con el flag apagado:
 | `ConfigService` sin verificar a fondo | `pcall` + valores por defecto; `-- VERIFY:` | Confirmar formato del valor JSON y límites de tamaño en Studio |
 | Cuotas (DataStore, MessagingService, Analytics) | Autosave 120 s, banner con cooldown, límites de analítica | Medir con tráfico real |
 | Cumplimiento por país/edad | `PolicyService` cacheado y conservador; flag apagado | Probar con el Player Emulator (AU, BE, NL, UK, BR) antes de la v1.5 |
-| Localización | Todo en español | EN/ES con tabla de textos |
+| Localización | ES (por defecto) y EN completos, un solo archivo de textos, servidor → cliente solo claves validadas (`Locale`) y pruebas que escanean el código | Probar en Studio con cuentas en ES y EN (`RobloxLocaleId` sin verificar); decidir el idioma de respaldo para idiomas no soportados; traducir la ficha y los pases en el Creator Hub |
 
 ---
 

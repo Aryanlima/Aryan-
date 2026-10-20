@@ -26,7 +26,6 @@ export type Runtime = {
 
 export type CatchResult = {
 	creatureId: string,
-	name: string,
 	rarity: string,
 	value: number,
 	isNew: boolean,
@@ -145,23 +144,27 @@ end
 -- Suerte y multiplicadores
 ----------------------------------------------------------------------------
 
-export type LuckSource = { id: string, label: string, value: number, paid: boolean, active: boolean }
+-- `labelKey`: clave de texto (shared/Strings.luau) del nombre de la fuente; el cliente la traduce.
+export type LuckSource = { id: string, labelKey: string, value: number, paid: boolean, active: boolean }
 
 function GameLogic.luckSources(self: Logic, data: any, ctx: Context, quality: string?): { LuckSource }
 	local balance = self.balance
 	local list: { LuckSource } = {}
 	local rod = balance.rods[data.rod]
-	table.insert(list, { id = "rod", label = rod.name, value = rod.luck, paid = false, active = true })
+	table.insert(list, { id = "rod", labelKey = "rod." .. data.rod, value = rod.luck, paid = false, active = true })
 	local qualityLuck = self.rules:qualityLuck(quality)
 	if qualityLuck > 0 then
 		table.insert(
 			list,
-			{ id = "minigame", label = "Lanzamiento perfecto", value = qualityLuck, paid = false, active = true }
+			{ id = "minigame", labelKey = "odds.source.perfect", value = qualityLuck, paid = false, active = true }
 		)
 	end
 	for _, source in ctx.events do
 		if source.kind == "luck" and source.active then
-			table.insert(list, { id = source.id, label = "Evento", value = source.value, paid = false, active = true })
+			table.insert(
+				list,
+				{ id = source.id, labelKey = "odds.source.event", value = source.value, paid = false, active = true }
+			)
 		end
 	end
 	-- Fuentes de pago (Suerte+ y Cebo): SOLO existen si el flag paidLuckEnabled esta encendido (v1.5) y, ademas,
@@ -169,14 +172,14 @@ function GameLogic.luckSources(self: Logic, data: any, ctx: Context, quality: st
 	if self.flags.paidLuckEnabled then
 		table.insert(list, {
 			id = "pass:luck_plus",
-			label = "Pase Suerte+",
+			labelKey = "pass.luck_plus.name",
 			value = balance.products.passes.luckPlus,
 			paid = true,
 			active = ctx.passes.luck_plus == true and ctx.paidRandomAllowed,
 		})
 		table.insert(list, {
 			id = "boost:lucky_bait",
-			label = "Cebo de Suerte",
+			labelKey = "product.lucky_bait_15.name",
 			value = balance.products.luckyBait.luck,
 			paid = true,
 			active = self.economy.isBoostActive(data.boosts, "lucky_bait", ctx.now) and ctx.paidRandomAllowed,
@@ -391,7 +394,6 @@ function GameLogic.resolveCatch(self: Logic, data: any, ctx: Context, quality: s
 	end
 	return {
 		creatureId = creatureId,
-		name = creature.name,
 		rarity = creature.rarity,
 		value = creature.value,
 		isNew = isNew,

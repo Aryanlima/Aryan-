@@ -9,7 +9,8 @@
         "$className": "Folder",
         "Odds": { "$path": "../../packages/Odds.luau" },
         "Net": { "$path": "../../packages/Net.luau" },
-        "UI": { "$path": "../../packages/UI.luau" }
+        "UI": { "$path": "../../packages/UI.luau" },
+        "Locale": { "$path": "../../packages/Locale.luau" }
       },
       "Shared": { "$path": "src/shared" }
     },

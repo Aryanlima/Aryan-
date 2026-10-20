@@ -20,7 +20,7 @@ Hallazgos: **0 críticos, 3 altos, 7 medios, 8 bajos.**
 
 | Medida | Antes | Después |
 |---|---|---|
-| Pruebas | 382 | **420 pasan, 0 fallan, 2 omitidas** (puerta previa a publicar, opt-in) |
+| Pruebas | 382 | **420 pasan, 0 fallan, 2 omitidas** (puerta previa a publicar, opt-in) tras integrar la revisión; **481 pasan** tras aplicar ANALYTICS-01, OFFLINE-01 y PASS-01 (+7) y la localización ES/EN (+54) |
 | `lint` (Selene + StyLua + luau-lsp) | OK | OK |
 | Formato | OK | OK |
 | Mutation testing (60 errores inyectados) | 50 detectados, **10 sobrevivían** | Los 10 mueren con las pruebas nuevas; 10 mutantes más sobre los propios arreglos también mueren |
@@ -43,9 +43,9 @@ Los mutantes que sobrevivían estaban casi todos en `GameService` (GS1 a GS7), q
 | MINI-01 | Media | `FishingRules.luau`, `Balance.luau` | La ventana de trampa (2,85 s) supera el periodo del marcador (1,5 s): un tramposo acierta la perfecta con cualquier centro | [EJ] | **Inherente, decisión tuya** (ver 4) |
 | LIVEOPS-01 | Baja | `LiveOps.luau`, `GameService.luau` | Un premio mal formado en la configuración remota marcaba el código como usado y fallaba sin pagar | [EJ] | **Aplicado**: validación (0 a 1e9) y reversión del canje |
 | BANNER-01 | Baja | `GameService.luau` | `string.sub(...,1,40)` corta bytes: un nombre CJK queda en UTF-8 inválido y el banner global no sale en otros servidores | [EJ] | **Aplicado**: corte por caracteres (`utf8.offset`) |
-| ANALYTICS-01 | Baja | `GameLogic.luau`, `GameService.luau` | El evento de compra sale antes de guardar; si el guardado falla se cuenta dos veces | [EJ] | Propuesto: registrarlo en `onPurchaseGranted` |
-| OFFLINE-01 | Baja | `GameService.luau` | `lastSeen` solo se guarda al salir; tras un crash se paga offline también el tiempo jugado (acotado por el tope) | [LEÍDO] | Propuesto: refrescar en el autosave |
-| PASS-01 | Baja | `Shop.luau` | Si la consulta de propiedad falló al entrar, el dueño real figura como "no poseído" hasta reentrar | [LEÍDO] | Propuesto: re-verificar si `wasPurchased=false` |
+| ANALYTICS-01 | Baja | `GameLogic.luau`, `GameService.luau` | El evento de compra sale antes de guardar; si el guardado falla se cuenta dos veces | [EJ] | **Aplicado**: el evento de economía IAP se encola al conceder y solo se envía en `onPurchaseGranted` (tras confirmar el guardado). Prueba: `GameService.spec` "BUG ANALYTICS-01". Residual: la concesión única de un pase (Pack de inicio) sigue registrándose al conceder; si el jugador sale justo entre conceder y guardar, ese evento no se cuenta (se prefiere no contar a contar dos veces) |
+| OFFLINE-01 | Baja | `GameService.luau` | `lastSeen` solo se guarda al salir; tras un crash se paga offline también el tiempo jugado (acotado por el tope) | [LEÍDO] | **Aplicado**: `lastSeen` se mantiene al día en memoria (bucle de 1 s, solo tras pagar el offline de la entrada) y lo persiste el autosave; sin tocar `Data`. Pruebas: `GameService.spec` "BUG OFFLINE-01" y "OFFLINE-01" |
+| PASS-01 | Baja | `Shop.luau` | Si la consulta de propiedad falló al entrar, el dueño real figura como "no poseído" hasta reentrar | [LEÍDO] | **Aplicado**: se recuerda qué pases quedaron con propiedad desconocida y, si el prompt termina sin compra (`wasPurchased=false`), se re-verifica (y se aplica la concesión única); con la propiedad ya conocida no se hace ninguna llamada extra. Pruebas: `Review.Shop.spec` "BUG PASS-01" |
 | CONFIG-01 | Baja | `GameService.luau` | Un snapshot de configuración nuevo por sondeo; la doc dice que solo cambia con `Refresh()` | [DOC] (la API existe; semántica no verificada) | Propuesto: usar `Refresh()` |
 | COMPLIANCE-01 | Baja | `Balance.luau` | Con `decimals=2` el Mítico se muestra "0.04 %" (real 0,0400-0,0427 %). Solo importa cuando haya suerte de pago (v1.5) | [EJ] | Propuesto: `decimals=4` en la v1.5 |
 | SHOP-03 | Baja | `Shop.luau` | El recibo de un producto deshabilitado queda `NotProcessedYet` para siempre. Es seguro, pero Roblox retira de superficies externas los productos listados con `ProcessReceipt` fallido | [DOC] | **No crear** en Creator Hub los productos de suerte en la v1; definir política para recibos antiguos antes de la v1.5 |
@@ -79,6 +79,6 @@ Es una decisión de diseño tuya: aceptarlo en la v1 o rediseñar el minijuego p
 
 1. Rellenar `ProductIds.luau` con IDs reales, ejecutar `FF_RELEASE_CHECK=1 bash ROBLOX/tools/test.sh` y probar en Studio una compra real de cada producto y de cada pase (resuelve el bloqueo 3).
 2. Decidir DATA-01 (tiempo de caducidad del bloqueo) y MINI-01 (minijuego).
-3. Aplicar los arreglos propuestos de impacto bajo (ANALYTICS-01, OFFLINE-01, PASS-01, CONFIG-01) y fijar `decimals=4` antes de activar suerte de pago.
+3. ~~Aplicar ANALYTICS-01, OFFLINE-01 y PASS-01~~ (hecho, ver la tabla). Quedan CONFIG-01 (semántica no verificada) y fijar `decimals=4` antes de activar suerte de pago. Todo el código nuevo de dinero está marcado `REVIEW(money)` (`GameService`: cola IAP y `lastSeen`; `Shop`: propiedad desconocida).
 4. Sustituir el módulo `Data` por ProfileStore para producción, o auditar con la misma exigencia el módulo propio.
 5. Una persona debe leer todo lo marcado `REVIEW(money)` antes de publicar.

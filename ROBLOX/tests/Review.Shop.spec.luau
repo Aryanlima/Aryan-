@@ -208,6 +208,86 @@ describe("Review: Shop", function()
 		end
 	)
 
+	describe("BUG PASS-01: la consulta de propiedad de un pase fallo al entrar", function()
+		local function passCatalog()
+			local catalog = newCatalog()
+			catalog.passes.starter = {
+				key = "starter",
+				id = 3001,
+				name = "Pack de inicio",
+				description = "Monedas para empezar.",
+				tier = "basic",
+				oneTimeGrant = { kind = "currency", coins = 500 },
+			}
+			return catalog
+		end
+
+		local function setup(changes)
+			local manager = newManager("A")
+			local player = env.Players:AddPlayer(USER, "Alice")
+			local profile = manager:load(USER)
+			local shop = newShop(manager, {
+				catalog = passCatalog(),
+				onPassChanged = function(_, pass, owned)
+					table.insert(changes, pass.key .. ":" .. tostring(owned))
+				end,
+			})
+			shop:start()
+			return player, profile, shop
+		end
+
+		it(
+			"si el prompt termina SIN compra (wasPurchased = false) se re-verifica: el dueno real deja de figurar como no poseido",
+			function()
+				local changes = {}
+				local player, profile, shop = setup(changes)
+				env.MarketplaceService:GrantGamePass(USER, 3001) -- ya es dueno (la compra fue en otra sesion o en la web)
+				env.MarketplaceService:FailNext(3) -- los 3 intentos de la consulta de entrada fallan
+				shop:loadPlayer(player)
+				expect(shop:ownsPass(player, "starter")).toBe(false) -- desconocido: no se asume propiedad
+				-- el jugador pulsa "Ver compra": Roblox le dice que ya lo tiene y cierra el prompt sin compra
+				env.MarketplaceService:SimulateGamePassPurchase(player, 3001, false)
+				expect(shop:ownsPass(player, "starter")).toBe(true) -- antes: seguia en false hasta reentrar
+				expect(profile.data.coins).toBe(500) -- la concesion unica del pase tambien se aplica (una vez)
+				expect(changes).toEqual({ "starter:true" })
+				env.MarketplaceService:SimulateGamePassPurchase(player, 3001, false)
+				expect(profile.data.coins).toBe(500)
+			end
+		)
+
+		it("si la re-verificacion tambien falla se sigue sin asumir propiedad y se puede volver a intentar", function()
+			local changes = {}
+			local player, profile, shop = setup(changes)
+			env.MarketplaceService:GrantGamePass(USER, 3001)
+			env.MarketplaceService:FailNext(6) -- entrada (3 intentos) + primera re-verificacion (3 intentos)
+			shop:loadPlayer(player)
+			env.MarketplaceService:SimulateGamePassPurchase(player, 3001, false)
+			env.clock:advance(10) -- los reintentos de la re-verificacion esperan 1 s y 2 s
+			expect(shop:ownsPass(player, "starter")).toBe(false)
+			expect(profile.data.coins).toBe(0)
+			env.MarketplaceService:SimulateGamePassPurchase(player, 3001, false) -- ahora Roblox responde
+			env.clock:advance(10)
+			expect(shop:ownsPass(player, "starter")).toBe(true)
+			expect(profile.data.coins).toBe(500)
+		end)
+
+		it("si la consulta de entrada FUE bien (no es dueno), cancelar un prompt no gasta llamadas a Roblox", function()
+			local changes = {}
+			local player, _, shop = setup(changes)
+			shop:loadPlayer(player)
+			local calls = 0
+			local realOwns = env.MarketplaceService.UserOwnsGamePassAsync
+			env.MarketplaceService.UserOwnsGamePassAsync = function(self, userId, passId)
+				calls += 1
+				return realOwns(self, userId, passId)
+			end
+			env.MarketplaceService:SimulateGamePassPurchase(player, 3001, false)
+			expect(calls).toBe(0)
+			expect(shop:ownsPass(player, "starter")).toBe(false)
+			expect(changes).toEqual({})
+		end)
+	end)
+
 	it(
 		"la puerta previa a publicar (allowPlaceholders = false) no cuenta lo apagado por flag (enabled = false)",
 		function()

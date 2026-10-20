@@ -10,6 +10,11 @@ local Data = require("../../../packages/Data")
 local Shop = require("../../../packages/Shop")
 local Economy = require("../../../packages/Economy")
 local Odds = require("../../../packages/Odds")
+local Locale = require("../../../packages/Locale")
+local Strings = require("../src/shared/Strings")
+
+-- Nombre y descripcion de la tienda viven en Strings: el catalogo del servidor los rellena en espanol.
+local spanish = Locale.new(Strings):translator("es")
 
 local describe, it, expect, beforeEach = testkit.describe, testkit.it, testkit.expect, testkit.beforeEach
 
@@ -77,7 +82,7 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 			flags = flags,
 		})
 		shop = Shop.new({
-			catalog = Catalog.build(FAKE_IDS, Balance, flags),
+			catalog = Catalog.build(FAKE_IDS, Balance, flags, spanish),
 			marketplace = env.MarketplaceService,
 			players = env.Players,
 			decision = env.Enum.ProductPurchaseDecision,

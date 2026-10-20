@@ -201,12 +201,14 @@ local function buildWorld(overrides)
 	local m = {
 		Odds = load(PACKAGES .. "Odds.luau"),
 		Net = load(PACKAGES .. "Net.luau"),
+		Locale = load(PACKAGES .. "Locale.luau"),
 		Data = load(PACKAGES .. "Data.luau"),
 		Economy = load(PACKAGES .. "Economy.luau"),
 		Shop = load(PACKAGES .. "Shop.luau"),
 		LiveOps = load(PACKAGES .. "LiveOps.luau"),
 		Analytics = load(PACKAGES .. "Analytics.luau"),
 		Balance = load(GAME .. "shared/Balance.luau"),
+		Strings = load(GAME .. "shared/Strings.luau"),
 		FishingRules = load(GAME .. "shared/FishingRules.luau"),
 		Remotes = load(GAME .. "shared/Remotes.luau"),
 		FeatureFlags = opts.flags or load(GAME .. "shared/FeatureFlags.luau"),
@@ -520,6 +522,244 @@ describe("GameService (arnes de integracion con dobles)", function()
 		local profile = world.api.manager:get(USER)
 		expect(profile.data.redeemedCodes.BAD).toBeNil() -- sigue disponible cuando se corrija la configuracion
 		expect(profile.data.wallet.coins).toBe(0)
+	end)
+
+	-- Eventos de economia (LogEconomyEvent) de tipo IAP registrados hasta ahora.
+	local function iapEconomyEvents(w)
+		local list = {}
+		for _, entry in w.analytics do
+			if entry.method == "LogEconomyEvent" and entry.args[6] == "IAP" then
+				table.insert(list, entry)
+			end
+		end
+		return list
+	end
+
+	it(
+		"BUG ANALYTICS-01: el evento IAP solo sale DESPUES de guardar; si el guardado falla no se cuenta (ni se cuenta dos veces)",
+		function()
+			local player = world.join()
+			env.DataStoreService:SetOutage(true)
+			local receipt, decision = env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.coin_pack_small)
+			env.clock:advance(60)
+			-- concedido en memoria pero NO guardado: Roblox lo reintentara; analitica a cero
+			expect(decision).toBe(env.Enum.ProductPurchaseDecision.NotProcessedYet)
+			expect(#iapEconomyEvents(world)).toBe(0)
+			-- vuelve el DataStore: el reintento guarda y SOLO entonces se registra el evento (una vez)
+			env.DataStoreService:SetOutage(false)
+			local retried = env.MarketplaceService:SimulateRedelivery(receipt.PurchaseId)
+			env.clock:advance(1)
+			expect(retried).toBe(env.Enum.ProductPurchaseDecision.PurchaseGranted)
+			local events = iapEconomyEvents(world)
+			expect(#events).toBe(1)
+			expect(events[1].args[4]).toBe(2500) -- amount
+			expect(events[1].args[5]).toBe(2500) -- endingBalance
+			expect(events[1].args[7]).toBe("coin_pack_small") -- sku
+			-- otra reentrega del mismo recibo no vuelve a contar
+			env.MarketplaceService:SimulateRedelivery(receipt.PurchaseId)
+			env.clock:advance(1)
+			expect(#iapEconomyEvents(world)).toBe(1)
+			expect(world.stored().data.wallet.coins).toBe(2500)
+		end
+	)
+
+	it(
+		"ANALYTICS-01: con el guardado correcto el evento IAP se registra una vez y el resto de la economia no cambia",
+		function()
+			local player = world.join()
+			env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.coin_pack_small)
+			env.clock:advance(1)
+			expect(#iapEconomyEvents(world)).toBe(1)
+			-- una venta normal sigue registrando su evento de economia en el momento (no es dinero real)
+			world.fire(player, "Cast")
+			env.clock:advance(0.8)
+			world.fire(player, "Reel", world.sentTo("CastStarted")[1].args[1].id, 0.8)
+			world.fire(player, "SellAll")
+			local gameplay = 0
+			for _, entry in world.analytics do
+				if entry.method == "LogEconomyEvent" and entry.args[6] == "Gameplay" then
+					gameplay += 1
+				end
+			end
+			expect(gameplay >= 1).toBe(true)
+			expect(#iapEconomyEvents(world)).toBe(1)
+		end
+	)
+
+	it(
+		"BUG OFFLINE-01: el autosave refresca lastSeen (tras un crash no se paga como offline el tiempo jugado)",
+		function()
+			world.join()
+			local joinedAt = env.clock.osTime()
+			env.clock:advance(500) -- sin salir ni BindToClose: solo hay autosaves cada 120 s
+			local lastSeen = world.stored().data.lastSeen
+			expect(lastSeen >= joinedAt + 360).toBe(true) -- antes: lastSeen seguia en el instante de entrada
+			expect(lastSeen <= env.clock.osTime()).toBe(true)
+		end
+	)
+
+	it(
+		"OFFLINE-01: refrescar lastSeen no pisa el calculo offline de la entrada aunque loadPlayer tarde varios segundos",
+		function()
+			local player = world.join()
+			env.clock:advance(10)
+			env.Players:RemovePlayer(player)
+			env.clock:advance(5)
+			env.clock:advance(10 * 3600)
+			-- la consulta de pases falla 3 veces (reintentos con espera): onLoaded tarda ~3 s antes de pagar el offline
+			env.MarketplaceService:FailNext(3 * 6)
+			world.join()
+			env.clock:advance(10)
+			expect(world.api.manager:get(USER).data.wallet.coins).toBe(80) -- 40/h x 2 h de tope
+		end
+	)
+
+	-- Localizacion: el servidor envia CLAVES + argumentos validados (nunca texto traducido); el cliente traduce.
+	local function validMessage(w, payload)
+		local locale = w.m.Locale.new(w.m.Strings)
+		local key, args = locale:sanitizeMessage(payload)
+		return key, args, locale
+	end
+
+	it("i18n: los avisos (Toast) son { key, args } validos y se traducen a ES y EN con las mismas cifras", function()
+		local player = world.join()
+		world.fire(player, "SellAll") -- nada que vender
+		world.fire(player, "Cast")
+		env.clock:advance(0.8)
+		world.fire(player, "Reel", world.sentTo("CastStarted")[1].args[1].id, 0.8)
+		world.fire(player, "SellAll")
+		env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.coin_pack_small)
+		env.clock:advance(1)
+		local keys = {}
+		for _, entry in world.sentTo("Toast") do
+			local payload = entry.args[1]
+			expect(type(payload)).toBe("table") -- nunca una cadena ya traducida
+			local key, args, locale = validMessage(world, payload)
+			expect(key).toBeTruthy()
+			table.insert(keys, key)
+			for _, language in { "es", "en" } do
+				local text = locale:format(language, key, args)
+				expect(string.find(text, "[{}]") == nil).toBe(true) -- sin marcadores sin sustituir
+			end
+			if key == "toast.sold" then
+				expect(args.count).toBe(1)
+				expect(locale:format("en", key, args)).toBe(
+					"Sold 1 catch for " .. locale:number("en", args.coins) .. " coins."
+				)
+				expect(locale:format("es", key, args)).toContain("Vendiste 1 captura por")
+			end
+			if key == "toast.purchase_received" then
+				expect(args.item).toEqual({ key = "product.coin_pack_small.name" })
+				expect(locale:format("en", key, args)).toBe("Purchase received: Small Coin Pack")
+				expect(locale:format("es", key, args)).toBe("Compra recibida: Pack de monedas pequeño")
+			end
+		end
+		expect(table.find(keys, "toast.nothing_to_sell") ~= nil).toBe(true)
+		expect(table.find(keys, "toast.sold") ~= nil).toBe(true)
+		expect(table.find(keys, "toast.purchase_received") ~= nil).toBe(true)
+	end)
+
+	it("i18n: el aviso de ganancias offline, el canje de codigos y la bienvenida llegan como claves", function()
+		local player = world.join()
+		-- la bienvenida por defecto tiene clave propia (welcome.launch)
+		local welcomeKeys = {}
+		for _, entry in world.sentTo("Toast") do
+			table.insert(welcomeKeys, entry.args[1].key)
+		end
+		expect(table.find(welcomeKeys, "welcome.launch") ~= nil).toBe(true)
+		world.remote("RedeemCode").OnServerEvent:Fire(player, "WELCOME")
+		env.clock:advance(1)
+		world.remote("RedeemCode").OnServerEvent:Fire(player, "NOEXISTE")
+		env.clock:advance(1)
+		local keys = {}
+		for _, entry in world.sentTo("Toast") do
+			table.insert(keys, entry.args[1].key)
+		end
+		expect(table.find(keys, "toast.code_redeemed") ~= nil).toBe(true)
+		expect(table.find(keys, "toast.code_unknown") ~= nil).toBe(true)
+	end)
+
+	it("i18n: un mensaje de bienvenida de la configuracion remota sin traduccion se envia como toast.raw", function()
+		world.api.liveOps:getConfig().welcome = { id = "w-remoto", message = "Mensaje remoto" }
+		local player = world.join()
+		local found = false
+		for _, entry in world.sentTo("Toast") do
+			local payload = entry.args[1]
+			if payload.key == "toast.raw" then
+				found = true
+				expect(payload.args.text).toBe("Mensaje remoto")
+				expect(validMessage(world, payload)).toBe("toast.raw")
+			end
+		end
+		expect(found).toBe(true)
+		expect(player).toBeTruthy()
+	end)
+
+	it("i18n: el banner de MITICO viaja como mensaje con referencias a criatura y zona (no como texto)", function()
+		local mythicWorld = buildWorld({
+			random = function()
+				return 0.99999
+			end,
+		})
+		local player = mythicWorld.join(USER, "Alice")
+		for _ = 1, 4 do
+			mythicWorld.fire(player, "Cast")
+			mythicWorld.env.clock:advance(0.8)
+			local started = mythicWorld.sentTo("CastStarted")
+			mythicWorld.fire(player, "Reel", started[#started].args[1].id, 0.8)
+			mythicWorld.env.clock:advance(1.2)
+		end
+		local banners = mythicWorld.sentTo("Banner")
+		expect(#banners >= 1).toBe(true)
+		local payload = banners[1].args[1]
+		local key, args, locale = validMessage(mythicWorld, payload)
+		expect(key).toBe("banner.mythic")
+		expect(args.player).toBe("Alice")
+		expect(args.creature).toEqual({ key = "creature.lake_spirit" })
+		expect(args.zone).toEqual({ key = "zone.lake.name" })
+		expect(locale:format("en", assert(key, "clave"), args)).toBe("Alice caught a MYTHIC: Lake Spirit (Calm Lake)")
+		expect(locale:format("es", assert(key, "clave"), args)).toBe(
+			"Alice pescó un MÍTICO: Espíritu del Lago (Lago Calmo)"
+		)
+		-- la captura ya no lleva el nombre: el cliente lo traduce con el id
+		local catches = mythicWorld.sentTo("Catch")
+		expect(catches[4].args[1].name).toBeNil()
+		expect(catches[4].args[1].id).toBe("lake_spirit")
+	end)
+
+	it(
+		"i18n: las ofertas de la tienda llevan claves y argumentos ademas del texto de respaldo (y 'maxed' sigue siendo un motivo)",
+		function()
+			local player = world.join()
+			world.fire(player, "RequestOffers")
+			local offers = world.sentTo("Offers")[1].args[1]
+			local locale = world.m.Locale.new(world.m.Strings)
+			local seen = 0
+			for _, offer in offers do
+				seen += 1
+				expect(offer.nameKey).toBe(offer.kind .. "." .. offer.key .. ".name")
+				expect(offer.descriptionKey).toBe(offer.kind .. "." .. offer.key .. ".desc")
+				local key, args = locale:sanitizeMessage(
+					{ key = offer.descriptionKey, args = offer.textArgs },
+					{ prefixes = { "pass.", "product." }, lenient = true }
+				)
+				expect(key).toBe(offer.descriptionKey)
+				expect(string.find(locale:format("en", assert(key, "clave"), args), "[{}]") == nil).toBe(true)
+				expect(#offer.name > 0).toBe(true) -- texto de respaldo en espanol
+			end
+			expect(seen).toBe(11)
+		end
+	)
+
+	it("i18n: las expulsiones de Data muestran ES y EN juntos (el servidor no conoce el idioma del jugador)", function()
+		local manager = world.api.manager
+		for name, spanishFragment in
+			{ locked = "Espera un minuto", loadFailed = "No pudimos cargar", lockLost = "otro servidor" }
+		do
+			local text = manager:_message(name)
+			expect(text).toContain(spanishFragment)
+			expect(string.find(text, "rejoin", 1, true) ~= nil).toBe(true)
+		end
 	end)
 
 	it(

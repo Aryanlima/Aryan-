@@ -1,6 +1,8 @@
 --!strict
 --[[
 	Feedback: avisos (toast), tarjeta de captura y banner global de MITICO. Solo presentacion.
+	Textos por clave (ctx.L): el banner y los avisos llegan ya traducidos al idioma del jugador desde Main (que valida los
+	mensajes del servidor); la tarjeta de captura se arma aqui con el id de la criatura.
 	Sin sonido ni particulas todavia (falta arte/sonido: ver README).
 ]]
 
@@ -16,6 +18,8 @@ function Feedback.start(ctx: any): any
 	local gui: ScreenGui = ctx.gui
 	local UI = ctx.UI
 	local balance = ctx.Balance
+	local L = ctx.L
+	local fmt = ctx.fmt
 	local currentCard: any = nil
 	local currentBanner: any = nil
 
@@ -27,7 +31,10 @@ function Feedback.start(ctx: any): any
 		if currentCard ~= nil then
 			currentCard:Destroy()
 		end
-		local rarityInfo = balance.rarities[payload.rarity]
+		-- Solo criaturas y rarezas que existen en el balance (el servidor es de confianza, pero un dato raro no debe romper la UI).
+		if balance.rarities[payload.rarity] == nil or ctx.rules:creature(payload.id) == nil then
+			return
+		end
 		local color = UI.theme.colors[payload.rarity] or UI.theme.colors.text
 		local card = UI.create("Frame", {
 			Name = "CatchCard",
@@ -49,24 +56,21 @@ function Feedback.start(ctx: any): any
 			}),
 		})
 		local lines: { { text: string, size: number, color: { number }, order: number } } = {
-			{ text = payload.name, size = 26, color = color, order = 1 },
-			{ text = rarityInfo.label, size = 18, color = color, order = 2 },
+			{ text = L("creature." .. payload.id), size = 26, color = color, order = 1 },
+			{ text = L("rarity." .. payload.rarity), size = 18, color = color, order = 2 },
 			{
-				text = "Valor: " .. UI.formatNumber(payload.value) .. " monedas",
+				text = L("catch.value", { amount = fmt.compact(payload.value) }),
 				size = 18,
 				color = UI.theme.colors.text,
 				order = 3,
 			},
 		}
 		if payload.isNew then
-			table.insert(
-				lines,
-				{ text = "NUEVO en tu bestiario", size = 18, color = UI.theme.colors.positive, order = 4 }
-			)
+			table.insert(lines, { text = L("catch.new"), size = 18, color = UI.theme.colors.positive, order = 4 })
 		end
 		if payload.stored == false then
 			table.insert(lines, {
-				text = "Inventario lleno: vendida por " .. UI.formatNumber(payload.autoSoldFor or 0),
+				text = L("catch.autosold", { amount = fmt.compact(payload.autoSoldFor or 0) }),
 				size = 16,
 				color = UI.theme.colors.textMuted,
 				order = 5,
@@ -97,7 +101,7 @@ function Feedback.start(ctx: any): any
 		end)
 	end
 
-	local function showBanner(payload: any)
+	local function showBanner(text: string)
 		if currentBanner ~= nil then
 			currentBanner:Destroy()
 		end
@@ -111,7 +115,7 @@ function Feedback.start(ctx: any): any
 			TextSize = 20,
 			TextWrapped = true,
 			Font = Enum.Font.GothamBold,
-			Text = ctx.ClientLogic.bannerText(payload),
+			Text = text,
 			Parent = gui,
 		}, {
 			UI.create("UICorner", { CornerRadius = UDim.new(0, 14) }),

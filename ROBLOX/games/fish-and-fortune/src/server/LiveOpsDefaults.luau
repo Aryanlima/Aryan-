@@ -5,6 +5,9 @@
 	clave "FishFortune_LiveOps" en Creator Hub > Configs (ver README, "LiveOps sin republicar").
 
 	Vive en el SERVIDOR (no en ReplicatedStorage) para no exponer los codigos de canje al cliente.
+	Textos: los de aqui (nombres de evento, temporada, bienvenida) son el RESPALDO en espanol: el cliente usa las claves de
+	shared/Strings.luau (event.<id>.name, season.<id>.name, welcome.<id>) y solo cae al texto de la configuracion si no hay clave.
+	tests/Strings.spec.luau comprueba que ambos coinciden.
 	Los textos de los eventos son de uso GRATUITO (no hay suerte ni azar comprable: FeatureFlags.paidLuckEnabled).
 ]]
 
@@ -24,7 +27,7 @@ return {
 		},
 		{
 			id = "mythic_moon",
-			name = "Luna Mitica",
+			name = "Luna Mítica",
 			description = "Sube tu suerte en 3 puntos mientras dure el evento.",
 			cycle = { anchor = ANCHOR, slotSeconds = WEEK, slotCount = 2, slot = 1 },
 			modifiers = { luck = 3 } :: { [string]: number },
@@ -35,7 +38,7 @@ return {
 	},
 	welcome = {
 		id = "launch",
-		message = "Bienvenido a Fish & Fortune. Lanza la cana, descubre criaturas y completa el bestiario.",
+		message = "Bienvenido a Fish & Fortune. Lanza la caña, descubre criaturas y completa el bestiario.",
 	},
 	season = { id = 1, name = "Temporada 1", startsAt = ANCHOR, endsAt = ANCHOR + 8 * WEEK },
 } :: { [string]: any } -- forma validada en runtime por packages/LiveOps (validateConfig)

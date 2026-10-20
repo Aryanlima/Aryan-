@@ -23,6 +23,7 @@ function Minigame.start(ctx: any): any
 	local UI = ctx.UI
 	local rules = ctx.rules
 	local balance = ctx.Balance
+	local L = ctx.L
 	local gui: ScreenGui = ctx.gui
 
 	local casting = false
@@ -47,7 +48,7 @@ function Minigame.start(ctx: any): any
 		UI.create("UISizeConstraint", { MaxSize = Vector2.new(520, 100) }),
 	})
 	local title = UI.label({
-		text = "Pulsa RECOGER cuando el marcador pase por la zona verde",
+		text = L("hint.reel"),
 		size = UDim2.new(1, -16, 0, 26),
 		textSize = 16,
 		alignX = Enum.TextXAlignment.Center,
@@ -158,6 +159,7 @@ function Minigame.start(ctx: any): any
 		startedClock = os.clock()
 		sweet.Size = UDim2.new(payload.width, 0, 1, 0)
 		sweet.Position = UDim2.new(payload.center - payload.width / 2, 0, 0, 0)
+		title.Text = L("hint.reel") -- en el idioma actual del jugador
 		overlay.Visible = true
 		placeBobber(payload.zone)
 		stopRender()
@@ -168,7 +170,7 @@ function Minigame.start(ctx: any): any
 				-- tiempo agotado en el cliente: el pez se suelta (el servidor tambien lo da por perdido)
 				finish()
 				removeBobber()
-				ctx.feedback.toast("Se solto el pez. Vuelve a lanzar.")
+				ctx.feedback.toast(L("fail.expired"))
 			end
 		end)
 		notify()

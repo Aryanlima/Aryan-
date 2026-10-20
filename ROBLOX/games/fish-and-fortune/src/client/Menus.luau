@@ -4,9 +4,14 @@
 	Solo presentacion y solicitudes: cada boton envia una peticion al servidor, que valida y decide.
 
 	Cumplimiento visible en la UI:
-	  * Probabilidades: se abre con un boton con TEXTO ("Probabilidades"), muestra TODOS los resultados de la zona
-	    con su porcentaje (suma 100 %), la columna "base" y el desglose de la suerte activa.
-	  * Tienda: textos neutros ("Ver compra"); los precios son los de Roblox (con "~" si son aproximados).
+	  * Probabilidades: se abre con un boton con TEXTO (Strings: menu.odds), muestra TODOS los resultados de la zona
+	    con su porcentaje (suma 100 %), la columna "base" y el desglose de la suerte activa. Las cifras son las mismas en
+	    todos los idiomas (solo cambia el separador decimal).
+	  * Tienda: textos neutros (Strings: ui.buy = "Ver compra" / "View item"); los precios son los de Roblox (con "~" si son
+	    aproximados).
+
+	Textos: todos por clave (ctx.L, shared/Strings.luau) en el idioma del jugador; cada panel se vuelve a dibujar con cada
+	estado del servidor, asi un cambio de idioma se aplica solo.
 ]]
 
 local Menus = {}
@@ -23,6 +28,8 @@ function Menus.start(ctx: any): any
 	local store = ctx.store
 	local balance = ctx.Balance
 	local rules = ctx.rules
+	local L = ctx.L
+	local fmt = ctx.fmt
 	local gui: ScreenGui = ctx.gui
 
 	local current: { name: string, root: any, unsubscribe: (() -> ())? }? = nil
@@ -120,88 +127,100 @@ function Menus.start(ctx: any): any
 	-- Canas y zonas
 	----------------------------------------------------------------------------
 	local function openRods()
-		openPanel("RodsPanel", "Canas y zonas", function(content: any, state: any)
+		openPanel("RodsPanel", L("rods.title"), function(content: any, state: any)
 			local order = 0
 			local function nextOrder(): number
 				order += 1
 				return order
 			end
-			addHeader(content, nextOrder(), "Canas")
+			addHeader(content, nextOrder(), L("rods.header"))
 			for _, rodId in balance.rodOrder do
 				local rod = balance.rods[rodId]
 				local owned = state.ownedRods[rodId] == true
 				local equipped = state.rod == rodId
-				local subtitle = ("Suerte +%s - zona perfecta %d%% - auto cada %ds"):format(
-					tostring(rod.luck),
-					math.floor(rod.sweetSpot * 100 + 0.5),
-					rod.autoInterval
-				)
+				local subtitle = L("rods.stats", {
+					luck = rod.luck,
+					sweet = math.floor(rod.sweetSpot * 100 + 0.5),
+					interval = rod.autoInterval,
+				})
 				local button: ButtonSpec
 				if equipped then
-					button = { text = "Equipada", enabled = false }
+					button = { text = L("rods.equipped"), enabled = false }
 				elseif owned then
 					button = {
-						text = "Equipar",
+						text = L("rods.equip"),
 						onClick = function()
 							net:fire("EquipRod", rodId)
 						end,
 					}
 				else
 					button = {
-						text = "Comprar - " .. UI.formatNumber(rod.price) .. " monedas",
+						text = L("rods.buy", { price = fmt.compact(rod.price) }),
 						enabled = state.coins >= rod.price,
 						onClick = function()
 							net:fire("BuyRod", rodId)
 						end,
 					}
 				end
-				addRow(content, nextOrder(), rod.name, subtitle, { button })
+				addRow(content, nextOrder(), L("rod." .. rodId), subtitle, { button })
 			end
 
-			addHeader(content, nextOrder(), "Zonas")
+			addHeader(content, nextOrder(), L("zones.header"))
 			for _, zoneId in balance.zoneOrder do
 				local zone = balance.zones[zoneId]
 				local unlocked = state.unlockedZones[zoneId] == true
 				local button: ButtonSpec
 				if state.zone == zoneId then
-					button = { text = "Estas aqui", enabled = false }
+					button = { text = L("zones.here"), enabled = false }
 				elseif unlocked then
 					button = {
-						text = "Viajar",
+						text = L("zones.travel"),
 						onClick = function()
 							net:fire("TravelZone", zoneId)
 						end,
 					}
 				else
 					button = {
-						text = "Desbloquear - " .. UI.formatNumber(zone.unlockCost) .. " monedas",
+						text = L("zones.unlock", { price = fmt.compact(zone.unlockCost) }),
 						enabled = state.coins >= zone.unlockCost,
 						onClick = function()
 							net:fire("UnlockZone", zoneId)
 						end,
 					}
 				end
-				addRow(content, nextOrder(), zone.name, zone.description, { button })
+				addRow(
+					content,
+					nextOrder(),
+					L("zone." .. zoneId .. ".name"),
+					L("zone." .. zoneId .. ".desc"),
+					{ button }
+				)
 			end
 
-			addHeader(content, nextOrder(), "Mochila")
+			addHeader(content, nextOrder(), L("bag.header"))
 			local maxed = state.capacity >= balance.inventory.maxSlots
-			addRow(content, nextOrder(), ("Espacio: %d / %d"):format(state.inventoryCount, state.capacity), nil, {
+			addRow(
+				content,
+				nextOrder(),
+				L("bag.space", { used = state.inventoryCount, capacity = state.capacity }),
+				nil,
 				{
-					text = ("Ampliar +%d con %d perlas"):format(
-						balance.inventory.slotsPerPack,
-						balance.inventory.pearlsPerSlotPack
-					),
-					enabled = not maxed and state.pearls >= balance.inventory.pearlsPerSlotPack,
-					onClick = function()
-						net:fire("BuySlotsWithPearls")
-					end,
-				},
-			})
-			if state.passes.vip then
-				addRow(content, nextOrder(), "Pase VIP", ("Perlas diarias: +%d"):format(balance.vip.dailyPearls), {
 					{
-						text = if state.dailyAvailable then "Reclamar perlas de hoy" else "Ya reclamadas hoy",
+						text = L("bag.expand", {
+							slots = balance.inventory.slotsPerPack,
+							pearls = balance.inventory.pearlsPerSlotPack,
+						}),
+						enabled = not maxed and state.pearls >= balance.inventory.pearlsPerSlotPack,
+						onClick = function()
+							net:fire("BuySlotsWithPearls")
+						end,
+					},
+				}
+			)
+			if state.passes.vip then
+				addRow(content, nextOrder(), L("pass.vip.name"), L("vip.daily", { pearls = balance.vip.dailyPearls }), {
+					{
+						text = if state.dailyAvailable then L("vip.claim") else L("vip.claimed"),
 						enabled = state.dailyAvailable == true,
 						onClick = function()
 							net:fire("ClaimDaily")
@@ -212,25 +231,48 @@ function Menus.start(ctx: any): any
 		end)
 	end
 
+	-- Premio { coins?, pearls?, slots? } como texto ("500 monedas + 5 perlas"); `count` elige singular o plural.
+	local function rewardText(reward: any): string
+		local parts = {}
+		if reward.coins then
+			table.insert(parts, L("reward.coins", { count = reward.coins, amount = fmt.compact(reward.coins) }))
+		end
+		if reward.pearls then
+			table.insert(parts, L("reward.pearls", { count = reward.pearls, amount = fmt.compact(reward.pearls) }))
+		end
+		if reward.slots then
+			table.insert(parts, L("reward.slots", { count = reward.slots, amount = fmt.compact(reward.slots) }))
+		end
+		return table.concat(parts, " + ")
+	end
+
 	----------------------------------------------------------------------------
 	-- Bestiario
 	----------------------------------------------------------------------------
 	local function openBestiary()
-		openPanel("BestiaryPanel", "Bestiario", function(content: any, state: any)
+		openPanel("BestiaryPanel", L("bestiary.title"), function(content: any, state: any)
 			local order = 0
 			local function nextOrder(): number
 				order += 1
 				return order
 			end
-			addHeader(content, nextOrder(), ("Descubiertas: %d / %d"):format(state.discoveries, #balance.creatures))
+			addHeader(
+				content,
+				nextOrder(),
+				L("bestiary.found", { found = state.discoveries, total = #balance.creatures })
+			)
 			for _, zoneId in balance.zoneOrder do
-				addHeader(content, nextOrder(), balance.zones[zoneId].name)
+				addHeader(content, nextOrder(), L("zone." .. zoneId .. ".name"))
 				for _, creature in rules:creaturesOf(zoneId) do
 					local count = state.bestiary[creature.id]
 					local found = count ~= nil
 					local text = if found
-						then ("%s  x%d  (%s)"):format(creature.name, count, balance.rarities[creature.rarity].label)
-						else "???"
+						then L("bestiary.entry", {
+							name = { key = "creature." .. creature.id },
+							count = count,
+							rarity = { key = "rarity." .. creature.rarity },
+						})
+						else L("bestiary.unknown")
 					UI.label({
 						text = text,
 						colorName = if found then UI.rarityColorName(creature.rarity) else "textMuted",
@@ -240,7 +282,7 @@ function Menus.start(ctx: any): any
 					})
 				end
 			end
-			addHeader(content, nextOrder(), "Recompensas")
+			addHeader(content, nextOrder(), L("bestiary.rewards"))
 			for _, reward in balance.bestiary.rewards do
 				local claimed = state.bestiaryClaimed[reward.id] == true
 				local reached = false
@@ -254,16 +296,12 @@ function Menus.start(ctx: any): any
 				else
 					reached = state.discoveries >= reward.target
 				end
-				local parts = {}
-				if reward.reward.coins then
-					table.insert(parts, UI.formatNumber(reward.reward.coins) .. " monedas")
-				end
-				if reward.reward.pearls then
-					table.insert(parts, reward.reward.pearls .. " perlas")
-				end
-				addRow(content, nextOrder(), reward.label, table.concat(parts, " + "), {
+				addRow(content, nextOrder(), L("bestiary.reward." .. reward.id), rewardText(reward.reward), {
 					{
-						text = if claimed then "Reclamada" elseif reached then "Reclamar" else "Aun no",
+						text = if claimed
+							then L("bestiary.claimed")
+							elseif reached then L("bestiary.claim")
+							else L("bestiary.not_yet"),
 						enabled = reached and not claimed,
 						onClick = function()
 							net:fire("ClaimBestiary", reward.id)
@@ -277,22 +315,8 @@ function Menus.start(ctx: any): any
 	----------------------------------------------------------------------------
 	-- Temporada
 	----------------------------------------------------------------------------
-	local function rewardText(reward: any): string
-		local parts = {}
-		if reward.coins then
-			table.insert(parts, UI.formatNumber(reward.coins) .. " monedas")
-		end
-		if reward.pearls then
-			table.insert(parts, reward.pearls .. " perlas")
-		end
-		if reward.slots then
-			table.insert(parts, reward.slots .. " espacios")
-		end
-		return table.concat(parts, " + ")
-	end
-
 	local function openSeason()
-		openPanel("SeasonPanel", "Temporada", function(content: any, state: any)
+		openPanel("SeasonPanel", L("menu.season"), function(content: any, state: any)
 			local season = state.season
 			local order = 0
 			local function nextOrder(): number
@@ -301,7 +325,7 @@ function Menus.start(ctx: any): any
 			end
 			if season == nil then
 				UI.label({
-					text = "No hay una temporada activa ahora mismo.",
+					text = L("season.none"),
 					layoutOrder = nextOrder(),
 					parent = content,
 				})
@@ -309,16 +333,22 @@ function Menus.start(ctx: any): any
 			end
 			local remaining =
 				ctx.ClientLogic.remainingSeconds(season.endsAt, state.serverNow, store:receivedAt(), os.clock())
-			addHeader(content, nextOrder(), season.name)
+			-- Nombre con clave propia (season.<id>.name) o, si es una temporada nueva de la configuracion remota, el configurado.
+			local seasonKey = "season." .. tostring(season.id) .. ".name"
+			addHeader(
+				content,
+				nextOrder(),
+				if ctx.locale:has(seasonKey) then L(seasonKey) else ctx.serverText(season.name, "?")
+			)
 			UI.label({
-				text = ("Puntos: %d - termina en %s"):format(season.points, UI.formatDuration(remaining)),
+				text = L("season.points", { points = season.points, time = UI.formatDuration(remaining) }),
 				layoutOrder = nextOrder(),
 				parent = content,
 			})
 			if not state.passes.season_pass then
-				addRow(content, nextOrder(), "Pista premium", "Premios fijos, sin azar. Pase de Temporada.", {
+				addRow(content, nextOrder(), L("season.premium_title"), L("season.premium_desc"), {
 					{
-						text = "Ver Pase de Temporada",
+						text = L("season.view_pass"),
 						onClick = function()
 							net:fire("RequestPurchase", "pass", "season_pass")
 						end,
@@ -330,21 +360,24 @@ function Menus.start(ctx: any): any
 				local key = "t" .. tostring(tier.tier)
 				local freeClaimed = season.claimedFree[key] == true
 				local premiumClaimed = season.claimedPremium[key] == true
-				addRow(content, nextOrder(), ("Nivel %d - %d puntos"):format(tier.tier, tier.points), nil, {
+				local function status(claimed: boolean): string
+					return if claimed
+						then L("season.status_claimed")
+						elseif reached then L("season.status_claimable")
+						else L("season.status_locked")
+				end
+				addRow(content, nextOrder(), L("season.tier", { tier = tier.tier, points = tier.points }), nil, {
 					{
-						text = ("Gratis: %s - %s"):format(
-							rewardText(tier.free),
-							if freeClaimed then "reclamada" elseif reached then "reclamar" else "bloqueada"
-						),
+						text = L("season.free_line", { reward = rewardText(tier.free), status = status(freeClaimed) }),
 						enabled = reached and not freeClaimed,
 						onClick = function()
 							net:fire("ClaimSeason", tier.tier, "free")
 						end,
 					},
 					{
-						text = ("Premium: %s - %s"):format(
-							rewardText(tier.premium),
-							if premiumClaimed then "reclamada" elseif reached then "reclamar" else "bloqueada"
+						text = L(
+							"season.premium_line",
+							{ reward = rewardText(tier.premium), status = status(premiumClaimed) }
 						),
 						enabled = reached and not premiumClaimed and state.passes.season_pass == true,
 						onClick = function()
@@ -361,15 +394,15 @@ function Menus.start(ctx: any): any
 	----------------------------------------------------------------------------
 	local function openCodes()
 		close()
-		local root, content = UI.panel(gui, { name = "CodesPanel", title = "Codigos", onClose = close })
+		local root, content = UI.panel(gui, { name = "CodesPanel", title = L("menu.codes"), onClose = close })
 		UI.label({
-			text = "Escribe un codigo y pulsa Canjear. Cada codigo se puede usar una vez.",
+			text = L("codes.intro"),
 			layoutOrder = 1,
 			parent = content,
 		})
 		local box = Instance.new("TextBox")
 		box.Name = "CodeBox"
-		box.PlaceholderText = "CODIGO"
+		box.PlaceholderText = L("codes.placeholder")
 		box.Text = ""
 		box.ClearTextOnFocus = false
 		box.Size = UDim2.new(1, 0, 0, UI.theme.minTouchHeight)
@@ -382,7 +415,7 @@ function Menus.start(ctx: any): any
 		box.Parent = content
 		UI.create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = box })
 		UI.button({
-			text = "Canjear",
+			text = L("codes.redeem"),
 			layoutOrder = 3,
 			parent = content,
 			onActivated = function()
@@ -407,15 +440,17 @@ function Menus.start(ctx: any): any
 		close()
 		local zone = zoneId or selectedOddsZone or state.zone
 		selectedOddsZone = zone
-		local view = rules:oddsFor(zone):displayRows({ luck = state.luck })
+		-- Mismas cifras en todos los idiomas: solo cambian el nombre de las filas y los separadores decimales.
+		local view = ctx.ClientLogic.localizeOddsView(
+			rules:oddsFor(zone):displayRows({ luck = state.luck }),
+			ctx.locale,
+			ctx.language()
+		)
 		local handle = UI.oddsPanel(gui, {
-			title = "Probabilidades - " .. balance.zones[zone].name,
+			title = L("odds.title", { zone = L("zone." .. zone .. ".name") }),
 			view = view,
 			onClose = close,
-			luckExplanation = "Tu suerte activa cambia estas probabilidades. La columna 'base' muestra los valores sin suerte. "
-				.. "Un lanzamiento perfecto suma ademas +"
-				.. tostring(balance.minigame.perfectLuck)
-				.. " de suerte gratis.",
+			luckExplanation = L("odds.luck_explanation", { perfect = balance.minigame.perfectLuck }),
 		})
 		local content = handle.root:FindFirstChild("Content")
 		if content ~= nil then
@@ -435,7 +470,7 @@ function Menus.start(ctx: any): any
 			})
 			for index, id in balance.zoneOrder do
 				UI.button({
-					text = balance.zones[id].name,
+					text = L("zone." .. id .. ".name"),
 					colorName = if id == zone then "accent" else "row",
 					size = UDim2.new(1 / #balance.zoneOrder, -6, 1, 0),
 					layoutOrder = index,
@@ -446,27 +481,33 @@ function Menus.start(ctx: any): any
 				})
 			end
 			-- desglose de la suerte activa
-			local lines =
-				{ ("Suerte total activa: +%s (tope %d)"):format(tostring(state.luck), balance.limits.maxLuck) }
+			local lines = { L("odds.luck_total", { luck = state.luck, cap = balance.limits.maxLuck }) }
 			for _, source in state.luckSources do
-				if source.active then
+				-- La clave del nombre llega del servidor: solo se acepta una clave conocida de los prefijos permitidos.
+				local labelKey = ctx.safeKey(source.labelKey, { "rod.", "odds.source.", "pass.", "product." })
+				if source.active and labelKey ~= nil then
 					table.insert(
 						lines,
-						("- %s: +%s%s"):format(
-							source.label,
-							tostring(source.value),
-							if source.paid then " (de pago)" else ""
-						)
+						L("odds.luck_line", {
+							label = L(labelKey),
+							value = source.value,
+							paid = if source.paid then L("odds.paid_suffix") else "",
+						})
 					)
 				end
 			end
 			UI.label({ text = table.concat(lines, "\n"), layoutOrder = -2, parent = content })
 			if state.totalCasts < #balance.ftue.guaranteedRarities then
-				UI.label({ text = balance.ftue.oddsNote, colorName = "positive", layoutOrder = -1, parent = content })
+				UI.label({
+					text = L("ftue.odds_note", { count = #balance.ftue.guaranteedRarities }),
+					colorName = "positive",
+					layoutOrder = -1,
+					parent = content,
+				})
 			end
 			if state.paidRandomRestricted then
 				UI.label({
-					text = "En tu region los objetos aleatorios de pago estan restringidos: no se ofrecen ni se aplican.",
+					text = L("odds.restricted"),
 					colorName = "textMuted",
 					layoutOrder = 0,
 					parent = content,
@@ -493,7 +534,7 @@ function Menus.start(ctx: any): any
 		close()
 		net:fire("RequestOffers")
 		local handle = UI.shopPanel(gui, {
-			title = "Tienda",
+			title = L("shop.title"),
 			offers = latestOffers or {},
 			onBuy = function(kind: string, key: string)
 				net:fire("RequestPurchase", kind, key)
@@ -503,7 +544,7 @@ function Menus.start(ctx: any): any
 		local content = handle.root:FindFirstChild("Content")
 		if content ~= nil then
 			UI.label({
-				text = "Los precios los define Roblox. Cada compra se confirma en la ventana de Roblox.",
+				text = L("shop.note"),
 				colorName = "textMuted",
 				textSize = 14,
 				layoutOrder = -1,
@@ -535,10 +576,37 @@ function Menus.start(ctx: any): any
 		end
 	end
 
+	-- Las claves de texto de cada oferta llegan del servidor: solo se aceptan claves de pases/productos que existen y con
+	-- argumentos validos; si no, se muestra el texto de respaldo (`name`/`description`).
+	local function cleanOffers(offers: any): { any }
+		local list = {}
+		if type(offers) ~= "table" then
+			return list
+		end
+		for _, offer in offers do
+			local copy = table.clone(offer)
+			local prefixes = { "pass.", "product." }
+			local nameKey, nameArgs = ctx.safeKey(offer.nameKey, prefixes, offer.textArgs)
+			local descriptionKey, descriptionArgs = ctx.safeKey(offer.descriptionKey, prefixes, offer.textArgs)
+			copy.nameKey = nameKey
+			copy.descriptionKey = descriptionKey
+			-- argumentos ya validados (los de nombre y descripcion se unen: la oferta los comparte)
+			local merged: { [string]: any } = {}
+			for _, args in { nameArgs or {}, descriptionArgs or {} } do
+				for name, value in args do
+					merged[name] = value
+				end
+			end
+			copy.textArgs = merged
+			table.insert(list, copy)
+		end
+		return list
+	end
+
 	local function onOffers(offers: any)
-		latestOffers = offers
+		latestOffers = cleanOffers(offers)
 		if shopHandle ~= nil then
-			shopHandle.update(offers)
+			shopHandle.update(latestOffers)
 		end
 	end
 

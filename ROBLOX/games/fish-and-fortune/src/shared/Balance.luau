@@ -14,14 +14,12 @@
 
 export type RarityInfo = {
 	order: number,
-	label: string,
 	luckFactor: number,
 	seasonPoints: number,
 }
 
 export type Creature = {
 	id: string,
-	name: string,
 	zone: string,
 	rarity: string,
 	weight: number, -- peso en la tabla de probabilidades de su zona
@@ -30,15 +28,12 @@ export type Creature = {
 
 export type Zone = {
 	id: string,
-	name: string,
 	order: number,
 	unlockCost: number, -- monedas; 0 = disponible desde el principio
-	description: string,
 }
 
 export type Rod = {
 	id: string,
-	name: string,
 	price: number, -- monedas
 	luck: number, -- puntos de suerte (gratis: se gana jugando)
 	sweetSpot: number, -- anchura de la zona perfecta del minijuego (fraccion de la barra)
@@ -51,7 +46,6 @@ export type Reward = { coins: number?, pearls: number?, slots: number? }
 
 export type BestiaryReward = {
 	id: string,
-	label: string,
 	kind: string, -- "discoveries" | "zone"
 	target: number?, -- descubrimientos necesarios (kind = discoveries)
 	zone: string?, -- zona completa (kind = zone)
@@ -74,12 +68,12 @@ local Balance = {}
 Balance.rarityOrder = { "Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic" }
 
 Balance.rarities = {
-	Common = { order = 1, label = "Comun", luckFactor = 1, seasonPoints = 1 },
-	Uncommon = { order = 2, label = "Poco comun", luckFactor = 1.04, seasonPoints = 2 },
-	Rare = { order = 3, label = "Raro", luckFactor = 1.09, seasonPoints = 5 },
-	Epic = { order = 4, label = "Epico", luckFactor = 1.16, seasonPoints = 15 },
-	Legendary = { order = 5, label = "Legendario", luckFactor = 1.28, seasonPoints = 50 },
-	Mythic = { order = 6, label = "MITICO", luckFactor = 1.45, seasonPoints = 200 },
+	Common = { order = 1, luckFactor = 1, seasonPoints = 1 },
+	Uncommon = { order = 2, luckFactor = 1.04, seasonPoints = 2 },
+	Rare = { order = 3, luckFactor = 1.09, seasonPoints = 5 },
+	Epic = { order = 4, luckFactor = 1.16, seasonPoints = 15 },
+	Legendary = { order = 5, luckFactor = 1.28, seasonPoints = 50 },
+	Mythic = { order = 6, luckFactor = 1.45, seasonPoints = 200 },
 } :: { [string]: RarityInfo }
 
 ----------------------------------------------------------------------------
@@ -105,65 +99,57 @@ Balance.zoneOrder = { "lake", "river", "coast" }
 Balance.zones = {
 	lake = {
 		id = "lake",
-		name = "Lago Calmo",
 		order = 1,
 		unlockCost = 0,
-		description = "Aguas tranquilas para empezar a pescar.",
 	},
 	river = {
 		id = "river",
-		name = "Rio Cristal",
 		order = 2,
 		unlockCost = 2000,
-		description = "Corrientes rapidas y peces mas valiosos.",
 	},
 	coast = {
 		id = "coast",
-		name = "Costa Dorada",
 		order = 3,
 		unlockCost = 30000,
-		description = "El mar abierto guarda las mayores capturas.",
 	},
 } :: { [string]: Zone }
 
 Balance.creatures = {
 	-- Lago Calmo (9)
-	{ id = "minnow", name = "Pececillo", zone = "lake", rarity = "Common", weight = 320, value = 8 },
-	{ id = "perch", name = "Perca", zone = "lake", rarity = "Common", weight = 260, value = 12 },
-	{ id = "carp", name = "Carpa", zone = "lake", rarity = "Common", weight = 190, value = 18 },
-	{ id = "bluegill", name = "Branquia Azul", zone = "lake", rarity = "Uncommon", weight = 100, value = 40 },
-	{ id = "catfish", name = "Bagre", zone = "lake", rarity = "Uncommon", weight = 60, value = 60 },
-	{ id = "golden_trout", name = "Trucha Dorada", zone = "lake", rarity = "Rare", weight = 45, value = 160 },
-	{ id = "moon_koi", name = "Koi Lunar", zone = "lake", rarity = "Epic", weight = 18, value = 900 },
-	{ id = "ancient_carp", name = "Carpa Ancestral", zone = "lake", rarity = "Legendary", weight = 6, value = 6000 },
-	{ id = "lake_spirit", name = "Espiritu del Lago", zone = "lake", rarity = "Mythic", weight = 0.4, value = 60000 },
+	{ id = "minnow", zone = "lake", rarity = "Common", weight = 320, value = 8 },
+	{ id = "perch", zone = "lake", rarity = "Common", weight = 260, value = 12 },
+	{ id = "carp", zone = "lake", rarity = "Common", weight = 190, value = 18 },
+	{ id = "bluegill", zone = "lake", rarity = "Uncommon", weight = 100, value = 40 },
+	{ id = "catfish", zone = "lake", rarity = "Uncommon", weight = 60, value = 60 },
+	{ id = "golden_trout", zone = "lake", rarity = "Rare", weight = 45, value = 160 },
+	{ id = "moon_koi", zone = "lake", rarity = "Epic", weight = 18, value = 900 },
+	{ id = "ancient_carp", zone = "lake", rarity = "Legendary", weight = 6, value = 6000 },
+	{ id = "lake_spirit", zone = "lake", rarity = "Mythic", weight = 0.4, value = 60000 },
 	-- Rio Cristal (8)
-	{ id = "chub", name = "Cacho de Rio", zone = "river", rarity = "Common", weight = 350, value = 45 },
-	{ id = "salmon", name = "Salmon Plateado", zone = "river", rarity = "Common", weight = 300, value = 70 },
-	{ id = "eel", name = "Anguila", zone = "river", rarity = "Uncommon", weight = 120, value = 200 },
-	{ id = "glass_shrimp", name = "Gamba de Cristal", zone = "river", rarity = "Uncommon", weight = 80, value = 260 },
-	{ id = "rapids_trout", name = "Trucha de los Rapidos", zone = "river", rarity = "Rare", weight = 60, value = 800 },
-	{ id = "crystal_pike", name = "Lucio de Cristal", zone = "river", rarity = "Epic", weight = 20, value = 4500 },
+	{ id = "chub", zone = "river", rarity = "Common", weight = 350, value = 45 },
+	{ id = "salmon", zone = "river", rarity = "Common", weight = 300, value = 70 },
+	{ id = "eel", zone = "river", rarity = "Uncommon", weight = 120, value = 200 },
+	{ id = "glass_shrimp", zone = "river", rarity = "Uncommon", weight = 80, value = 260 },
+	{ id = "rapids_trout", zone = "river", rarity = "Rare", weight = 60, value = 800 },
+	{ id = "crystal_pike", zone = "river", rarity = "Epic", weight = 20, value = 4500 },
 	{
 		id = "aurora_sturgeon",
-		name = "Esturion Aurora",
 		zone = "river",
 		rarity = "Legendary",
 		weight = 6,
 		value = 30000,
 	},
-	{ id = "river_queen", name = "Reina del Rio", zone = "river", rarity = "Mythic", weight = 0.4, value = 300000 },
+	{ id = "river_queen", zone = "river", rarity = "Mythic", weight = 0.4, value = 300000 },
 	-- Costa Dorada (8)
-	{ id = "sand_crab", name = "Cangrejo de Arena", zone = "coast", rarity = "Common", weight = 350, value = 250 },
-	{ id = "sardine", name = "Sardina", zone = "coast", rarity = "Common", weight = 300, value = 350 },
-	{ id = "mackerel", name = "Caballa", zone = "coast", rarity = "Uncommon", weight = 120, value = 1000 },
-	{ id = "clownfish", name = "Pez Payaso", zone = "coast", rarity = "Uncommon", weight = 80, value = 1300 },
-	{ id = "tuna", name = "Atun Rojo", zone = "coast", rarity = "Rare", weight = 60, value = 4000 },
-	{ id = "manta", name = "Manta Gigante", zone = "coast", rarity = "Epic", weight = 20, value = 22000 },
-	{ id = "golden_marlin", name = "Marlin Dorado", zone = "coast", rarity = "Legendary", weight = 6, value = 150000 },
+	{ id = "sand_crab", zone = "coast", rarity = "Common", weight = 350, value = 250 },
+	{ id = "sardine", zone = "coast", rarity = "Common", weight = 300, value = 350 },
+	{ id = "mackerel", zone = "coast", rarity = "Uncommon", weight = 120, value = 1000 },
+	{ id = "clownfish", zone = "coast", rarity = "Uncommon", weight = 80, value = 1300 },
+	{ id = "tuna", zone = "coast", rarity = "Rare", weight = 60, value = 4000 },
+	{ id = "manta", zone = "coast", rarity = "Epic", weight = 20, value = 22000 },
+	{ id = "golden_marlin", zone = "coast", rarity = "Legendary", weight = 6, value = 150000 },
 	{
 		id = "tide_leviathan",
-		name = "Leviatan de la Marea",
 		zone = "coast",
 		rarity = "Mythic",
 		weight = 0.4,
@@ -180,7 +166,6 @@ Balance.rodOrder = { "driftwood", "reed", "fiberglass", "carbon", "golden" }
 Balance.rods = {
 	driftwood = {
 		id = "driftwood",
-		name = "Cana de Madera",
 		price = 0,
 		luck = 0,
 		sweetSpot = 0.14,
@@ -190,7 +175,6 @@ Balance.rods = {
 	},
 	reed = {
 		id = "reed",
-		name = "Cana de Junco",
 		price = 120,
 		luck = 0.5,
 		sweetSpot = 0.16,
@@ -200,7 +184,6 @@ Balance.rods = {
 	},
 	fiberglass = {
 		id = "fiberglass",
-		name = "Cana de Fibra",
 		price = 2500,
 		luck = 1,
 		sweetSpot = 0.18,
@@ -210,7 +193,6 @@ Balance.rods = {
 	},
 	carbon = {
 		id = "carbon",
-		name = "Cana de Carbono",
 		price = 30000,
 		luck = 1.8,
 		sweetSpot = 0.2,
@@ -220,7 +202,6 @@ Balance.rods = {
 	},
 	golden = {
 		id = "golden",
-		name = "Cana Dorada",
 		price = 400000,
 		luck = 2.6,
 		sweetSpot = 0.22,
@@ -277,7 +258,7 @@ Balance.offline = {
 
 Balance.ftue = {
 	guaranteedRarities = { "Uncommon", "Uncommon", "Rare" },
-	oddsNote = "Tus 3 primeros lanzamientos son un tutorial con premio garantizado (no cuentan como probabilidad normal).",
+	-- (el texto "tus N primeros lanzamientos..." esta en Strings: ftue.odds_note)
 	targetSeconds = 60, -- primera captura y primera venta en <= 60 s
 }
 
@@ -287,46 +268,40 @@ Balance.ftue = {
 
 Balance.bestiary = {
 	rewards = {
-		{ id = "disc_5", label = "Descubre 5 criaturas", kind = "discoveries", target = 5, reward = { coins = 500 } },
-		{ id = "disc_10", label = "Descubre 10 criaturas", kind = "discoveries", target = 10, reward = { pearls = 5 } },
+		{ id = "disc_5", kind = "discoveries", target = 5, reward = { coins = 500 } },
+		{ id = "disc_10", kind = "discoveries", target = 10, reward = { pearls = 5 } },
 		{
 			id = "disc_15",
-			label = "Descubre 15 criaturas",
 			kind = "discoveries",
 			target = 15,
 			reward = { coins = 25000 },
 		},
 		{
 			id = "disc_20",
-			label = "Descubre 20 criaturas",
 			kind = "discoveries",
 			target = 20,
 			reward = { pearls = 15 },
 		},
 		{
 			id = "disc_25",
-			label = "Bestiario completo",
 			kind = "discoveries",
 			target = 25,
 			reward = { pearls = 40, coins = 500000 },
 		},
 		{
 			id = "zone_lake",
-			label = "Completa el Lago Calmo",
 			kind = "zone",
 			zone = "lake",
 			reward = { coins = 2000, pearls = 5 },
 		},
 		{
 			id = "zone_river",
-			label = "Completa el Rio Cristal",
 			kind = "zone",
 			zone = "river",
 			reward = { coins = 30000, pearls = 10 },
 		},
 		{
 			id = "zone_coast",
-			label = "Completa la Costa Dorada",
 			kind = "zone",
 			zone = "coast",
 			reward = { coins = 400000, pearls = 20 },

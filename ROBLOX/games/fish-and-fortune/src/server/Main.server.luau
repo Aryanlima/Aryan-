@@ -4,8 +4,8 @@
 	el DataModel (ver default.project.json) y arranca GameService. Nada mas.
 
 	Mapa Rojo -> Studio:
-	  ReplicatedStorage.Packages    Odds, Net, UI              (seguros para el cliente)
-	  ReplicatedStorage.Shared      Balance, FishingRules, Remotes
+	  ReplicatedStorage.Packages    Odds, Net, UI, Locale      (seguros para el cliente)
+	  ReplicatedStorage.Shared      Balance, Strings, FishingRules, Remotes
 	  ServerScriptService.ServerPackages   Data, Economy, Shop, LiveOps, Analytics   (SOLO servidor)
 	  ServerScriptService.Server    este script + GameService, GameLogic, Catalog, ProductIds, Schema, WorldBuilder
 ]]
@@ -32,6 +32,7 @@ GameService.start({
 	-- paquetes compartidos
 	Odds = load(packages, "Odds"),
 	Net = load(packages, "Net"),
+	Locale = load(packages, "Locale"),
 	-- paquetes solo de servidor
 	Data = load(serverPackages, "Data"),
 	Economy = load(serverPackages, "Economy"),
@@ -40,6 +41,7 @@ GameService.start({
 	Analytics = load(serverPackages, "Analytics"),
 	-- juego
 	Balance = load(shared, "Balance"),
+	Strings = load(shared, "Strings"),
 	FishingRules = load(shared, "FishingRules"),
 	Remotes = load(shared, "Remotes"),
 	FeatureFlags = load(shared, "FeatureFlags"),
