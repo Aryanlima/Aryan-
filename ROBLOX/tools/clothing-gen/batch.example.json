@@ -1,0 +1,19 @@
+{
+  "_comment": "Lote de ejemplo. kind: shirt | pants | set (camisa+pantalon a juego) | tshirt. Todo original; sin marcas.",
+  "items": [
+    {"id": "sunset-stripes", "kind": "set", "pattern": "stripes", "palette": "sunset", "seed": 11,
+     "params": {"orient": "d", "size": 20}, "hem": "#3a0ca3", "cuff": "#3a0ca3"},
+    {"id": "ocean-waves", "kind": "set", "pattern": "waves", "palette": "ocean", "seed": 3,
+     "sleeve": "short", "pants_extra": {"length": "shorts"}},
+    {"id": "candy-tiedye", "kind": "shirt", "pattern": "tiedye", "palette": "candy", "seed": 5,
+     "params": {"centers": 4, "ring": 14}},
+    {"id": "forest-camo", "kind": "set", "pattern": "camo", "palette": "forest", "seed": 8,
+     "params": {"cell": 44}},
+    {"id": "neon-triangles", "kind": "shirt", "pattern": "triangles", "palette": "neon", "seed": 2,
+     "text": {"front": "NIGHT SHIFT", "back": "ORIGINAL"}, "collar": "#ff2bd6", "cuff": "#0b0b1a"},
+    {"id": "autumn-diamonds", "kind": "pants", "pattern": "diamonds", "palette": "autumn", "seed": 4},
+    {"id": "mint-dots", "kind": "set", "pattern": "dots", "palette": "mint", "seed": 6},
+    {"id": "tee-hex-tiedye", "kind": "tshirt", "pattern": "tiedye", "palette": "pastel", "seed": 9,
+     "shape": "hexagon", "text": "GOOD VIBES"}
+  ]
+}
