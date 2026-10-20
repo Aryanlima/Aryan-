@@ -292,6 +292,35 @@ function GameLogic.grantProduct(self: Logic, player: any, profile: any, product:
 	return false
 end
 
+--[[
+	Veto previo al prompt (Shop.canPurchase): no se debe vender lo que el jugador pagaria sin recibir todo su valor.
+	  * boost: si `restante + duracion` supera el tope de acumulacion (maxBoostSeconds), la compra se "comeria" parte
+	    de lo pagado (grantBoost recorta) => "maxed".
+	  * monedas/perlas: si el saldo + el pack superaria el tope del saldo, el exceso se perderia => "maxed".
+	Devuelve (true) o (false, motivo).
+]]
+function GameLogic.canBuy(self: Logic, data: any, item: any, itemKind: string, now: number): (boolean, string?)
+	if itemKind ~= "product" or type(item.grant) ~= "table" then
+		return true, nil
+	end
+	local grant = item.grant
+	if item.kind == "boost" and type(grant.boostId) == "string" and type(grant.seconds) == "number" then
+		local remaining = self.economy.boostRemaining(data.boosts, grant.boostId, now)
+		if remaining + grant.seconds > self.balance.limits.maxBoostSeconds then
+			return false, "maxed"
+		end
+	elseif item.kind == "currency" then
+		local limits = self.balance.limits
+		if type(grant.coins) == "number" and data.wallet.coins + grant.coins > limits.maxBalance then
+			return false, "maxed"
+		end
+		if type(grant.pearls) == "number" and data.wallet.pearls + grant.pearls > limits.pearlsMaxBalance then
+			return false, "maxed"
+		end
+	end
+	return true, nil
+end
+
 -- Handlers de concesion para packages/Shop (uno por `kind` del catalogo).
 function GameLogic.shopHandlers(
 	self: Logic,

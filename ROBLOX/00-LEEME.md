@@ -50,7 +50,7 @@ Estos comandos funcionan en el entorno de nube donde se construyó el proyecto (
 
 | Qué | Comando (desde la raíz del repositorio) | Qué comprueba |
 |---|---|---|
-| Todas las pruebas | `bash ROBLOX/tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al 2026-10-20: **18 especificaciones, 382 pruebas, 0 fallos** |
+| Todas las pruebas | `bash ROBLOX/tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al 2026-10-20: **24 especificaciones, 420 pruebas, 0 fallos, 2 omitidas a propósito** |
 | Una sola prueba | `lune run ROBLOX/tests/Odds.spec.luau` | Lo mismo para un archivo |
 | Filtrar por nombre | `bash ROBLOX/tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
 | Linter, formato y tipos | `bash ROBLOX/tools/lint.sh` y `bash ROBLOX/tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
@@ -66,7 +66,8 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 
 - 9 informes de investigación con etiquetas de fiabilidad y fuentes (01 a 09).
 - 3 documentos de decisión en `docs/` ([informe maestro](docs/informe-maestro.md), [plan de 90 días](docs/plan-90-dias.md), [preguntas para Aryan](docs/preguntas-para-aryan.md)) que resumen, deciden y enlazan cada dato a su informe.
-- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 382 pruebas en verde con el linter limpio (2026-10-20).
+- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 420 pruebas en verde (2 omitidas a propósito: la puerta previa a publicar) con el linter limpio (2026-10-20).
+- Una **revisión independiente del código de dinero y datos** ([resultado y estado de cada hallazgo](docs/revision-codigo-dinero.md)): 0 críticos, 3 altos, 7 medios y 8 bajos; los arreglos de mayor impacto ya están aplicados con pruebas nuevas, y quedan propuestos los de impacto bajo y dos decisiones de diseño tuyas.
 
 ### Hecho, pero SIN probar en Roblox
 

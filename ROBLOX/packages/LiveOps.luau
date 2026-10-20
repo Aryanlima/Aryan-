@@ -242,6 +242,18 @@ function LiveOps.validateConfig(config: any, now: number?, maxActiveOrUpcoming: 
 				if def.startsAt ~= nil and not isFinite(def.startsAt) then
 					problem("codigo '" .. code .. "': startsAt invalido")
 				end
+				-- Los premios numericos deben ser finitos, >= 0 y razonables (un NaN/negativo/1e300 de la configuracion
+				-- remota llegaria tal cual a la logica del juego). Los valores no numericos los interpreta el juego.
+				for rewardKey, rewardValue in def.reward do
+					if
+						type(rewardValue) == "number"
+						and (not isFinite(rewardValue) or rewardValue < 0 or rewardValue > 1e9)
+					then
+						problem(
+							"codigo '" .. code .. "': premio '" .. tostring(rewardKey) .. "' fuera de rango (0..1e9)"
+						)
+					end
+				end
 				if def.expiresAt ~= nil then
 					if not isFinite(def.expiresAt) then
 						problem("codigo '" .. code .. "': expiresAt invalido")

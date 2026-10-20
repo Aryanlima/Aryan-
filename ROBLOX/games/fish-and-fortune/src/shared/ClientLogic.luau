@@ -86,6 +86,7 @@ function ClientLogic.failureText(reason: string): string?
 		unavailable = "No disponible por ahora.",
 		loading = "Cargando tus datos...",
 		["max-slots"] = "Ya tienes el maximo de espacio.",
+		maxed = "Ya tienes el maximo acumulado: no se puede comprar mas por ahora.",
 	}
 	-- motivos tecnicos (too-early, no-cast, impossible-time...) no se muestran al jugador
 	return texts[reason]

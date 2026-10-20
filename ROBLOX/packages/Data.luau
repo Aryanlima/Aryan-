@@ -68,6 +68,7 @@ export type Config = {
 	releaseRetry: RetryConfig?, -- la liberacion final reintenta MAS (es el ultimo guardado)
 	lock: LockConfig?,
 	autosaveSeconds: number?, -- por defecto 120
+	maxConcurrentRequests: number?, -- peticiones simultaneas a DataStore (por defecto 20; la cola de Roblox es de 30)
 	messages: Messages?,
 }
 
@@ -241,6 +242,7 @@ type ProfileData = {
 	claimedAt: number,
 	_manager: any,
 	_saving: boolean,
+	_releasing: boolean, -- hay una liberacion en curso (PlayerRemoving y BindToClose pueden coincidir)
 }
 export type Profile = typeof(setmetatable({} :: ProfileData, Profile))
 
@@ -300,6 +302,15 @@ function Profile.release(self: Profile): boolean
 		manager:_forget(self)
 		return false
 	end
+	-- Otra liberacion ya esta en curso (PlayerRemoving + BindToClose, o autosave): esperar su resultado en vez de
+	-- repetirla. Una segunda escritura con lock = nil veria "bloqueo perdido" y marcaria el perfil como `lost`.
+	if self._releasing then
+		while self._releasing do
+			manager:_wait(0.1)
+		end
+		return self.state == "released"
+	end
+	self._releasing = true
 	self.state = "releasing"
 	while self._saving do
 		manager:_wait(0.1)
@@ -308,6 +319,7 @@ function Profile.release(self: Profile): boolean
 	self.revision += 1
 	local ok = manager:_persist(self, true)
 	self._saving = false
+	self._releasing = false
 	if ok then
 		self.state = "released"
 		manager:_forget(self)
@@ -343,6 +355,7 @@ type ManagerData = {
 	profiles: { [number]: Profile },
 	loading: { [number]: boolean },
 	autosaveRunning: boolean,
+	inFlight: number, -- peticiones a DataStore en curso (limitador de concurrencia)
 	shuttingDown: boolean,
 	onProfileLost: ((profile: Profile) -> ())?,
 }
@@ -368,6 +381,7 @@ function Data.new(config: Config): Manager
 		profiles = {},
 		loading = {},
 		autosaveRunning = false,
+		inFlight = 0,
 		shuttingDown = false,
 		onProfileLost = nil,
 	}
@@ -444,6 +458,23 @@ function Manager._retry(
 	return false, lastError
 end
 
+--[[
+	Ejecuta una peticion a DataStore (con pcall) limitando cuantas hay a la vez. Cada cola de DataStore admite 30
+	peticiones: pasado eso Roblox las DESCARTA (errores 301-306). En el cierre del servidor (PlayerRemoving de todos +
+	BindToClose) se lanzan tantas liberaciones como jugadores; sin este limite, a partir de ~30 jugadores parte de los
+	guardados finales se descartan y solo se salvan tras los reintentos (1, 2, 4... s) si da tiempo antes de los 30 s.
+]]
+function Manager._call(self: Manager, fn: () -> ()): (boolean, any)
+	local limit = self.cfg.maxConcurrentRequests or 20
+	while self.inFlight >= limit do
+		self:_wait(0.05)
+	end
+	self.inFlight += 1
+	local ok, err = pcall(fn :: any)
+	self.inFlight -= 1
+	return ok, err
+end
+
 function Manager.keyFor(self: Manager, userId: number): string
 	return self.prefix .. tostring(userId)
 end
@@ -501,7 +532,7 @@ function Manager._claimOnce(self: Manager, key: string, userId: number): (boolea
 		return claimed, { userId }
 	end
 
-	local ok, err = pcall(function()
+	local ok, err = self:_call(function()
 		self.store:UpdateAsync(key, transform)
 	end)
 	if not ok then
@@ -514,7 +545,7 @@ end
 function Manager._unlockOnly(self: Manager, key: string)
 	local jobId = self.jobId
 	self:_retry("unlock " .. key, nil, function()
-		return pcall(function()
+		return self:_call(function()
 			self.store:UpdateAsync(key, function(old: any): any
 				if type(old) ~= "table" or type(old.lock) ~= "table" or old.lock.jobId ~= jobId then
 					return nil
@@ -611,6 +642,7 @@ function Manager._loadInner(self: Manager, userId: number, shouldCancel: (() -> 
 				claimedAt = self.nowFn(),
 				_manager = self,
 				_saving = false,
+				_releasing = false,
 			}
 			local profile: Profile = setmetatable(profileData, Profile)
 			self.profiles[userId] = profile
@@ -686,7 +718,7 @@ function Manager._persist(self: Manager, profile: Profile, releasing: boolean): 
 		then (self.cfg.releaseRetry or defaultReleaseRetry)
 		else self.cfg.retry
 	local ok, result = self:_retry("save " .. profile.key, retryConfig, function()
-		return pcall(function()
+		return self:_call(function()
 			self.store:UpdateAsync(profile.key, transform)
 		end)
 	end)

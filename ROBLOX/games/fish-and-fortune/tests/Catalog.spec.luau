@@ -41,32 +41,42 @@ describe("Catalog", function()
 		end
 	end)
 
-	it("los IDs son placeholders 0 -- TODO_ID en el UNICO archivo de configuracion", function()
-		local pending = 0
+	-- OJO: este test NO debe exigir que los IDs sean 0 (antes lo hacia): al pegar los IDs reales fallaba y empujaba a
+	-- borrarlo. Solo comprueba la forma del archivo de IDs.
+	it("ProductIds es el UNICO archivo de IDs: numericos y uno por cada pase/producto del catalogo", function()
 		for key, id in ProductIds.passes do
 			expect(type(id)).toBe("number")
 			expect(catalog.passes[key]).toBeTruthy()
-			if id == 0 then
-				pending += 1
-			end
 		end
 		for key, id in ProductIds.products do
 			expect(type(id)).toBe("number")
 			expect(catalog.products[key]).toBeTruthy()
-			if id == 0 then
-				pending += 1
-			end
 		end
 		-- todo catalogo tiene su ID en ProductIds (ni mas ni menos)
 		expect(countKeys(ProductIds.passes)).toBe(countKeys(catalog.passes))
 		expect(countKeys(ProductIds.products)).toBe(countKeys(catalog.products))
-		expect(pending).toBe(countKeys(catalog.passes) + countKeys(catalog.products)) -- aun sin rellenar
 	end)
 
-	it("el chequeo previo a publicar (allowPlaceholders = false) lista todo lo pendiente", function()
-		local problems = Shop.validateCatalog(catalog, handlers(), { allowPlaceholders = false })
-		expect(#problems).toBe(countKeys(catalog.passes) + countKeys(catalog.products))
-	end)
+	it(
+		"el chequeo previo a publicar (allowPlaceholders = false) lista lo pendiente, SIN contar lo apagado por flag",
+		function()
+			local pending = 0
+			for _, group in { catalog.passes, catalog.products } do
+				for _, item in group do
+					if item.id == 0 and item.enabled ~= false then
+						pending += 1
+					end
+				end
+			end
+			local problems = Shop.validateCatalog(catalog, handlers(), { allowPlaceholders = false })
+			expect(#problems).toBe(pending)
+			-- Suerte+ y el Cebo (apagados en la v1) pueden quedarse en 0 y la puerta aun asi puede pasar
+			for _, problem in problems do
+				expect(string.find(problem, "luck_plus", 1, true)).toBeNil()
+				expect(string.find(problem, "lucky_bait_15", 1, true)).toBeNil()
+			end
+		end
+	)
 
 	it("con IDs reales distintos el catalogo sigue siendo valido tambien sin placeholders", function()
 		local ids = { passes = {}, products = {} }

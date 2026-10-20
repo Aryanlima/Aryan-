@@ -80,11 +80,14 @@ export type Config = {
 	now: (() -> number)?,
 	log: ((message: string) -> ())?,
 	random: (() -> number)?,
-	profileWaitSeconds: number?, -- por defecto 20
+	profileWaitSeconds: number?, -- por defecto 90 (>= espera del bloqueo de sesion de Data + reintentos de carga)
 	purchaseHistorySize: number?, -- por defecto 500
 	promptCooldownSeconds: number?, -- por defecto 3
 	onPurchaseGranted: ((player: any, product: ProductDef, receipt: Receipt) -> ...any)?, -- DESPUES de persistir
 	onPassChanged: ((player: any, pass: PassDef, owned: boolean) -> ...any)?,
+	-- Opcional: el juego puede vetar una oferta que el jugador pagaria sin recibir todo su valor (p. ej. un boost que ya
+	-- esta en su tope de acumulacion). Devuelve (true) o (false, motivo). Se evalua ANTES del prompt.
+	canPurchase: ((player: any, profile: any, item: any, itemKind: string) -> (boolean, string?))?,
 }
 
 local Shop = {}
@@ -242,7 +245,7 @@ function Shop.validateCatalog(
 		if type(item.id) ~= "number" or item.id < 0 or item.id % 1 ~= 0 then
 			problem(label .. ": id invalido")
 		elseif item.id == 0 then
-			if not allowPlaceholders then
+			if not allowPlaceholders and item.enabled ~= false then
 				problem(label .. ": id placeholder (0 -- TODO_ID) sin rellenar")
 			end
 		elseif seenIds[item.id] ~= nil then
@@ -334,6 +337,12 @@ type ShopData = {
 }
 export type Shop = typeof(setmetatable({} :: ShopData, ShopImpl))
 
+-- Espera maxima del perfil dentro de ProcessReceipt. ProcessReceipt NO tiene reintento por tiempo (solo al volver a
+-- comprar o al reentrar) y su callback puede ceder todo lo que haga falta, asi que conviene esperar MAS que el
+-- bloqueo de sesion de Data (30 s por defecto) mas sus reintentos de carga: si no, una compra hecha justo al
+-- cambiar de servidor queda sin resolver hasta la proxima entrada del jugador.
+local DEFAULT_PROFILE_WAIT_SECONDS = 90
+
 -- ProcessReceipt solo debe asignarse UNA vez por servidor (varias asignaciones se pisan en silencio).
 local processReceiptOwner: any = nil
 
@@ -344,12 +353,15 @@ function Shop.new(config: Config): Shop
 	local productsById: { [number]: ProductDef } = {}
 	for _, product in config.catalog.products do
 		if product.id ~= 0 then
+			-- Un ID repetido haria que el recibo de un producto concediera OTRO (dinero real): no se arranca.
+			assert(productsById[product.id] == nil, "Shop.new: id de producto repetido " .. tostring(product.id))
 			productsById[product.id] = product
 		end
 	end
 	local passesById: { [number]: PassDef } = {}
 	for _, pass in config.catalog.passes do
 		if pass.id ~= 0 then
+			assert(passesById[pass.id] == nil, "Shop.new: id de pase repetido " .. tostring(pass.id))
 			passesById[pass.id] = pass
 		end
 	end
@@ -473,7 +485,8 @@ function ShopImpl._processReceiptInner(self: Shop, receipt: Receipt): any
 	if player == nil then
 		return notYet -- Roblox vuelve a llamar cuando el jugador entre de nuevo
 	end
-	local profile = self.cfg.waitForProfile(receipt.PlayerId, self.cfg.profileWaitSeconds or 20)
+	local profile =
+		self.cfg.waitForProfile(receipt.PlayerId, self.cfg.profileWaitSeconds or DEFAULT_PROFILE_WAIT_SECONDS)
 	if profile == nil or not profile:isActive() then
 		return notYet
 	end
@@ -627,7 +640,7 @@ function ShopImpl._applyOneTimeGrant(self: Shop, player: any, pass: PassDef): bo
 	if grant == nil then
 		return true
 	end
-	local profile = self.cfg.waitForProfile(player.UserId, self.cfg.profileWaitSeconds or 20)
+	local profile = self.cfg.waitForProfile(player.UserId, self.cfg.profileWaitSeconds or DEFAULT_PROFILE_WAIT_SECONDS)
 	if profile == nil or not profile:isActive() then
 		return false
 	end
@@ -738,6 +751,14 @@ function ShopImpl.canOffer(self: Shop, player: any, itemKind: string, key: strin
 	end
 	if itemKind == "pass" and self:ownsPass(player, key) then
 		return false, "owned"
+	end
+	local gate = self.cfg.canPurchase
+	if gate ~= nil then
+		local gateOk, allowed, why = pcall(gate, player, profile, item, itemKind)
+		if not gateOk or allowed ~= true then
+			-- ante la duda (error del gancho) NO se vende
+			return false, if gateOk and type(why) == "string" then why else "unavailable"
+		end
 	end
 	return true, nil
 end

@@ -182,7 +182,9 @@ function GameService.start(m: any)
 			passes = passes,
 			events = liveOps:getModifierSources(),
 			-- PolicyService: sin datos => restringido (conservador). Cacheado por jugador en Shop.getPolicy.
-			paidRandomAllowed = m.Odds.paidRandomAllowed(shop:getPolicy(player)),
+			-- Con el flag de suerte de pago APAGADO (v1) no se consulta: getPolicy cede (yield) y context() corre en
+			-- cada remoto y en el bucle de pesca automatica.
+			paidRandomAllowed = flags.paidLuckEnabled and m.Odds.paidRandomAllowed(shop:getPolicy(player)) or false,
 			now = os.time(),
 		}
 	end
@@ -300,6 +302,10 @@ function GameService.start(m: any)
 			return manager:waitForProfile(userId, timeoutSeconds)
 		end,
 		grants = grants,
+		profileWaitSeconds = 90, -- ProcessReceipt no tiene reintento por tiempo: esperar mas que el bloqueo de sesion
+		canPurchase = function(_player: Player, profile: any, item: any, itemKind: string): (boolean, string?)
+			return logic:canBuy(profile.data, item, itemKind, os.time())
+		end,
 		onPurchaseGranted = function(player: Player, product: any, receipt: any)
 			-- Solo corre DESPUES de confirmar el guardado.
 			analytics:funnel(player, "shop", 3, "purchase_granted", funnelSessions[player.UserId])
@@ -345,7 +351,13 @@ function GameService.start(m: any)
 		end
 		lastMythicPublish = now
 		task.spawn(function()
-			local message = { j = jobId, p = string.sub(player.DisplayName, 1, 40), c = result.creatureId, v = isVip }
+			-- Truncar por CARACTERES (un corte por bytes puede partir un caracter UTF-8 y el receptor descartaria el banner).
+			local shownName = player.DisplayName
+			local cut = utf8.offset(shownName, 21)
+			if cut ~= nil then
+				shownName = string.sub(shownName, 1, cut - 1)
+			end
+			local message = { j = jobId, p = shownName, c = result.creatureId, v = isVip }
 			local ok, err = pcall(function()
 				MessagingService:PublishAsync(balance.mythicBanner.topic, message)
 			end)
@@ -390,7 +402,7 @@ function GameService.start(m: any)
 						return
 					end
 					local creature = rules:creature(tostring(data.c))
-					if creature == nil or type(data.p) ~= "string" or not utf8.len(data.p) or #data.p > 60 then
+					if creature == nil or type(data.p) ~= "string" or not utf8.len(data.p) or #data.p > 100 then
 						return
 					end
 					net:fireAllClients("Banner", {
@@ -674,7 +686,15 @@ function GameService.start(m: any)
 				toast(player, codeMessages[result.reason or "invalid"] or "Codigo no valido.")
 				return
 			end
-			logic:grantReward(profile.data, result.reward, "TimedReward", "redeem_code", player)
+			local granted, grantErr =
+				pcall(logic.grantReward, logic, profile.data, result.reward, "TimedReward", "redeem_code", player)
+			if not granted then
+				-- Premio mal formado en la configuracion remota: no se "gasta" el codigo del jugador sin pagarle.
+				profile.data.redeemedCodes[result.code :: string] = nil
+				warn("[LiveOps] el premio del codigo " .. tostring(result.code) .. " fallo: " .. tostring(grantErr))
+				toast(player, "Ese codigo no se pudo canjear ahora. Prueba mas tarde.")
+				return
+			end
 			profile:markDirty()
 			analytics:custom(player, "code_redeemed", 1)
 			toast(player, "Codigo canjeado.")
@@ -722,7 +742,9 @@ function GameService.start(m: any)
 		task.spawn(function()
 			-- 1. propiedad de pases + concesiones unicas + politica (se cachea para no ceder despues)
 			shop:loadPlayer(player)
-			shop:getPolicy(player)
+			if flags.paidLuckEnabled then
+				shop:getPolicy(player) -- precalienta la cache (solo hace falta si la suerte de pago esta encendida)
+			end
 			if not profile:isActive() then
 				return
 			end
