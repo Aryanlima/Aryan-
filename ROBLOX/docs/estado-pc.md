@@ -77,6 +77,17 @@ Arreglos del entorno Windows que hicieron falta (no tocan código):
 - **Tipos de Roblox:** `ROBLOX/.toolchain/share/globalTypes.d.luau` bajado de `JohnnyMorganz/luau-lsp/main/scripts/` (lo usa `lint.sh`).
 - **`rokit.toml`** nuevo en la raíz, con las versiones de `tools/setup.sh` (selene 0.31.0, no 0.32.0). `rokit install` funciona en Windows.
 
+## Verificaciones en la doc oficial (hechas desde la PC, que sí abre create.roblox.com y el DevForum)
+
+Detalle y citas: `pc-investigacion/verificacion-monetizacion.md` y `pc-investigacion/verificacion-studio-politicas.md`.
+- `ProcessReceipt` **no está deprecado** (la doc lo llama "legacy"). Existe `MarketplaceService:BindReceiptHandler(...)`, que devuelve `Enum.ReceiptDecision`. Si conviven, gana la nueva. `tools/examples/ReceiptHandler.luau` sigue siendo válido.
+- Impuestos DevEx confirmados: desde el 1-nov-2026 son regalías; W-8BEN o W-8BEN-E antes del 31-oct en Creator Hub → Finances → Taxes.
+- DevEx: sin tarifas por país (0,0038 / 0,0054 / 0,0035 legado). Qué países quedan fuera sigue sin verificar (la lista de Tipalti da 403).
+- **Script Sync ya NO es beta** (salió completo el 2026-06-17, según anuncio de staff). Corregir `research/04` y `pc-investigacion/flujo.md`.
+- Planning Mode existe (`/plan` en Assistant), pero no se puede usar desde el MCP ni desde Claude Code.
+- Open Cloud: `universe-places:write` para publicar (endpoint beta) y `universe.place.luau-execution-session:write` para Luau Execution. Las claves caducan tras 60 días sin uso.
+- Los requisitos de publicación se aplican a cada actualización, no solo al primer lanzamiento.
+
 ## Recomendaciones para la nube (de la investigación)
 
 - Usar **Rojo** como vía de sincronización: todo vive en archivos, `rojo build` funciona sin Studio y genera el sourcemap para luau-lsp. No mezclarlo con Script Sync en las mismas carpetas.
