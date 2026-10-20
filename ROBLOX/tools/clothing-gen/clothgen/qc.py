@@ -45,7 +45,11 @@ def _face_mask(shape):
 
 
 def belt_wrap_score(arr, part):
-    """(diferencia en la costura de cierre, p99 de diferencias columna-a-columna internas)."""
+    """(diferencia en la costura de cierre, maximo de diferencias columna-a-columna internas).
+
+    Un borde duro legitimo (p. ej. entre dos rayas) puede caer justo en el cierre; por eso se
+    compara con el MAXIMO interno y no con un percentil. La garantia fuerte de periodicidad
+    esta en tests/test_periodic.py."""
     faces = L.PARTS[part]
     order, C, Hh = L.belt_geometry(part)
     cols = []
@@ -61,7 +65,7 @@ def belt_wrap_score(arr, part):
         diffs.append(np.abs(rgb[ok, i] - rgb[ok, i + 1]).mean() if ok.any() else 0.0)
     ok = vis[:, C - 1] & vis[:, 0]
     wrap = np.abs(rgb[ok, C - 1] - rgb[ok, 0]).mean() if ok.any() else 0.0
-    return float(wrap), float(np.percentile(diffs, 99))
+    return float(wrap), float(np.max(diffs))
 
 
 def check_clothing(path, kind="shirt", texts=None, blocklist=None) -> dict:
@@ -99,10 +103,10 @@ def check_clothing(path, kind="shirt", texts=None, blocklist=None) -> dict:
     res["semi_transparent_pixels"] = semi
     seams = {}
     for part in L.BELTS:
-        wrap, p99 = belt_wrap_score(arr, part)
-        seams[part] = {"wrap_diff": round(wrap, 2), "p99_internal": round(p99, 2)}
-        if wrap > p99 * 1.05 + 2.0:
-            res["warnings"].append(f"costura de cierre visible en {part}: {wrap:.1f} > p99 {p99:.1f}")
+        wrap, mx = belt_wrap_score(arr, part)
+        seams[part] = {"wrap_diff": round(wrap, 2), "max_internal": round(mx, 2)}
+        if wrap > mx * 1.05 + 2.0:
+            res["warnings"].append(f"costura de cierre visible en {part}: {wrap:.1f} > max interno {mx:.1f}")
     res["seams"] = seams
     res["sha1"] = hashlib.sha1(Path(path).read_bytes()).hexdigest()[:12]
     hits = check_text(texts or [], blocklist)
@@ -162,6 +166,6 @@ def tile_seam_score(path):
     for name, ax in (("x", 1), ("y", 0)):
         d = np.abs(np.diff(a, axis=ax)).mean(axis=(0, 2) if ax == 1 else (1, 2))
         seam = np.abs(a[:, -1] - a[:, 0]).mean() if ax == 1 else np.abs(a[-1] - a[0]).mean()
-        res[name] = {"seam": round(float(seam), 2), "p99": round(float(np.percentile(d, 99)), 2)}
-        res[name]["ok"] = bool(seam <= np.percentile(d, 99) * 1.05 + 2.0)
+        res[name] = {"seam": round(float(seam), 2), "max_internal": round(float(d.max()), 2)}
+        res[name]["ok"] = bool(seam <= d.max() * 1.05 + 2.0)
     return res

@@ -355,6 +355,12 @@ macOS:
 
 (Si ya tienes otras entradas en `mcpServers`, separalas con comas: una coma que falta rompe todo el archivo.)
 
+La doc oficial tambien da el comando directo para clientes que lo piden (Windows: `cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat`;
+macOS: `/Applications/RobloxStudio.app/Contents/MacOS/StudioMCP`). Para Claude Code, el equivalente seria
+`claude mcp add Roblox_Studio -- "/Applications/RobloxStudio.app/Contents/MacOS/StudioMCP"` (macOS):
+**[NO VERIFICADO]** (sintaxis estandar de `claude mcp add` aplicada a la ruta oficial; no lo ejecute). Prefiere
+la via A o B.
+
 ### 7.3 Comprobar que funciona
 
 **[VERIFICADO EN DOC OFICIAL]** (Roblox `studio/mcp.md`, "Verify your connection")
@@ -377,9 +383,11 @@ macOS:
 
 **[VERIFICADO EN DOC OFICIAL]** (README del plugin oficial, lista de herramientas de solo lectura frente a las que cambian cosas)
 
-- Solo lectura (puedes permitirlas): `list_roblox_studios`, `get_studio_state`, `get_console_output`,
+- Roblox clasifica como **solo lectura**: `list_roblox_studios`, `get_studio_state`, `get_console_output`,
   `script_read`, `script_search`, `script_grep`, `search_game_tree`, `inspect_instance`, `screen_capture`,
-  `http_get`, `skill`, `search_asset`, `wait_job_finished`, `store_image`.
+  `http_get`, `skill`, `search_asset`, `wait_job_finished`, `store_image`. Mi recomendacion (informe
+  `research/04`, 4.5) es permitir "siempre" solo las mas basicas: `list_roblox_studios`, `get_studio_state`,
+  `get_console_output`, `script_read`, `search_game_tree`, `inspect_instance` y `screen_capture`.
 - **Cambian tu lugar o tu cuenta (aprueba cada vez, nunca "permitir siempre")**: `execute_luau`, `multi_edit`,
   `insert_asset`, `generate_mesh`, `generate_material`, `generate_procedural_model`, `generate_texture`,
   `segment_mesh`, `upload_image`, `start_stop_play`, `character_navigation`, `user_keyboard_input`,
@@ -404,8 +412,10 @@ Pasos generales (los detalles exactos, los de su README):
    (o usa el panel de Claude Code). **[VERIFICADO EN DOC OFICIAL]** (Anthropic, Claude Code `setup`: "open a terminal in
    the project you want to work in and start Claude Code: `claude`")
 2. Dile: `Lee ROBLOX/games/fish-and-fortune/README.md y dime los pasos para abrirlo en Studio.`
-3. En Studio abre un lugar nuevo (o el que indique el README), guardalo como archivo `.rbxlx` en la carpeta que
-   diga el README (los archivos `.rbxl` y `.rbxlx` no se suben a Git).
+3. En Studio abre un lugar nuevo (o el que indique el README) y guardalo donde diga el README (File, Save to File).
+   Si el README no lo dice, preguntale a Claude donde guardarlo y si ese archivo debe ir o no a Git; el repositorio
+   de ejemplo de Roblox deja fuera de Git los `.rbxlx` (`ai/coding-harness.md`, paso 4), pero lo de este proyecto
+   lo decide su `.gitignore`.
 4. **Conecta los archivos con Studio. Elige UNA via por juego; no las mezcles** (un solo "escritor" por script):
 
    **Via 1: Script Sync (la oficial y mas simple).**
