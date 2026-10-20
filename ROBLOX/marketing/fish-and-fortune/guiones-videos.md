@@ -16,7 +16,7 @@ Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**,
 |---|---|---|---|
 | **A** | **Captura de gameplay real** [a grabar por Aryan o por la sesión de su PC] | 15 | El juego abierto (Studio o publicado), grabador (OBS, o grabación de pantalla del móvil) y CapCut/DaVinci para montar. **Claude no puede grabar** gameplay desde la nube |
 | **B** | **Generado por IA** (Veo / Kling / Runway; incluye PROMPT exacto) | 7 | **Cuenta + créditos de Aryan** en la herramienta elegida (ver §0.3). Es ambiente/marca/lore, **nunca gameplay** |
-| **C** | **Render por código con el pipeline** (`marketing/pipeline/`) | 8 (6 con spec ya hechos y renderizados en `specs-video/`) | Nada externo: `node render.mjs` (Node + Chromium + ffmpeg, ya funciona en esta sesión) |
+| **C** | **Render por código con el pipeline** (`ROBLOX/marketing/pipeline/`) | 8 (6 con spec ya hechos y renderizados en `specs-video/`) | Nada externo: `node render.mjs` (Node + Chromium + ffmpeg, ya funciona en esta sesión) |
 
 **Reglas comunes de cumplimiento (aplican a los 30)**
 
@@ -118,7 +118,7 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **CTA:** "Busca Fish & Fortune — gratis en Roblox · compras opcionales".
 - **EN:** "Can you catch a MYTHIC?" (traducir el spec cambiando los textos).
 - **Hashtags:** `#FishAndFortune #Roblox #Pesca #CozyGames`
-- **Origen C:** `node marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4` → **ya renderizado** en `specs-video/out/ff-01-gancho-mitico.mp4` (1080×1920, 18,2 s). Fondo de gráficos de marca con emojis (Noto Color Emoji), no gameplay; lleva la línea legal "Imágenes de marca, no es gameplay".
+- **Origen C:** `node ROBLOX/marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4` → **ya renderizado** en `specs-video/out/ff-01-gancho-mitico.mp4` (1080×1920, 18,2 s). Fondo de gráficos de marca con emojis (Noto Color Emoji), no gameplay; lleva la línea legal "Imágenes de marca, no es gameplay".
 - **Requiere de Aryan:** nada para publicarlo; opcional voz (`narrationFile`) y sustituir fondos por clips reales (`bg {type:'video'}`).
 
 ### V04 — Progresión: mi primera caña · 25 s · origen A
@@ -432,4 +432,4 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 
 **B (IA):** generar clips de 5–8 s sin texto; revisar uno por uno (IP, rostros, "artefactos" raros); montar y añadir texto y la etiqueta "Escena creada con IA · no es gameplay"; activar el interruptor de IA de la plataforma.
 
-**C (pipeline):** `node marketing/pipeline/render.mjs <spec.json> <salida.mp4>`; opciones útiles: `--aspect 9:16|16:9|1:1|4:5`, `--scale 0.5` (preview), `--stills 1,5,9` (fotogramas de revisión), `--crf 21 --report`. Ver `specs-video/README.md`.
+**C (pipeline):** `node ROBLOX/marketing/pipeline/render.mjs <spec.json> <salida.mp4>`; opciones útiles: `--aspect 9:16|16:9|1:1|4:5`, `--scale 0.5` (preview), `--stills 1,5,9` (fotogramas de revisión), `--crf 21 --report`. Ver `specs-video/README.md`.

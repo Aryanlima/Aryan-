@@ -1,10 +1,13 @@
 # shellcheck shell=bash
-# Entorno comun de los scripts de tools/ (se usa con `source`, no se ejecuta).
+# Entorno comun de los scripts de ROBLOX/tools/ (se usa con `source`, no se ejecuta).
 #
 # Variables que define:
-#   ROOT       raiz del proyecto (carpeta que contiene tools/, .luaurc, selene.toml, stylua.toml)
-#   TOOLCHAIN  donde se instalan los binarios (ignorado por git). Por defecto ROBLOX/.toolchain
-#              si existe ROBLOX/, si no .toolchain. Se puede forzar con ARYAN_TOOLCHAIN=/ruta.
+#   ROOT       raiz de trabajo = la carpeta ROBLOX/ (contiene tools/, .luaurc, selene.toml, stylua.toml).
+#              Los scripts hacen `cd "$ROOT"` antes de llamar a selene/stylua/luau-lsp/lune, asi que esas
+#              herramientas encuentran sus configs (y el alias @testkit de .luaurc) sin importar desde que
+#              carpeta se invoque el script.
+#   TOOLCHAIN  donde se instalan los binarios (ignorado por git): ROBLOX/.toolchain. Se puede forzar con
+#              ARYAN_TOOLCHAIN=/ruta.
 #   GLOBAL_TYPES  definiciones de tipos de Roblox (globalTypes.d.luau) para luau-lsp
 #
 # Todo es relativo a la ubicacion de este archivo: no hay rutas absolutas del equipo.
@@ -14,8 +17,6 @@ ROOT="$(cd "$TOOLS_DIR/.." && pwd)"
 
 if [ -n "${ARYAN_TOOLCHAIN:-}" ]; then
 	TOOLCHAIN="$ARYAN_TOOLCHAIN"
-elif [ -d "$ROOT/ROBLOX" ]; then
-	TOOLCHAIN="$ROOT/ROBLOX/.toolchain"
 else
 	TOOLCHAIN="$ROOT/.toolchain"
 fi
@@ -35,7 +36,7 @@ abs_paths() {
 	done
 }
 
-# Lista de archivos Luau/Lua del proyecto (excluye research, dependencias y el toolchain).
+# Lista de archivos Luau/Lua del proyecto (excluye research, dependencias, venv y el toolchain).
 # Uso: mapfile -t FILES < <(find_luau_files [ruta...])
 find_luau_files() {
 	local paths=("$@")
@@ -50,7 +51,7 @@ find_luau_files() {
 # Comprueba que un binario existe; si no, explica como instalarlo.
 require_tool() {
 	if ! command -v "$1" >/dev/null 2>&1; then
-		echo "Falta '$1'. Ejecuta: tools/setup.sh" >&2
+		echo "Falta '$1'. Ejecuta: bash ROBLOX/tools/setup.sh" >&2
 		return 1
 	fi
 }

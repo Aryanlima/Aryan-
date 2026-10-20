@@ -2,19 +2,22 @@
 # Analisis estatico del codigo Luau: selene (lint) + stylua --check (formato) + comprobacion de tipos.
 #
 # Uso:
-#   tools/lint.sh                  # todo el proyecto
-#   tools/lint.sh tools/testkit    # solo una carpeta o archivos
-#   tools/lint.sh --no-types       # sin la comprobacion de tipos
-#   tools/lint.sh --no-format      # sin stylua --check
+#   bash ROBLOX/tools/lint.sh                         # todo ROBLOX/
+#   bash ROBLOX/tools/lint.sh ROBLOX/tools/testkit    # solo una carpeta o archivos
+#   bash ROBLOX/tools/lint.sh --no-types              # sin la comprobacion de tipos
+#   bash ROBLOX/tools/lint.sh --no-format             # sin stylua --check
+#
+# Se puede invocar desde cualquier carpeta; el script trabaja con ROBLOX/ como raiz (selene.toml,
+# stylua.toml y .luaurc se resuelven desde ahi).
 #
 # Comprobacion de tipos (en este orden de preferencia):
 #   1. luau-lsp analyze  + definiciones de Roblox ($TOOLCHAIN/share/globalTypes.d.luau)
-#   2. luau-analyze      (Luau "puro": no conoce game/Instance/warn...; por eso solo se pasa a tools/)
+#   2. luau-analyze      (Luau "puro": no conoce game/Instance/warn...; por eso solo se pasa a tools/ de ROBLOX/)
 #   3. si no hay ninguno, se omite con un aviso.
 #
 # Codigo de salida: 0 si todo esta limpio; 1 si algun paso falla.
 set -uo pipefail
-# shellcheck source=tools/env.sh
+# shellcheck source=ROBLOX/tools/env.sh
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
 do_types=1
@@ -25,7 +28,7 @@ for arg in "$@"; do
 	--no-types) do_types=0 ;;
 	--no-format) do_format=0 ;;
 	-h | --help)
-		sed -n '2,15p' "${BASH_SOURCE[0]}"
+		sed -n '2,18p' "${BASH_SOURCE[0]}"
 		exit 0
 		;;
 	*) paths+=("$arg") ;;
@@ -54,7 +57,7 @@ if [ $do_format -eq 1 ]; then
 	step "stylua --check"
 	if require_tool stylua; then
 		stylua --check "${files[@]}" || {
-			echo "Hay archivos sin formatear: ejecuta tools/format.sh" >&2
+			echo "Hay archivos sin formatear: ejecuta bash ROBLOX/tools/format.sh" >&2
 			failed=1
 		}
 	else
@@ -77,7 +80,7 @@ if [ $do_types -eq 1 ]; then
 		echo "Aviso: sin luau-lsp no se comprueba el codigo de Roblox (game, Instance...)."
 	else
 		echo
-		echo "Aviso: no hay luau-lsp ni luau-analyze; se omite la comprobacion de tipos (ver tools/setup.sh)."
+		echo "Aviso: no hay luau-lsp ni luau-analyze; se omite la comprobacion de tipos (ver ROBLOX/tools/setup.sh)."
 	fi
 fi
 

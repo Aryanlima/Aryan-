@@ -7,7 +7,7 @@
 	Por que una sola tabla: si la UI y la logica leyeran datos distintos, lo que se muestra
 	podria diferir de lo que se sortea (incumplimiento y riesgo de moderacion). Aqui no puede.
 
-	Reglas de cumplimiento que este modulo IMPONE (ver research/03 seccion 2.1):
+	Reglas de cumplimiento que este modulo IMPONE (ver ROBLOX/research/03 seccion 2.1):
 	  * Cada resultado se muestra con su porcentaje numerico real; la suma mostrada es EXACTAMENTE
 	    100 % (metodo del resto mayor), y ninguna fila se muestra como 0 %.
 	  * No existe el resultado "nada": se rechazan ids tipo nothing/none/miss y valores <= 0.
@@ -473,7 +473,7 @@ function OddsTable.displayRows(self: OddsTable, options: DisplayOptions?): Displ
 end
 
 ----------------------------------------------------------------------------
--- Gating por PolicyService (ver research/03 2.1)
+-- Gating por PolicyService (ver ROBLOX/research/03 2.1)
 ----------------------------------------------------------------------------
 
 export type PolicyInfo = { [string]: any }

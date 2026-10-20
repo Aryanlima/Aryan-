@@ -159,9 +159,9 @@ Escritorio/
   ROBLOX/                     <- raiz del repositorio (aqui abres VS Code y Claude Code)
     CLAUDE.md                 <- reglas del proyecto para Claude
     .claude/skills/roblox-dev <- acceso directo a la skill de Roblox
-    research/  tools/  marketing/
-    ROBLOX/                   <- la parte de Roblox
-      docs/  games/  packages/  skills/ ...
+    ROBLOX/                   <- la parte de Roblox (todo lo de Roblox vive aqui)
+      00-LEEME.md  docs/  research/  games/  packages/  tests/
+      tools/  marketing/  skills/  rokit.toml  .luaurc ...
 ```
 
 **[NO VERIFICADO]** (comandos estandar de Git y PowerShell; no pude abrir el repositorio desde mi entorno)
@@ -244,20 +244,23 @@ rokit --help
 
 ### 6.2 Instalar las herramientas del proyecto
 
-Dentro de la carpeta `ROBLOX` del Escritorio (la raiz del repo):
+El repositorio ya trae `ROBLOX/rokit.toml` con las versiones fijas (rojo 7.7.1, StyLua 2.6.0, selene 0.31.0, lune 0.11.0,
+luau-lsp 1.70.1). Entra en la carpeta **interior** `ROBLOX/` (la que contiene `rokit.toml`; Rokit busca el archivo desde
+la carpeta actual hacia arriba, asi que no lo encuentra desde la raiz del repo):
 
-**[NO VERIFICADO]** (README de Rokit: `rokit install` instala "todas las herramientas del proyecto"; usalo solo si el
-repositorio ya trae un archivo `rokit.toml`; Rokit puede pedirte confirmar que confias en cada herramienta)
+**[NO VERIFICADO]** (README de Rokit: `rokit install` instala "todas las herramientas del proyecto"; Rokit puede pedirte
+confirmar que confias en cada herramienta. No se probo en Windows ni macOS)
 
 ```
+cd ROBLOX
 rokit install
 ```
 
-Si el repositorio **aun no tiene** `rokit.toml`, crea uno y anade las herramientas (esto fija las versiones
-actuales en `rokit.toml`; despues se sube a Git para que todos usen las mismas):
+Solo si por algun motivo `rokit.toml` faltara, se puede crear uno nuevo y anadir las herramientas (esto fija las
+versiones actuales; despues se sube a Git para que todos usen las mismas):
 
 **[NO VERIFICADO]** (README de Rokit: comandos `init` y `add`; los nombres `usuario/repositorio` salen del informe
-`research/04` y de los repos de cada herramienta)
+`ROBLOX/research/04` y de los repos de cada herramienta)
 
 ```
 rokit init
@@ -386,7 +389,7 @@ la via A o B.
 - Roblox clasifica como **solo lectura**: `list_roblox_studios`, `get_studio_state`, `get_console_output`,
   `script_read`, `script_search`, `script_grep`, `search_game_tree`, `inspect_instance`, `screen_capture`,
   `http_get`, `skill`, `search_asset`, `wait_job_finished`, `store_image`. Mi recomendacion (informe
-  `research/04`, 4.5) es permitir "siempre" solo las mas basicas: `list_roblox_studios`, `get_studio_state`,
+  `ROBLOX/research/04`, 4.5) es permitir "siempre" solo las mas basicas: `list_roblox_studios`, `get_studio_state`,
   `get_console_output`, `script_read`, `search_game_tree`, `inspect_instance` y `screen_capture`.
 - **Cambian tu lugar o tu cuenta (aprueba cada vez, nunca "permitir siempre")**: `execute_luau`, `multi_edit`,
   `insert_asset`, `generate_mesh`, `generate_material`, `generate_procedural_model`, `generate_texture`,
@@ -430,7 +433,7 @@ Pasos generales (los detalles exactos, los de su README):
 
    **Via 2: Rojo.** Solo si el README del juego dice que usa Rojo.
 
-   **[NO VERIFICADO]** (README de Rojo y del informe `research/04`; su pagina de instalacion, rojo.space, no pude abrirla)
+   **[NO VERIFICADO]** (README de Rojo y del informe `ROBLOX/research/04`; su pagina de instalacion, rojo.space, no pude abrirla)
 
    - Instala el plugin de Rojo en Studio (el informe da `rojo plugin install`, o el archivo `Rojo.rbxm`, o la
      tienda de plugins), y en la raiz del juego ejecuta:
@@ -468,7 +471,7 @@ copia al codigo. **[VERIFICADO EN DOC OFICIAL]** (Roblox `production/monetizatio
    los IDs de pases y productos? Pon estos IDs ahi: ...` y revisa el cambio. Los IDs no son secretos (se ven
    en el juego); **una clave de API, una cookie o una contrasena SI lo son: nunca las pegues en archivos ni en el chat.**
 
-Reglas de oro del proyecto (viven en `CLAUDE.md` y `research/03`):
+Reglas de oro del proyecto (viven en `CLAUDE.md` y `ROBLOX/research/03`):
 
 - Un solo script asigna `ProcessReceipt`, y debe ser **idempotente** (no dar el premio dos veces). Siempre con
   revision humana.

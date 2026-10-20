@@ -1,7 +1,7 @@
 # Libreria estandar "lite" de Roblox para selene.
 #
 # Motivo: `selene generate-roblox-std` descarga el API dump desde raw.githubusercontent.com,
-# que esta bloqueado/no confiable desde el entorno de sesion (ver docs/entorno-y-toolchain.md).
+# que esta bloqueado/no confiable desde el entorno de sesion (ver docs/entorno-y-toolchain.md, en esta misma carpeta ROBLOX/).
 # Esto declara los globales de Roblox mas usados como `any` para que selene no marque
 # "undefined variable" y siga detectando lo demas (variables sin usar, sombreado, etc.).
 # Si en tu maquina con red libre ejecutas `selene generate-roblox-std`, cambia

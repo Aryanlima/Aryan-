@@ -9,7 +9,7 @@ Estado verificado el 2026-10-20 en la sesion de nube (Linux x86_64, 4 hilos, car
 ## 1. Que quedo instalado
 
 Los binarios viven en `ROBLOX/.toolchain/bin/` (ignorado por git; ver `CLAUDE.md`). Los scripts de
-`tools/` lo anaden al `PATH` solos (`tools/env.sh`).
+`ROBLOX/tools/` lo anaden al `PATH` solos (`ROBLOX/tools/env.sh`).
 
 | Herramienta | Version | Para que | Como se obtuvo |
 |---|---|---|---|
@@ -21,17 +21,20 @@ Los binarios viven en `ROBLOX/.toolchain/bin/` (ignorado por git; ver `CLAUDE.md
 | `luau-lsp` | 1.70.1 (commit del 2026-10-10) | Analizador con tipos de Roblox / servidor LSP | Compilado desde fuente (ver 2) |
 | `globalTypes.d.luau` | del repo luau-lsp (2026-10-10) | Definiciones de tipos de la API de Roblox | Sale del codigo fuente de luau-lsp |
 
+Las mismas versiones (rojo, StyLua, selene, lune, luau-lsp) estan fijadas para Rokit en `ROBLOX/rokit.toml`
+(no probado con Rokit en este entorno; ver el comentario del propio archivo).
+
 Smoke tests ejecutados (todos OK): `lune --version`, `stylua --version`, `selene --version`,
 `rojo --version`; un script Luau con tipos ejecutado con `lune run`; `rojo build` de un proyecto minimo
-a `.rbxlx`; `luau-analyze` y `luau-lsp analyze` sobre todo `tools/` (0 errores); y los 65 tests propios
-(`tools/test.sh`; con los specs de otros ayudantes de `ROBLOX/tests` el total fue 134, todos en verde).
+a `.rbxlx`; `luau-analyze` y `luau-lsp analyze` sobre todo `ROBLOX/tools/` (0 errores); y los 65 tests propios
+(`ROBLOX/tools/test.sh`; con los specs de otros ayudantes de `ROBLOX/tests` el total fue 134, todos en verde).
 
 ### 1.1 Estado de `luau-lsp`
 
 **Instalado y funcionando** (luau-lsp 1.70.1, compilado con clang 18 desde el commit `6f90396fa8f6` del
-2026-10-10 sobre el Luau `8387cfb461b3`). `tools/lint.sh` lo usa para la comprobacion de tipos con las
+2026-10-10 sobre el Luau `8387cfb461b3`). `ROBLOX/tools/lint.sh` lo usa para la comprobacion de tipos con las
 definiciones de Roblox: se probo que entiende la API (`game:GetService("Players")` es un `Players`, marca
-`Key 'NoSuchMethod' not found in external type 'Players'` y asignar un `string` a un `number`) y que `tools/`
+`Key 'NoSuchMethod' not found in external type 'Players'` y asignar un `string` a un `number`) y que `ROBLOX/tools/`
 sale limpio. Uso directo:
 
 ```bash
@@ -47,16 +50,16 @@ devuelven 1 valor donde el tipo declarado exige 2); no se corrigieron (no son de
 ### 1.2 Reproducir la instalacion
 
 ```bash
-tools/setup.sh                 # instala lo que falte (idempotente); --check solo verifica
-tools/setup.sh --skip-lsp      # omite luau-lsp (la compilacion mas lenta, ~10-20 min)
-tools/setup.sh --only lune,stylua
-JOBS=2 tools/setup.sh          # hilos de compilacion (por defecto nproc, maximo 4)
+ROBLOX/tools/setup.sh                 # instala lo que falte (idempotente); --check solo verifica
+ROBLOX/tools/setup.sh --skip-lsp      # omite luau-lsp (la compilacion mas lenta, ~10-20 min)
+ROBLOX/tools/setup.sh --only lune,stylua
+JOBS=2 ROBLOX/tools/setup.sh          # hilos de compilacion (por defecto nproc, maximo 4)
 ```
 
 Requisitos del sistema: `cargo`, `cmake`, `curl`, `python3` y `clang++` o `g++` (`ninja` es opcional).
 El primer `setup.sh` completo tarda del orden de 20-30 min con 4 hilos (medido aqui: lune ~6 min, stylua+selene+rojo
 ~9 min en paralelo con lune, Luau ~3 min, luau-lsp bastante mas; la maquina compartia CPU con otros procesos). Las
-versiones estan fijadas al principio de `tools/setup.sh`.
+versiones estan fijadas al principio de `ROBLOX/tools/setup.sh`.
 
 Hosts de red que usa `setup.sh` (todos permitidos por la politica actual):
 `index.crates.io`, `static.crates.io`, `proxy.golang.org` y `sum.golang.org` (verificacion de hashes; si no
@@ -97,25 +100,25 @@ WebAssembly con modulo `analysis`) + `ROBLOX/scripts/typecheck.mjs`. Complementa
 
 ## 4. Como correr lint, formato y tests
 
-Todo desde la raiz del repo; los scripts excluyen `research/`, `.git/`, `node_modules/`, `venv/`, `.toolchain/`
-y los archivos de definiciones `*.d.luau`.
+Todo desde la raiz del repo (o desde cualquier carpeta: los scripts hacen `cd ROBLOX/` por dentro); excluyen
+`research/`, `.git/`, `node_modules/`, `venv/`, `.toolchain/` y los archivos de definiciones `*.d.luau`.
 
 ```bash
-tools/test.sh                       # todos los *.spec.luau (un proceso lune por archivo)
-tools/test.sh tools/examples        # solo una carpeta o archivo
-tools/test.sh -t "idempotente"      # solo tests cuyo nombre completo contiene el texto
-tools/test.sh -v                    # salida completa tambien de los que pasan
+ROBLOX/tools/test.sh                       # todos los *.spec.luau (un proceso lune por archivo)
+ROBLOX/tools/test.sh ROBLOX/tools/examples        # solo una carpeta o archivo
+ROBLOX/tools/test.sh -t "idempotente"      # solo tests cuyo nombre completo contiene el texto
+ROBLOX/tools/test.sh -v                    # salida completa tambien de los que pasan
 
-tools/lint.sh                       # selene + stylua --check + tipos (luau-lsp o luau-analyze)
-tools/lint.sh tools/testkit         # solo una ruta
-tools/lint.sh --no-types            # sin comprobacion de tipos
-tools/format.sh                     # reformatea con StyLua (stylua.toml: tabs, 120 columnas)
-tools/format.sh --check             # solo comprueba
+ROBLOX/tools/lint.sh                       # selene + stylua --check + tipos (luau-lsp o luau-analyze)
+ROBLOX/tools/lint.sh ROBLOX/tools/testkit         # solo una ruta
+ROBLOX/tools/lint.sh --no-types            # sin comprobacion de tipos
+ROBLOX/tools/format.sh                     # reformatea con StyLua (stylua.toml: tabs, 120 columnas)
+ROBLOX/tools/format.sh --check             # solo comprueba
 ```
 
 Codigos de salida: `0` todo bien, `1` hay fallos, `2` falta una herramienta o no hay specs.
 
-Configuracion en la raiz: `.luaurc` (alias `@testkit`, alias `@lune` hacia los tipos locales de Lune; modo
+Configuracion en `ROBLOX/` (la raiz de trabajo de los scripts): `.luaurc` (alias `@testkit`, alias `@lune` hacia los tipos locales de Lune; modo
 `nonstrict` por defecto, los archivos nuevos de juego deben llevar `--!strict`), `selene.toml`,
 `roblox_lite.yml`, `stylua.toml`, `.styluaignore`.
 
@@ -146,7 +149,7 @@ describe("MiModulo", function()
 end)
 ```
 
-API del runner (`tools/testkit/`):
+API del runner (`ROBLOX/tools/testkit/`):
 
 - Estructura: `describe`, `it` / `test`, `describe.skip`, `it.skip`, `describe.only`, `it.only`,
   `beforeAll`, `afterAll`, `beforeEach`, `afterEach`. Los tests pueden ceder (`task.wait` real) con timeout de 5 s.
@@ -157,9 +160,9 @@ API del runner (`tools/testkit/`):
   (`expect(x).never.toBe(y)`; `not` es palabra reservada en Luau). Se admite `expect(x).toBe(y)` y `expect(x):toBe(y)`.
 - Espias: `testkit.fn(impl?)` -> `.callCount`, `.calls`, `.results`, `:mockReturn(...)`, `:reset()`.
 - Runner aislado (para tests del propio testkit): `testkit.createRunner()`.
-- Filtro por nombre: `TESTKIT_FILTER=texto` (lo que usa `tools/test.sh -t`).
+- Filtro por nombre: `TESTKIT_FILTER=texto` (lo que usa `ROBLOX/tools/test.sh -t`).
 
-### Mocks de servicios de Roblox (`tools/testkit/mocks/`)
+### Mocks de servicios de Roblox (`ROBLOX/tools/testkit/mocks/`)
 
 Se crean con `Mocks.new(opciones)` y se **inyectan** en la logica bajo prueba (recomendado:
 `Modulo.new({ dataStoreService = env.DataStoreService, players = env.Players, enum = env.Enum })`). Para codigo
@@ -176,7 +179,7 @@ que usa los globales de Roblox directamente: `env:installGlobals()` expone `Enum
 | `MarketplaceService` | `ProcessReceipt` y `BindReceiptHandler`; el test hace de Roblox: `SimulatePurchase`, `SimulateRedelivery(purchaseId)`, `RetryPending(userId?)`, `GetReceiptStatus`, `GetDeliveryAttempts`; si el callback lanza error o devuelve `NotProcessedYet` el recibo queda pendiente. `UserOwnsGamePassAsync` con `GrantGamePass/RevokeGamePass`, `PromptGamePassPurchase`, `PromptProductPurchase` (con `autoApprove`), eventos `Prompt*Finished`, `GetProductInfo` (con `RegisterProduct`) y `FailNext` para fallos web. |
 | `Enum` | Solo `ProductPurchaseDecision`, `InfoType`, `CurrencyType`, `MembershipType`, `ReceiptType`, `ReceiptDecision`; se anaden mas con `Mocks.Enum.define(nombre, {Item = valor})`. |
 
-Ejemplo completo y probado: `tools/examples/ReceiptHandler.luau` + `ReceiptHandler.spec.luau`
+Ejemplo completo y probado: `ROBLOX/tools/examples/ReceiptHandler.luau` + `ReceiptHandler.spec.luau`
 (ProcessReceipt idempotente por `PurchaseId` con `UpdateAsync`: reentrega del mismo recibo, caida y
 recuperacion del DataStore, jugador ausente, producto desconocido, error en el callback y carrera con otro
 servidor; 9 tests).
@@ -204,12 +207,14 @@ servidor; 9 tests).
   un `init.luau`, los hijos se piden con `@self/hijo` (un `./` apunta a la carpeta padre).
   Para codigo con `require(script.Parent.X)` usa inyeccion de dependencias o un adaptador fino.
 - **Tipos**: sin `luau-lsp`, `luau-analyze` no conoce los tipos de Roblox (`game`, `Instance`, `warn`...), por eso
-  `lint.sh` solo lo aplica a `tools/` (Luau puro). El linter `selene` usa `roblox_lite.yml`: reconoce los globales
+  `lint.sh` solo lo aplica a `ROBLOX/tools/` (Luau puro). El linter `selene` usa `roblox_lite.yml`: reconoce los globales
   de Roblox pero no valida los argumentos de sus API.
 - Los tests corren en procesos separados y secuenciales; `lune` es rapido (los 65 tests tardan < 1 s), pero un
   `task.wait` real dentro de un test consume tiempo real: usa `env.clock` en su lugar.
 - `lune setup` genera los tipos de `@lune/*` en `~/.lune/.typedefs/0.11.0/` (por equipo, no en el repo); el alias `lune`
-  de `.luaurc` apunta ahi. `tools/setup.sh` lo regenera.
-- Si se mueve `tools/` dentro de `ROBLOX/` (lo que pide `CLAUDE.md` para "todo lo de Roblox"), hay que ajustar el alias
-  `testkit` de `.luaurc` y la ruta `tools/` de `lint.sh` (filtro de luau-analyze); `tools/env.sh` calcula todo
-  de forma relativa y no necesita cambios.
+  de `.luaurc` apunta ahi. `ROBLOX/tools/setup.sh` lo regenera.
+- Ubicacion (desde 2026-10-20): `tools/` y las configuraciones (`.luaurc`, `selene.toml`, `stylua.toml`, `.styluaignore`,
+  `roblox_lite.yml`) viven dentro de `ROBLOX/`, como pide `CLAUDE.md` para "todo lo de Roblox". `ROBLOX/tools/env.sh` fija
+  `ROOT` = `ROBLOX/` y los scripts hacen `cd "$ROOT"` antes de llamar a selene, stylua, luau-lsp y lune, asi que esas
+  herramientas encuentran su configuracion; `luau-lsp` y `lune` resuelven `.luaurc` (alias `@testkit` = `./tools/testkit`)
+  subiendo desde el archivo que analizan, y todos los specs estan bajo `ROBLOX/`.

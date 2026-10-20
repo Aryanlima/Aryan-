@@ -1,20 +1,20 @@
 # specs-video — 6 vídeos de marca de Fish & Fortune (pipeline de renderizado por código)
 
-Fecha: 2026-10-20. Renderizador: `marketing/pipeline/render.mjs` (otro agente; **no se ha modificado**). Estos vídeos son **gráficos de marca** (texto, emojis, partículas, música sintetizada): **no son gameplay**, así que sirven para TikTok, Shorts, Reels y Discord, **nunca para la página del juego en Roblox** (allí solo vale gameplay real sin voz ni anuncios [OFICIAL `thumbnails.md`]). Cada vídeo lleva en pantalla la línea legal "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
+Fecha: 2026-10-20. Renderizador: `ROBLOX/marketing/pipeline/render.mjs` (otro agente; **no se ha modificado**). Estos vídeos son **gráficos de marca** (texto, emojis, partículas, música sintetizada): **no son gameplay**, así que sirven para TikTok, Shorts, Reels y Discord, **nunca para la página del juego en Roblox** (allí solo vale gameplay real sin voz ni anuncios [OFICIAL `thumbnails.md`]). Cada vídeo lleva en pantalla la línea legal "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
 
 ## Estado del renderizador
-`marketing/pipeline/README.md` **no existía** al hacer este trabajo; el formato del spec se dedujo del código (`lib/compile.mjs`, `player/*.js`) y de los 4 ejemplos de `marketing/pipeline/specs/`. `node render.mjs --help` funciona (Node 22.22, Chromium headless de `/opt/pw-browsers`, ffmpeg del sistema). Los 6 specs compilan sin avisos y se renderizaron completos.
+`ROBLOX/marketing/pipeline/README.md` **no existía** al hacer este trabajo; el formato del spec se dedujo del código (`lib/compile.mjs`, `player/*.js`) y de los 4 ejemplos de `ROBLOX/marketing/pipeline/specs/`. `node render.mjs --help` funciona (Node 22.22, Chromium headless de `/opt/pw-browsers`, ffmpeg del sistema). Los 6 specs compilan sin avisos y se renderizaron completos.
 
 ## Cómo renderizar
 Desde cualquier carpeta, con las rutas del repo:
 
 ```bash
 # uno
-node marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4 --crf 21 --report
+node ROBLOX/marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4 --crf 21 --report
 # todos (los .json de una carpeta)
-cd ROBLOX/marketing/fish-and-fortune/specs-video && node ../../../../marketing/pipeline/render.mjs --all . out --crf 21 --report
+cd ROBLOX/marketing/fish-and-fortune/specs-video && node ../../pipeline/render.mjs --all . out --crf 21 --report
 # revisión rápida: fotogramas sueltos a media resolución
-node marketing/pipeline/render.mjs <spec.json> <carpeta_pngs> --stills 1,5,9 --scale 0.5
+node ROBLOX/marketing/pipeline/render.mjs <spec.json> <carpeta_pngs> --stills 1,5,9 --scale 0.5
 ```
 
 Las rutas relativas del spec (`fonts/Fredoka.ttf`, y los `bg.src` de clips) se resuelven **respecto a la carpeta del spec**. Los MP4 ya generados están en `out/` junto con su informe `.json` (opción `--report`).
@@ -58,4 +58,4 @@ Tamaños con `--crf 21` (el defecto del pipeline es 18, más pesado). Total ≈ 
 ## Licencias de los recursos
 - **Fredoka** y **Nunito** (SIL Open Font License 1.1): descargadas de `github.com/google/fonts` (carpeta `ofl/`) el 2026-10-20, con sus textos `OFL-Fredoka.txt` y `OFL-Nunito.txt` en `fonts/`.
 - **Emojis:** Noto Color Emoji del sistema (Google); la licencia exacta de sus componentes [NO VERIFICADO]; no se usan emojis de otros fabricantes.
-- **Música y efectos:** sintetizados por código en `marketing/pipeline/lib/synth.mjs` (sin muestras ni terceros).
+- **Música y efectos:** sintetizados por código en `ROBLOX/marketing/pipeline/lib/synth.mjs` (sin muestras ni terceros).

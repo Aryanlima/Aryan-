@@ -1,0 +1,4 @@
+# Todo lo de Roblox tiene su propio .gitignore en ROBLOX/.gitignore.
+# Estado local del plugin Governor (cada carpeta .governor/ ya trae su propio .gitignore).
+.governor/
+.DS_Store

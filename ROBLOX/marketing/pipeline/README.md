@@ -20,7 +20,7 @@ spec.json ──► compile.mjs ──► player (HTML/CSS/Canvas, window.render
 - Instalación (solo local, dentro de esta carpeta):
 
 ```bash
-cd marketing/pipeline        # (o ROBLOX/marketing/pipeline tras la mudanza)
+cd ROBLOX/marketing/pipeline  # desde la raiz del repositorio
 npm install                  # playwright-core + mespeak (TTS opcional). NO descarga navegadores.
 ```
 

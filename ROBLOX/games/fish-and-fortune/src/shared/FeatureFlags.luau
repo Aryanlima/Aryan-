@@ -4,7 +4,7 @@
 
 	paidLuckEnabled (por defecto FALSE en la v1; decision D9 del informe maestro):
 	  La "suerte" comprable con Robux (Pase Suerte+ y Cebo de Suerte) cuenta como objeto aleatorio de pago
-	  (research/03 2.1): exige odds numericas dinamicas, PolicyService y alternativa por pais. Se activara en la
+	  (ROBLOX/research/03 2.1): exige odds numericas dinamicas, PolicyService y alternativa por pais. Se activara en la
 	  v1.5 cuando eso este probado con el Player Emulator.
 
 	  Con el flag APAGADO:

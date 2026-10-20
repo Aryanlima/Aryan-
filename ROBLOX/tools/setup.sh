@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Instala el toolchain Luau local (sin Roblox Studio). Idempotente: lo ya instalado y con la
-# version correcta se omite. Todo va a $TOOLCHAIN (por defecto ROBLOX/.toolchain, ignorado por git).
+# version correcta se omite. Todo va a $TOOLCHAIN (ROBLOX/.toolchain, ignorado por git).
+# Las mismas versiones fijas estan en ROBLOX/rokit.toml (alternativa: instalar con Rokit).
 #
 # Herramientas:
 #   lune          runtime Luau para ejecutar scripts/tests            (cargo, crates.io)
@@ -15,19 +16,19 @@
 # el codigo fuente de Luau y luau-lsp se baja del proxy de modulos de Go (es un espejo de los repos).
 #
 # Uso:
-#   tools/setup.sh                    # instala todo lo que falte
-#   tools/setup.sh --check            # solo verifica lo instalado (no instala nada)
-#   tools/setup.sh --only lune,stylua # solo esas: lune stylua selene rojo luau luau-lsp
-#   tools/setup.sh --skip-lsp         # omite luau-lsp (la compilacion mas lenta)
-#   JOBS=2 tools/setup.sh             # hilos de compilacion (por defecto: nproc, maximo 4)
-#   KEEP_BUILD=1 tools/setup.sh       # conserva los directorios de compilacion
+#   bash ROBLOX/tools/setup.sh                    # instala todo lo que falte
+#   bash ROBLOX/tools/setup.sh --check            # solo verifica lo instalado (no instala nada)
+#   bash ROBLOX/tools/setup.sh --only lune,stylua # solo esas: lune stylua selene rojo luau luau-lsp
+#   bash ROBLOX/tools/setup.sh --skip-lsp         # omite luau-lsp (la compilacion mas lenta)
+#   JOBS=2 bash ROBLOX/tools/setup.sh             # hilos de compilacion (por defecto: nproc, maximo 4)
+#   KEEP_BUILD=1 bash ROBLOX/tools/setup.sh       # conserva los directorios de compilacion
 #
 # Requisitos del sistema: cargo/rustc, cmake, g++ o clang++, curl, python3 (ninja es opcional).
 set -euo pipefail
-# shellcheck source=tools/env.sh
+# shellcheck source=ROBLOX/tools/env.sh
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
-# ---- Versiones fijadas (las que se probaron) --------------------------------------------------
+# ---- Versiones fijadas (las que se probaron; mantener sincronizadas con ROBLOX/rokit.toml) -----------------
 LUNE_VERSION="0.11.0"
 STYLUA_VERSION="2.6.0"
 SELENE_VERSION="0.31.0"
@@ -287,7 +288,7 @@ fi
 
 verify || rc=1
 if [ $rc -eq 0 ]; then
-	log "listo. Prueba: tools/test.sh && tools/lint.sh"
+	log "listo. Prueba: bash ROBLOX/tools/test.sh && bash ROBLOX/tools/lint.sh"
 else
 	log "terminado con elementos pendientes (ver arriba)" >&2
 fi

@@ -171,7 +171,7 @@ El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([0
 | Cuándo | Qué | Coste aproximado | Condición |
 |---|---|---|---|
 | S0 (15 min) | Verificación en Creator Hub (ver tarea 13): suelo de precio, anticipo vigente, Plus o Premium, ID | 0 | Siempre |
-| S1 a S2 | **Prueba de pipeline: 3 prendas clásicas** generadas con `tools/clothing-gen`, probadas gratis en Studio (Block Avatar) y **subidas a mano** al Creator Dashboard. Puerta: ≥ 2 de 3 aprobadas en ≤ 24 h | 240 R$ de subida + 30 R$ de anticipo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
+| S1 a S2 | **Prueba de pipeline: 3 prendas clásicas** generadas con `ROBLOX/tools/clothing-gen`, probadas gratis en Studio (Block Avatar) y **subidas a mano** al Creator Dashboard. Puerta: ≥ 2 de 3 aprobadas en ≤ 24 h | 240 R$ de subida + 30 R$ de anticipo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
 | Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada en Blender | ≈ 3.400 R$ (680 R$ por ítem) | Puerta de S1 a S2 superada; horas disponibles |
 | S10 en adelante | **Tienda de avatar dentro de Fish & Fortune**: 5 a 10 ítems propios exclusivos de tu juego (por Place ID) y menú de inspección activo para ganar 40 % por ítems de otros | Subida 80 R$ + anticipo según tipo por ítem | G4 pasado: ≥ 100 a 200 jugadores diarios |
 | S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Con 5 ítems solo se mide tiempo por ítem, aprobación y suelo real; los criterios de matar o duplicar exigen un mínimo de 20 ítems publicados ([informe maestro §9.4](informe-maestro.md)) |
@@ -242,7 +242,7 @@ El calendario detallado de marketing para los 30 días del lanzamiento (D-14 a D
 |---|---|---|
 | Guiones, ganchos, textos en pantalla, descripciones, hashtags | Los escribe y varía | Aprueba |
 | Calendario de publicaciones y seguimiento | Lo mantiene | Lo cumple |
-| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (`marketing/pipeline`, en construcción; ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
+| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (`ROBLOX/marketing/pipeline`, en construcción; ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
 | **Grabación del gameplay real** | No puede (requiere el juego abierto en tu equipo) | **La graba** (OBS u otra herramienta) |
 | Iconos y miniaturas con IA de imagen | Prepara prompts y especificaciones (512x512, círculo, 16:9) | Genera con tus cuentas de IA y sube a Creator Hub |
 | Publicar en TikTok, YouTube Shorts, Discord | Redacta y programa la tanda | **Publica** desde tus cuentas |

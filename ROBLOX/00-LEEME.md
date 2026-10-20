@@ -27,19 +27,20 @@ Cada informe es muy largo (decenas de páginas): no hace falta leerlos enteros. 
 
 ## 3. Qué hay en cada carpeta
 
-Estado tomado a las ~14:50 UTC del 2026-10-20. "Se moverá" significa que otro agente está trasladando el contenido a `ROBLOX/`.
+Rutas relativas a esta carpeta (`ROBLOX/`). Desde 2026-10-20 todo lo de Roblox está aquí dentro; en la raíz del repositorio solo quedan `CLAUDE.md`, `README.md`, `.claude/` y `.gitignore`.
 
 | Carpeta | Qué contiene | Estado hoy |
 |---|---|---|
-| `research/` | Informes 01 a 09: mejores juegos, monetización y economía, políticas, IA en Studio, IA para assets y marketing, stack técnico, diseño y conceptos, ropa vs juegos, producir ropa con IA | Hechos. Hoy viven en `research/` en la raíz del repositorio y se moverán a `ROBLOX/research/` |
-| `docs/` | Documentos de decisión: `informe-maestro.md`, `plan-90-dias.md`, `preguntas-para-aryan.md`. Además `setup-en-tu-pc.md` y `skills-instaladas.md` (otros agentes). `entorno-y-toolchain.md` está en `docs/` de la raíz del repositorio y se moverá | Los tres de decisión, hechos. Los otros, de otros agentes |
+| `research/` | Informes 01 a 09: mejores juegos, monetización y economía, políticas, IA en Studio, IA para assets y marketing, stack técnico, diseño y conceptos, ropa vs juegos, producir ropa con IA | Hechos |
+| `docs/` | Documentos de decisión: `informe-maestro.md`, `plan-90-dias.md`, `preguntas-para-aryan.md`. Además `setup-en-tu-pc.md` y `skills-instaladas.md` (otros agentes). `entorno-y-toolchain.md` (qué toolchain hay instalado y cómo usarlo) | Los tres de decisión, hechos. Los otros, de otros agentes |
 | `packages/` | Código Luau compartido ("el kit"): `Data` (datos por jugador), `Net` (remotos validados), `Economy` (monedas, boosts, offline), `Odds` (tabla de probabilidades para cumplir con objetos aleatorios de pago), `Shop` (tienda y compras idempotentes), `Analytics`, `LiveOps` (eventos y códigos) y `UI` | **En construcción** (8 módulos al escribir esto). Según [06 §4.2](research/06-stack-tecnico.md) puede faltar un módulo `Policy` aparte (la lógica de `PolicyService` vive hoy dentro de `Odds` y `Shop`) |
-| `games/` | Los juegos. El primero será `fish-and-fortune` | **Solo hay estructura**: carpetas `src/server`, `src/client`, `src/shared` y `tests`, **sin código todavía** al escribir esto |
+| `games/` | Los juegos. El primero es `fish-and-fortune` | **MVP escrito y probado con Lune** (95 pruebas propias del juego; servidor, cliente, mundo procedural, tienda, eventos y flag `paidLuckEnabled` apagado). **No se ha ejecutado en Roblox Studio**; falta arte, sonido, miniaturas, localización EN y poner los IDs reales de pases/productos. Lee `games/fish-and-fortune/README.md` |
 | `tests/` | Pruebas del kit en Lune (`*.spec.luau`) | Hechas para los paquetes presentes |
-| `tools/` | `clothing-gen/` (generador procedural de ropa clásica en Python con plantillas oficiales y control de calidad; 8 pruebas pasan, no probado en Studio). En la raíz del repositorio hasta que se muevan: `testkit/` (ejecutor de pruebas y simulaciones de servicios de Roblox), `examples/` (ejemplo de `ProcessReceipt`), `setup.sh`, `test.sh`, `lint.sh`, `format.sh` | En construcción; `testkit` y `clothing-gen` funcionan |
-| `marketing/` | `fish-and-fortune/`: 30 guiones de vídeo corto, texto de la página del juego, plan de lanzamiento a 30 días y 6 especificaciones de vídeo ya renderizadas. El generador de vídeos (`pipeline/`: JSON, HTML/Canvas, Playwright y ffmpeg) está todavía en `marketing/pipeline/` en la raíz del repositorio | **En construcción.** Los textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL") |
-| `skills/` | Skill `roblox-dev` (conocimiento verificado de Roblox y Luau para Claude) | Instalada y revisada: ver [docs/skills-instaladas.md](docs/skills-instaladas.md) |
-| `.toolchain/` | Herramientas instaladas localmente (ignorada por git) | Se regenera con `tools/setup.sh` |
+| `tools/` | `clothing-gen/` (generador procedural de ropa clásica en Python con plantillas oficiales y control de calidad; 8 pruebas pasan, no probado en Studio). Además: `testkit/` (ejecutor de pruebas y simulaciones de servicios de Roblox), `examples/` (ejemplo de `ProcessReceipt`) y los scripts `setup.sh`, `test.sh`, `lint.sh`, `format.sh` (con `env.sh`) | En construcción; `testkit` y `clothing-gen` funcionan |
+| `marketing/` | `fish-and-fortune/`: 30 guiones de vídeo corto, texto de la página del juego, plan de lanzamiento a 30 días y 6 especificaciones de vídeo ya renderizadas. `pipeline/` es el generador de vídeos (JSON, HTML/Canvas, Playwright y ffmpeg) | **En construcción.** Los textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL") |
+| `skills/` | Skill `roblox-dev` (conocimiento verificado de Roblox y Luau para Claude; `.claude/skills/roblox-dev` en la raíz del repositorio apunta aquí) | Instalada y revisada: ver [docs/skills-instaladas.md](docs/skills-instaladas.md) |
+| `.toolchain/` | Herramientas instaladas localmente (ignorada por git) | Se regenera con `bash ROBLOX/tools/setup.sh` |
+| `rokit.toml`, `.luaurc`, `selene.toml`, `stylua.toml`, `.styluaignore`, `roblox_lite.yml` | Versiones fijas del toolchain (Rokit) y configuración de Luau, selene y StyLua | Los scripts de `tools/` trabajan con esta carpeta como raíz |
 
 Reglas del repositorio (resumen de `CLAUDE.md`): todo lo de Roblox vive bajo `ROBLOX/`; idioma español (el código y los identificadores, en inglés); no se instalan binarios fuera de `ROBLOX/.toolchain/`; los datos de investigación llevan etiqueta [OFICIAL], [TERCERO] o [NO VERIFICADO].
 
@@ -49,12 +50,12 @@ Estos comandos funcionan en el entorno de nube donde se construyó el proyecto (
 
 | Qué | Comando (desde la raíz del repositorio) | Qué comprueba |
 |---|---|---|
-| Todas las pruebas | `tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al escribir esto: **11 especificaciones, 264 pruebas, 0 fallos** |
+| Todas las pruebas | `bash ROBLOX/tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al 2026-10-20: **18 especificaciones, 382 pruebas, 0 fallos** |
 | Una sola prueba | `lune run ROBLOX/tests/Odds.spec.luau` | Lo mismo para un archivo |
-| Filtrar por nombre | `tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
-| Linter, formato y tipos | `tools/lint.sh` y `tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
+| Filtrar por nombre | `bash ROBLOX/tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
+| Linter, formato y tipos | `bash ROBLOX/tools/lint.sh` y `bash ROBLOX/tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
 | Ropa: pruebas del generador | `cd ROBLOX/tools/clothing-gen && venv/bin/python -m unittest discover -s tests` | Al escribir esto: 8 pruebas OK. Para generar ejemplos: `./run_demo.sh` |
-| Vídeos promocionales | `cd marketing/pipeline && node render.mjs specs/ejemplo-gancho.json out/ejemplo-gancho.mp4` | Renderiza un vídeo desde un archivo de especificación (necesita Node 20+, Chromium y ffmpeg). Los agentes de marketing informan de que funciona en la sesión de nube; no lo ejecuté yo al escribir esto ni se probó en tu PC |
+| Vídeos promocionales | `cd ROBLOX/marketing/pipeline && node render.mjs specs/ejemplo-gancho.json out/ejemplo-gancho.mp4` | Renderiza un vídeo desde un archivo de especificación (necesita Node 20+, Chromium y ffmpeg). Los agentes de marketing informan de que funciona en la sesión de nube; no lo ejecuté yo al escribir esto ni se probó en tu PC |
 | Ejecutar los juegos | Abrir el proyecto en Roblox Studio con Rojo o Script Sync | Ver [docs/setup-en-tu-pc.md](docs/setup-en-tu-pc.md). **Nunca probado por nosotros** |
 
 Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuestran que la lógica es correcta, no que funcione dentro de Studio.
@@ -65,7 +66,7 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 
 - 9 informes de investigación con etiquetas de fiabilidad y fuentes (01 a 09).
 - 3 documentos de decisión en `docs/` ([informe maestro](docs/informe-maestro.md), [plan de 90 días](docs/plan-90-dias.md), [preguntas para Aryan](docs/preguntas-para-aryan.md)) que resumen, deciden y enlazan cada dato a su informe.
-- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 264 pruebas en verde con el linter limpio (al escribir esto).
+- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 382 pruebas en verde con el linter limpio (2026-10-20).
 
 ### Hecho, pero SIN probar en Roblox
 
@@ -96,5 +97,5 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 |---|---|
 | Una cifra o regla parece contradictoria | [Informe maestro §6](docs/informe-maestro.md) (hechos verificados vs dudas): dice qué informe manda |
 | No sé qué hacer esta semana | [Plan de 90 días](docs/plan-90-dias.md), semana 0 |
-| Algo del toolchain no arranca | `docs/entorno-y-toolchain.md` y `tools/setup.sh --check` |
+| Algo del toolchain no arranca | `docs/entorno-y-toolchain.md` y `bash ROBLOX/tools/setup.sh --check` |
 | Preguntas sobre ropa | [Informe maestro §9](docs/informe-maestro.md), [08](research/08-ropa-vs-juegos.md) y [09](research/09-ropa-produccion-con-ia.md) |

@@ -13,8 +13,8 @@
 	  -- no hace falta llamar a nada al final: el runner se ejecuta solo al terminar el script.
 	  -- (explicito y opcional: testkit.run())
 
-	Mocks de servicios de Roblox: require("@testkit/mocks")  (ver tools/testkit/mocks/init.luau).
-	El alias @testkit se define en /.luaurc.
+	Mocks de servicios de Roblox: require("@testkit/mocks")  (ver ROBLOX/tools/testkit/mocks/init.luau).
+	El alias @testkit se define en ROBLOX/.luaurc.
 ]]
 
 -- En un init.luau, "./" apunta al directorio padre: los hijos se piden con @self.

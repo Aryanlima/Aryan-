@@ -1,7 +1,7 @@
 # Arquitectura del kit de juegos (paquetes + Fish & Fortune)
 
 Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games/fish-and-fortune/` (primer juego) y `ROBLOX/tests/`.
-**Nada de este código se ha ejecutado en Roblox Studio** (el entorno de desarrollo es Linux sin Studio). Lo que sí se ha hecho: tests de lógica pura con Lune y los mocks de `tools/testkit`, análisis estático con selene, StyLua y luau-lsp (con los tipos reales de Roblox) y una compilación con Rojo (`rojo build`). Las marcas `-- REVIEW(money):` señalan código de monetización o datos que **una persona debe revisar** antes de publicar; las marcas `-- VERIFY:` señalan algo que no se pudo comprobar en la documentación oficial.
+**Nada de este código se ha ejecutado en Roblox Studio** (el entorno de desarrollo es Linux sin Studio). Lo que sí se ha hecho: tests de lógica pura con Lune y los mocks de `ROBLOX/tools/testkit`, análisis estático con selene, StyLua y luau-lsp (con los tipos reales de Roblox) y una compilación con Rojo (`rojo build`). Las marcas `-- REVIEW(money):` señalan código de monetización o datos que **una persona debe revisar** antes de publicar; las marcas `-- VERIFY:` señalan algo que no se pudo comprobar en la documentación oficial.
 
 ---
 
@@ -77,7 +77,7 @@ Reglas que el código impone y los tests comprueban (`tests/Data.spec.luau`):
 * `release()` que falla tras todos los reintentos deja el perfil en `release-failed` y el autosave lo reintenta (no se pierde en memoria).
 * Cada clave se asocia al `UserId` (`UpdateAsync` devuelve `{userId}`) para el derecho al olvido.
 
-Migraciones: `Schema.version` + `migrations[N]` (de vN a vN+1, en el sitio). **Nunca edites una migración publicada**; añade la siguiente y sube la versión. No cambies el nombre del DataStore (sería un almacén vacío). Haz un *snapshot* de DataStores antes de publicar cambios en la lógica de datos (Open Cloud, ver research/06 §2.4).
+Migraciones: `Schema.version` + `migrations[N]` (de vN a vN+1, en el sitio). **Nunca edites una migración publicada**; añade la siguiente y sube la versión. No cambies el nombre del DataStore (sería un almacén vacío). Haz un *snapshot* de DataStores antes de publicar cambios en la lógica de datos (Open Cloud, ver ROBLOX/research/06 §2.4).
 
 ---
 
@@ -196,13 +196,13 @@ En la v1 **no se vende suerte ni azar de pago**. Con el flag apagado:
 ## 11. Cómo se prueba y se comprueba
 
 ```
-bash tools/test.sh            # todos los *.spec.luau con Lune (testkit: tools/testkit)
-bash tools/lint.sh            # selene + stylua --check + luau-lsp (tipos de Roblox)
-bash tools/format.sh          # aplica StyLua
+bash ROBLOX/tools/test.sh            # todos los *.spec.luau con Lune (testkit: ROBLOX/tools/testkit)
+bash ROBLOX/tools/lint.sh            # selene + stylua --check + luau-lsp (tipos de Roblox)
+bash ROBLOX/tools/format.sh          # aplica StyLua
 cd ROBLOX/games/fish-and-fortune && rojo build default.project.json -o ../../../build.rbxl   # valida el proyecto Rojo
 ```
 
-Los tests usan los dobles de `tools/testkit/mocks` (`Clock`, `DataStoreService`, `MarketplaceService`, `Players`, `Signal`). El reloj simulado hace que `task.wait` avance el tiempo sin esperar: los reintentos con backoff y los bucles se prueban en milisegundos.
+Los tests usan los dobles de `ROBLOX/tools/testkit/mocks` (`Clock`, `DataStoreService`, `MarketplaceService`, `Players`, `Signal`). El reloj simulado hace que `task.wait` avance el tiempo sin esperar: los reintentos con backoff y los bucles se prueban en milisegundos.
 
 ---
 

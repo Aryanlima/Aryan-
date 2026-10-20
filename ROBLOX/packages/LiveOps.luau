@@ -5,10 +5,10 @@
 	la configuracion vive en una fuente remota (ConfigService / DataStore, inyectada con `fetch`) y los
 	servidores la refrescan cada pocos minutos y/o al recibir un aviso de MessagingService.
 
-	Principios de honestidad (research/03 2.3):
+	Principios de honestidad (ROBLOX/research/03 2.3):
 	  * Los temporizadores son exactos (endsAt - now) y NO se reinician solos: un evento solo se repite si
 	    su configuracion define explicitamente un ciclo (`cycle`).
-	  * Maximo 10 eventos activos/proximos a la vez (limite documentado en research/07 [F28]).
+	  * Maximo 10 eventos activos/proximos a la vez (limite documentado en ROBLOX/research/07 [F28]).
 	  * Una configuracion invalida NUNCA reemplaza a la buena: se registra el problema y se sigue con la anterior.
 
 	Sin dependencias del motor: se prueba con Lune.

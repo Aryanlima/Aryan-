@@ -9,7 +9,7 @@ export type Hint = { id: string, text: string, target: string } -- target: "cast
 local ClientLogic = {}
 
 --[[
-	Guia de los primeros 60 s (research/07 4.1). Devuelve la sugerencia actual o nil.
+	Guia de los primeros 60 s (ROBLOX/research/07 4.1). Devuelve la sugerencia actual o nil.
 	  * 0-5 s:   objetivo visible (Lanzar), cero menus previos
 	  * primera captura -> vender -> comprar la primera mejora -> bestiario
 ]]

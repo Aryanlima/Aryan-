@@ -2,6 +2,6 @@
 node_modules/
 *.log
 .DS_Store
-# Videos renderizados: se regeneran desde los specs (ver marketing/pipeline/README.md)
+# Videos renderizados: se regeneran desde los specs (ver marketing/pipeline/README.md, en esta carpeta)
 **/out/*.mp4
 **/out/*.wav

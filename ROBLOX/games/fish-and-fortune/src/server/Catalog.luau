@@ -3,7 +3,7 @@
 	Catalog: catalogo de la tienda de Fish & Fortune (nombres, descripciones, escalon de precio y contenido).
 	Los IDs vienen de server/ProductIds.luau y los importes de shared/Balance.luau.
 
-	Reglas de honestidad (research/03 2.3), comprobadas por tests/Catalog.spec.luau:
+	Reglas de honestidad (ROBLOX/research/03 2.3), comprobadas por tests/Catalog.spec.luau:
 	  * Sin lenguaje de presion ni "ofertas"/descuentos/temporizadores inventados.
 	  * Lo que altera probabilidades (Suerte+, Cebo de Suerte) esta marcado `affectsOdds` y se oculta si
 	    PolicyService restringe los objetos aleatorios de pago; ningun pase promocionado puede alterarlas.

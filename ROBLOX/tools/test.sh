@@ -2,14 +2,17 @@
 # Ejecuta todos los *.spec.luau con lune (cada archivo en su propio proceso).
 #
 # Uso:
-#   tools/test.sh                       # todos los specs del proyecto
-#   tools/test.sh tools/examples        # solo los de una carpeta o archivo(s)
-#   tools/test.sh -t "ProcessReceipt"   # solo tests cuyo nombre completo contiene el texto
-#   tools/test.sh -v                    # muestra la salida completa tambien de los que pasan
+#   bash ROBLOX/tools/test.sh                          # todos los specs de ROBLOX/
+#   bash ROBLOX/tools/test.sh ROBLOX/tools/examples    # solo los de una carpeta o archivo(s)
+#   bash ROBLOX/tools/test.sh -t "ProcessReceipt"      # solo tests cuyo nombre completo contiene el texto
+#   bash ROBLOX/tools/test.sh -v                       # muestra la salida completa tambien de los que pasan
+#
+# Se puede invocar desde cualquier carpeta; lune corre con ROBLOX/ como directorio de trabajo, donde
+# .luaurc define el alias @testkit.
 #
 # Codigo de salida: 0 si todo pasa, 1 si algun spec falla, 2 si falta lune o no hay specs.
 set -uo pipefail
-# shellcheck source=tools/env.sh
+# shellcheck source=ROBLOX/tools/env.sh
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
 verbose=0
@@ -23,7 +26,7 @@ while [ $# -gt 0 ]; do
 		filter="${1:-}"
 		;;
 	-h | --help)
-		sed -n '2,11p' "${BASH_SOURCE[0]}"
+		sed -n '2,14p' "${BASH_SOURCE[0]}"
 		exit 0
 		;;
 	*) targets+=("$1") ;;

@@ -1,5 +1,5 @@
 --!nonstrict
--- Test de ejemplo: ProcessReceipt idempotente usando los mocks de tools/testkit/mocks.
+-- Test de ejemplo: ProcessReceipt idempotente usando los mocks de ROBLOX/tools/testkit/mocks.
 
 local testkit = require("@testkit")
 local Mocks = require("@testkit/mocks")

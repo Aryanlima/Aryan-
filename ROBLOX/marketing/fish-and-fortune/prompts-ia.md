@@ -2,7 +2,7 @@
 
 Fecha: 2026-10-20. Idioma del documento: español; los prompts van en **inglés** (los modelos de imagen/vídeo/música responden mejor) con nota en español. Sin IP ajena: ningún prompt nombra marcas, estudios, artistas vivos, personajes ni juegos.
 
-Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**. Todo lo que dependa del juego construido lleva **[AJUSTAR A LO REAL]**. Contexto de licencias y herramientas: `research/05` (resumido en §7).
+Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**. Todo lo que dependa del juego construido lleva **[AJUSTAR A LO REAL]**. Contexto de licencias y herramientas: `ROBLOX/research/05` (resumido en §7).
 
 ---
 

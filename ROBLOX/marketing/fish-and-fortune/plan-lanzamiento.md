@@ -4,7 +4,7 @@ Fecha: 2026-10-20. Idioma: español. Autor: sesión de marketing (Claude). Venta
 
 Etiquetas: **[OFICIAL]** leído directamente en `Roblox/creator-docs` (espejo de la doc oficial) el 2026-10-20; **[OFICIAL‡]** solo vi un extracto del buscador; **[TERCERO]**; **[NO VERIFICADO]**; **[IDEA PROPIA]** = diseño/heurística mía; **[AJUSTAR A LO REAL]** = depende del juego construido (a esta fecha `ROBLOX/games/fish-and-fortune` no existía).
 
-Documentos hermanos: `pagina-del-juego.md` (título, textos, ícono/miniaturas), `guiones-videos.md` (30 guiones V01–V30), `prompts-ia.md` (brand kit y prompts), `plantillas-colaboracion.md` (creadores), `specs-video/` (6 specs y 6 MP4 ya renderizados). Contexto: `research/07` (puertas G0–G5), `ROBLOX/docs/plan-90-dias.md`, `research/03` (cumplimiento).
+Documentos hermanos: `pagina-del-juego.md` (título, textos, ícono/miniaturas), `guiones-videos.md` (30 guiones V01–V30), `prompts-ia.md` (brand kit y prompts), `plantillas-colaboracion.md` (creadores), `specs-video/` (6 specs y 6 MP4 ya renderizados). Contexto: `ROBLOX/research/07` (puertas G0–G5), `ROBLOX/docs/plan-90-dias.md`, `ROBLOX/research/03` (cumplimiento).
 
 ---
 
@@ -188,7 +188,7 @@ Leyenda: **[ARYAN]** = tiene que hacerlo él; **[CLAUDE]** = lo hace/prepara est
 - Métricas: Spent, Impressions, Clicks, Plays, **CPP (gasto/plays)**, Playtime, Earnings; ROAS solo en campañas Earnings; **no hay métrica de retención** en Ads Manager. Vistas: All, New, Recent, Resurrected. Plays y earnings pueden incluir eventos hasta 30 días tras el anuncio; datos con hasta 48 h de retraso.
 - **Seguimiento por launch data:** opcional, para identificar uniones por anuncio; probar la URL antes de lanzar; puede no coincidir exactamente con las plays del tile patrocinado.
 - Fraude: se analiza a los 14 días del fin; reembolsos a los 16 días.
-- **No indica** presupuesto mínimo, tasa Robux→crédito, ni límites de caracteres de título: **[VERIFICAR en el panel]** antes de pagar. Un resumen de `research/07` cita **1 crédito = 263 Robux** [OFICIAL‡] y 263 ≈ 1/0,0038 (tarifa estándar de DevEx), lo que sugiere que **1 crédito vale 1 USD de gasto** [IDEA PROPIA, NO VERIFICADO].
+- **No indica** presupuesto mínimo, tasa Robux→crédito, ni límites de caracteres de título: **[VERIFICAR en el panel]** antes de pagar. Un resumen de `ROBLOX/research/07` cita **1 crédito = 263 Robux** [OFICIAL‡] y 263 ≈ 1/0,0038 (tarifa estándar de DevEx), lo que sugiere que **1 crédito vale 1 USD de gasto** [IDEA PROPIA, NO VERIFICADO].
 
 ### 6.2 Presupuesto en Robux y USD (cuatro "lentes")
 

@@ -1,7 +1,7 @@
 # Fish & Fortune — Página del juego (título, descripciones, etiquetas, ícono y miniaturas)
 
 Fecha: 2026-10-20. Idioma del documento: español. Textos públicos del juego: ES + EN.
-Estado del juego (2026-10-20): `ROBLOX/games/fish-and-fortune/src` ya tiene **lógica de servidor y balance** (3 zonas: Lago Calmo, Río Cristal, Costa Dorada; 25 criaturas; 6 rarezas; cañas; bestiario; eventos Marea Dorada y Luna Mítica; código `WELCOME`; panel Probabilidades generado por la misma tabla que la tirada), pero **todavía no hay cliente ni UI jugable**. Los datos de abajo salen de `Balance.luau` y del concepto 1 de `research/07` (**provisionales**). Cada afirmación que dependa de la UI o de algo aún no confirmado lleva **[AJUSTAR A LO REAL]**: antes de publicar, contrasta con el juego construido. Una página que promete algo que el juego no tiene baja en recomendaciones y en búsqueda [OFICIAL, `discovery.md`] y puede ser moderada.
+Estado del juego (2026-10-20): `ROBLOX/games/fish-and-fortune/src` ya tiene **lógica de servidor y balance** (3 zonas: Lago Calmo, Río Cristal, Costa Dorada; 25 criaturas; 6 rarezas; cañas; bestiario; eventos Marea Dorada y Luna Mítica; código `WELCOME`; panel Probabilidades generado por la misma tabla que la tirada), pero **todavía no hay cliente ni UI jugable**. Los datos de abajo salen de `Balance.luau` y del concepto 1 de `ROBLOX/research/07` (**provisionales**). Cada afirmación que dependa de la UI o de algo aún no confirmado lleva **[AJUSTAR A LO REAL]**: antes de publicar, contrasta con el juego construido. Una página que promete algo que el juego no tiene baja en recomendaciones y en búsqueda [OFICIAL, `discovery.md`] y puede ser moderada.
 
 Etiquetas: **[OFICIAL]** leído hoy en el espejo `Roblox/creator-docs` (raw.githubusercontent.com); **[TERCERO]**; **[NO VERIFICADO]**; **[IDEA PROPIA]**; **[VERIFICAR a mano en Roblox]** = hay que mirarlo en la web/Creator Hub porque desde aquí no se puede.
 
@@ -185,7 +185,7 @@ Variantes A/B/C para G1 (3 días, mismo presupuesto por variante): **A = Idea 1*
 
 ## 6. Checklist técnico de ícono, miniaturas y vídeo (según documentación oficial, leída hoy)
 
-Fuentes [OFICIAL], consultadas el 2026-10-20 en `Roblox/creator-docs`: `production/publishing/experience-icons.md`, `production/publishing/thumbnails.md`, `discovery.md`, `production/promotion/ads-manager.md`, y (de `research/05` §2) `passes.md` y `developer-products.md`. Las rutas web equivalentes están en create.roblox.com (bloqueado desde esta red): **[VERIFICAR a mano]** que la web publicada coincide con el espejo antes de subir.
+Fuentes [OFICIAL], consultadas el 2026-10-20 en `Roblox/creator-docs`: `production/publishing/experience-icons.md`, `production/publishing/thumbnails.md`, `discovery.md`, `production/promotion/ads-manager.md`, y (de `ROBLOX/research/05` §2) `passes.md` y `developer-products.md`. Las rutas web equivalentes están en create.roblox.com (bloqueado desde esta red): **[VERIFICAR a mano]** que la web publicada coincide con el espejo antes de subir.
 
 ### Ícono del juego
 - [ ] Cuadrado, **mínimo 512×512 px** (plantilla de 512×512 para alta resolución). Una versión por idioma.
@@ -215,7 +215,7 @@ Fuentes [OFICIAL], consultadas el 2026-10-20 en `Roblox/creator-docs`: `producti
 - [ ] Los vídeos con IA (Veo/Kling/Runway) y los renders del pipeline (`specs-video/`) **no valen para la página**: son gráficos, no juego. Solo para TikTok/Shorts/Reels/Discord.
 - [ ] Contenido de IA en miniaturas: el doc no menciona IA; vale la regla general de no engañar. Si usas imagen de IA, composita con capturas reales y revisa que no copie IP ajena.
 
-### Íconos de pases y productos (de `research/05`)
+### Íconos de pases y productos (de `ROBLOX/research/05`)
 - [ ] Máximo 512×512, `.jpg/.png/.bmp`, **recorte en círculo**: lo importante dentro del círculo. Roblox recomienda un ícono propio por producto. Nada de arte de azar (ruedas, cofres que giran) en pases promocionados.
 
 ### Antes de subir

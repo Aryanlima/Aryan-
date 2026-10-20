@@ -2,11 +2,14 @@
 # Formatea (o comprueba) el codigo Luau con StyLua usando stylua.toml.
 #
 # Uso:
-#   tools/format.sh                 # reformatea todo el proyecto (excluye research/, .toolchain/, venv/...)
-#   tools/format.sh --check         # no modifica nada; sale con 1 si algo no esta formateado
-#   tools/format.sh tools/testkit   # solo una carpeta o archivos concretos
+#   bash ROBLOX/tools/format.sh                 # reformatea todo ROBLOX/ (excluye research/, .toolchain/, venv/...)
+#   bash ROBLOX/tools/format.sh --check         # no modifica nada; sale con 1 si algo no esta formateado
+#   bash ROBLOX/tools/format.sh ROBLOX/tools/testkit   # solo una carpeta o archivos concretos
+#
+# Se puede invocar desde cualquier carpeta (las rutas de argumento son relativas a donde estas); el script
+# trabaja siempre con ROBLOX/ como raiz, donde viven stylua.toml y .styluaignore.
 set -uo pipefail
-# shellcheck source=tools/env.sh
+# shellcheck source=ROBLOX/tools/env.sh
 source "$(dirname "${BASH_SOURCE[0]}")/env.sh"
 
 check=0
@@ -15,7 +18,7 @@ for arg in "$@"; do
 	case "$arg" in
 	--check) check=1 ;;
 	-h | --help)
-		sed -n '2,8p' "${BASH_SOURCE[0]}"
+		sed -n '2,11p' "${BASH_SOURCE[0]}"
 		exit 0
 		;;
 	*) paths+=("$arg") ;;

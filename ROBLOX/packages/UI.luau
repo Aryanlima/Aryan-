@@ -167,7 +167,7 @@ function UI.reasonText(reason: string?): string
 	return texts[reason or "unknown"] or "No disponible"
 end
 
--- Etiqueta del boton de compra. Neutra a proposito (research/03 2.3: "View Item", nunca "BUY NOW").
+-- Etiqueta del boton de compra. Neutra a proposito (ROBLOX/research/03 2.3: "View Item", nunca "BUY NOW").
 function UI.buyButtonText(offer: OfferView): string
 	if offer.owned then
 		return "Ya lo tienes"

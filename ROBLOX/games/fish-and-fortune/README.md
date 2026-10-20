@@ -1,6 +1,6 @@
 # Fish & Fortune (MVP v1)
 
-Pesca relajante en lagos compartidos: lanza la caña, recoge en el momento justo, descubre 25 criaturas de 6 rarezas en 3 zonas, véndelas, mejora tu caña y completa el bestiario. Concepto 1 del informe `research/07`.
+Pesca relajante en lagos compartidos: lanza la caña, recoge en el momento justo, descubre 25 criaturas de 6 rarezas en 3 zonas, véndelas, mejora tu caña y completa el bestiario. Concepto 1 del informe `ROBLOX/research/07`.
 
 **Estado: código completo del MVP, NUNCA ejecutado en Roblox Studio.** Se ha comprobado con tests de lógica pura (Lune), análisis estático (selene, StyLua, luau-lsp con los tipos de Roblox) y `rojo build`. Antes de publicar hay que hacer el playtest de la sección 6 y la revisión humana de todo lo marcado `-- REVIEW(money):`.
 
@@ -50,9 +50,9 @@ Requisitos en tu PC (ver `../../docs/setup-en-tu-pc.md`): Roblox Studio, [Rojo](
 Comprobaciones locales (desde la raíz del repositorio):
 
 ```
-bash tools/test.sh      # tests de lógica pura
-bash tools/lint.sh      # selene + stylua --check + luau-lsp
-bash tools/format.sh    # aplica StyLua
+bash ROBLOX/tools/test.sh      # tests de lógica pura
+bash ROBLOX/tools/lint.sh      # selene + stylua --check + luau-lsp
+bash ROBLOX/tools/format.sh    # aplica StyLua
 ```
 
 Para un build: `rojo build default.project.json -o FishAndFortune.rbxl` (el `.rbxl` no se versiona).
@@ -193,14 +193,14 @@ Hazlo en un lugar de pruebas, con un jugador nuevo (o borra su clave en el DataS
 ## 7. Límites conocidos
 
 * **No probado en Studio.** Toda la integración con el motor (`GameService`, cliente, `WorldBuilder`) está tipada y revisada, pero no ejecutada.
-* **`Data` es una implementación propia**: en producción, sustituir por ProfileStore (ver `docs/arquitectura.md`).
+* **`Data` es una implementación propia**: en producción, sustituir por ProfileStore (ver `ROBLOX/docs/arquitectura.md`).
 * El minijuego depende del tiempo que informa el cliente: un script puede acertar siempre la zona perfecta (+1 de suerte gratuita). Es un riesgo aceptado y acotado.
 * Los códigos de canje son por jugador; un límite global de usos necesitaría un almacén compartido (MemoryStore/DataStore).
 * El pase de temporada es de **una** temporada: hay que crear un pase por temporada.
 * Todo el texto está en **español**; falta la localización EN/ES.
 * El banner global es de **mejor esfuerzo** (MessagingService no garantiza la entrega) y tiene enfriamiento de 5 s por servidor.
 * La analítica de Roblox solo envía desde servidores **publicados**; los gráficos tardan hasta 24 h.
-* No hay rebirth ("Mareas"), cañas cosméticas de pago, intercambio ni zonas 4-6 (concepto completo en research/07).
+* No hay rebirth ("Mareas"), cañas cosméticas de pago, intercambio ni zonas 4-6 (concepto completo en ROBLOX/research/07).
 * `ConfigService` y la forma de su valor JSON: `-- VERIFY:` (sección 5).
 
 ---
@@ -209,7 +209,7 @@ Hazlo en un lugar de pruebas, con un jugador nuevo (o borra su clave en el DataS
 
 * **Arte:** mapa y modelos (muelles, árboles, cartel, tienda), modelos de caña por tier, criaturas (iconos o modelos), skins de UI, partículas de captura, efecto del banner. El mundo actual es procedural y debe sustituirse respetando el contrato de `WorldBuilder` (`Workspace.World/<zona>/Spawn` y `CastTarget`).
 * **Sonido:** lanzar, mordisco, captura por rareza, MÍTICO, venta, compra, música ambiente.
-* **Icono y miniaturas** del juego (cumpliendo la guía de miniaturas de Roblox), 5-6 capturas con las criaturas más raras y un clip del banner MÍTICO (research/05).
+* **Icono y miniaturas** del juego (cumpliendo la guía de miniaturas de Roblox), 5-6 capturas con las criaturas más raras y un clip del banner MÍTICO (ROBLOX/research/05).
 * **Cuestionario de madurez**, descripción y título únicos, texto de la tienda revisado por una persona.
 * **Revisión humana** de `REVIEW(money)` y prueba con el Player Emulator antes de activar la suerte de pago (v1.5).
 

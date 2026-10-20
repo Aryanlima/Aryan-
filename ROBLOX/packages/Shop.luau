@@ -9,7 +9,7 @@
 	  * gating por PolicyService (objetos que alteran probabilidades) y por precios/IDs placeholder,
 	  * escalera de precios en Robux configurable y validacion del catalogo (sin urgencia ni descuentos falsos).
 
-	Flujo de ProcessReceipt (ver docs/arquitectura.md):
+	Flujo de ProcessReceipt (ver ROBLOX/docs/arquitectura.md):
 	  1. validar recibo y producto            -> si no: NotProcessedYet (nunca se "traga" una compra)
 	  2. jugador presente y perfil activo      -> si no: NotProcessedYet (Roblox reintenta al volver a entrar)
 	  3. PurchaseId ya registrado?             -> guardar (si faltaba) y PurchaseGranted
@@ -98,7 +98,7 @@ Shop.DECISION_NOT_PROCESSED = "NotProcessedYet"
 -- Escalera de precios y validacion del catalogo
 ----------------------------------------------------------------------------
 
--- Escalera por defecto (hipotesis para A/B test, research/02 seccion 5.2): NO es un dato de mercado.
+-- Escalera por defecto (hipotesis para A/B test, ROBLOX/research/02 seccion 5.2): NO es un dato de mercado.
 Shop.DEFAULT_LADDER = {
 	impulse = 25,
 	entry = 49,
@@ -146,7 +146,7 @@ local function stripAccents(text: string): string
 	return string.lower(result)
 end
 
--- Lenguaje de presion/urgencia que NO debe aparecer en tiendas (menores; research/03 2.3).
+-- Lenguaje de presion/urgencia que NO debe aparecer en tiendas (menores; ROBLOX/research/03 2.3).
 local PRESSURE_PHRASES: { string } = {
 	"ultima oportunidad",
 	"ultimas unidades",

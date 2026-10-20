@@ -81,7 +81,7 @@ Por archivo: PNG, tamaño exacto 585×559 (o cuadrado en T-shirt), RGBA, **cero 
 - Los **2 px de separación** entre caras de la plantilla se dejan transparentes.
 - Las **líneas punteadas** (torso y=170, brazos/piernas y=407, medidas en el PNG oficial) marcan "límite máximo de altura de guantes y detalles de la parte baja de la pierna (solo R15)". Los puños/dobladillos del generador (10 px en el borde inferior) y las mangas/shorts cortos (56/64 px) son **decisiones de estilo propias**, no medidas oficiales.
 - El pantalón pinta por defecto todo el torso (`--torso-coverage 1.0`); cuánto del torso conviene pintar es algo a probar en Studio.
-- **Subida**: no existe API oficial para subir Shirt/Pants/T-Shirt (ver `research/09-ropa-produccion-con-ia.md`); la subida y el pago de tarifas son manuales. El manifiesto trae columnas vacías (`uploaded_by_hand`, `asset_id`, `price_robux`) para llevar el control.
+- **Subida**: no existe API oficial para subir Shirt/Pants/T-Shirt (ver `ROBLOX/research/09-ropa-produccion-con-ia.md`); la subida y el pago de tarifas son manuales. El manifiesto trae columnas vacías (`uploaded_by_hand`, `asset_id`, `price_robux`) para llevar el control.
 - No hay IA generativa aquí (sin GPU). Los patrones son matemáticos. Para diseños ilustrados, genera con una herramienta de IA con licencia comercial y úsalos como entrada propia (ver el informe).
 
 ## Estructura

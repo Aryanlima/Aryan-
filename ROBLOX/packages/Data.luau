@@ -5,7 +5,7 @@
 
 	NOTA DE PRODUCCION: esta es una implementacion propia (para poder probarla a fondo con mocks).
 	Para un juego real con mucho trafico se recomienda SUSTITUIRLA por ProfileStore
-	(MadStudioRoblox/ProfileStore, ver research/06 seccion 2): lo ha usado mucha mas gente.
+	(MadStudioRoblox/ProfileStore, ver ROBLOX/research/06 seccion 2): lo ha usado mucha mas gente.
 	La API publica de este modulo (load / save / release / attach) es deliberadamente parecida para
 	que el cambio sea mecanico.
 
