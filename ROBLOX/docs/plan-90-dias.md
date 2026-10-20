@@ -39,6 +39,8 @@ Semanas de lunes a domingo. La semana 0 dura hasta el domingo 1-nov. L = día de
 | S11 | 11 a 17 ene | G0 del 2.º juego; informe de 90 días | Informe de 90 días, propuesta de los siguientes 90 | Playtest del 2.º juego | Informe listo | 4 |
 | S12 | 18 a 24 ene | **Día 90: decisión** | Escenarios, presupuesto | Decidir: continuar, pausar o cambiar el peso de juegos y ropa | Decisión | 3 |
 
+**Aviso sobre las horas:** el [plan de lanzamiento de marketing](../marketing/fish-and-fortune/plan-lanzamiento.md) estima 5 a 8 h/semana solo de marketing en las semanas de lanzamiento (S4 a S6). Si tu tiempo total ronda las 5 h/semana, usa su "mínimo viable" (12 clips, Discord, 1 test de anuncios y 3 creadores) o baja el ritmo de clips; las horas de la tabla son una estimación media, no un tope.
+
 Carril rápido [IDEA PROPIA]: si tienes más de 15 h/semana y el juego pasa H1 en la semana 1, L puede adelantarse a la semana 4 (23 a 29 nov). No lo adelantes por ansiedad: lo que decide es pasar G0.
 
 ---
@@ -220,6 +222,8 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 ---
 
 ## 7. Marketing con IA
+
+El calendario detallado de marketing para los 30 días del lanzamiento (D-14 a D+15), con la prueba de anuncios, los códigos de canje, los eventos y la encuesta a jugadores, está en [plan-lanzamiento.md](../marketing/fish-and-fortune/plan-lanzamiento.md). Lo de abajo es el resumen; si hay diferencias, manda ese documento para el detalle de marketing y este plan para fechas y puertas.
 
 ### 7.1 Reglas que condicionan todo
 
