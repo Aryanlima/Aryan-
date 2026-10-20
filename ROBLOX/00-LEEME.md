@@ -34,7 +34,7 @@ Rutas relativas a esta carpeta (`ROBLOX/`). Desde 2026-10-20 todo lo de Roblox e
 | `research/` | Informes 01 a 09: mejores juegos, monetización y economía, políticas, IA en Studio, IA para assets y marketing, stack técnico, diseño y conceptos, ropa vs juegos, producir ropa con IA | Hechos |
 | `docs/` | Documentos de decisión: `informe-maestro.md`, `plan-90-dias.md`, `preguntas-para-aryan.md`. Además `setup-en-tu-pc.md` y `skills-instaladas.md` (otros agentes). `entorno-y-toolchain.md` (qué toolchain hay instalado y cómo usarlo) | Los tres de decisión, hechos. Los otros, de otros agentes |
 | `packages/` | Código Luau compartido ("el kit"): `Data` (datos por jugador), `Net` (remotos validados), `Economy` (monedas, boosts, offline), `Odds` (tabla de probabilidades para cumplir con objetos aleatorios de pago), `Shop` (tienda y compras idempotentes), `Analytics`, `LiveOps` (eventos y códigos) y `UI` | **En construcción** (8 módulos al escribir esto). Según [06 §4.2](research/06-stack-tecnico.md) puede faltar un módulo `Policy` aparte (la lógica de `PolicyService` vive hoy dentro de `Odds` y `Shop`) |
-| `games/` | Los juegos. El primero es `fish-and-fortune` | **MVP escrito y probado con Lune** (95 pruebas propias del juego; servidor, cliente, mundo procedural, tienda, eventos y flag `paidLuckEnabled` apagado). **No se ha ejecutado en Roblox Studio**; falta arte, sonido, miniaturas, localización EN y poner los IDs reales de pases/productos. Lee `games/fish-and-fortune/README.md` |
+| `games/` | Los juegos. El primero es `fish-and-fortune` | **MVP escrito y probado con Lune** (servidor, cliente, mundo procedural, tienda, eventos, **español e inglés** y flag `paidLuckEnabled` apagado; un idioma no soportado ve inglés). **No se ha ejecutado en Roblox Studio**; falta arte, sonido, miniaturas, localización EN y poner los IDs reales de pases/productos. Lee `games/fish-and-fortune/README.md` |
 | `tests/` | Pruebas del kit en Lune (`*.spec.luau`) | Hechas para los paquetes presentes |
 | `tools/` | `clothing-gen/` (generador procedural de ropa clásica en Python con plantillas oficiales y control de calidad; 8 pruebas pasan, no probado en Studio). Además: `testkit/` (ejecutor de pruebas y simulaciones de servicios de Roblox), `examples/` (ejemplo de `ProcessReceipt`) y los scripts `setup.sh`, `test.sh`, `lint.sh`, `format.sh` (con `env.sh`) | En construcción; `testkit` y `clothing-gen` funcionan |
 | `marketing/` | `fish-and-fortune/`: 30 guiones de vídeo corto, texto de la página del juego, plan de lanzamiento a 30 días y 6 especificaciones de vídeo ya renderizadas. `pipeline/` es el generador de vídeos (JSON, HTML/Canvas, Playwright y ffmpeg) | **En construcción.** Los textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL") |
@@ -50,7 +50,7 @@ Estos comandos funcionan en el entorno de nube donde se construyó el proyecto (
 
 | Qué | Comando (desde la raíz del repositorio) | Qué comprueba |
 |---|---|---|
-| Todas las pruebas | `bash ROBLOX/tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al 2026-10-20: **24 especificaciones, 420 pruebas, 0 fallos, 2 omitidas a propósito** |
+| Todas las pruebas | `bash ROBLOX/tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al 2026-10-20: **26 especificaciones, 481 pruebas, 0 fallos, 2 omitidas a propósito** |
 | Una sola prueba | `lune run ROBLOX/tests/Odds.spec.luau` | Lo mismo para un archivo |
 | Filtrar por nombre | `bash ROBLOX/tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
 | Linter, formato y tipos | `bash ROBLOX/tools/lint.sh` y `bash ROBLOX/tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
@@ -66,7 +66,7 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 
 - 9 informes de investigación con etiquetas de fiabilidad y fuentes (01 a 09).
 - 3 documentos de decisión en `docs/` ([informe maestro](docs/informe-maestro.md), [plan de 90 días](docs/plan-90-dias.md), [preguntas para Aryan](docs/preguntas-para-aryan.md)) que resumen, deciden y enlazan cada dato a su informe.
-- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 420 pruebas en verde (2 omitidas a propósito: la puerta previa a publicar) con el linter limpio (2026-10-20).
+- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 481 pruebas en verde (2 omitidas a propósito: la puerta previa a publicar) con el linter limpio (2026-10-20).
 - Una **revisión independiente del código de dinero y datos** ([resultado y estado de cada hallazgo](docs/revision-codigo-dinero.md)): 0 críticos, 3 altos, 7 medios y 8 bajos; los arreglos de mayor impacto ya están aplicados con pruebas nuevas, y quedan propuestos los de impacto bajo y dos decisiones de diseño tuyas.
 
 ### Hecho, pero SIN probar en Roblox
@@ -100,3 +100,7 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 | No sé qué hacer esta semana | [Plan de 90 días](docs/plan-90-dias.md), semana 0 |
 | Algo del toolchain no arranca | `docs/entorno-y-toolchain.md` y `bash ROBLOX/tools/setup.sh --check` |
 | Preguntas sobre ropa | [Informe maestro §9](docs/informe-maestro.md), [08](research/08-ropa-vs-juegos.md) y [09](research/09-ropa-produccion-con-ia.md) |
+
+### Arte provisional de Fish & Fortune
+
+`marketing/fish-and-fortune/assets/` contiene 3 íconos, 8 miniaturas (ES y EN), 5 íconos de pases y 6 de productos, hechos por código (no hay IA de imagen en la nube) y verificados contra las medidas oficiales: ver su `README.md` y `contact-sheet.png`. Son **provisionales**: se sustituyen por arte de IA con los prompts de `marketing/fish-and-fortune/prompts-ia.md`.

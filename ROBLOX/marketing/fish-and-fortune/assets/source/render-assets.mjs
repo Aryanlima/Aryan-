@@ -280,7 +280,7 @@ async function contactSheet() {
   const warns = rows.flatMap((r) => r.warnings.map((e) => `${r.id}: ${e}`));
   const sheet = path.join(OUT, 'contact-sheet.png');
   const totalAll = totalBytes + (fs.existsSync(sheet) ? fs.statSync(sheet).size : 0);
-  fs.writeFileSync(path.join(OUT, 'assets-manifest.json'), JSON.stringify({
+  if (!flag('validate-only')) fs.writeFileSync(path.join(OUT, 'assets-manifest.json'), JSON.stringify({
     generated: new Date().toISOString().slice(0, 10),
     rules: { icon: '512x512 cuadrado (>=512), preview a 150x150', thumbnail: '16:9, ideal 1920x1080, <3 MB, jpg/gif/png/tga/bmp, sin elementos clave en el borde inferior', passAndProduct: '<=512x512, jpg/png/bmp, sin detalles importantes fuera del circulo' },
     totalBytes: totalAll, totalMB: +(totalAll / 1048576).toFixed(2), disabledV1: DISABLED, files: rows,

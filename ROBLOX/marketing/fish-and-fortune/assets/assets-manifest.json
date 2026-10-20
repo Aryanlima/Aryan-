@@ -5,7 +5,7 @@
     "thumbnail": "16:9, ideal 1920x1080, <3 MB, jpg/gif/png/tga/bmp, sin elementos clave en el borde inferior",
     "passAndProduct": "<=512x512, jpg/png/bmp, sin detalles importantes fuera del circulo"
   },
-  "totalBytes": 8369437,
+  "totalBytes": 8371112,
   "totalMB": 7.98,
   "disabledV1": [
     {
@@ -25,18 +25,16 @@
       "file": "icon/icon-a-mitico.png",
       "group": "icon",
       "key": "(ninguna: icono del juego)",
-      "errors": [
-        "11 px del sujeto fuera del circulo seguro (radio 230); caja 6x4+133+451"
-      ],
+      "errors": [],
       "warnings": [],
       "w": 512,
       "h": 512,
       "format": "PNG",
-      "bytes": 200280,
+      "bytes": 199585,
       "safeZone": {
-        "outsidePx": 11,
-        "outsideBBox": "6x4+133+451",
-        "subjectMaxRadius": 240
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 230
       },
       "textContrast": []
     },
