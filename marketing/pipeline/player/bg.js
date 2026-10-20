@@ -309,7 +309,7 @@
       root.appendChild(base);
     }
     let fx = null, fctx = null;
-    if (desc.particles) {
+    if (desc.particles && !ctx) {
       fx = document.createElement('canvas'); fx.width = W; fx.height = H; fx.className = 'bg-canvas';
       fctx = fx.getContext('2d'); root.appendChild(fx);
     }
@@ -350,7 +350,8 @@
           if (desc.zoom) scale *= lerp(1, desc.zoom, clamp(lt / Math.max(dur, 0.01)));
         }
         base.style.transform = `translate(${tx.toFixed(1)}px,0) scale(${scale.toFixed(4)})`;
-        if (fctx) { fctx.clearRect(0, 0, W, H); drawParticles(fctx, desc.particles, T, W, H, pal, desc.seed || 1); }
+        if (ctx && desc.particles) drawParticles(ctx, desc.particles, T, W, H, pal, desc.seed || 1); // mismo canvas: una capa menos que componer
+        else if (fctx) { fctx.clearRect(0, 0, W, H); drawParticles(fctx, desc.particles, T, W, H, pal, desc.seed || 1); }
         return p;
       },
     };

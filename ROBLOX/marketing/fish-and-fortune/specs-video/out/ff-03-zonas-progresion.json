@@ -1,0 +1,21 @@
+{
+  "id": "ff-03-zonas-progresion",
+  "out": "out/ff-03-zonas-progresion.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 15,
+  "frames": 450,
+  "size_mb": 6.65,
+  "workers": 4,
+  "capture_fps": 20.5,
+  "timings_ms": {
+    "compilar+TTS+clips": 1,
+    "captura": 23328,
+    "audio": 0,
+    "codificar": 10183,
+    "total": 33574
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "id": "ff-05-codigo-lanzamiento",
+  "out": "out/ff-05-codigo-lanzamiento.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 14.9,
+  "frames": 447,
+  "size_mb": 4.98,
+  "workers": 4,
+  "capture_fps": 17.9,
+  "timings_ms": {
+    "compilar+TTS+clips": 3,
+    "captura": 26451,
+    "audio": 0,
+    "codificar": 24033,
+    "total": 50622
+  }
+}

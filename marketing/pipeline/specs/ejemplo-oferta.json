@@ -4,6 +4,7 @@
   "title": "Oferta relámpago con código de canje (juego de ejemplo)",
   "aspect": "9:16",
   "fps": 30,
+  "encode": { "crf": 24, "preset": "veryfast" },
   "palette": "gold",
   "brand": { "name": "CUBO RUSH", "handle": "@cuborush.oficial" },
 
@@ -45,6 +46,7 @@
     "sub": "La oferta termina pronto",
     "button": "CANJEAR AHORA",
     "emoji": "🎁",
+    "subY": 0.79,
     "narration": "Canjéalo ahora."
   },
 

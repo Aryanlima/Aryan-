@@ -4,6 +4,7 @@
   "title": "Top 3 mascotas más OP (juego de ejemplo)",
   "aspect": "9:16",
   "fps": 30,
+  "encode": { "crf": 24, "preset": "veryfast" },
   "palette": "candy",
   "brand": { "name": "MUNDO MASCOTAS", "handle": "@mundomascotas" },
 

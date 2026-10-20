@@ -43,7 +43,7 @@ export type Transaction = {
 
 export type LedgerConfig = {
 	currencies: { [string]: CurrencyDef },
-	onTransaction: ((transaction: Transaction) -> ())?,
+	onTransaction: ((transaction: Transaction) -> ...any)?,
 }
 
 export type MultiplierSource = {
@@ -112,7 +112,14 @@ function Ledger._cap(self: Ledger, currency: string): number
 	return def.maxBalance or DEFAULT_MAX_BALANCE
 end
 
-function Ledger._notify(self: Ledger, flow: string, currency: string, amount: number, ending: number, info: TransactionInfo?)
+function Ledger._notify(
+	self: Ledger,
+	flow: string,
+	currency: string,
+	amount: number,
+	ending: number,
+	info: TransactionInfo?
+)
 	local hook = self.config.onTransaction
 	if hook == nil or amount <= 0 then
 		return
@@ -131,7 +138,7 @@ function Ledger._notify(self: Ledger, flow: string, currency: string, amount: nu
 	end
 end
 
-function Ledger.balance(self: Ledger, wallet: Wallet, currency: string): number
+function Ledger.balance(_self: Ledger, wallet: Wallet, currency: string): number
 	local value = wallet[currency]
 	if type(value) ~= "number" or not isFinite(value) or value < 0 then
 		return 0
@@ -147,7 +154,13 @@ end
 	Suma `amount` (entero >= 0). Respeta el tope. Devuelve (sumado, saldoNuevo).
 	Una cantidad invalida NO modifica nada y devuelve (0, saldoActual).
 ]]
-function Ledger.add(self: Ledger, wallet: Wallet, currency: string, amount: number, info: TransactionInfo?): (number, number)
+function Ledger.add(
+	self: Ledger,
+	wallet: Wallet,
+	currency: string,
+	amount: number,
+	info: TransactionInfo?
+): (number, number)
 	local current = self:balance(wallet, currency)
 	if not Economy.isValidAmount(amount) or amount == 0 then
 		return 0, current
@@ -233,8 +246,19 @@ end
 	total nunca supera `maxRemainingSeconds` (evita acumular boosts de dias). Devuelve el nuevo
 	vencimiento. Devuelve nil (sin cambios) si los parametros son invalidos.
 ]]
-function Economy.grantBoost(boosts: BoostState, id: string, durationSeconds: number, now: number, maxRemainingSeconds: number): number?
-	if not isFinite(durationSeconds) or durationSeconds <= 0 or not isFinite(now) or not isFinite(maxRemainingSeconds) then
+function Economy.grantBoost(
+	boosts: BoostState,
+	id: string,
+	durationSeconds: number,
+	now: number,
+	maxRemainingSeconds: number
+): number?
+	if
+		not isFinite(durationSeconds)
+		or durationSeconds <= 0
+		or not isFinite(now)
+		or not isFinite(maxRemainingSeconds)
+	then
 		return nil
 	end
 	local remaining = Economy.boostRemaining(boosts, id, now)

@@ -164,16 +164,25 @@ Reglas de publicación [OFICIAL] ([06 §6.3][r06]): se despliega antes y se acti
 
 ### 5.1 Línea secundaria opcional: ropa y accesorios de avatar
 
-El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([08 §6][r08]). Esta línea es opcional y **no se abre sin tu respuesta a la pregunta 11**. Los umbrales son heurísticas [IDEA PROPIA] del propio informe.
+El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([08 §6][r08]); el 09 explica cómo producirla ([09][r09]). Esta línea es opcional y **no se abre sin tu respuesta a la pregunta 11**. Los umbrales son heurísticas [IDEA PROPIA] de esos informes.
 
 | Cuándo | Qué | Coste aproximado | Condición |
 |---|---|---|---|
-| S0 (15 min) | Verificación en Creator Hub (ver tarea 13) | 0 | Siempre |
+| S0 (15 min) | Verificación en Creator Hub (ver tarea 13): suelo de precio, anticipo vigente, Plus o Premium, ID | 0 | Siempre |
+| S1 a S2 | **Prueba de pipeline: 3 prendas clásicas** generadas con `tools/clothing-gen`, probadas gratis en Studio (Block Avatar) y **subidas a mano** al Creator Dashboard. Puerta: ≥ 2 de 3 aprobadas en ≤ 24 h | 240 R$ de subida + 30 R$ de anticipo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
+| Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada en Blender | ≈ 3.400 R$ (680 R$ por ítem) | Puerta de S1 a S2 superada; horas disponibles |
 | S10 en adelante | **Tienda de avatar dentro de Fish & Fortune**: 5 a 10 ítems propios exclusivos de tu juego (por Place ID) y menú de inspección activo para ganar 40 % por ítems de otros | Subida 80 R$ + anticipo según tipo por ítem | G4 pasado: ≥ 100 a 200 jugadores diarios |
-| Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada | ≈ 3.400 R$ (680 R$ por ítem) | Respondes "ropa" o "las dos"; Plus activo; ID verificado; horas disponibles |
 | S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Con 5 ítems solo se mide tiempo por ítem, aprobación y suelo real; los criterios de matar o duplicar exigen un mínimo de 20 ítems publicados ([informe maestro §9.4](informe-maestro.md)) |
 
-No se hace en estos 90 días: ropa clásica 2D como negocio, Limiteds pagados ni accesorios con máscara emisiva ([08 §6.1][r08]). Los pasos de producción con IA están **pendientes de 09**.
+Detalles que condicionan el calendario:
+
+- **No hay API oficial para subir ropa ni accesorios de avatar**: toda subida es manual (Creator Dashboard para clásica; Studio > Save to Roblox para 3D). No se automatiza con la cookie de la cuenta ([09 §8][r09]) [OFICIAL].
+- **Halloween (31-oct) no se persigue**: hay que subir antes del 27-oct y todavía faltan tus requisitos. Fechas con margen: **Black Friday** (27-nov; subir antes del 13-nov) y **Navidad** (subir entre el 1 y el 10-dic) ([09 §7.3][r09]). La relación entre estacionalidad y ventas de ropa no tiene datos [NO VERIFICADO].
+- La imagen de una prenda clásica **no se puede reemplazar** tras subirla: se hace control de calidad antes ([09 §0][r09]).
+- Presupuesto de referencia del informe 09 para 30 días: mínimo 3.120 R$ (≈ 11,9 USD al valor DevEx) o medio 6.240 R$ (≈ 23,7 USD); más si compras los Robux ([09 §11.1][r09]).
+- Contenido prohibido que afecta a temas de temporada: religioso, sangriento, de citas o bodas, y texto excesivo ([09 §3][r09]) [OFICIAL].
+
+No se hace en estos 90 días: ropa clásica 2D como negocio (solo la prueba de 3 prendas), Limiteds pagados ni accesorios con máscara emisiva ([08 §6.1][r08]).
 
 ---
 
@@ -308,7 +317,7 @@ Se miden en Creator Analytics (gratis) y se consolidan con la API de consulta de
 | Publicación | Compila y prepara la versión | **Aprueba y publica a producción**; cuestionario de madurez fiel; crear universo |
 | Datos y mercado | Informe semanal, resumen de políticas | Leer, decidir y matar |
 | Marketing | Guiones, calendario, renders, mensajes | **Grabar, publicar, enviar** |
-| Ropa (opcional) | Scripts de Blender, plantillas de textura, descripciones y metadatos, hoja de precio contra el suelo, lista de comprobación de IP | **Subir los ítems (Save to Roblox o web), pagar subida y anticipo, revisar a ojo el ajuste en varios cuerpos** |
+| Ropa (opcional) | Diseños procedurales en lote, control de calidad y de IP, textos y manifiesto, scripts de Blender, informes desde las transacciones exportadas | **Probar en Studio (Block Avatar), subir a mano (no hay API), pagar subida y anticipo, fijar precio, revisar el ajuste en varios cuerpos** |
 | Dinero | Cálculos de equilibrio y presupuesto | **Pagar anuncios, Plus y tarifas** |
 
 ---
@@ -351,3 +360,4 @@ Con el informe de la semana 11, decidir una de tres: **continuar** (cartera pequ
 [r06]: ../research/06-stack-tecnico.md
 [r07]: ../research/07-diseno-crecimiento-y-conceptos.md
 [r08]: ../research/08-ropa-vs-juegos.md
+[r09]: ../research/09-ropa-produccion-con-ia.md

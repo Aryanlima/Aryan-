@@ -348,25 +348,61 @@ def prep_palette(name, pal):
     return pal
 
 
+_IMG_CACHE = {}
+
+
+def image(U, V, C, H, pal, seed=0, path="", scale=1.0, wrap_v=False, **kw):
+    """Repite una imagen TUYA (p. ej. una tesela de IA con licencia comercial) alrededor del cuerpo.
+
+    path: PNG/JPG (idealmente seamless; ver `clothgen seamless`). scale: tamano relativo (1.0 = tamano
+    original). El numero de repeticiones se ajusta a un entero para que cierre sin costura.
+    """
+    from PIL import Image as _I
+    if not path:
+        raise ValueError("pattern image requiere --param path=archivo.png")
+    if path not in _IMG_CACHE:
+        _IMG_CACHE[path] = np.asarray(_I.open(path).convert("RGB"), dtype=np.float64)
+    img = _IMG_CACHE[path]
+    ih, iw = img.shape[:2]
+    reps_u = fit(iw * scale, C)
+    tile_w = C / reps_u
+    tile_h = tile_w * ih / iw
+    if wrap_v:
+        reps_v = fit(tile_h, H)
+        tile_h = H / reps_v
+    fu = ((U % tile_w) / tile_w) * iw
+    fv = ((V % tile_h) / tile_h) * ih
+    u0 = np.floor(fu).astype(int) % iw
+    v0 = np.floor(fv).astype(int) % ih
+    u1, v1 = (u0 + 1) % iw, (v0 + 1) % ih
+    au, av = (fu - np.floor(fu))[..., None], (fv - np.floor(fv))[..., None]
+    top = img[v0, u0] * (1 - au) + img[v0, u1] * au
+    bot = img[v1, u0] * (1 - au) + img[v1, u1] * au
+    return top * (1 - av) + bot * av
+
+
 PATTERNS = {
     "solid": solid, "stripes": stripes, "gradient": gradient, "tiedye": tiedye,
     "camo": camo, "checks": checks, "diamonds": diamonds, "chevron": chevron,
     "dots": dots, "triangles": triangles, "waves": waves, "gingham": gingham,
     "speckle": speckle,
 }
+# `image` necesita un archivo; se registra aparte para que los tests de periodicidad generica no lo exijan.
+PATTERNS_WITH_FILE = {"image": image}
 
 
 def render_pattern(name, pal, C, H, origin_u=0.0, seed=0, grain=2.0, wrap_v=False, **params):
     """Renderiza un patron sobre una rejilla (H x C) y devuelve uint8 (H, C, 3)."""
-    if name not in PATTERNS:
-        raise KeyError(f"patron desconocido {name!r}. Opciones: {sorted(PATTERNS)}")
+    fn = PATTERNS.get(name) or PATTERNS_WITH_FILE.get(name)
+    if fn is None:
+        raise KeyError(f"patron desconocido {name!r}. Opciones: {sorted(PATTERNS) + sorted(PATTERNS_WITH_FILE)}")
     C_i, H_i = int(C), int(H)
     u = np.arange(C_i, dtype=np.float64) + 0.5
     v = np.arange(H_i, dtype=np.float64) + 0.5
     U, V = np.meshgrid(u + origin_u, v)
     U = U % C
     pal = prep_palette(name, pal)
-    rgb = PATTERNS[name](U, V, float(C), float(H), pal, seed=seed, wrap_v=wrap_v, **params)
+    rgb = fn(U, V, float(C), float(H), pal, seed=seed, wrap_v=wrap_v, **params)
     if grain:
         # grano de tela periodico en u: ruido determinista por pixel
         g = _hash2((U - 0.5).astype(int) % C_i, (V - 0.5).astype(int), seed + 99) - 0.5

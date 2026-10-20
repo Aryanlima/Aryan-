@@ -14,7 +14,7 @@ from . import __version__, qc
 from .garment import render_clothing, render_tile, render_tshirt
 from .naming import make_description, make_name, random_params
 from .palettes import PALETTES, SEASONAL
-from .patterns import PATTERNS
+from .patterns import PATTERNS, PATTERNS_WITH_FILE
 from .preview import contact_sheet, mock, overlay
 
 
@@ -48,6 +48,13 @@ def _spec_from_args(a):
         t["back"] = a.text_back
     if t:
         spec["text"] = t
+    ts = {}
+    if getattr(a, "font", None):
+        ts["font"] = a.font
+    if getattr(a, "text_size", None):
+        ts["size"] = a.text_size
+    if ts:
+        spec["text_style"] = ts
     return spec
 
 
@@ -213,8 +220,26 @@ def cmd_qc(a):
     return 1 if bad else 0
 
 
+def cmd_seamless(a):
+    """Convierte una imagen cualquiera en tesela seamless (mezcla de bordes con la imagen desplazada media vuelta)."""
+    import numpy as np
+    im = Image.open(a.input).convert("RGB")
+    s = a.size
+    im = im.resize((s, s), Image.LANCZOS)
+    arr = np.asarray(im, dtype=np.float64)
+    rolled = np.roll(arr, (s // 2, s // 2), axis=(0, 1))
+    t = (np.arange(s) + 0.5) / s
+    w1 = np.clip(1 - np.abs(2 * t - 1) ** a.sharp, 0, 1)    # 1 en el centro, 0 en los bordes
+    w = np.outer(w1, w1)[..., None]
+    out = np.clip(arr * w + rolled * (1 - w), 0, 255).astype(np.uint8)
+    Path(a.out).parent.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(out).save(a.out)
+    print(a.out, qc.tile_seam_score(a.out))
+    return 0
+
+
 def cmd_list(a):
-    print("patrones:", ", ".join(sorted(PATTERNS)))
+    print("patrones:", ", ".join(sorted(PATTERNS)), "+ image (--param path=tu_tesela.png)")
     print("paletas:", ", ".join(sorted(PALETTES)))
     print("temporadas:", ", ".join(sorted(SEASONAL)))
     return 0
@@ -226,7 +251,7 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     def common(p):
-        p.add_argument("--pattern", default="stripes", choices=sorted(PATTERNS))
+        p.add_argument("--pattern", default="stripes", choices=sorted(PATTERNS) + sorted(PATTERNS_WITH_FILE))
         p.add_argument("--palette", default="sunset", help="nombre o lista '#hex,#hex,...'")
         p.add_argument("--seed", type=int, default=1)
         p.add_argument("--param", action="append", help="clave=valor del patron (repetible)")
@@ -244,6 +269,8 @@ def main(argv=None):
         p.add_argument("--collar")
         p.add_argument("--text-front")
         p.add_argument("--text-back")
+        p.add_argument("--font", help="ruta a un .ttf con licencia que cubra uso comercial (p. ej. OFL)")
+        p.add_argument("--text-size", dest="text_size", type=int)
         p.set_defaults(fn=cmd_one)
     p = sub.add_parser("tshirt")
     common(p)
@@ -267,6 +294,12 @@ def main(argv=None):
     p.add_argument("--unique-patterns", action="store_true")
     p.add_argument("--out", default="out")
     p.set_defaults(fn=cmd_collection)
+    p = sub.add_parser("seamless", help="hacer seamless una imagen (p. ej. salida de IA)")
+    p.add_argument("--input", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--size", type=int, default=512)
+    p.add_argument("--sharp", type=float, default=1.6, help="mayor = mas zona central intacta")
+    p.set_defaults(fn=cmd_seamless)
     p = sub.add_parser("qc")
     p.add_argument("--dir", required=True)
     p.set_defaults(fn=cmd_qc)

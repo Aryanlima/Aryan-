@@ -153,7 +153,13 @@
       d.style.cssText = `width:${px(C, cur ? 56 : 30)}px;height:${px(C, 30)}px;border-radius:99px;background:${i >= sc.rank ? sc.accent : 'rgba(255,255,255,0.3)'};opacity:${cur ? 1 : 0.7}`;
       dotEls.push(d);
     }
-    const badgeBox = $('div', '', fit);
+    let hostA = fit, hostB = fit;
+    if (C.land) { // horizontal: insignia a la izquierda, texto a la derecha
+      const row = $('div', '', fit); row.style.cssText = `display:flex;align-items:center;justify-content:center;gap:${px(C, 80)}px;width:100%`;
+      hostA = $('div', '', row); hostB = $('div', '', row);
+      hostB.style.cssText = `flex:1;display:flex;flex-direction:column;align-items:center;gap:${px(C, 22)}px`;
+    }
+    const badgeBox = $('div', '', hostA);
     badgeBox.style.cssText = `position:relative;width:${px(C, 470)}px;height:${px(C, 400)}px;`;
     const badge = $('div', 'badge', badgeBox);
     badge.style.cssText = `position:absolute;inset:0;border-radius:${px(C, 70)}px;background:linear-gradient(145deg,${sc.accent},${sc.accent2});border:${px(C, 10)}px solid #fff;box-shadow:0 ${px(C, 18)}px 0 rgba(0,0,0,0.35);`;
@@ -164,11 +170,11 @@
     if (sc.emoji) { emo = $('div', 'sticker', badgeBox, sc.emoji); emo.style.fontSize = px(C, 170) + 'px'; emo.style.right = px(C, -90) + 'px'; emo.style.top = px(C, -70) + 'px'; }
     let img = null;
     if (sc.image) { img = $('img', 'sticker', badgeBox); img.src = sc.image; img.style.width = px(C, 260) + 'px'; img.style.right = px(C, -120) + 'px'; img.style.top = px(C, -90) + 'px'; }
-    const T = words(fit, sc.title.words, 'h2');
+    const T = words(hostB, sc.title.words, 'h2');
     fitWords(T.wrap, T.items, C.safeH * 0.22, px(C, 104));
     let sub = null, stat = null;
-    if (sc.sub) sub = words(fit, sc.sub.words, 'h3');
-    if (sc.stat) stat = $('div', 'pill big', fit, '');
+    if (sc.sub) sub = words(hostB, sc.sub.words, 'h3');
+    if (sc.stat) stat = $('div', 'pill big', hostB, '');
     return function (lt) {
       const p = clamp(lt / 0.45), k = E.outBack(p, 1.7);
       setT(badgeBox, { x: (1 - k) * -C.W * 0.9, r: (1 - k) * -14, s: 1 });
@@ -420,7 +426,7 @@
     const bw = $('div', '', fit); bw.style.cssText = `position:relative;margin-top:${px(C, 12)}px`;
     const btn = $('div', 'pill big', bw, sc.button || '¡JUEGA GRATIS!'); btn.style.cssText += `font-size:${px(C, 72)}px;padding:${px(C, 30)}px ${px(C, 70)}px;overflow:hidden;position:relative;background:linear-gradient(180deg,${sc.accent},${sc.accent2});`;
     const shine = $('div', '', btn); shine.style.cssText = 'position:absolute;top:0;bottom:0;width:30%;left:0;background:linear-gradient(105deg,transparent,rgba(255,255,255,0.65),transparent)';
-    const hand = $('div', 'emoji', bw, '👆'); hand.style.cssText += `position:absolute;right:${px(C, 10)}px;top:${px(C, 78)}px;font-size:${px(C, 120)}px`;
+    const hand = $('div', 'emoji', bw, '👆'); hand.style.cssText += `position:absolute;right:${px(C, 6)}px;top:${px(C, 98)}px;font-size:${px(C, 110)}px`;
     let code = null, handle = null;
     if (sc.code) { code = $('div', 'pill dark', fit, ''); code.innerHTML = `<span class="small" style="opacity:.8">${sc.codeLabel || 'CÓDIGO'}</span><span style="color:${sc.accent};font-family:'JetBrains Mono','DejaVu Sans Mono',monospace;letter-spacing:.06em">${sc.code}</span>`; }
     if (sc.handle) handle = $('div', 'body', fit, sc.handle);

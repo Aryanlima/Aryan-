@@ -232,6 +232,20 @@ describe("tirada del servidor (RNG inyectado)", function()
 		end)).toBe("minnow") -- NaN se trata como 0
 	end)
 
+	it("una secuencia de numeros produce una secuencia de resultados predecible", function()
+		local odds = Odds.new({
+			{ id = "a", weight = 50 },
+			{ id = "b", weight = 30 },
+			{ id = "c", weight = 20 },
+		})
+		local rng = sequence({ 0, 0.55, 0.85, 0.2 })
+		local results = {}
+		for _ = 1, 4 do
+			table.insert(results, odds:roll(rng))
+		end
+		expect(results).toEqual({ "a", "b", "c", "a" })
+	end)
+
 	it("los umbrales acumulados coinciden con las probabilidades", function()
 		local odds = Odds.new({
 			{ id = "a", weight = 50 },
@@ -291,7 +305,11 @@ describe("pity visible", function()
 	local function pityOdds()
 		return Odds.new(pondTable(), {
 			maxLuck = 5,
-			pity = { rolls = 5, targetIds = { "koi", "dragon", "leviathan" }, note = "Cada 5 lanzamientos sin Epico, el siguiente lo es." },
+			pity = {
+				rolls = 5,
+				targetIds = { "koi", "dragon", "leviathan" },
+				note = "Cada 5 lanzamientos sin Epico, el siguiente lo es.",
+			},
 		})
 	end
 
@@ -348,8 +366,8 @@ describe("gating por PolicyService", function()
 	it("el comercio de objetos pagados es una comprobacion separada", function()
 		expect(Odds.paidItemTradingAllowed({ IsPaidItemTradingAllowed = true })).toBe(true)
 		expect(Odds.paidItemTradingAllowed({ IsPaidItemTradingAllowed = false })).toBe(false)
-		expect(
-			Odds.paidItemTradingAllowed({ ArePaidRandomItemsRestricted = false, IsPaidItemTradingAllowed = false })
-		).toBe(false)
+		expect(Odds.paidItemTradingAllowed({ ArePaidRandomItemsRestricted = false, IsPaidItemTradingAllowed = false })).toBe(
+			false
+		)
 	end)
 end)

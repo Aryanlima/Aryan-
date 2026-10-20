@@ -81,7 +81,7 @@ describe("Data", function()
 		end)
 
 		it("reconcile rellena claves nuevas sin pisar las existentes", function()
-			local data = { coins = 50, settings = { music = false } }
+			local data: { [string]: any } = { coins = 50, settings = { music = false } }
 			Data.reconcile(data, { coins = 0, settings = { music = true, sfx = true }, fresh = 5, list = {} })
 			expect(data.coins).toBe(50)
 			expect(data.settings.music).toBe(false)

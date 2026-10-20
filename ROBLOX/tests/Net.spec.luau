@@ -101,7 +101,7 @@ describe("token bucket", function()
 end)
 
 describe("Net.newServer", function()
-	local env, now, server, remotes, handled, rejected, abuse
+	local now, server, remotes, handled, rejected, abuse
 
 	local function create(className, name)
 		local remote = {
@@ -121,7 +121,6 @@ describe("Net.newServer", function()
 	end
 
 	beforeEach(function()
-		env = Mocks.new()
 		now = 0
 		remotes = {}
 		handled = {}

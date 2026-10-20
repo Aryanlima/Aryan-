@@ -4,6 +4,7 @@
   "title": "Antes / después + progresión, 16:9 (juego de ejemplo)",
   "aspect": "16:9",
   "fps": 30,
+  "encode": { "crf": 24, "preset": "veryfast" },
   "palette": "lime",
   "brand": { "name": "CUBO RUSH" },
 
