@@ -43,6 +43,16 @@ describe("GameService (arnes de integracion con dobles)", function()
 		env.clock:assertNoErrors()
 	end)
 
+	it("en un lugar sin publicar (GetDataStore lanza error) arranca con el almacen en memoria", function()
+		local w = buildWorld({ unpublishedStudio = true })
+		expect(w.env.MarketplaceService.ProcessReceipt).toBeTruthy()
+		local usedMemory = false
+		for _, line in w.warnings do
+			usedMemory = usedMemory or string.find(tostring(line), "MEMORIA", 1, true) ~= nil
+		end
+		expect(usedMemory).toBe(true)
+	end)
+
 	it("al entrar un jugador se carga el perfil y se le envia el estado inicial", function()
 		local player = world.join()
 		local profile = world.api.manager:get(USER)
