@@ -26,6 +26,15 @@ GLOBAL_TYPES="$TOOLCHAIN/share/globalTypes.d.luau"
 export PATH="$TOOLCHAIN/bin:$PATH:$HOME/.cargo/bin"
 export ROOT TOOLCHAIN GLOBAL_TYPES TOOLS_DIR
 
+# Convierte rutas (relativas al directorio desde el que se invoco el script) en absolutas.
+# Uso: mapfile -t paths < <(abs_paths "${paths[@]}")
+abs_paths() {
+	local p
+	for p in "$@"; do
+		realpath -- "$p"
+	done
+}
+
 # Lista de archivos Luau/Lua del proyecto (excluye research, dependencias y el toolchain).
 # Uso: mapfile -t FILES < <(find_luau_files [ruta...])
 find_luau_files() {

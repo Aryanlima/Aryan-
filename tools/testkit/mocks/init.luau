@@ -12,7 +12,7 @@
 	  env.DataStoreService   DataStoreService mock (fallos y limites simulables)
 	  env.MarketplaceService MarketplaceService mock (ProcessReceipt, game passes)
 	  env.game          stub con :GetService(name), PlaceId, JobId
-	  env:installGlobals()  (ver abajo) intenta exponer Enum/task/game como globales
+	  env:installGlobals()  (ver abajo) intenta exponer Enum y game como globales (task solo con installGlobals(true))
 
 	La logica bajo prueba debe recibir estos objetos por inyeccion de dependencias
 	(recomendado): Modulo.new({ players = env.Players, dataStoreService = env.DataStoreService, ... }).

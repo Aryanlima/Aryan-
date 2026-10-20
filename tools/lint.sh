@@ -32,6 +32,7 @@ for arg in "$@"; do
 	esac
 done
 
+mapfile -t paths < <(abs_paths "${paths[@]}")
 cd "$ROOT" || exit 2
 mapfile -t files < <(find_luau_files "${paths[@]}")
 if [ "${#files[@]}" -eq 0 ]; then
@@ -67,7 +68,7 @@ if [ $do_types -eq 1 ]; then
 		luau-lsp analyze --definitions="$GLOBAL_TYPES" "${files[@]}" || failed=1
 	elif command -v luau-analyze >/dev/null 2>&1; then
 		step "luau-analyze (solo tools/: Luau puro, sin tipos de Roblox)"
-		mapfile -t pure < <(printf '%s\n' "${files[@]}" | grep -E "^$ROOT/tools/" || true)
+		mapfile -t pure < <(printf '%s\n' "${files[@]}" | grep -E "^(${ROOT}/)?tools/" || true)
 		if [ "${#pure[@]}" -gt 0 ]; then
 			luau-analyze --formatter=gnu "${pure[@]}" || failed=1
 		else

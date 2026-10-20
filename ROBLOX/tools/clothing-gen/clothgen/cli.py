@@ -64,9 +64,8 @@ def make_item(item: dict, out: Path, previews=True) -> list[dict]:
     rows = []
     lang = item.get("lang", "en")
     pal_name = item["palette"] if isinstance(item["palette"], str) else "custom"
-    texts = list((item.get("text") or {}).values())
-    if isinstance(item.get("text"), str):
-        texts = [item["text"]]
+    raw_text = item.get("text")
+    texts = [raw_text] if isinstance(raw_text, str) else list((raw_text or {}).values())
     kinds = ["shirt", "pants"] if kind == "set" else [kind]
     imgs = {}
     for k in kinds:
@@ -104,17 +103,29 @@ def make_item(item: dict, out: Path, previews=True) -> list[dict]:
 
 def write_manifest(rows, out: Path):
     out.mkdir(parents=True, exist_ok=True)
+    if getattr(write_manifest, "append", False) and (out / "manifest.csv").exists():
+        _write_rows(rows, out, mode="a")
+        return
+    _write_rows(rows, out, mode="w")
+
+
+def _write_rows(rows, out: Path, mode="w"):
     cols = ["id", "type", "file", "name", "description", "pattern", "palette", "seed",
             "qc_ok", "qc_problems", "qc_warnings", "sha1", "uploaded_by_hand", "asset_id", "price_robux", "notes"]
-    with open(out / "manifest.csv", "w", newline="", encoding="utf-8") as f:
+    with open(out / "manifest.csv", mode, newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
-        w.writeheader()
+        if mode == "w":
+            w.writeheader()
         for r in rows:
             r = dict(r)
             r.update(uploaded_by_hand="", asset_id="", price_robux="", notes="")
             w.writerow(r)
-    with open(out / "qc_report.json", "w", encoding="utf-8") as f:
-        json.dump([r["_qc"] for r in rows], f, indent=1, ensure_ascii=False, default=str)
+    prev = []
+    qp = out / "qc_report.json"
+    if mode == "a" and qp.exists():
+        prev = json.loads(qp.read_text(encoding="utf-8"))
+    with open(qp, "w", encoding="utf-8") as f:
+        json.dump(prev + [r["_qc"] for r in rows], f, indent=1, ensure_ascii=False, default=str)
 
 
 def cmd_one(a):
@@ -125,6 +136,7 @@ def cmd_one(a):
         spec["text"] = a.text
         spec["shape"] = a.shape
     rows = make_item(spec, out, previews=a.cmd != "tshirt")
+    write_manifest.append = True   # comandos sueltos acumulan filas en el manifiesto
     write_manifest(rows, out)
     for r in rows:
         print(("OK  " if r["qc_ok"] else "FAIL"), out / r["file"], r["qc_problems"], r["qc_warnings"])

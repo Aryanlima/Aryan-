@@ -1,0 +1,50 @@
+{
+  "id": "ff-05-codigo-lanzamiento",
+  "template": "custom",
+  "title": "Fish & Fortune — cómo canjear el código de lanzamiento (9:16, ~17 s)",
+  "_nota": "NO PUBLICAR hasta que el código exista, esté validado en servidor y la caducidad sea real. 'LANZAMIENTO' y la fecha 15 dic son los valores del plan (plan-lanzamiento.md §7); cambiar si el juego usa otros. Sin promesas de Robux: el código solo da la recompensa que el juego realmente dé (no se menciona aquí).",
+  "aspect": "9:16",
+  "fps": 30,
+  "palette": {
+    "bg1": "#0A1F44", "bg2": "#0F6E9E", "accent": "#FFC83D", "accent2": "#19C3C0", "hot": "#FF7A59",
+    "text": "#F4FBFF", "dim": "#B9D8EA", "good": "#3CCB7F", "bad": "#FF5C73"
+  },
+  "typography": { "heading": "Fredoka", "body": "Nunito", "headingWeight": 700 },
+  "fonts": [
+    { "family": "Fredoka", "file": "fonts/Fredoka.ttf", "weight": "300 700" },
+    { "family": "Nunito", "file": "fonts/Nunito.ttf", "weight": "200 1000" }
+  ],
+  "brand": { "name": "FISH & FORTUNE" },
+
+  "bg": { "type": "gradient", "particles": "sparks" },
+
+  "hook": { "kicker": "🎁 CÓDIGO", "text": "Código de *LANZAMIENTO*", "emoji": "🎣", "chip": "Fish & Fortune", "duration": 2.2 },
+
+  "scenes": [
+    {
+      "id": "pasos",
+      "kind": "bullets",
+      "text": "Cómo *canjearlo*",
+      "duration": 6.0,
+      "items": [
+        { "emoji": "1️⃣", "text": "Abre Fish & Fortune" },
+        { "emoji": "2️⃣", "text": "Toca el botón «Códigos»" },
+        { "emoji": "3️⃣", "text": "Escribe LANZAMIENTO" }
+      ],
+      "narration": "Abre el juego, toca códigos y escribe lanzamiento."
+    }
+  ],
+
+  "cta": {
+    "text": "Caduca el *15 de dic*",
+    "sub": "Hasta las 23:59 UTC · un canje por cuenta",
+    "button": "▶ JUGAR EN ROBLOX",
+    "emoji": "🎁",
+    "code": "LANZAMIENTO",
+    "codeLabel": "CÓDIGO"
+  },
+
+  "subtitles": { "enabled": true, "y": 0.74 },
+  "audio": { "music": { "style": "arcade", "volume": 0.45 }, "sfx": true },
+  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. El código no regala Robux. Imágenes de marca, no es gameplay."
+}

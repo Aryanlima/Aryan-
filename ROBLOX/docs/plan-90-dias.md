@@ -37,7 +37,7 @@ Semanas de lunes a domingo. La semana 0 dura hasta el domingo 1-nov. L = día de
 | S9 | 28 dic a 3 ene | **G4** (tráfico orgánico) | Informe, parches | Revisar; clips | **G4** | 4 |
 | S10 | 4 a 10 ene | Inicio **G5**; 2.º juego en construcción | Prototipo del 2.º juego (si procede) | Probar; revisar Términos y políticas nuevas | G5 en curso | 4 |
 | S11 | 11 a 17 ene | G0 del 2.º juego; informe de 90 días | Informe de 90 días, propuesta de los siguientes 90 | Playtest del 2.º juego | Informe listo | 4 |
-| S12 | 18 a 24 ene | **Día 90: decisión** | Escenarios, presupuesto | Decidir: continuar, pausar o cambiar de línea (juegos / ropa) | Decisión | 3 |
+| S12 | 18 a 24 ene | **Día 90: decisión** | Escenarios, presupuesto | Decidir: continuar, pausar o cambiar el peso de juegos y ropa | Decisión | 3 |
 
 Carril rápido [IDEA PROPIA]: si tienes más de 15 h/semana y el juego pasa H1 en la semana 1, L puede adelantarse a la semana 4 (23 a 29 nov). No lo adelantes por ansiedad: lo que decide es pasar G0.
 
@@ -52,17 +52,17 @@ Orden de prioridad. Lo que va primero tiene fecha límite.
 | 1 | Responder las 4 preguntas urgentes (país, edad, persona o empresa, cuenta existente) | Aryan | Hoy | Sin esto no se sabe qué formulario fiscal ni si DevEx existe en tu país | [preguntas-para-aryan.md](preguntas-para-aryan.md) |
 | 2 | Cuenta de Roblox en orden: correo verificado, contraseña única, **2FA activado** | Aryan | Hoy | 2FA es requisito para publicar a todas las edades y protege la cuenta única de la que cuelga todo | [OFICIAL] [03 §3.3][r03] |
 | 3 | **Verificación de edad o identidad** (estimación facial si eres menor de 18; documento de identidad si tienes 18+) | Aryan | Hoy o mañana | Necesaria para publicar a todas las edades, para añadir enlaces sociales (16+) y desbloquea más cuota de assets. Hazlo solo dentro de Roblox, nunca enviando tu documento a terceros | [OFICIAL] [03 §3.3, §5.1][r03] |
-| 4 | **Formulario fiscal: W-8BEN (persona) o W-8BEN-E (empresa)** en Creator Hub > Finances > Taxes | Aryan | **Antes del miércoles 28-oct** (límite oficial: sábado 31-oct) | Si falta información, desde el 1-nov puede aplicarse una retención de respaldo de **24 % sobre todo el pago**. Con información válida y número de identificación fiscal (NIF/TIN), la retención va de 0 a 30 % solo sobre la parte de fuente de EE. UU. Tu ciudadanía debe coincidir con tu país de residencia permanente. Se presenta solo por Creator Hub, nunca por correo | [OFICIAL] [03 §5.4][r03] |
+| 4 | **Formulario fiscal: W-8BEN (persona) o W-8BEN-E (empresa)** en Creator Hub > Finances > Taxes | Aryan | **Antes del miércoles 28-oct** (límite oficial: sábado 31-oct) | Si falta información, desde el 1-nov puede aplicarse una retención de respaldo de **24 % sobre todo el pago**. Con información válida, la retención va de 0 a 30 % solo sobre la parte de fuente de EE. UU. (según país y convenio). Para reducirla, el formulario debe estar completo, incluir un número de identificación fiscal (NIF/TIN) y tu país de ciudadanía debe coincidir con tu país de residencia permanente. Se presenta solo por Creator Hub, nunca por correo | [OFICIAL] [03 §5.4][r03] |
 | 4b | Preparar los datos del W-8BEN: nombre legal, país, dirección, NIF/TIN, país del convenio | Claude prepara la lista, Aryan rellena | Hoy | Claude no puede firmar ni presentar por ti. La tasa que te toca depende de tu país: pregúntala a un contador local | [OFICIAL] [03 §5.4][r03] |
 | 5 | Comprobar que **DevEx existe en tu país** y qué método de cobro tienes (PayPal, banco, otro) | Aryan | Esta semana | Roblox dice "más de cien países" pero la lista no se pudo leer. Mira el Help Center de DevEx y la cobertura de Tipalti | [NO VERIFICADO] [03 §5.3][r03] |
 | 6 | Que el **nombre legal coincida** en Roblox, portal DevEx y cuenta bancaria | Aryan | Esta semana | Si no coincide, el pago puede fallar | [OFICIAL] [03 §10][r03] |
-| 7 | **Plus o Premium**: decidir si activar Plus (4,99 USD/mes) | Aryan | Esta semana | Mantenerlo 2 meses seguidos exime de la tarifa de 1.000 Robux por juego. Si lo activas el 22-oct, los 2 meses se cumplen hacia el 22-dic. Comprueba en Creator Hub si está disponible en tu país | [OFICIAL] la regla [03 §3.3][r03]; precio [OFICIAL] vía resumen [02 §2.3][r02] |
+| 7 | **Plus o Premium**: decidir si activar Plus (4,99 USD/mes) | Aryan | Esta semana | Mantenerlo 2 meses seguidos exime de la tarifa de 1.000 Robux por juego. Si lo activas el 22-oct, los 2 meses se cumplen hacia el 22-dic. Comprueba en Creator Hub si está disponible en tu país. Plus o Premium también es obligatorio para publicar y mantener ropa y accesorios de avatar a la venta ([08 §2.2][r08]), así que sirve para las dos líneas | [OFICIAL] la regla [03 §3.3][r03]; precio [OFICIAL] vía resumen [02 §2.3][r02] |
 | 8 | **Creator Hub y grupo**: entrar en create.roblox.com; decidir si publicas como persona o con un grupo | Aryan | Esta semana | Regla simple: persona si trabajas solo; grupo si habrá socios. Los requisitos de publicación se aplican a través del dueño del grupo. Cómo cobra un grupo por DevEx no está cubierto por los informes: comprobarlo antes de crear uno | [OFICIAL] [03 §3.3][r03]; cobro de grupo [NO VERIFICADO] |
 | 9 | **Universo de pruebas**: crear una experiencia **privada** de staging para Fish & Fortune (desde Studio: Publish to Roblox) | Aryan | Cuando Studio esté listo | Todas las pruebas de compras y datos van aquí, nunca en producción. Esto exige haber instalado Studio (tarea 10) | [OFICIAL] la separación de entornos [06 §4.3][r06] |
 | 10 | **Instalar Studio** (Windows o Mac), activar el servidor MCP integrado y conectar Claude Code | Aryan activa; Claude configura | Esta semana | Studio > Assistant > "..." > Manage MCP Servers > Enable Studio as MCP server > Quick connect > Claude Code. Concede solo herramientas de lectura al principio y deja `execute_luau`, `multi_edit`, `insert_asset`, `generate_*` y `start_stop_play` con aprobación manual | [OFICIAL] [04 §11][r04] |
 | 11 | **Claves de Open Cloud con alcance mínimo** (ver 2.1) | Aryan crea; Claude usa | Después de la tarea 9 | "Equivalente a una contraseña": una clave por juego, restringida a esa experiencia, solo los permisos que hagan falta, nunca en el chat ni en el repositorio. Se caducan tras 60 días sin uso: poner un recordatorio al día 50 | [OFICIAL] [06 §4.3][r06] |
 | 12 | Leer los **Términos de Uso nuevos** (en vigor el 1-nov) y apuntar qué cambia | Aryan | Antes del 1-nov | No se pudo leer qué cambia; puede afectar a cuentas, IA o pagos | [NO VERIFICADO] [03 §9][r03] |
-| 13 | **Verificación de 15 minutos en Creator Hub** de lo que los informes dejaron dudoso | Aryan | Esta semana | (a) umbral de evaluación Kids/Select: 250 o 500 jugadas; (b) condiciones de reembolso de la tarifa de 1.000 Robux; (c) detalle R15 de la tarifa 18+; (d) lista de países de DevEx; (e) si Plus hace falta para actualizar | [NO VERIFICADO] [03 §3.3, §9][r03], [02 §8][r02] |
+| 13 | **Verificación de 15 minutos en Creator Hub** de lo que los informes dejaron dudoso | Aryan | Esta semana | (a) umbral de evaluación Kids/Select: 250 o 500 jugadas; (b) condiciones de reembolso de la tarifa de 1.000 Robux; (c) detalle R15 de la tarifa 18+; (d) lista de países de DevEx; (e) si Plus hace falta para actualizar; (f) si vas a probar ropa: suelo de precio por categoría, si el reparto progresivo vale para ropa 2D, precio de Plus o Premium en tu país y si el ID verificado está disponible a tu edad ([08 §7][r08]) | [NO VERIFICADO] [03 §3.3, §9][r03], [02 §8][r02], [08 §7][r08] |
 | 14 | Anotar el **tope de pérdida** (dinero y horas) que aceptas | Aryan | Esta semana | Es la barandilla de todo el plan | [IDEA PROPIA] |
 | 15 | **Jueves 29-oct: resultados T3 de Roblox**; leer qué dicen de bookings y de monetización | Claude resume, Aryan lee | 29-oct | Confirma o no la guía de -14 a -18 % | [TERCERO] [01 §2][r01] |
 
@@ -161,6 +161,19 @@ Todo [IDEA PROPIA] apoyado en lo que hacen los juegos que duran ([01 §6][r01], 
 | 12 a 19 ene | v1.6 | Evento 3; revisión de precios por cohortes | Pasa G4 |
 
 Reglas de publicación [OFICIAL] ([06 §6.3][r06]): se despliega antes y se activa con un flag de Configs; publicar una versión no expulsa a los jugadores (los servidores viejos siguen vivos); si cambia el formato de datos hay que reiniciar servidores; los eventos duran 7 a 30 días y puede haber hasta 10 publicados o próximos [OFICIAL‡] ([07 §4.2][r07]). Estacionalidad: se espera más tráfico en vacaciones de verano del hemisferio norte y diciembre-enero, pero es [NO VERIFICADO] ([02 §5.5][r02]); el cuarto trimestre de 2025 fue el récord de pagos a creadores [TERCERO] ([02 §4.2][r02]). Mídelo con tus datos.
+
+### 5.1 Línea secundaria opcional: ropa y accesorios de avatar
+
+El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([08 §6][r08]). Esta línea es opcional y **no se abre sin tu respuesta a la pregunta 11**. Los umbrales son heurísticas [IDEA PROPIA] del propio informe.
+
+| Cuándo | Qué | Coste aproximado | Condición |
+|---|---|---|---|
+| S0 (15 min) | Verificación en Creator Hub (ver tarea 13) | 0 | Siempre |
+| S10 en adelante | **Tienda de avatar dentro de Fish & Fortune**: 5 a 10 ítems propios exclusivos de tu juego (por Place ID) y menú de inspección activo para ganar 40 % por ítems de otros | Subida 80 R$ + anticipo según tipo por ítem | G4 pasado: ≥ 100 a 200 jugadores diarios |
+| Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada | ≈ 3.400 R$ (680 R$ por ítem) | Respondes "ropa" o "las dos"; Plus activo; ID verificado; horas disponibles |
+| S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Mínimo 20 ítems publicados para aplicar los criterios de matar o duplicar ([informe maestro §9.4](informe-maestro.md)) |
+
+No se hace en estos 90 días: ropa clásica 2D como negocio, Limiteds pagados ni accesorios con máscara emisiva ([08 §6.1][r08]). Los pasos de producción con IA están **pendientes de 09**.
 
 ---
 
@@ -280,6 +293,7 @@ Se miden en Creator Analytics (gratis) y se consolidan con la API de consulta de
 | Errores de servidor (datos, recibos pendientes) | Consola y alertas | Cualquier recibo duplicado o pendiente reiterado es prioridad uno. Las alertas exigen ≥ 100 DAU y llegan solo por webhook [OFICIAL] ([06 §7.2][r06]) | Parche inmediato |
 | Rendimiento móvil (fotogramas, memoria) | Analytics de rendimiento | Probar en móvil gama baja | Optimizar |
 | Reportes y moderación | Panel Safety | Cualquier pico | Revisar el contenido |
+| Piloto de ropa (si se hace) | Transacciones de Creator Hub | Ventas medianas por ítem < 3 al mes y retorno < 1,0x en el 60 % de ítems = matar ([08 §6.3][r08]) [IDEA PROPIA] | Parar el piloto |
 | Mercado | Trackers (Rolimon's, RoMonitor) y resultados de Roblox | Vigilar si aparece un formato nuevo con ≥ 100.000 CCU en < 2 semanas | Decidir si hay ventana de "seguidor rápido" (4 a 6 semanas) ([07 §5.3][r07]) |
 
 ---
@@ -294,6 +308,7 @@ Se miden en Creator Analytics (gratis) y se consolidan con la API de consulta de
 | Publicación | Compila y prepara la versión | **Aprueba y publica a producción**; cuestionario de madurez fiel; crear universo |
 | Datos y mercado | Informe semanal, resumen de políticas | Leer, decidir y matar |
 | Marketing | Guiones, calendario, renders, mensajes | **Grabar, publicar, enviar** |
+| Ropa (opcional) | Scripts de Blender, plantillas de textura, descripciones y metadatos, hoja de precio contra el suelo, lista de comprobación de IP | **Subir los ítems (Save to Roblox o web), pagar subida y anticipo, revisar a ojo el ajuste en varios cuerpos** |
 | Dinero | Cálculos de equilibrio y presupuesto | **Pagar anuncios, Plus y tarifas** |
 
 ---
@@ -302,14 +317,14 @@ Se miden en Creator Analytics (gratis) y se consolidan con la API de consulta de
 
 | Escenario | Señal | Qué hacemos |
 |---|---|---|
-| **A. Ningún juego pasa G2** | D7 < 1,5 % o sin compradores | Parar gasto; revisar qué falló (¿FTUE?, ¿bucle?, ¿tráfico?); decidir entre 2.º concepto (Rumble Rotation), pivotar el bucle o pasar a la línea de ropa si 08 y 09 la favorecen |
+| **A. Ningún juego pasa G2** | D7 < 1,5 % o sin compradores | Parar gasto; revisar qué falló (¿FTUE?, ¿bucle?, ¿tráfico?); decidir entre 2.º concepto (Rumble Rotation) o pivotar el bucle. La ropa solo como línea secundaria: el informe 08 la desaconseja como motor ([08 §6.1][r08]) |
 | **B. Un juego pasa G2 y G3** | Retención y gasto sostenidos | Tier A, actualización semanal, reinvertir el 70 % de ingresos, empezar el 2.º juego |
 | **C. Pico viral** | CCU crece rápido | **Cobrar mientras sube**: la caída típica es del 90 al 99 %. No contratar ni gastar contra ingresos futuros. Eventos y códigos ya preparados. Primer cobro: 30.000 R$ + papeles al día |
 | **D. Problema de cuenta o moderación** | Aviso de Roblox, juego retirado | Apelar por el cauce oficial, sin cuentas alternas ni spam; restaurar desde copias `.rbxl`; revisar cuestionario e IP |
 
 ### Decisión de día 90 (lunes 18-ene-2027)
 
-Con el informe de la semana 11, decidir una de tres: **continuar** (cartera pequeña con puertas), **pausar** (mantener Tier C y revisar en 90 días) o **cambiar de línea** (ropa o avatar, si 08/09 y tu respuesta 11 lo justifican). Decidir con el tope de pérdida y las horas reales, no con la ilusión.
+Con el informe de la semana 11, decidir una de tres: **continuar** (cartera pequeña con puertas), **pausar** (mantener Tier C y revisar en 90 días) o **cambiar el peso de las líneas** (más ropa o avatar solo si los datos del piloto y tu respuesta 11 lo justifican; el criterio es el de [informe maestro §9.4](informe-maestro.md)). Decidir con el tope de pérdida y las horas reales, no con la ilusión.
 
 ---
 
@@ -335,3 +350,4 @@ Con el informe de la semana 11, decidir una de tres: **continuar** (cartera pequ
 [r05]: ../research/05-ia-assets-y-marketing.md
 [r06]: ../research/06-stack-tecnico.md
 [r07]: ../research/07-diseno-crecimiento-y-conceptos.md
+[r08]: ../research/08-ropa-vs-juegos.md

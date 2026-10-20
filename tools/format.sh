@@ -23,6 +23,7 @@ for arg in "$@"; do
 done
 
 require_tool stylua || exit 2
+mapfile -t paths < <(abs_paths "${paths[@]}")
 cd "$ROOT" || exit 2
 
 mapfile -t files < <(find_luau_files "${paths[@]}")
