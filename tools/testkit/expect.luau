@@ -384,8 +384,12 @@ Expectation.__index = function(self, key)
 	end
 	local matcher = matchers[key]
 	if matcher then
-		return function(selfAgain, ...)
-			return matcher(selfAgain, ...)
+		-- admite expect(x).toBe(y) (estilo Jest) y expect(x):toBe(y)
+		return function(...)
+			if rawequal((...), self) then
+				return matcher(self, select(2, ...))
+			end
+			return matcher(self, ...)
 		end
 	end
 	error("expect(...): matcher desconocido '" .. tostring(key) .. "'", 2)

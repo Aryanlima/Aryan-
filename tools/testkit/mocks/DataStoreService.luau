@@ -429,12 +429,12 @@ function DataStore:SetAsync(key: string, value: any, userIds: { number }?, optio
 	return tostring(entry.version)
 end
 
---[[
+--[=[
 	transform(oldValue, keyInfo) -> newValue | nil [, userIds [, metadata]]
 	  * devolver nil cancela la actualizacion (se devuelve nil, nil).
 	  * el callback NO puede ceder (en Roblox esta prohibido): el mock lanza error si cede.
 	  * una peticion es atomica en el mock (no hay entrelazado dentro de UpdateAsync).
-]]
+]=]
 function DataStore:UpdateAsync(key: string, transform: (any, any) -> ...any)
 	assert(type(transform) == "function", "UpdateAsync espera una funcion de transformacion")
 	self._service:_begin(self, "UpdateAsync", key, true)
