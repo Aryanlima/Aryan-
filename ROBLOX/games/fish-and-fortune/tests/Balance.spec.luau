@@ -3,6 +3,7 @@
 local testkit = require("@testkit")
 local Balance = require("../src/shared/Balance")
 local FishingRules = require("../src/shared/FishingRules")
+local LiveOpsDefaults = require("../src/server/LiveOpsDefaults")
 local Odds = require("../../../packages/Odds")
 local LiveOps = require("../../../packages/LiveOps")
 
@@ -189,7 +190,7 @@ describe("Balance: progresion y recompensas", function()
 	it(
 		"la configuracion de LiveOps por defecto es valida y exactamente un evento esta activo en cada instante",
 		function()
-			local cfg = Balance.liveOps
+			local cfg = LiveOpsDefaults
 			local ok, problems = LiveOps.validateConfig(cfg, 1792368000 + 10)
 			expect(problems).toEqual({})
 			expect(ok).toBe(true)
@@ -209,6 +210,6 @@ describe("Balance: progresion y recompensas", function()
 
 	it("el codigo de canje por defecto y la bienvenida estan bien formados", function()
 		expect(LiveOps.normalizeCode("WELCOME")).toBe("WELCOME")
-		expect(Balance.liveOps.welcome.id).toBeTruthy()
+		expect(LiveOpsDefaults.welcome.id).toBeTruthy()
 	end)
 end)

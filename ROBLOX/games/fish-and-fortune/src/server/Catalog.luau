@@ -7,6 +7,8 @@
 	  * Sin lenguaje de presion ni "ofertas"/descuentos/temporizadores inventados.
 	  * Lo que altera probabilidades (Suerte+, Cebo de Suerte) esta marcado `affectsOdds` y se oculta si
 	    PolicyService restringe los objetos aleatorios de pago; ningun pase promocionado puede alterarlas.
+	  * v1: esos dos objetos estan APAGADOS por el flag FeatureFlags.paidLuckEnabled (= false): salen del
+	    catalogo con `enabled = false` (no se muestran, no se compran y sus recibos se rechazan).
 	  * El pack de inicio no incluye azar ni bonus de suerte.
 
 	// REVIEW(money): precios y contenido de cada producto; revisar antes de publicar.
@@ -27,8 +29,13 @@ Catalog.ladder = {
 	anchor = 1999,
 }
 
-function Catalog.build(ids: { passes: { [string]: number }, products: { [string]: number } }, balance: any): any
+function Catalog.build(
+	ids: { passes: { [string]: number }, products: { [string]: number } },
+	balance: any,
+	flags: { paidLuckEnabled: boolean }?
+): any
 	local products = balance.products
+	local paidLuckEnabled = flags ~= nil and flags.paidLuckEnabled == true -- por defecto APAGADO (v1)
 	return {
 		priceLadder = Catalog.ladder,
 		passes = {
@@ -55,6 +62,7 @@ function Catalog.build(ids: { passes: { [string]: number }, products: { [string]
 					.. " puntos de suerte de forma permanente. Cambia las probabilidades: miralo en el panel Probabilidades.",
 				tier = "strong",
 				affectsOdds = true,
+				enabled = paidLuckEnabled,
 			},
 			starter = {
 				key = "starter",
@@ -100,6 +108,7 @@ function Catalog.build(ids: { passes: { [string]: number }, products: { [string]
 				grant = { boostId = "lucky_bait", seconds = products.luckyBait.seconds },
 				tier = "impulse",
 				affectsOdds = true,
+				enabled = paidLuckEnabled,
 			},
 			coin_boost_15 = {
 				key = "coin_boost_15",

@@ -31,7 +31,7 @@ describe("GameLogic", function()
 		return c
 	end
 
-	local function setup(rng)
+	local function setup(rng, flags)
 		clock = 0
 		transactions = {}
 		rules = FishingRules.new(Balance, Odds)
@@ -45,6 +45,7 @@ describe("GameLogic", function()
 			clock = function()
 				return clock
 			end,
+			flags = flags,
 			onTransaction = function(tx)
 				table.insert(transactions, tx)
 			end,
@@ -246,6 +247,11 @@ describe("GameLogic", function()
 	end)
 
 	describe("suerte (visible en la tabla de odds)", function()
+		-- Suerte de pago ENCENDIDA (v1.5). En la v1 el flag esta apagado: ver el bloque "suerte de pago APAGADA".
+		beforeEach(function()
+			setup(nil, { paidLuckEnabled = true })
+		end)
+
 		local function totalLuck(c)
 			return (logic:luck(data, c))
 		end
@@ -301,11 +307,53 @@ describe("GameLogic", function()
 		end)
 
 		it("la tirada real usa la suerte total de la caña + bonus (resolveCatch -> luck)", function()
-			setup(lcg(99))
+			setup(lcg(99), { paidLuckEnabled = true })
 			data.stats.casts = 10 -- fuera del tutorial
 			data.rod = "golden"
 			local result = catchOnce(ctx({ passes = { luck_plus = true } }), "perfect")
 			expect(result.luck).toBeCloseTo(Balance.rods.golden.luck + 3 + Balance.minigame.perfectLuck, 6)
+		end)
+	end)
+
+	describe("suerte de pago APAGADA (v1: FeatureFlags.paidLuckEnabled = false)", function()
+		it("por defecto (sin flags) esta apagada", function()
+			setup()
+			data.boosts.lucky_bait = NOW + 600
+			local _, list = logic:luck(data, ctx({ passes = { luck_plus = true } }))
+			for _, source in list do
+				expect(source.paid).toBe(false)
+			end
+		end)
+
+		it("aunque el jugador tenga el pase y el boost, NO suman suerte ni se listan", function()
+			setup(nil, { paidLuckEnabled = false })
+			data.boosts.lucky_bait = NOW + 600
+			local c = ctx({ passes = { luck_plus = true }, paidRandomAllowed = true })
+			local total, list = logic:luck(data, c)
+			expect(total).toBe(Balance.rods.driftwood.luck)
+			for _, source in list do
+				expect(source.id).never.toBe("pass:luck_plus")
+				expect(source.id).never.toBe("boost:lucky_bait")
+			end
+		end)
+
+		it("la suerte GRATUITA (caña, evento, minijuego) sigue funcionando", function()
+			setup(nil, { paidLuckEnabled = false })
+			data.rod = "reed"
+			local c = ctx({ events = { { id = "event:mythic_moon", kind = "luck", value = 3, active = true } } })
+			local total = logic:luck(data, c, "perfect")
+			expect(total).toBeCloseTo(Balance.rods.reed.luck + 3 + Balance.minigame.perfectLuck, 6)
+		end)
+
+		it("las odds mostradas sin suerte son las base (la UI no depende de nada comprable)", function()
+			setup(nil, { paidLuckEnabled = false })
+			local luck = logic:luck(data, ctx({ passes = { luck_plus = true } }))
+			local view = rules:oddsFor("lake"):displayRows({ luck = luck })
+			local base = rules:oddsFor("lake"):displayRows({ luck = 0 })
+			expect(view.luckActive).toBe(false)
+			for index, row in view.rows do
+				expect(row.percentText).toBe(base.rows[index].percentText)
+			end
 		end)
 	end)
 
@@ -413,9 +461,20 @@ describe("GameLogic", function()
 		it("un boost no acumula mas del maximo", function()
 			local profile = { data = data }
 			for _ = 1, 20 do
-				logic:grantProduct(nil, profile, product("boost", { boostId = "lucky_bait", seconds = 900 }), NOW)
+				logic:grantProduct(nil, profile, product("boost", { boostId = "coin_boost", seconds = 900 }), NOW)
 			end
-			expect(Economy.boostRemaining(data.boosts, "lucky_bait", NOW)).toBe(Balance.limits.maxBoostSeconds)
+			expect(Economy.boostRemaining(data.boosts, "coin_boost", NOW)).toBe(Balance.limits.maxBoostSeconds)
+		end)
+
+		it("el Cebo de Suerte solo se concede con el flag de suerte de pago encendido", function()
+			local profile = { data = data }
+			local bait = product("boost", { boostId = "lucky_bait", seconds = 900 })
+			expect(logic:grantProduct(nil, profile, bait, NOW)).toBe(false) -- v1: apagado por defecto
+			expect(data.boosts.lucky_bait).toBeNil()
+			setup(nil, { paidLuckEnabled = true })
+			local profile2 = { data = data }
+			expect(logic:grantProduct(nil, profile2, bait, NOW)).toBe(true)
+			expect(Economy.boostRemaining(data.boosts, "lucky_bait", NOW)).toBe(900)
 		end)
 
 		it("datos invalidos o kind desconocido NO conceden (el recibo queda pendiente)", function()
@@ -572,6 +631,23 @@ describe("GameLogic", function()
 			expect(firstBuyAt).toBeLessThanOrEqual(Balance.ftue.targetSeconds)
 			-- y el tercer lanzamiento fue el "reveal" Raro
 			expect(data.bestiary.golden_trout or data.bestiary.catfish).toBeTruthy()
+		end)
+	end)
+	describe("fuente de la primera conexion (first_join)", function()
+		it("clasifica referido, teletransporte, enlace compartido y directo", function()
+			expect(GameLogic.joinSource(nil)).toBe("direct")
+			expect(GameLogic.joinSource({})).toBe("direct")
+			expect(GameLogic.joinSource({ ReferredByPlayerId = 5 })).toBe("referral")
+			expect(GameLogic.joinSource({ SourceGameId = 9 })).toBe("teleport")
+			expect(GameLogic.joinSource({ SourcePlaceId = 9 })).toBe("teleport")
+			expect(GameLogic.joinSource({ LaunchData = "tiktok_oct" })).toBe("share_tiktok_oct")
+		end)
+
+		it("sanea el LaunchData (solo A-Za-z0-9_-, maximo 20) y lo ignora si queda vacio", function()
+			expect(GameLogic.joinSource({ LaunchData = "a b/c;d" })).toBe("share_abcd")
+			expect(GameLogic.joinSource({ LaunchData = string.rep("x", 50) })).toBe("share_" .. string.rep("x", 20))
+			expect(GameLogic.joinSource({ LaunchData = "!!!" })).toBe("direct")
+			expect(GameLogic.joinSource({ LaunchData = 42 })).toBe("direct")
 		end)
 	end)
 end)

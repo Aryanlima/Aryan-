@@ -1,0 +1,48 @@
+{
+  "name": "FishAndFortune",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "$className": "ReplicatedStorage",
+      "Packages": {
+        "$className": "Folder",
+        "Odds": { "$path": "../../packages/Odds.luau" },
+        "Net": { "$path": "../../packages/Net.luau" },
+        "UI": { "$path": "../../packages/UI.luau" }
+      },
+      "Shared": { "$path": "src/shared" }
+    },
+
+    "ServerScriptService": {
+      "$className": "ServerScriptService",
+      "ServerPackages": {
+        "$className": "Folder",
+        "Data": { "$path": "../../packages/Data.luau" },
+        "Economy": { "$path": "../../packages/Economy.luau" },
+        "Shop": { "$path": "../../packages/Shop.luau" },
+        "LiveOps": { "$path": "../../packages/LiveOps.luau" },
+        "Analytics": { "$path": "../../packages/Analytics.luau" }
+      },
+      "Server": { "$path": "src/server" }
+    },
+
+    "StarterPlayer": {
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "Client": { "$path": "src/client" }
+      }
+    },
+
+    "Workspace": {
+      "$className": "Workspace",
+      "$ignoreUnknownInstances": true
+    },
+
+    "Lighting": {
+      "$className": "Lighting",
+      "$ignoreUnknownInstances": true
+    }
+  }
+}

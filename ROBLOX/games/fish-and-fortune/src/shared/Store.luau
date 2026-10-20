@@ -10,7 +10,7 @@ Store.__index = Store
 type StoreData = {
 	state: any,
 	receivedAtClock: number,
-	listeners: { [number]: (state: any) -> () },
+	listeners: { [number]: (state: any) -> ...any },
 	nextId: number,
 	clock: () -> number,
 }
@@ -39,7 +39,7 @@ end
 function Store.set(self: Store, state: any)
 	self.state = state
 	self.receivedAtClock = self.clock()
-	local snapshot: { (state: any) -> () } = {}
+	local snapshot: { (state: any) -> ...any } = {}
 	for _, listener in self.listeners do
 		table.insert(snapshot, listener)
 	end
@@ -52,7 +52,7 @@ function Store.set(self: Store, state: any)
 end
 
 -- Devuelve una funcion para cancelar la suscripcion.
-function Store.subscribe(self: Store, listener: (state: any) -> ()): () -> ()
+function Store.subscribe(self: Store, listener: (state: any) -> ...any): () -> ()
 	local id = self.nextId
 	self.nextId += 1
 	self.listeners[id] = listener

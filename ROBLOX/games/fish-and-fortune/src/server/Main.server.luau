@@ -42,10 +42,12 @@ GameService.start({
 	Balance = load(shared, "Balance"),
 	FishingRules = load(shared, "FishingRules"),
 	Remotes = load(shared, "Remotes"),
+	FeatureFlags = load(shared, "FeatureFlags"),
 	GameLogic = load(server, "GameLogic"),
 	Catalog = load(server, "Catalog"),
 	ProductIds = load(server, "ProductIds"),
 	Schema = load(server, "Schema"),
 	WorldBuilder = load(server, "WorldBuilder"),
 	StudioMemoryStore = load(server, "StudioMemoryStore"),
+	LiveOpsDefaults = load(server, "LiveOpsDefaults"),
 })

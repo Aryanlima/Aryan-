@@ -37,7 +37,7 @@ local FAKE_IDS = {
 }
 
 describe("Monetizacion de Fish & Fortune (integracion)", function()
-	local env, store, manager, shop, logic, policyRestricted
+	local env, store, manager, shop, logic, policyRestricted, flags
 
 	local function join()
 		local player = env.Players:AddPlayer(USER, "Alice")
@@ -45,7 +45,8 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		return player, profile
 	end
 
-	beforeEach(function()
+	local function build(featureFlags)
+		flags = featureFlags
 		env = Mocks.new()
 		store = env.DataStoreService:GetDataStore("FF_PlayerData")
 		policyRestricted = false
@@ -73,9 +74,10 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 				return 0.5
 			end,
 			clock = env.clock.time,
+			flags = flags,
 		})
 		shop = Shop.new({
-			catalog = Catalog.build(FAKE_IDS, Balance),
+			catalog = Catalog.build(FAKE_IDS, Balance, flags),
 			marketplace = env.MarketplaceService,
 			players = env.Players,
 			decision = env.Enum.ProductPurchaseDecision,
@@ -97,6 +99,14 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 			profileWaitSeconds = 5,
 		})
 		shop:start()
+	end
+
+	-- v1: la suerte de pago esta APAGADA por defecto. Los tests de suerte la encienden con build(ON).
+	local OFF = { paidLuckEnabled = false }
+	local ON = { paidLuckEnabled = true }
+
+	beforeEach(function()
+		build(OFF)
 	end)
 
 	it("pack de monedas: se concede una vez, se guarda y es idempotente", function()
@@ -117,7 +127,8 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		expect(store:_peek(KEY).data.wallet.coins).toBe(Balance.products.coinPackMedium.coins)
 	end)
 
-	it("Cebo de Suerte: concede el boost y su suerte cuenta en la tabla de odds (si la politica lo permite)", function()
+	it("[v1.5, flag ON] Cebo de Suerte: concede el boost y su suerte cuenta en la tabla de odds", function()
+		build(ON)
 		local player, profile = join()
 		env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.lucky_bait_15)
 		local now = env.clock.osTime()
@@ -130,7 +141,8 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		expect(logic:luck(profile.data, ctx)).toBe(Balance.rods.driftwood.luck)
 	end)
 
-	it("con objetos aleatorios de pago restringidos: no se ofrece el Cebo y aunque exista no suma suerte", function()
+	it("[v1.5, flag ON] con objetos aleatorios de pago restringidos: no se ofrece el Cebo ni suma suerte", function()
+		build(ON)
 		policyRestricted = true
 		local player, profile = join()
 		local ok, reason = shop:promptProduct(player, "lucky_bait_15")
@@ -184,7 +196,8 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		expect(profile.data.wallet.pearls).toBe(Balance.products.slotPack.slots)
 	end)
 
-	it("la tienda muestra las ofertas del jugador con motivos neutros", function()
+	it("[v1.5, flag ON] la tienda muestra las ofertas del jugador con motivos neutros", function()
+		build(ON)
 		local player = join()
 		policyRestricted = true
 		local offers = shop:getOffers(player)
@@ -196,5 +209,95 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		expect(byKey.lucky_bait_15.reason).toBe("restricted")
 		expect(byKey.coin_pack_small.available).toBe(true)
 		expect(#offers).toBe(13)
+	end)
+	describe("v1: suerte de pago APAGADA (FeatureFlags.paidLuckEnabled = false)", function()
+		it("Suerte+ y Cebo de Suerte NO aparecen en la tienda", function()
+			local player = join()
+			policyRestricted = false -- aunque la politica lo permitiera
+			local keys = {}
+			for _, offer in shop:getOffers(player) do
+				keys[offer.key] = true
+			end
+			expect(keys.luck_plus).toBeNil()
+			expect(keys.lucky_bait_15).toBeNil()
+			expect(keys.coin_pack_small).toBe(true)
+			expect(#shop:getOffers(player)).toBe(11) -- 13 menos los 2 apagados
+		end)
+
+		it("ningun texto de la tienda menciona suerte comprable", function()
+			local player = join()
+			for _, offer in shop:getOffers(player) do
+				local text = string.lower(offer.name .. " " .. offer.description)
+				expect(string.find(text, "suerte", 1, true)).toBeNil()
+				expect(string.find(text, "probabilidad", 1, true)).toBeNil()
+			end
+		end)
+
+		it("no se pueden comprar: los prompts se rechazan como no disponibles", function()
+			local player = join()
+			policyRestricted = false
+			expect(select(2, shop:promptProduct(player, "lucky_bait_15"))).toBe("unavailable")
+			expect(select(2, shop:promptPass(player, "luck_plus"))).toBe("unavailable")
+			expect(#env.MarketplaceService.prompts).toBe(0)
+		end)
+
+		it("un recibo ANTIGUO del Cebo se rechaza de forma segura: no concede, no se confirma, no se pierde", function()
+			local player, profile = join()
+			local receipt, decision = env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.lucky_bait_15)
+			expect(decision).toBe(env.Enum.ProductPurchaseDecision.NotProcessedYet)
+			expect(profile.data.boosts.lucky_bait).toBeNil()
+			expect(profile.data.purchases[receipt.PurchaseId]).toBeNil()
+			-- sigue pendiente (Roblox lo volvera a entregar): ni regalado ni consumido
+			expect(env.MarketplaceService:GetReceiptStatus(receipt.PurchaseId)).toBe("pending")
+			expect(env.MarketplaceService:RetryPending()).toBe(0)
+			-- y los demas productos siguen funcionando con normalidad
+			local _, ok = env.MarketplaceService:SimulatePurchase(player, FAKE_IDS.products.coin_pack_small)
+			expect(ok).toBe(env.Enum.ProductPurchaseDecision.PurchaseGranted)
+		end)
+
+		it("aunque el jugador ya tuviera el pase Suerte+, no cuenta ni se consulta su propiedad", function()
+			local player, profile = join()
+			env.MarketplaceService:GrantGamePass(USER, FAKE_IDS.passes.luck_plus)
+			shop:loadPlayer(player)
+			expect(shop:ownsPass(player, "luck_plus")).toBe(false)
+			local ctx = {
+				passes = { luck_plus = shop:ownsPass(player, "luck_plus") },
+				events = {},
+				paidRandomAllowed = true,
+				now = env.clock.osTime(),
+			}
+			expect(logic:luck(profile.data, ctx)).toBe(Balance.rods.driftwood.luck)
+		end)
+
+		it("la UI de probabilidades muestra las odds base (sin fuentes de pago)", function()
+			local player, profile = join()
+			env.MarketplaceService:GrantGamePass(USER, FAKE_IDS.passes.luck_plus)
+			profile.data.boosts.lucky_bait = env.clock.osTime() + 600
+			shop:loadPlayer(player)
+			local ctx = { passes = {}, events = {}, paidRandomAllowed = true, now = env.clock.osTime() }
+			local luck, sources = logic:luck(profile.data, ctx)
+			local rules = FishingRules.new(Balance, Odds)
+			local view = rules:oddsFor("lake"):displayRows({ luck = luck })
+			expect(view.luckActive).toBe(false)
+			for _, source in sources do
+				expect(source.paid).toBe(false)
+			end
+		end)
+
+		it(
+			"el resto de la monetizacion de la v1 sigue operativa (pack de inicio, 2x, VIP, slots, temporada)",
+			function()
+				local player = join()
+				policyRestricted = true -- da igual: nada de lo demas depende de la politica de azar
+				for _, key in { "coin_pack_small", "coin_boost_15", "slot_pack", "pearl_pack" } do
+					expect((shop:promptProduct(player, key))).toBe(true)
+					env.clock:advance(5)
+				end
+				for _, key in { "auto_fish", "double_coins", "starter", "vip", "season_pass" } do
+					expect((shop:promptPass(player, key))).toBe(true)
+					env.clock:advance(5)
+				end
+			end
+		)
 	end)
 end)

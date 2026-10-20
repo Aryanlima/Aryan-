@@ -3,6 +3,7 @@
 local testkit = require("@testkit")
 local Balance = require("../src/shared/Balance")
 local Catalog = require("../src/server/Catalog")
+local FeatureFlags = require("../src/shared/FeatureFlags")
 local ProductIds = require("../src/server/ProductIds")
 local Shop = require("../../../packages/Shop")
 local GameLogic = require("../src/server/GameLogic")
@@ -25,7 +26,7 @@ local function countKeys(tbl)
 end
 
 describe("Catalog", function()
-	local catalog = Catalog.build(ProductIds, Balance)
+	local catalog = Catalog.build(ProductIds, Balance, FeatureFlags)
 
 	it("es valido (precios en la escalera, sin ids repetidos, sin lenguaje de presion)", function()
 		expect(Shop.validateCatalog(catalog, handlers())).toEqual({})
@@ -80,6 +81,24 @@ describe("Catalog", function()
 		end
 		local real = Catalog.build(ids, Balance)
 		expect(Shop.validateCatalog(real, handlers(), { allowPlaceholders = false })).toEqual({})
+	end)
+
+	it("v1: Suerte+ y el Cebo de Suerte estan APAGADOS por el flag (enabled = false)", function()
+		expect(FeatureFlags.paidLuckEnabled).toBe(false) -- el flag de la v1 esta apagado
+		expect(catalog.passes.luck_plus.enabled).toBe(false)
+		expect(catalog.products.lucky_bait_15.enabled).toBe(false)
+		-- sin flags explicitos tambien salen apagados (por defecto seguro)
+		expect(Catalog.build(ProductIds, Balance).passes.luck_plus.enabled).toBe(false)
+		-- el resto sigue activo
+		expect(catalog.passes.auto_fish.enabled).toBeNil()
+		expect(catalog.products.coin_pack_small.enabled).toBeNil()
+	end)
+
+	it("v1.5: con el flag encendido vuelven a estar disponibles (y siguen siendo validos)", function()
+		local on = Catalog.build(ProductIds, Balance, { paidLuckEnabled = true })
+		expect(on.passes.luck_plus.enabled).toBe(true)
+		expect(on.products.lucky_bait_15.enabled).toBe(true)
+		expect(Shop.validateCatalog(on, handlers())).toEqual({})
 	end)
 
 	it("solo Suerte+ y el Cebo de Suerte alteran probabilidades (y se gatean por PolicyService)", function()

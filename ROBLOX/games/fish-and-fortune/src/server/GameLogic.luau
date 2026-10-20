@@ -48,6 +48,7 @@ type LogicData = {
 	ledger: any,
 	rng: () -> number,
 	clock: () -> number,
+	flags: { paidLuckEnabled: boolean },
 }
 export type Logic = typeof(setmetatable({} :: LogicData, GameLogic))
 
@@ -58,6 +59,7 @@ export type Deps = {
 	rng: () -> number,
 	clock: () -> number, -- os.clock
 	onTransaction: ((transaction: any) -> ...any)?,
+	flags: { paidLuckEnabled: boolean }?, -- FeatureFlags; por defecto la suerte de pago esta APAGADA
 }
 
 function GameLogic.new(deps: Deps): Logic
@@ -75,6 +77,7 @@ function GameLogic.new(deps: Deps): Logic
 		ledger = ledger,
 		rng = deps.rng,
 		clock = deps.clock,
+		flags = deps.flags or { paidLuckEnabled = false },
 	}
 	return setmetatable(data, GameLogic)
 end
@@ -92,7 +95,7 @@ function GameLogic.template(): { [string]: any }
 		bestiary = {},
 		bestiaryClaimed = {},
 		stats = { casts = 0, catches = 0, sells = 0, perfectCasts = 0, coinsEarned = 0 },
-		ftue = { step = 0 },
+		ftue = { step = 0, joinLogged = false },
 		boosts = {},
 		autoFish = false,
 		lastSeen = 0,
@@ -103,6 +106,35 @@ function GameLogic.template(): { [string]: any }
 		purchases = {},
 		passGrants = {},
 	}
+end
+
+--[[
+	Fuente de la primera conexion para la analitica ("first_join"). Funcion pura sobre Player:GetJoinData():
+	  "referral"          lo invito un jugador (ReferredByPlayerId)
+	  "teleport"          viene de otro juego/lugar (SourceGameId / SourcePlaceId)
+	  "share_<codigo>"    enlace compartido con LaunchData (solo A-Z a-z 0-9 _ -, maximo 20 caracteres)
+	  "direct"            cualquier otro caso (Home, busqueda, amigos...)
+	// VERIFIED: Player:GetJoinData() (creator-docs Player.yaml): SourceGameId, SourcePlaceId, ReferredByPlayerId,
+	// Members, TeleportData, LaunchData (string).
+]]
+function GameLogic.joinSource(joinData: any): string
+	if type(joinData) ~= "table" then
+		return "direct"
+	end
+	if type(joinData.ReferredByPlayerId) == "number" then
+		return "referral"
+	end
+	if type(joinData.SourceGameId) == "number" or type(joinData.SourcePlaceId) == "number" then
+		return "teleport"
+	end
+	local launch = joinData.LaunchData
+	if type(launch) == "string" and launch ~= "" then
+		local cleaned = string.sub(string.gsub(launch, "[^%w_%-]", ""), 1, 20)
+		if cleaned ~= "" then
+			return "share_" .. cleaned
+		end
+	end
+	return "direct"
 end
 
 function GameLogic.newRuntime(): Runtime
@@ -132,21 +164,24 @@ function GameLogic.luckSources(self: Logic, data: any, ctx: Context, quality: st
 			table.insert(list, { id = source.id, label = "Evento", value = source.value, paid = false, active = true })
 		end
 	end
-	-- Fuentes de pago: solo cuentan si PolicyService permite objetos aleatorios de pago.
-	table.insert(list, {
-		id = "pass:luck_plus",
-		label = "Pase Suerte+",
-		value = balance.products.passes.luckPlus,
-		paid = true,
-		active = ctx.passes.luck_plus == true and ctx.paidRandomAllowed,
-	})
-	table.insert(list, {
-		id = "boost:lucky_bait",
-		label = "Cebo de Suerte",
-		value = balance.products.luckyBait.luck,
-		paid = true,
-		active = self.economy.isBoostActive(data.boosts, "lucky_bait", ctx.now) and ctx.paidRandomAllowed,
-	})
+	-- Fuentes de pago (Suerte+ y Cebo): SOLO existen si el flag paidLuckEnabled esta encendido (v1.5) y, ademas,
+	-- solo cuentan si PolicyService permite objetos aleatorios de pago. Con el flag apagado ni se listan.
+	if self.flags.paidLuckEnabled then
+		table.insert(list, {
+			id = "pass:luck_plus",
+			label = "Pase Suerte+",
+			value = balance.products.passes.luckPlus,
+			paid = true,
+			active = ctx.passes.luck_plus == true and ctx.paidRandomAllowed,
+		})
+		table.insert(list, {
+			id = "boost:lucky_bait",
+			label = "Cebo de Suerte",
+			value = balance.products.luckyBait.luck,
+			paid = true,
+			active = self.economy.isBoostActive(data.boosts, "lucky_bait", ctx.now) and ctx.paidRandomAllowed,
+		})
+	end
 	return list
 end
 
@@ -246,6 +281,9 @@ function GameLogic.grantProduct(self: Logic, player: any, profile: any, product:
 	elseif kind == "boost" then
 		if type(grant.boostId) ~= "string" or type(grant.seconds) ~= "number" then
 			return false
+		end
+		if grant.boostId == "lucky_bait" and not self.flags.paidLuckEnabled then
+			return false -- defensa en profundidad: la suerte de pago esta apagada (el recibo queda sin resolver)
 		end
 		local expiresAt =
 			self.economy.grantBoost(data.boosts, grant.boostId, grant.seconds, now, self.balance.limits.maxBoostSeconds)

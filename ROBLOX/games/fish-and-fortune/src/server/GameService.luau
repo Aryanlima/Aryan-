@@ -47,6 +47,7 @@ function GameService.start(m: any)
 	----------------------------------------------------------------------------
 	-- Paquetes
 	----------------------------------------------------------------------------
+	local flags = m.FeatureFlags -- { paidLuckEnabled = false } en la v1
 	local analytics = m.Analytics.new({ service = AnalyticsService, enums = Enum })
 
 	local rules = m.FishingRules.new(balance, m.Odds)
@@ -58,6 +59,7 @@ function GameService.start(m: any)
 			return random:NextNumber()
 		end,
 		clock = os.clock,
+		flags = flags,
 		onTransaction = function(tx: any)
 			if tx.player ~= nil then
 				analytics:economy(tx.player, tx.flow, tx.currency, tx.amount, tx.endingBalance, tx.reason, tx.sku)
@@ -107,7 +109,7 @@ function GameService.start(m: any)
 		return value
 	end
 	local liveOps = m.LiveOps.new({
-		defaults = balance.liveOps,
+		defaults = m.LiveOpsDefaults,
 		fetch = fetchRemoteConfig,
 		pollSeconds = 120,
 		log = function(message: string)
@@ -115,7 +117,7 @@ function GameService.start(m: any)
 		end,
 	})
 
-	local catalog = m.Catalog.build(m.ProductIds, balance)
+	local catalog = m.Catalog.build(m.ProductIds, balance, flags)
 	local grants = logic:shopHandlers(os.time)
 	for _, problem in m.Shop.validateCatalog(catalog, grants) do
 		warn("[Shop] catalogo: " .. problem)
@@ -232,7 +234,8 @@ function GameService.start(m: any)
 			coinMultiplier = logic:coinMultiplier(data, c),
 			autoFish = data.autoFish,
 			passes = c.passes,
-			paidRandomRestricted = not c.paidRandomAllowed,
+			paidLuckEnabled = flags.paidLuckEnabled,
+			paidRandomRestricted = flags.paidLuckEnabled and not c.paidRandomAllowed,
 			boosts = data.boosts,
 			bestiary = data.bestiary,
 			bestiaryClaimed = data.bestiaryClaimed,
@@ -739,6 +742,15 @@ function GameService.start(m: any)
 				toast(player, welcome.message)
 			end
 			ftue(player, data, 1, "joined")
+			if not data.ftue.joinLogged then
+				-- Primera conexion: evento con la FUENTE de adquisicion (referido, teletransporte, enlace, directo).
+				data.ftue.joinLogged = true
+				local okJoin, joinData = pcall(function()
+					return player:GetJoinData()
+				end)
+				local source = m.GameLogic.joinSource(if okJoin then joinData else nil)
+				analytics:custom(player, "first_join", 1, { CustomField01 = source })
+			end
 			profile:markDirty()
 			pushState(player)
 			if data.zone ~= "lake" then

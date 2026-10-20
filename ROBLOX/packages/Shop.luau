@@ -40,6 +40,7 @@ export type PassDef = {
 	priceOverride: boolean?, -- true: precio fuera de la escalera (revisar a mano)
 	promoted: boolean?, -- los pases promocionados deben costar 50-800 R$ y NO pueden alterar azar
 	affectsOdds: boolean?, -- modifica probabilidades (suerte): requiere PolicyService
+	enabled: boolean?, -- false: no se ofrece, no se puede comprar y sus recibos se rechazan (flag de funcion)
 	oneTimeGrant: { [string]: any }?, -- { kind = "...", ... } concesion unica al poseerlo (p. ej. pack de inicio)
 }
 
@@ -54,6 +55,7 @@ export type ProductDef = {
 	priceRobux: number?,
 	priceOverride: boolean?,
 	affectsOdds: boolean?,
+	enabled: boolean?, -- false: no se ofrece, no se puede comprar y sus recibos se rechazan (flag de funcion)
 }
 
 export type Catalog = {
@@ -453,6 +455,19 @@ function ShopImpl._processReceiptInner(self: Shop, receipt: Receipt): any
 		return notYet
 	end
 
+	if product.enabled == false then
+		-- Producto apagado por un flag de funcion (p. ej. suerte de pago en la v1). NO se concede y NO se confirma:
+		-- el recibo queda sin resolver (no se pierde ni se regala nada) hasta que una persona decida (ver README).
+		self:_log(
+			"REVIEW(money): recibo "
+				.. purchaseId
+				.. " de un producto DESHABILITADO ("
+				.. product.key
+				.. "): NotProcessedYet"
+		)
+		return notYet
+	end
+
 	-- 2. jugador y perfil
 	local player = self.cfg.players:GetPlayerByUserId(receipt.PlayerId)
 	if player == nil then
@@ -644,7 +659,7 @@ end
 function ShopImpl.loadPlayer(self: Shop, player: any)
 	local pending = 0
 	for _, pass in self.catalog.passes do
-		if pass.id ~= 0 then
+		if pass.id ~= 0 and pass.enabled ~= false then
 			pending += 1
 			self.taskLib.spawn(function()
 				local ok, owns = self:_checkOwnership(player, pass)
@@ -678,7 +693,7 @@ end
 
 function ShopImpl._onPassPromptFinished(self: Shop, player: any, passId: number, wasPurchased: boolean)
 	local pass = self.passesById[passId]
-	if pass == nil or not wasPurchased then
+	if pass == nil or pass.enabled == false or not wasPurchased then
 		return
 	end
 	-- Re-verificar (la cache de UserOwnsGamePassAsync se actualiza con este evento). Si la
@@ -704,8 +719,8 @@ function ShopImpl.canOffer(self: Shop, player: any, itemKind: string, key: strin
 	if item == nil then
 		return false, "unknown"
 	end
-	if item.id == 0 then
-		return false, "unavailable" -- placeholder TODO_ID
+	if item.id == 0 or item.enabled == false then
+		return false, "unavailable" -- placeholder TODO_ID o funcion apagada
 	end
 	if player.Parent == nil then
 		return false, "left"
@@ -802,7 +817,7 @@ function ShopImpl.refreshPrices(self: Shop)
 		return nil
 	end
 	for key, product in self.catalog.products do
-		if product.id ~= 0 then
+		if product.id ~= 0 and product.enabled ~= false then
 			local price = fetch(product.id, types.Product)
 			if price then
 				self.priceCache["product:" .. key] = price
@@ -810,7 +825,7 @@ function ShopImpl.refreshPrices(self: Shop)
 		end
 	end
 	for key, pass in self.catalog.passes do
-		if pass.id ~= 0 then
+		if pass.id ~= 0 and pass.enabled ~= false then
 			local price = fetch(pass.id, types.GamePass)
 			if price then
 				self.priceCache["pass:" .. key] = price
@@ -835,6 +850,9 @@ export type Offer = {
 function ShopImpl.getOffers(self: Shop, player: any): { Offer }
 	local offers: { Offer } = {}
 	local function add(kind: string, key: string, item: any)
+		if item.enabled == false then
+			return -- funcion apagada: ni siquiera se muestra en la tienda
+		end
 		local cached = self.priceCache[kind .. ":" .. key]
 		local price = cached or Shop.resolvePrice(self.catalog, item)
 		local available, reason = self:canOffer(player, kind, key)
@@ -877,6 +895,10 @@ end
 	Registra el UNICO ProcessReceipt y escucha el fin de los prompts de pases.
 	Devuelve la funcion de ProcessReceipt por si el llamador quiere probarla directamente.
 ]]
+-- VERIFY: la referencia oficial de MarketplaceService (2026-10-20) llama a ProcessReceipt "legacy" y documenta
+-- BindReceiptHandler(Enum.ReceiptType.DeveloperProduct, handler, filter?) con Enum.ReceiptDecision. ProcessReceipt sigue
+-- funcionando y es lo que pide este proyecto; migrar a BindReceiptHandler es un cambio mecanico (misma logica,
+-- otro enum de retorno) que debe probarse en Studio con compras reales de prueba antes de adoptarlo.
 function ShopImpl.start(self: Shop): (receipt: Receipt) -> any
 	assert(not self.started, "Shop.start ya se ejecuto")
 	if processReceiptOwner ~= nil and processReceiptOwner ~= self then
