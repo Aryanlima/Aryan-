@@ -69,7 +69,7 @@ export async function buildAudio(audio, duration, workDir) {
   }
   if (narFile) {
     F.push(`[${idx.n}:a]${fmt},asplit=2[n1][n2]`);
-    if (musicFile && audio.duck) { F.push(`[m0][n1]sidechaincompress=threshold=0.035:ratio=5:attack=12:release=380:makeup=1[md]`); mixIns.push('[md]'); parts.push('ducking (sidechain) bajo la voz'); }
+    if (musicFile && audio.duck) { F.push(`[m0][n1]sidechaincompress=threshold=0.05:ratio=4:attack=10:release=350:makeup=1[md]`); mixIns.push('[md]'); parts.push('ducking sidechain (-11 dB bajo la voz)'); }
     else { if (musicFile) mixIns.push('[m0]'); F.push('[n1]anullsink'); }
     mixIns.push('[n2]');
   } else if (musicFile) mixIns.push('[m0]');

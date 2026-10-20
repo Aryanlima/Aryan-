@@ -111,7 +111,7 @@ function bass(f, len, kind = 'saw') {
 function pluck(f, len = 0.25, bright = 1) {
   const n = Math.floor(len * SR), y = new Float32Array(n); let p1 = 0, p2 = 0;
   for (let i = 0; i < n; i++) { const t = i / SR; p1 += f / SR; p2 += (f * 1.005) / SR; y[i] = (saw(p1) + saw(p2)) * 0.5 * Math.exp(-t * 9) * Math.min(1, t / 0.002); }
-  return lpSweep(y, (i) => 600 + 5200 * bright * Math.exp((-i / SR) * 14));
+  return lpSweep(y, (i) => 500 + 3200 * bright * Math.exp((-i / SR) * 14));
 }
 function pad(f, len) {
   const n = Math.floor((len + 0.4) * SR), y = new Float32Array(n); const ph = [0, 0, 0], det = [0.994, 1, 1.007];
@@ -130,7 +130,7 @@ function lead(f, len, duty = 0.5, vib = 0.004) {
     const a = Math.min(1, t / 0.004), r = t > len ? Math.max(0, 1 - (t - len) / 0.05) : 1;
     y[i] = sqr(ph, duty) * a * r * (0.75 + 0.25 * Math.exp(-t * 6));
   }
-  return y;
+  return lp(y, 5500); // quita el aliasing del pulso ingenuo
 }
 function bell(f, len = 0.9, dec = 4) {
   const n = Math.floor(len * SR), y = new Float32Array(n);

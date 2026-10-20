@@ -21,7 +21,7 @@ Enlaces: `[02 §2.1]` significa informe 02, sección 2.1. Las definiciones está
 ## 1. Veredicto honesto (lectura de 1 minuto)
 
 1. **Esto es una lotería de boletos baratos, no un plan de ingresos.** La IA abarata el boleto (menos horas y menos dinero por juego), pero **no mejora la probabilidad de ganar**. [IDEA PROPIA] apoyada en [01 §1][r01], [02 §6][r02] y [07 §0][r07].
-2. **Planifica para el caso "mediana o menos".** La mediana de los creadores que ya cobran es de unos 1.500 USD **al año**, y el 1 % de arriba se lleva casi todo (sección 2). [TERCERO]
+2. **Planifica para el caso "mediana o menos".** La mediana de los creadores que ya cobran es de unos 1.500 USD **al año**, y los 1.000 primeros (de más de 42.000, el ~2 % de arriba) se llevan ≈ 76 a 82 % del total (sección 2). [TERCERO]
 3. **Si un juego despega, caerá.** Los virales pierden 90 a 99 % de su pico en semanas o meses (sección 2). Hay que cobrar mientras suben y no vivir de eso. [TERCERO]
 4. **Comprar visitas casi seguro pierde dinero.** Cada visita comprada cuesta más (unos 4 a 12 Robux) de lo que suele dejar (0,5 a 2 Robux por visita). Los anuncios sirven para medir, no para ganar. [TERCERO] + cálculo [IDEA PROPIA], sección 2.4.
 5. **Lo que sí está en nuestras manos:** retención a 28 días, gasto pequeño y recurrente, jugar con amigos, eventos con calendario fijo, marketing con clips reales y mejorar rápido con datos (sección 3). [OFICIAL/TERCERO según fila]
@@ -121,7 +121,7 @@ Implicación: asumir **menos gasto por jugador que en 2025** y diseñar para ret
 | **Marketing y creadores** | Streamers y YouTubers están detrás de casi todos los hits recientes. Un dato "interno" habla de 35 a 45 % de sesiones nuevas desde creadores en juegos grandes | Mecánicas "clipables" (captura rara, anuncio global), códigos, micro-creadores a cambio de código o servidor VIP, no pagos fijos | [TERCERO] / [NO VERIFICADO] la cifra [07 §3.6][r07] |
 | **Socios con audiencia** | Grow a Garden: creador del prototipo + estudio con audiencia y operaciones | Valorar un socio con audiencia (pregunta 13 de [preguntas-para-aryan.md](preguntas-para-aryan.md)) | [TERCERO] [01 §7][r01] |
 | **Iteración rápida con datos propios** | Mercado que cambia en semanas (Steal An Egg: 56 días hasta el pico) | Kit reutilizable (datos, compras, tienda, eventos, analítica), puertas G0 a G5, A/B con `Experiments` (útil solo con volumen: por debajo de ~1.000 DAU puede no haber significancia) | [OFICIAL] el A/B [06 §7.3][r06]; el resto [IDEA PROPIA] |
-| **Monetizar por hora, no solo ganar horas** | Roblox lo señala como causa de su caída de bookings | Público 13+ y adultos de EE. UU. (18 a 34 crece ~40 a 50 % y gasta >50 % más que menores) con avatar R15 para optar a 0,0054 | [TERCERO] [02 §4.1][r02]; la tarifa [OFICIAL] |
+| **Monetizar por hora, no solo ganar horas** | Roblox lo señala como causa de su caída de bookings | Público 13+ y adultos de EE. UU. (en EE. UU., los de 18 a 34 crecen ~40 a 50 % interanual y gastan >50 % más que los menores de 18) con avatar R15 para optar a 0,0054 | [TERCERO] [02 §4.1][r02]; la tarifa [OFICIAL] |
 | **Honestidad de tienda** | Roblox exige descuentos reales, temporizadores reales, lenguaje neutro. Una tienda agresiva daña retención y descubrimiento | Ver sección 4 | [OFICIAL] [03 §2.3][r03] |
 
 **Lo que la IA sí cambia:** más prototipos por hora, texto y código más baratos, balance y análisis más rápidos. **Lo que no cambia:** que el juego sea divertido, que Roblox lo recomiende, que un creador lo quiera enseñar. [IDEA PROPIA]
@@ -160,11 +160,11 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | D2 | **Primer juego** | **Fish & Fortune** (pesca idle + colección, lagos compartidos, banner global cuando alguien pesca un mítico) | Raid the Museum ("Steal a X"): saturado y ventana de 4 a 6 semanas | [07 §8.1][r07] |
 | D3 | **Segundo y tercer candidato** | **2º Rumble Rotation** (party de minijuegos, 1 minijuego nuevo por semana). **3º Plot Defenders** (tower defense co-op, unidades originales) | Night Shift Cabin (techo alto, mayor coste y competencia). Reserva barata: Deep Dig Co-op o Brew & Bloom (reutilizan casi todo el kit, pero cuidado: "casi idéntico" se castiga) | [07 §8.1][r07] |
 | D4 | Código | **Luau puro `--!strict`**, archivos + Git, **Claude Code + MCP integrado de Studio + Rojo** (Script Sync como alternativa simple). Assistant de Studio solo para 3D, materiales, bocetos | roblox-ts (capa extra), Knit y TestEZ (archivados), pesde (esperar), DataStore2 | [04 §10][r04], [06 §3][r06] |
-| D5 | Datos y compras | **ProfileStore**; un único `ProcessReceipt` idempotente (`PurchaseRouter`); `PolicyService` en un solo módulo; `ConfigService` para eventos; revisión humana de todo lo de dinero | Código de compras sin revisar (la IA falla aquí de forma sutil) | [04 §0][r04], [06 §1-2, §4][r06] |
+| D5 | Datos y compras | **ProfileStore** para el juego real (el módulo `Data` del repositorio es una implementación propia probada con simulaciones y él mismo recomienda sustituirlo); un único `ProcessReceipt` idempotente; `PolicyService` en un solo módulo; `ConfigService` para eventos; revisión humana de todo lo de dinero | Código de compras sin revisar (la IA falla aquí de forma sutil) | [04 §0][r04], [06 §1-2, §4][r06] |
 | D6 | UI y analítica | React Lua para UI; Creator Analytics + `AnalyticsService` + API de consulta de analítica (panel único) | Fusion (no mezclar) | [06 §3, §7][r06] |
 | D7 | Calidad automática | StyLua, Selene, luau-lsp, tests en Lune, CI en GitHub Actions + Open Cloud; universo de pruebas separado; publicar en producción solo con aprobación manual | Publicar directo desde CI | [04 §11][r04], [06 §4.3][r06] |
 | D8 | Assets | Generación de Studio + Blender (mallas bajo 20.000 triángulos); audio del Creator Store; Meshy o Tripo **solo en plan de pago** y solo cuando haga falta | Hunyuan3D (prohibido en UE, Reino Unido y Corea del Sur: **depende de tu país**), Cube 3D abierto (solo investigación), Suno/Udio | [05 §0, §2, §10][r05] |
-| D9 | Monetización de la v1 de F&F | Pack de inicio, 2x dinero, auto-pesca, slots, cosméticos, VIP mensual, pase de temporada. **Sin venta de "suerte" ni cajas con Robux en la v1** (provisional) | Vender suerte desde el día 1: obliga a odds dinámicas, `PolicyService` y alternativa por país; se añade en v1.1 cuando esté probado | [02 §7][r02], [03 §2.1][r03], [07 §8][r07] |
+| D9 | Monetización de la v1 de F&F | Pack de inicio, 2x dinero, auto-pesca, slots, cosméticos, VIP mensual, pase de temporada. **Sin venta de "suerte" ni cajas con Robux en la v1** (provisional) | Vender suerte desde el día 1: obliga a odds dinámicas, `PolicyService` y alternativa por país; se añade más tarde (v1.5 en el [plan](plan-90-dias.md)) cuando esté probado | [02 §7][r02], [03 §2.1][r03], [07 §8][r07] |
 | D10 | Publicación | Activar Plus o Premium cuanto antes (la exención de la tarifa exige **2 meses seguidos**); si el 1.er lanzamiento llega antes, pagar la tarifa de 1.000 Robux (reembolsable) o lanzar solo para 16+ (provisional) | Lanzar sin decidir: por defecto un juego nuevo solo llega a 16+ verificados | [03 §3.3][r03], [02 §2.3][r02] |
 | D11 | Público e idioma | Diseñar para 13+ y avatar R15 estándar (opta a 0,0054 si hay adultos de EE. UU.); sin chat libre ni "hangouts" para conservar etiqueta suave. Texto EN + ES; marketing según tus canales (provisional) | Público infantil como objetivo: es el que menos monetiza por hora y el más regulado | [03 §3.4][r03], [05 §7.3][r05], [07 §2][r07] |
 | D12 | Cuenta | **Una sola cuenta o grupo** del creador, con 2FA, correo verificado y verificación de edad. Claves de Open Cloud: una por juego, permisos mínimos | Repartir juegos en varias cuentas | [03 §8][r03], [06 §4.3][r06] |
@@ -189,8 +189,8 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | ID gubernamental para DevEx general | [NO VERIFICADO] (sí se exige para Audience Expansion y acceso pagado en dinero real) | [02 §2.4][r02] |
 | **Países donde está disponible DevEx** y método de cobro en países hispanohablantes | [NO VERIFICADO]. Roblox dice "más de cien países"; no se pudo abrir la lista | [03 §5.3][r03] |
 | Tipalti descuenta comisión según método y 1,9 a 3 % si cambias moneda | [OFICIAL] | [03 §5.2][r03] |
-| Los "Premium Payouts" ya no existen; hoy hay Creator Rewards (5 Robux por jugador activo con gasto reciente; captación exige ~100 DAU de media) | [OFICIAL] vía resumen | [02 §3][r02] |
-| Anuncios con recompensa: hasta ~3 % de ingresos del creador al inicio (cifras de 5 a 15 % de terceros contradicen) | [OFICIAL] vía resumen / [NO VERIFICADO] las cifras altas | [02 §3][r02] |
+| Los "Premium Payouts" ya no existen; hoy hay Creator Rewards (5 Robux por jugador activo con gasto reciente; captación exige ~100 DAU de media) | [TERCERO] (resumen de página oficial) | [02 §3][r02] |
+| Anuncios con recompensa: hasta ~3 % de ingresos del creador al inicio (cifras de 5 a 15 % de terceros contradicen) | [TERCERO] (resumen de página oficial) / [NO VERIFICADO] las cifras altas | [02 §3][r02] |
 | Venta de pases/productos **entre juegos** desactivada desde el 30-may-2026 | [OFICIAL] | [03 §2.4][r03] |
 | Ropa 2D desde el 14-jul-2026: el creador cobra 30 % en el Marketplace (antes 70 %); dentro de un juego, 30 % creador + 40 % dueño del juego (antes 60 % + 10 %). Quien vende su propia ropa en su propio juego se queda con el 70 % | **[OFICIAL]** (historial del repositorio de documentación, leído en 08; el informe 02 lo daba como tercero) | [08 §2.5][r08], [02 §2.3][r02] |
 | Los ítems de avatar son Robux ganados elegibles para DevEx a **0,0038** (no a 0,0054) y tienen 30 días de retención en cada venta | **[OFICIAL]** | [08 §2.6][r08] |
@@ -215,7 +215,7 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | Hecho | Estado | Fuente |
 |---|---|---|
 | Sin pagar tarifa (1.000 Robux por juego, reembolsable) ni mantener Plus o Premium **2 meses seguidos**, un juego nuevo solo llega a usuarios de **16+** con edad verificada | [OFICIAL] | [03 §3.3][r03] |
-| Roblox Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) | [OFICIAL] vía resumen | [02 §2.3][r02] |
+| Roblox Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) | [TERCERO] (resumen de página oficial) | [02 §2.3][r02] |
 | Para Kids (5-8) y Select (9-15): cuestionario, 2FA, verificación y **250 jugadas únicas de usuarios verificados en 60 días** (un blog dice 500) | [OFICIAL] 250 / [NO VERIFICADO] 500 | [03 §3.3][r03], [02 §2.3][r02] |
 | Condiciones exactas de reembolso de la tarifa (25 jugadores muy comprometidos 60 días vs 90 días) | [NO VERIFICADO] (las páginas se contradicen) | [03 §3.3][r03] |
 | Si hace falta Plus para *actualizar* (no solo publicar) juegos antiguos; si "Premium deja de venderse" | [NO VERIFICADO] | [02 §2.3][r02] |
@@ -232,7 +232,7 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | Benchmarks de retención de GameAnalytics 2026: D1 10,3 %, D7 1,6 %, D30 0,5 % (muestra de juegos grandes, supervivientes) | [TERCERO] | [02 §4.3][r02], [07 §7][r07] |
 | Blogs que dan D1 20 a 35 % o D7 ≥ 20 % como "bueno" | [NO VERIFICADO] (definiciones distintas, vendedores de promoción); no usar para decidir | [07 §7][r07] |
 | Coste por visita en anuncios (4 a 12 Robux) y mínimos de campaña (10 créditos en 2023, ~35 USD en un blog 2026, ninguno en la doc actual) | [TERCERO] / [NO VERIFICADO] el mínimo | [05 §7.2][r05], [07 §3.5][r07] |
-| 1 crédito de anuncios = 263 Robux | [OFICIAL] vía resumen | [07 §3.5][r07] |
+| 1 crédito de anuncios = 263 Robux | [TERCERO] (resumen de página oficial) | [07 §3.5][r07] |
 | Claves de Open Cloud: una por aplicación, permisos mínimos, se caducan tras 60 días sin uso | [OFICIAL] | [06 §4.3][r06] |
 | La API de publicación no actualiza `SurfaceAppearance`, `EditableMesh`, `PartOperation`, etc. | [OFICIAL] | [04 §6.4][r04] |
 | Luau Execution API (tests de motor en CI): estado y límites reales | [NO VERIFICADO] | [06 §4.3][r06] |

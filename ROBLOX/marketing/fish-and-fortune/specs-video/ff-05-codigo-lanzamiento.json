@@ -6,45 +6,116 @@
   "aspect": "9:16",
   "fps": 30,
   "palette": {
-    "bg1": "#0A1F44", "bg2": "#0F6E9E", "accent": "#FFC83D", "accent2": "#19C3C0", "hot": "#FF7A59",
-    "text": "#F4FBFF", "dim": "#B9D8EA", "good": "#3CCB7F", "bad": "#FF5C73"
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
   },
-  "typography": { "heading": "Fredoka", "body": "Nunito", "headingWeight": 700 },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
   "fonts": [
-    { "family": "Fredoka", "file": "fonts/Fredoka.ttf", "weight": "300 700" },
-    { "family": "Nunito", "file": "fonts/Nunito.ttf", "weight": "200 1000" }
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
   ],
-  "brand": { "name": "FISH & FORTUNE" },
-
-  "bg": { "type": "gradient", "particles": "sparks" },
-
-  "hook": { "kicker": "🎁 CÓDIGO", "text": "Código de *LANZAMIENTO*", "emoji": "🎣", "chip": "Fish & Fortune", "duration": 2.2 },
-
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "bg": {
+    "type": "gradient",
+    "particles": "sparks"
+  },
+  "hook": {
+    "kicker": "🎁 CÓDIGO",
+    "text": "Código de *LANZAMIENTO*",
+    "emoji": "🎣",
+    "chip": "Fish & Fortune",
+    "duration": 2.2
+  },
   "scenes": [
     {
       "id": "pasos",
       "kind": "bullets",
       "text": "Cómo *canjearlo*",
-      "duration": 6.0,
+      "duration": 6.5,
       "items": [
-        { "emoji": "1️⃣", "text": "Abre Fish & Fortune" },
-        { "emoji": "2️⃣", "text": "Toca el botón «Códigos»" },
-        { "emoji": "3️⃣", "text": "Escribe LANZAMIENTO" }
+        {
+          "emoji": "1️⃣",
+          "text": "Abre Fish & Fortune"
+        },
+        {
+          "emoji": "2️⃣",
+          "text": "Toca el botón «Códigos»"
+        },
+        {
+          "emoji": "3️⃣",
+          "text": "Escribe LANZAMIENTO"
+        }
       ],
-      "narration": "Abre el juego, toca códigos y escribe lanzamiento."
+      "narration": "Abre el juego, toca códigos y escribe lanzamiento.",
+      "captions": false
+    },
+    {
+      "id": "caduca",
+      "kind": "caption",
+      "duration": 3.4,
+      "text": "Caduca el *15 de diciembre*",
+      "narration": "Un canje por cuenta. Caduca el quince de diciembre.",
+      "stickers": [
+        {
+          "emoji": "⏳",
+          "at": 0.7,
+          "x": 0.5,
+          "y": 0.46,
+          "size": 280,
+          "rot": -6
+        }
+      ],
+      "chips": [
+        {
+          "text": "Hasta las 23:59 UTC",
+          "at": 1.5,
+          "x": 0.5,
+          "y": 0.64,
+          "style": "dark"
+        }
+      ]
     }
   ],
-
   "cta": {
-    "text": "Caduca el *15 de dic*",
-    "sub": "Hasta las 23:59 UTC · un canje por cuenta",
+    "text": "Código *LANZAMIENTO*",
+    "sub": "Un canje por cuenta",
     "button": "▶ JUGAR EN ROBLOX",
     "emoji": "🎁",
     "code": "LANZAMIENTO",
-    "codeLabel": "CÓDIGO"
+    "codeLabel": "CÓDIGO",
+    "duration": 4.0
   },
-
-  "subtitles": { "enabled": true, "y": 0.74 },
-  "audio": { "music": { "style": "arcade", "volume": 0.45 }, "sfx": true },
+  "subtitles": {
+    "enabled": true,
+    "y": 0.74
+  },
+  "audio": {
+    "music": {
+      "style": "arcade",
+      "volume": 0.45
+    },
+    "sfx": true
+  },
   "legal": "Fish & Fortune es gratis con compras opcionales con Robux. El código no regala Robux. Imágenes de marca, no es gameplay."
 }

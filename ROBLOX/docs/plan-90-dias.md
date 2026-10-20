@@ -56,7 +56,7 @@ Orden de prioridad. Lo que va primero tiene fecha límite.
 | 4b | Preparar los datos del W-8BEN: nombre legal, país, dirección, NIF/TIN, país del convenio | Claude prepara la lista, Aryan rellena | Hoy | Claude no puede firmar ni presentar por ti. La tasa que te toca depende de tu país: pregúntala a un contador local | [OFICIAL] [03 §5.4][r03] |
 | 5 | Comprobar que **DevEx existe en tu país** y qué método de cobro tienes (PayPal, banco, otro) | Aryan | Esta semana | Roblox dice "más de cien países" pero la lista no se pudo leer. Mira el Help Center de DevEx y la cobertura de Tipalti | [NO VERIFICADO] [03 §5.3][r03] |
 | 6 | Que el **nombre legal coincida** en Roblox, portal DevEx y cuenta bancaria | Aryan | Esta semana | Si no coincide, el pago puede fallar | [OFICIAL] [03 §10][r03] |
-| 7 | **Plus o Premium**: decidir si activar Plus (4,99 USD/mes) | Aryan | Esta semana | Mantenerlo 2 meses seguidos exime de la tarifa de 1.000 Robux por juego. Si lo activas el 22-oct, los 2 meses se cumplen hacia el 22-dic. Comprueba en Creator Hub si está disponible en tu país. Plus o Premium también es obligatorio para publicar y mantener ropa y accesorios de avatar a la venta ([08 §2.2][r08]), así que sirve para las dos líneas | [OFICIAL] la regla [03 §3.3][r03]; precio [OFICIAL] vía resumen [02 §2.3][r02] |
+| 7 | **Plus o Premium**: decidir si activar Plus (4,99 USD/mes) | Aryan | Esta semana | Mantenerlo 2 meses seguidos exime de la tarifa de 1.000 Robux por juego. Si lo activas el 22-oct, los 2 meses se cumplen hacia el 22-dic. Comprueba en Creator Hub si está disponible en tu país. Plus o Premium también es obligatorio para publicar y mantener ropa y accesorios de avatar a la venta ([08 §2.2][r08]), así que sirve para las dos líneas | [OFICIAL] la regla [03 §3.3][r03]; precio [TERCERO] (resumen de página oficial) [02 §2.3][r02] |
 | 8 | **Creator Hub y grupo**: entrar en create.roblox.com; decidir si publicas como persona o con un grupo | Aryan | Esta semana | Regla simple: persona si trabajas solo; grupo si habrá socios. Los requisitos de publicación se aplican a través del dueño del grupo. Cómo cobra un grupo por DevEx no está cubierto por los informes: comprobarlo antes de crear uno | [OFICIAL] [03 §3.3][r03]; cobro de grupo [NO VERIFICADO] |
 | 9 | **Universo de pruebas**: crear una experiencia **privada** de staging para Fish & Fortune (desde Studio: Publish to Roblox) | Aryan | Cuando Studio esté listo | Todas las pruebas de compras y datos van aquí, nunca en producción. Esto exige haber instalado Studio (tarea 10) | [OFICIAL] la separación de entornos [06 §4.3][r06] |
 | 10 | **Instalar Studio** (Windows o Mac), activar el servidor MCP integrado y conectar Claude Code | Aryan activa; Claude configura | Esta semana | Studio > Assistant > "..." > Manage MCP Servers > Enable Studio as MCP server > Quick connect > Claude Code. Concede solo herramientas de lectura al principio y deja `execute_luau`, `multi_edit`, `insert_asset`, `generate_*` y `start_stop_play` con aprobación manual | [OFICIAL] [04 §11][r04] |
@@ -160,7 +160,7 @@ Todo [IDEA PROPIA] apoyado en lo que hacen los juegos que duran ([01 §6][r01], 
 | 5 ene | v1.5 | Zona 4 y, si el cumplimiento está probado, **"Suerte" con odds numéricas** | Pasa G3 |
 | 12 a 19 ene | v1.6 | Evento 3; revisión de precios por cohortes | Pasa G4 |
 
-Reglas de publicación [OFICIAL] ([06 §6.3][r06]): se despliega antes y se activa con un flag de Configs; publicar una versión no expulsa a los jugadores (los servidores viejos siguen vivos); si cambia el formato de datos hay que reiniciar servidores; los eventos duran 7 a 30 días y puede haber hasta 10 publicados o próximos [OFICIAL‡] ([07 §4.2][r07]). Estacionalidad: se espera más tráfico en vacaciones de verano del hemisferio norte y diciembre-enero, pero es [NO VERIFICADO] ([02 §5.5][r02]); el cuarto trimestre de 2025 fue el récord de pagos a creadores [TERCERO] ([02 §4.2][r02]). Mídelo con tus datos.
+Reglas de publicación [OFICIAL] ([06 §6.3][r06]): se despliega antes y se activa con un flag de Configs; publicar una versión no expulsa a los jugadores (los servidores viejos siguen vivos); si cambia el formato de datos hay que reiniciar servidores; los eventos duran 7 a 30 días y puede haber hasta 10 publicados o próximos [TERCERO] (extracto de página oficial) ([07 §4.2][r07]). Estacionalidad: se espera más tráfico en vacaciones de verano del hemisferio norte y diciembre-enero, pero es [NO VERIFICADO] ([02 §5.5][r02]); el cuarto trimestre de 2025 fue el récord de pagos a creadores [TERCERO] ([02 §4.2][r02]). Mídelo con tus datos.
 
 ### 5.1 Línea secundaria opcional: ropa y accesorios de avatar
 
@@ -171,7 +171,7 @@ El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([0
 | S0 (15 min) | Verificación en Creator Hub (ver tarea 13) | 0 | Siempre |
 | S10 en adelante | **Tienda de avatar dentro de Fish & Fortune**: 5 a 10 ítems propios exclusivos de tu juego (por Place ID) y menú de inspección activo para ganar 40 % por ítems de otros | Subida 80 R$ + anticipo según tipo por ítem | G4 pasado: ≥ 100 a 200 jugadores diarios |
 | Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada | ≈ 3.400 R$ (680 R$ por ítem) | Respondes "ropa" o "las dos"; Plus activo; ID verificado; horas disponibles |
-| S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Mínimo 20 ítems publicados para aplicar los criterios de matar o duplicar ([informe maestro §9.4](informe-maestro.md)) |
+| S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Con 5 ítems solo se mide tiempo por ítem, aprobación y suelo real; los criterios de matar o duplicar exigen un mínimo de 20 ítems publicados ([informe maestro §9.4](informe-maestro.md)) |
 
 No se hace en estos 90 días: ropa clásica 2D como negocio, Limiteds pagados ni accesorios con máscara emisiva ([08 §6.1][r08]). Los pasos de producción con IA están **pendientes de 09**.
 
@@ -187,7 +187,7 @@ Los anuncios sirven para **comprar una muestra y medir**, no para ganar dinero (
 | **1** (mínimo útil) | 5.000 a 10.000 Robux (≈ 50 a 100 USD nominales) | ≈ 420 a 2.500 visitas: alcanza para G1 | Semana 5 |
 | **2** (con repetición) | Hasta ≈ 300 USD en total en los 90 días | G1 + repetición tras un arreglo + G1 del 2.º juego | Semanas 5, 7 y 11 |
 
-El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" ([02 §2.1][r02]); lo que de verdad cuesta depende de cómo consigas los Robux. Un crédito de anuncios equivale a 263 Robux [OFICIAL] vía resumen ([07 §3.5][r07]).
+El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" ([02 §2.1][r02]); lo que de verdad cuesta depende de cómo consigas los Robux. Un crédito de anuncios equivale a 263 Robux [TERCERO] (resumen de página oficial) ([07 §3.5][r07]).
 
 **Cómo funciona Ads Manager** [OFICIAL] ([05 §7.2][r05]):
 

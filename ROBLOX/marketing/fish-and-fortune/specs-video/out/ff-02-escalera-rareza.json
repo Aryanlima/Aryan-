@@ -1,0 +1,21 @@
+{
+  "id": "ff-02-escalera-rareza",
+  "out": "out/ff-02-escalera-rareza.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 17.4,
+  "frames": 522,
+  "size_mb": 6.52,
+  "workers": 4,
+  "capture_fps": 28.5,
+  "timings_ms": {
+    "compilar+TTS+clips": 1,
+    "captura": 19433,
+    "audio": 0,
+    "codificar": 10564,
+    "total": 30067
+  }
+}

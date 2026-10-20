@@ -6,7 +6,7 @@ Cómo responder: contesta en el chat o rellena la hoja del final. Una respuesta 
 
 Prioridad: **URGENTE** = antes del miércoles 28-oct (el plazo oficial del formulario fiscal es el sábado 31-oct). **Pronto** = antes de la semana 3. **Cuando puedas** = antes de la semana 4.
 
-Nunca me envíes (ni por chat ni en archivos del repositorio) fotos de tu documento de identidad, contraseñas, códigos de 2FA ni claves de Open Cloud. Todo eso se hace directamente en Roblox.
+No envíes nunca a Claude (ni por chat ni en archivos del repositorio) fotos de tu documento de identidad, contraseñas, códigos de 2FA ni claves de Open Cloud. Todo eso se hace directamente en Roblox.
 
 Si solo respondes cinco cosas hoy: **1, 2, 3, 4 y 7**.
 
@@ -101,7 +101,7 @@ Las etiquetas [OFICIAL], [TERCERO], [NO VERIFICADO] e [IDEA PROPIA] son las del 
 
 **Pregunta.** Para que un juego nuevo llegue a todas las edades, ¿prefieres suscribirte a Plus o Premium, pagar 1.000 Robux por juego (reembolsables si sigue activo y sin sanciones), o empezar solo con público de 16+?
 
-**Por qué importa.** Sin ninguna de las dos, un juego nuevo solo llega a usuarios de 16+ verificados ([03 §3.3][r03]) [OFICIAL]. Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) ([02 §2.3][r02]) [OFICIAL vía resumen]. Las condiciones exactas de reembolso se contradicen entre páginas [NO VERIFICADO]. Cada decisión cambia el alcance del juego y el coste, que es pequeño pero real.
+**Por qué importa.** Sin ninguna de las dos, un juego nuevo solo llega a usuarios de 16+ verificados ([03 §3.3][r03]) [OFICIAL]. Plus cuesta 4,99 USD/mes (lanzado el 30-abr-2026) ([02 §2.3][r02]) [TERCERO] (resumen de página oficial). Las condiciones exactas de reembolso se contradicen entre páginas [NO VERIFICADO]. Cada decisión cambia el alcance del juego y el coste, que es pequeño pero real.
 
 **Qué decido según tu respuesta.**
 
@@ -179,7 +179,7 @@ Las etiquetas [OFICIAL], [TERCERO], [NO VERIFICADO] e [IDEA PROPIA] son las del 
 
 **Pregunta.** (a) ¿Cuánto dinero y cuántas horas estás dispuesto a perder en 90 días sin que te duela? (b) ¿Reinvertirías las ganancias? (c) ¿Prefieres una apuesta lenta y estable (pocos juegos cuidados) o una de alta varianza (copiar rápido el formato del momento)?
 
-**Por qué importa.** La mediana de los creadores que cobran es ~1.500 USD al año, el 1 % de arriba se queda casi todo, y los virales caen entre 90 y 99 % ([informe maestro §2](informe-maestro.md)) [TERCERO]. La IA abarata el boleto pero no mejora la probabilidad. Tú fijas el tope; el plan lo respeta.
+**Por qué importa.** La mediana de los creadores que cobran es ~1.500 USD al año, los 1.000 primeros (≈ 2 % de los creadores de DevEx) se llevan ≈ 76 a 82 % del total, y los virales caen entre 90 y 99 % ([informe maestro §2](informe-maestro.md)) [TERCERO]. La IA abarata el boleto pero no mejora la probabilidad. Tú fijas el tope; el plan lo respeta.
 
 **Qué decido según tu respuesta.**
 

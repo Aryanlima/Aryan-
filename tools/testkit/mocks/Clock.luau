@@ -53,14 +53,14 @@ function Clock.new(options: { startTime: number?, epoch: number? }?)
 
 	self.task = {
 		spawn = spawnThread,
-		defer = function(target, ...)
-			local thread = type(target) == "thread" and target or coroutine.create(target)
+		defer = function(target: any, ...)
+			local thread: thread = if type(target) == "thread" then target else coroutine.create(target)
 			self._managed[thread] = true
 			self:_schedule(self._now, thread, { ... })
 			return thread
 		end,
-		delay = function(dt, target, ...)
-			local thread = type(target) == "thread" and target or coroutine.create(target)
+		delay = function(dt: number?, target: any, ...)
+			local thread: thread = if type(target) == "thread" then target else coroutine.create(target)
 			self._managed[thread] = true
 			self:_schedule(self._now + math.max(dt or 0, 0), thread, { ... })
 			return thread

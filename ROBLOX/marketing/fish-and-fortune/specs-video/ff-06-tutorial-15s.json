@@ -6,43 +6,90 @@
   "aspect": "9:16",
   "fps": 30,
   "palette": {
-    "bg1": "#0A1F44", "bg2": "#0F6E9E", "accent": "#FFC83D", "accent2": "#19C3C0", "hot": "#FF7A59",
-    "text": "#F4FBFF", "dim": "#B9D8EA", "good": "#3CCB7F", "bad": "#FF5C73"
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
   },
-  "typography": { "heading": "Fredoka", "body": "Nunito", "headingWeight": 700 },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
   "fonts": [
-    { "family": "Fredoka", "file": "fonts/Fredoka.ttf", "weight": "300 700" },
-    { "family": "Nunito", "file": "fonts/Nunito.ttf", "weight": "200 1000" }
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
   ],
-  "brand": { "name": "FISH & FORTUNE" },
-
-  "bg": { "type": "gradient", "particles": "sparks" },
-
-  "hook": { "kicker": "🎣 TUTORIAL EXPRESS", "text": "3 tips para *pescar mejor*", "emoji": "💡", "duration": 2.0 },
-
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "bg": {
+    "type": "gradient",
+    "particles": "sparks"
+  },
+  "hook": {
+    "kicker": "🎣 TUTORIAL EXPRESS",
+    "text": "3 tips para *pescar mejor*",
+    "emoji": "💡",
+    "duration": 2.4
+  },
   "scenes": [
     {
       "id": "tips",
       "kind": "bullets",
       "text": "Prueba esto",
-      "duration": 7.4,
+      "duration": 8.6,
       "items": [
-        { "emoji": "👆", "text": "Mantén pulsado para lanzar más lejos", "at": 0.8 },
-        { "emoji": "🎯", "text": "Sigue el ritmo del minijuego", "at": 2.6 },
-        { "emoji": "📖", "text": "Revisa tu bestiario antes de vender", "at": 4.4 }
+        {
+          "emoji": "👆",
+          "text": "Mantén pulsado para lanzar más lejos",
+          "at": 0.8
+        },
+        {
+          "emoji": "🎯",
+          "text": "Sigue el ritmo del minijuego",
+          "at": 3.2
+        },
+        {
+          "emoji": "📖",
+          "text": "Revisa tu bestiario antes de vender",
+          "at": 5.6
+        }
       ],
-      "narration": "Mantén pulsado para lanzar más lejos, sigue el ritmo del minijuego y revisa tu bestiario antes de vender."
+      "narration": "Mantén pulsado para lanzar más lejos, sigue el ritmo del minijuego y revisa tu bestiario antes de vender.",
+      "captions": false
     }
   ],
-
   "cta": {
     "text": "Pruébalo *gratis*",
     "sub": "Fish & Fortune en Roblox",
     "button": "▶ JUGAR EN ROBLOX",
-    "emoji": "🎣"
+    "emoji": "🎣",
+    "duration": 4.0
   },
-
-  "subtitles": { "enabled": true, "y": 0.8 },
-  "audio": { "music": { "style": "chill", "volume": 0.5 }, "sfx": true },
+  "subtitles": {
+    "enabled": true,
+    "y": 0.8
+  },
+  "audio": {
+    "music": {
+      "style": "chill",
+      "volume": 0.5
+    },
+    "sfx": true
+  },
   "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
 }

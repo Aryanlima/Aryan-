@@ -6,47 +6,81 @@
   "aspect": "9:16",
   "fps": 30,
   "palette": {
-    "bg1": "#0A1F44", "bg2": "#0F6E9E", "accent": "#FFC83D", "accent2": "#19C3C0", "hot": "#FF7A59",
-    "text": "#F4FBFF", "dim": "#B9D8EA", "good": "#3CCB7F", "bad": "#FF5C73"
+    "bg1": "#0A1F44",
+    "bg2": "#0F6E9E",
+    "accent": "#FFC83D",
+    "accent2": "#19C3C0",
+    "hot": "#FF7A59",
+    "text": "#F4FBFF",
+    "dim": "#B9D8EA",
+    "good": "#3CCB7F",
+    "bad": "#FF5C73"
   },
-  "typography": { "heading": "Fredoka", "body": "Nunito", "headingWeight": 700 },
+  "typography": {
+    "heading": "Fredoka",
+    "body": "Nunito",
+    "headingWeight": 700
+  },
   "fonts": [
-    { "family": "Fredoka", "file": "fonts/Fredoka.ttf", "weight": "300 700" },
-    { "family": "Nunito", "file": "fonts/Nunito.ttf", "weight": "200 1000" }
+    {
+      "family": "Fredoka",
+      "file": "fonts/Fredoka.ttf",
+      "weight": "300 700"
+    },
+    {
+      "family": "Nunito",
+      "file": "fonts/Nunito.ttf",
+      "weight": "200 1000"
+    }
   ],
-  "brand": { "name": "FISH & FORTUNE" },
-
-  "hook": { "kicker": "🎣 FISH & FORTUNE", "text": "¿Qué tan *RARO* puede ser tu próximo pez?", "emoji": "🐟", "duration": 2.4 },
-
+  "brand": {
+    "name": "FISH & FORTUNE"
+  },
+  "hook": {
+    "kicker": "🎣 FISH & FORTUNE",
+    "text": "¿Qué tan *RARO* puede ser tu próximo pez?",
+    "emoji": "🐟",
+    "duration": 2.4
+  },
   "items": [
     {
       "title": "Criatura *Rara*",
       "sub": "Brilla un poco más que el resto",
       "emoji": "🐠",
-      "narration": "Tres: las criaturas raras brillan un poco más."
+      "narration": "Tres: las criaturas raras brillan un poco más.",
+      "duration": 4.4
     },
     {
       "title": "Criatura *Legendaria*",
       "sub": "Aparece muy de vez en cuando",
       "emoji": "🦑",
-      "narration": "Dos: las legendarias aparecen muy de vez en cuando."
+      "narration": "Dos: las legendarias aparecen muy de vez en cuando.",
+      "duration": 4.4
     },
     {
       "title": "Criatura *MÍTICA*",
       "sub": "Todo el servidor se entera",
-      "emoji": "🐉",
-      "narration": "Uno: la mítica. Todo el servidor se entera."
+      "emoji": "🐋",
+      "narration": "Uno: la mítica. Todo el servidor se entera.",
+      "duration": 4.4
     }
   ],
-
   "cta": {
     "text": "¿Cuál *te falta*?",
     "sub": "Fish & Fortune · gratis en Roblox",
     "button": "▶ JUGAR EN ROBLOX",
     "emoji": "🎣"
   },
-
-  "subtitles": { "enabled": true, "y": 0.74 },
-  "audio": { "music": { "style": "arcade", "volume": 0.45 }, "sfx": true },
+  "subtitles": {
+    "enabled": true,
+    "y": 0.74
+  },
+  "audio": {
+    "music": {
+      "style": "arcade",
+      "volume": 0.45
+    },
+    "sfx": true
+  },
   "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
 }

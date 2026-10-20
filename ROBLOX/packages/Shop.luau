@@ -138,8 +138,8 @@ local function stripAccents(text: string): string
 		["Ú"] = "u",
 		["Ñ"] = "n",
 	}
-	local result = string.gsub(text, "[%z\1-\127\194-\244][\128-\191]*", function(char: string): string?
-		return map[char]
+	local result = string.gsub(text, utf8.charpattern, function(char: string): string
+		return map[char] or char
 	end)
 	return string.lower(result)
 end
@@ -317,6 +317,7 @@ type ShopData = {
 	policies: { [number]: any },
 	lastPrompt: { [number]: number },
 	priceCache: { [string]: number },
+	pendingHooks: { [string]: { player: any, product: ProductDef, receipt: Receipt } }, -- compras concedidas aun sin confirmar
 	started: boolean,
 	connections: { any },
 }
@@ -357,6 +358,7 @@ function Shop.new(config: Config): Shop
 		policies = {},
 		lastPrompt = {},
 		priceCache = {},
+		pendingHooks = {},
 		started = false,
 		connections = {},
 	}
@@ -459,6 +461,7 @@ function ShopImpl._processReceiptInner(self: Shop, receipt: Receipt): any
 	-- 3. ya registrado? (reentrega o segundo servidor): solo falta asegurar que esta guardado
 	if purchases[purchaseId] ~= nil then
 		if profile:save() then
+			self:_fireGrantedHook(purchaseId)
 			return decision.PurchaseGranted
 		end
 		return notYet
@@ -481,20 +484,31 @@ function ShopImpl._processReceiptInner(self: Shop, receipt: Receipt): any
 	purchases[purchaseId] = self.nowFn()
 	self:_trimHistory(purchases)
 	profile:markDirty()
+	self.pendingHooks[purchaseId] = { player = player, product = product, receipt = receipt }
 
 	-- 5. persistir; solo entonces confirmar
 	if not profile:save() then
 		self:_log("compra " .. purchaseId .. " concedida en memoria pero NO guardada: NotProcessedYet")
 		return notYet
 	end
+	self:_fireGrantedHook(purchaseId)
+	return decision.PurchaseGranted
+end
+
+-- Analitica/efectos laterales: solo DESPUES de confirmar el guardado y una sola vez por compra.
+function ShopImpl._fireGrantedHook(self: Shop, purchaseId: string)
+	local pending = self.pendingHooks[purchaseId]
+	if pending == nil then
+		return
+	end
+	self.pendingHooks[purchaseId] = nil
 	local hook = self.cfg.onPurchaseGranted
 	if hook then
-		local hookOk, hookErr = pcall(hook, player, product, receipt)
-		if not hookOk then
-			self:_log("onPurchaseGranted fallo: " .. tostring(hookErr))
+		local ok, err = pcall(hook, pending.player, pending.product, pending.receipt)
+		if not ok then
+			self:_log("onPurchaseGranted fallo: " .. tostring(err))
 		end
 	end
-	return decision.PurchaseGranted
 end
 
 ----------------------------------------------------------------------------
@@ -858,12 +872,10 @@ function ShopImpl.start(self: Shop): (receipt: Receipt) -> any
 	self.cfg.marketplace.ProcessReceipt = callback
 	local signal = self.cfg.marketplace.PromptGamePassPurchaseFinished
 	if signal ~= nil then
-		table.insert(
-			self.connections,
-			signal:Connect(function(player: any, passId: number, wasPurchased: boolean)
-				self:_onPassPromptFinished(player, passId, wasPurchased)
-			end)
-		)
+		local connection = signal:Connect(function(player: any, passId: number, wasPurchased: boolean)
+			self:_onPassPromptFinished(player, passId, wasPurchased)
+		end)
+		table.insert(self.connections, connection)
 	end
 	return callback
 end
