@@ -296,7 +296,13 @@ Balance.bestiary = {
 			target = 15,
 			reward = { coins = 25000 },
 		},
-		{ id = "disc_20", label = "Descubre 20 criaturas", kind = "discoveries", target = 20, reward = { pearls = 15 } },
+		{
+			id = "disc_20",
+			label = "Descubre 20 criaturas",
+			kind = "discoveries",
+			target = 20,
+			reward = { pearls = 15 },
+		},
 		{
 			id = "disc_25",
 			label = "Bestiario completo",
@@ -304,7 +310,13 @@ Balance.bestiary = {
 			target = 25,
 			reward = { pearls = 40, coins = 500000 },
 		},
-		{ id = "zone_lake", label = "Completa el Lago Calmo", kind = "zone", zone = "lake", reward = { coins = 2000, pearls = 5 } },
+		{
+			id = "zone_lake",
+			label = "Completa el Lago Calmo",
+			kind = "zone",
+			zone = "lake",
+			reward = { coins = 2000, pearls = 5 },
+		},
 		{
 			id = "zone_river",
 			label = "Completa el Rio Cristal",
@@ -395,14 +407,14 @@ Balance.liveOps = {
 			name = "Marea Dorada",
 			description = "Las monedas por venta se multiplican por 2 durante este evento.",
 			cycle = { anchor = ANCHOR, slotSeconds = WEEK, slotCount = 2, slot = 0 },
-			modifiers = { coins = 2 },
+			modifiers = { coins = 2 } :: { [string]: number },
 		},
 		{
 			id = "mythic_moon",
 			name = "Luna Mitica",
 			description = "Sube tu suerte en 3 puntos mientras dure el evento.",
 			cycle = { anchor = ANCHOR, slotSeconds = WEEK, slotCount = 2, slot = 1 },
-			modifiers = { luck = 3 },
+			modifiers = { luck = 3 } :: { [string]: number },
 		},
 	},
 	codes = {
@@ -413,6 +425,6 @@ Balance.liveOps = {
 		message = "Bienvenido a Fish & Fortune. Lanza la cana, descubre criaturas y completa el bestiario.",
 	},
 	season = { id = 1, name = "Temporada 1", startsAt = ANCHOR, endsAt = ANCHOR + 8 * WEEK },
-}
+} :: { [string]: any } -- forma validada en runtime por packages/LiveOps (validateConfig)
 
 return Balance

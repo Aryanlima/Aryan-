@@ -94,7 +94,7 @@ async function renderOne(specFile, outFile, o) {
     if (aud) console.log('  audio: ' + aud.parts.join(' · '));
 
     mkdirp(path.dirname(path.resolve(outFile)));
-    const vf = [`scale=${resolved.W}:${resolved.H}:flags=lanczos:in_range=full:in_color_matrix=bt601:out_range=limited:out_color_matrix=bt709`, 'format=yuv420p'].join(',');
+    const vf = [`scale=${resolved.vw}:${resolved.vh}:flags=lanczos:in_range=full:in_color_matrix=bt601:out_range=limited:out_color_matrix=bt709`, 'format=yuv420p'].join(',');
     const args = ['-y', '-v', 'error', '-framerate', String(resolved.fps), '-i', path.join(frames, `f_%06d.${cap.ext}`)];
     if (aud) args.push('-i', aud.file);
     const enc = raw.encode || {};

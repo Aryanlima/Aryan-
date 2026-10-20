@@ -95,7 +95,13 @@ end
 	Elige la captura. Los primeros lanzamientos (`casts` < #ftue) estan garantizados por rareza:
 	se EXCLUYE de la misma tabla todo lo que no sea de la rareza garantizada (misma tabla, sin ruta aparte).
 ]]
-function FishingRules.pickCatch(self: Rules, zoneId: string, rng: () -> number, luck: number, casts: number): (string, boolean)
+function FishingRules.pickCatch(
+	self: Rules,
+	zoneId: string,
+	rng: () -> number,
+	luck: number,
+	casts: number
+): (string, boolean)
 	local odds = self:oddsFor(zoneId)
 	local guaranteed = self.balance.ftue.guaranteedRarities[casts + 1]
 	local exclude: { [string]: boolean }? = nil
@@ -136,7 +142,14 @@ end
 --[[
 	Nueva sesion de lanzamiento. `rng` decide el centro de la zona perfecta.
 ]]
-function FishingRules.newCast(self: Rules, id: number, zoneId: string, rodId: string, now: number, rng: () -> number): CastSession
+function FishingRules.newCast(
+	self: Rules,
+	id: number,
+	zoneId: string,
+	rodId: string,
+	now: number,
+	rng: () -> number
+): CastSession
 	local minigame = self.balance.minigame
 	local rod = self.balance.rods[rodId]
 	local center = minigame.centerMin + rng() * (minigame.centerMax - minigame.centerMin)
@@ -156,7 +169,12 @@ end
 	Nota: un script que calcule el momento perfecto siempre podra acertar la zona (bonus pequeno y gratuito);
 	lo que NO puede es inventar tiempos imposibles ni recoger antes del minimo.
 ]]
-function FishingRules.evaluateReel(self: Rules, cast: CastSession, clientElapsed: number, now: number): (Quality?, string?)
+function FishingRules.evaluateReel(
+	self: Rules,
+	cast: CastSession,
+	clientElapsed: number,
+	now: number
+): (Quality?, string?)
 	local minigame = self.balance.minigame
 	if now > cast.expiresAt then
 		return nil, "expired"
