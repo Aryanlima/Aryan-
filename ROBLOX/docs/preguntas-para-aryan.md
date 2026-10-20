@@ -255,7 +255,7 @@ Las etiquetas [OFICIAL], [TERCERO], [NO VERIFICADO] e [IDEA PROPIA] son las del 
 
 **Pregunta.** ¿Te gusta el concepto de pesca idle y colección? ¿Tienes preferencias de estética, nombre o temática? ¿Alguna de las otras 9 ideas te atrae más? ¿Quieres una marca propia?
 
-**Por qué importa.** Es la primera apuesta. Hay un competidor directo vigente (Fisch, [01 §3, §5][r01]) [TERCERO]; el nombre y la marca no deben parecerse a otros ni a marcas ajenas ([03 §4.2][r03]) [OFICIAL]. Se puede cambiar de juego ahora; después de la semana 3 cuesta semanas.
+**Por qué importa.** Es la primera apuesta. Hay un competidor directo vigente (Fisch, [01 §3, §5][r01]) [TERCERO]; el nombre y la marca no deben parecerse a otros ni a marcas ajenas ([03 §4.2][r03]) [OFICIAL]. "Fortune" también puede asociarse con juegos de azar con dinero y los metadatos que insinúan recompensa económica no se priorizan: hay un chequeo de nombres y tres títulos alternativos en la [página del juego](../marketing/fish-and-fortune/pagina-del-juego.md). Que el nombre esté libre solo se comprueba a mano (Discover y registros de marcas). Se puede cambiar de juego ahora; después de la semana 3 cuesta semanas.
 
 **Qué decido según tu respuesta.**
 

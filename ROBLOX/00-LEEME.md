@@ -20,25 +20,24 @@ Un experimento de 90 días para crear pocos juegos de Roblox bien hechos con ayu
 | 4 | [docs/plan-90-dias.md](docs/plan-90-dias.md), semana 0 y calendario | 20 min | Saber qué hacer esta semana |
 | 5 | [docs/informe-maestro.md](docs/informe-maestro.md) completo | 30 min | Decisiones, riesgos, hechos verificados vs dudas, juegos vs ropa |
 | 6 | [docs/setup-en-tu-pc.md](docs/setup-en-tu-pc.md) | 60 a 90 min | Montar Studio y Claude Code en tu PC (lo escribió otro agente; no se probó en Windows ni macOS) |
-| 7 | Informes de `research/`, en este orden: [07 diseño y conceptos](research/07-diseno-crecimiento-y-conceptos.md), [02 dinero](research/02-monetizacion-y-economia.md), [03 políticas](research/03-politicas-y-cumplimiento.md), [08 ropa vs juegos](research/08-ropa-vs-juegos.md), [01 mercado](research/01-mejores-juegos.md) | 2 a 3 h | Entender de dónde sale cada dato |
+| 7 | Informes de `research/`, en este orden: [07 diseño y conceptos](research/07-diseno-crecimiento-y-conceptos.md), [02 dinero](research/02-monetizacion-y-economia.md), [03 políticas](research/03-politicas-y-cumplimiento.md), [08 ropa vs juegos](research/08-ropa-vs-juegos.md), [09 producir ropa con IA](research/09-ropa-produccion-con-ia.md), [01 mercado](research/01-mejores-juegos.md) | 2 a 3 h | Entender de dónde sale cada dato |
 | 8 | Informes técnicos: [04 IA en Studio](research/04-ia-studio-mcp-skills.md), [05 IA para assets y marketing](research/05-ia-assets-y-marketing.md), [06 stack técnico](research/06-stack-tecnico.md) | Cuando haga falta | Detalle de herramientas y arquitectura |
 
 Cada informe es muy largo (decenas de páginas): no hace falta leerlos enteros. Los documentos de `docs/` ya resumen y enlazan cada dato a su informe.
 
 ## 3. Qué hay en cada carpeta
 
-Estado tomado a las ~14:40 UTC del 2026-10-20. "Se moverá" significa que otro agente está trasladando el contenido a `ROBLOX/`.
+Estado tomado a las ~14:50 UTC del 2026-10-20. "Se moverá" significa que otro agente está trasladando el contenido a `ROBLOX/`.
 
 | Carpeta | Qué contiene | Estado hoy |
 |---|---|---|
-| `research/` | Informes 01 a 08: mejores juegos, monetización y economía, políticas, IA en Studio, IA para assets y marketing, stack técnico, diseño y conceptos, ropa vs juegos | Hechos. **El 09 (producir ropa con IA) estaba pendiente al escribir esto.** Hoy viven en `research/` en la raíz del repositorio y se moverán a `ROBLOX/research/` |
+| `research/` | Informes 01 a 09: mejores juegos, monetización y economía, políticas, IA en Studio, IA para assets y marketing, stack técnico, diseño y conceptos, ropa vs juegos, producir ropa con IA | Hechos. Hoy viven en `research/` en la raíz del repositorio y se moverán a `ROBLOX/research/` |
 | `docs/` | Documentos de decisión: `informe-maestro.md`, `plan-90-dias.md`, `preguntas-para-aryan.md`. Además `setup-en-tu-pc.md` y `skills-instaladas.md` (otros agentes). `entorno-y-toolchain.md` está en `docs/` de la raíz del repositorio y se moverá | Los tres de decisión, hechos. Los otros, de otros agentes |
-| `packages/` | Código Luau compartido ("el kit"): `Data` (datos por jugador), `Net` (remotos validados), `Economy` (monedas, boosts, offline), `Odds` (tabla de probabilidades para cumplir con objetos aleatorios de pago), y `Shop` (tienda y compras) si ya estaba al abrir | **En construcción.** Faltan, según [06 §4.2](research/06-stack-tecnico.md): `Policy`, `Analytics`, `LiveConfig`, `UIKit` |
-| `games/` | Los juegos. El primero será `fish-and-fortune` | **Aún no existe en `ROBLOX/`** al escribir esto; lo construye otro agente |
+| `packages/` | Código Luau compartido ("el kit"): `Data` (datos por jugador), `Net` (remotos validados), `Economy` (monedas, boosts, offline), `Odds` (tabla de probabilidades para cumplir con objetos aleatorios de pago), `Shop` (tienda y compras idempotentes), `Analytics`, `LiveOps` (eventos y códigos) y `UI` | **En construcción** (8 módulos al escribir esto). Según [06 §4.2](research/06-stack-tecnico.md) puede faltar un módulo `Policy` aparte (la lógica de `PolicyService` vive hoy dentro de `Odds` y `Shop`) |
+| `games/` | Los juegos. El primero será `fish-and-fortune` | **Solo hay estructura**: carpetas `src/server`, `src/client`, `src/shared` y `tests`, **sin código todavía** al escribir esto |
 | `tests/` | Pruebas del kit en Lune (`*.spec.luau`) | Hechas para los paquetes presentes |
-| `tools/` | `clothing-gen/` (generador de ropa en Python con plantillas oficiales; en construcción), y, en la raíz del repositorio hasta que se muevan: `testkit/` (ejecutor de pruebas y simulaciones de servicios de Roblox), `examples/` (ejemplo de `ProcessReceipt`), `setup.sh`, `test.sh`, `lint.sh`, `format.sh` | En construcción; el `testkit` funciona |
-| `scripts/` | `typecheck.mjs` (comprobación de tipos Luau sin Studio) y `roblox-lite.d.luau` (definiciones mínimas de Roblox) | Funcionan con limitaciones: ver el encabezado del script |
-| `marketing/` | Generador de vídeos promocionales a partir de un archivo de datos (`pipeline/`: JSON, HTML/Canvas, Playwright y ffmpeg) y materiales de Fish & Fortune | **En construcción.** Hoy `marketing/pipeline` puede estar todavía en la raíz del repositorio |
+| `tools/` | `clothing-gen/` (generador procedural de ropa clásica en Python con plantillas oficiales y control de calidad; 8 pruebas pasan, no probado en Studio). En la raíz del repositorio hasta que se muevan: `testkit/` (ejecutor de pruebas y simulaciones de servicios de Roblox), `examples/` (ejemplo de `ProcessReceipt`), `setup.sh`, `test.sh`, `lint.sh`, `format.sh` | En construcción; `testkit` y `clothing-gen` funcionan |
+| `marketing/` | `fish-and-fortune/`: 30 guiones de vídeo corto, texto de la página del juego y 6 especificaciones de vídeo ya renderizadas. El generador de vídeos (`pipeline/`: JSON, HTML/Canvas, Playwright y ffmpeg) está todavía en `marketing/pipeline/` en la raíz del repositorio | **En construcción.** Los textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL") |
 | `skills/` | Skill `roblox-dev` (conocimiento verificado de Roblox y Luau para Claude) | Instalada y revisada: ver [docs/skills-instaladas.md](docs/skills-instaladas.md) |
 | `.toolchain/` | Herramientas instaladas localmente (ignorada por git) | Se regenera con `tools/setup.sh` |
 
@@ -50,12 +49,12 @@ Estos comandos funcionan en el entorno de nube donde se construyó el proyecto (
 
 | Qué | Comando (desde la raíz del repositorio) | Qué comprueba |
 |---|---|---|
-| Todas las pruebas | `tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al escribir esto: **7 especificaciones, 169 pruebas, 0 fallos** |
+| Todas las pruebas | `tools/test.sh` | Ejecuta cada `*.spec.luau` con Lune. Al escribir esto: **11 especificaciones, 264 pruebas, 0 fallos** |
 | Una sola prueba | `lune run ROBLOX/tests/Odds.spec.luau` | Lo mismo para un archivo |
 | Filtrar por nombre | `tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
-| Linter y formato | `tools/lint.sh` y `tools/format.sh --check` | selene, stylua y tipos. Al escribir esto: selene 0 errores y 5 avisos; stylua pedía reformatear algunos archivos (`tools/format.sh` lo arregla) |
-| Tipos sin Studio | `node ROBLOX/scripts/typecheck.mjs ROBLOX/packages` | Comprobación `--!strict` de los paquetes. Al escribir esto: 4 archivos, 0 errores |
-| Vídeos promocionales | `cd marketing/pipeline && npm run render` | **Aún no disponible**: faltaba el comando de render al escribir esto |
+| Linter, formato y tipos | `tools/lint.sh` y `tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
+| Ropa: pruebas del generador | `cd ROBLOX/tools/clothing-gen && venv/bin/python -m unittest discover -s tests` | Al escribir esto: 8 pruebas OK. Para generar ejemplos: `./run_demo.sh` |
+| Vídeos promocionales | `cd marketing/pipeline && node render.mjs specs/ejemplo-gancho.json out/ejemplo-gancho.mp4` | Renderiza un vídeo desde un archivo de especificación (necesita Node 20+, Chromium y ffmpeg). Los agentes de marketing informan de que funciona en la sesión de nube; no lo ejecuté yo al escribir esto ni se probó en tu PC |
 | Ejecutar los juegos | Abrir el proyecto en Roblox Studio con Rojo o Script Sync | Ver [docs/setup-en-tu-pc.md](docs/setup-en-tu-pc.md). **Nunca probado por nosotros** |
 
 Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuestran que la lógica es correcta, no que funcione dentro de Studio.
@@ -64,15 +63,16 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 
 ### Hecho y comprobado
 
-- 8 informes de investigación con etiquetas de fiabilidad y fuentes (01 a 08).
+- 9 informes de investigación con etiquetas de fiabilidad y fuentes (01 a 09).
 - 3 documentos de decisión en `docs/` ([informe maestro](docs/informe-maestro.md), [plan de 90 días](docs/plan-90-dias.md), [preguntas para Aryan](docs/preguntas-para-aryan.md)) que resumen, deciden y enlazan cada dato a su informe.
-- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo) y 169 pruebas en verde (al escribir esto).
+- Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 264 pruebas en verde con el linter limpio (al escribir esto).
 
 ### Hecho, pero SIN probar en Roblox
 
 - Todo el código Luau (`packages/`, ejemplos, juego). Se probó con Lune y simulaciones, **no** en Studio.
 - El módulo `Data` es una **implementación propia**; el propio módulo recomienda sustituirla por ProfileStore para un juego real con tráfico ([06 §2](research/06-stack-tecnico.md)).
 - Todo lo que toque dinero (`Shop`, `Economy`, recibos) lleva la marca `REVIEW(money)`: necesita revisión humana y pruebas con jugadores de prueba antes de publicar.
+- `clothing-gen` genera las imágenes de ropa clásica y las comprueba, pero **no se ha visto cómo quedan sobre un avatar en Studio** ni se ha subido nada a Roblox; la subida de ropa es siempre manual (no hay API oficial, [09 §8](research/09-ropa-produccion-con-ia.md)).
 
 ### No se pudo verificar
 
@@ -97,4 +97,4 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 | Una cifra o regla parece contradictoria | [Informe maestro §6](docs/informe-maestro.md) (hechos verificados vs dudas): dice qué informe manda |
 | No sé qué hacer esta semana | [Plan de 90 días](docs/plan-90-dias.md), semana 0 |
 | Algo del toolchain no arranca | `docs/entorno-y-toolchain.md` y `tools/setup.sh --check` |
-| Preguntas sobre ropa | [Informe maestro §9](docs/informe-maestro.md) y [08](research/08-ropa-vs-juegos.md) |
+| Preguntas sobre ropa | [Informe maestro §9](docs/informe-maestro.md), [08](research/08-ropa-vs-juegos.md) y [09](research/09-ropa-produccion-con-ia.md) |

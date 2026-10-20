@@ -29,7 +29,7 @@ Semanas de lunes a domingo. La semana 0 dura hasta el domingo 1-nov. L = día de
 | S1 | 2 a 8 nov | Núcleo técnico + primera prueba en Studio | Verificar y completar el núcleo (datos, compras, política, remotos, analítica, config) con tests | Abrir el juego en Studio y jugarlo; copiar errores | **H1**: el juego abre y se juega en Studio | 3 |
 | S2 | 9 a 15 nov | Fish & Fortune jugable | Bucle de pesca, tienda, UI móvil, zonas | Jugar 30 min por sesión; decir qué aburre | **H2**: MVP jugable | 4 |
 | S3 | 16 a 22 nov | MVP completo, eventos, analítica | Eventos por config, códigos, embudo de analítica, tabla de odds (sin azar de pago) | Probar en móvil real; grabar clips | **H3**: MVP completo | 5 |
-| S4 | 23 a 29 nov | **G0** + preparar lanzamiento | Arreglos, textos de tienda, guiones, kit de marketing, borrador del cuestionario de madurez | 5 a 10 personas juegan; cuestionario; iconos; pases y productos; decidir tarifa/Plus | **G0**; checklist de lanzamiento | 8 |
+| S4 | 23 a 29 nov | **G0** + preparar lanzamiento | Arreglos, textos de tienda, guiones, kit de marketing, borrador del cuestionario de madurez | 5 a 10 personas juegan; cuestionario; iconos; pases y productos; **comprobar que el nombre está libre (Discover y registros de marcas)**; decidir tarifa/Plus | **G0**; checklist de lanzamiento | 8 |
 | S5 | 30 nov a 6 dic | **Lanzamiento suave + G1** | Parche rápido, informe diario de analítica, clips | Publicar en producción (aprobación), comprar anuncios de prueba, publicar clips | **G1** (días L+1 a L+4) | 6 |
 | S6 | 7 a 13 dic | **G2** (D7) + 1.a actualización | Actualización v1.1 con datos, informe | Revisar, publicar, outreach a creadores | **G2** | 5 |
 | S7 | 14 a 20 dic | **G3** económica + decidir 2.º juego | Cálculo ingreso vs coste, evento 1 | Decidir según G2/G3; clips | **G3**; decisión sobre Rumble Rotation | 4 |
@@ -238,7 +238,7 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 |---|---|---|
 | Guiones, ganchos, textos en pantalla, descripciones, hashtags | Los escribe y varía | Aprueba |
 | Calendario de publicaciones y seguimiento | Lo mantiene | Lo cumple |
-| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (en construcción, ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
+| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (`marketing/pipeline`, en construcción; ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
 | **Grabación del gameplay real** | No puede (requiere el juego abierto en tu equipo) | **La graba** (OBS u otra herramienta) |
 | Iconos y miniaturas con IA de imagen | Prepara prompts y especificaciones (512x512, círculo, 16:9) | Genera con tus cuentas de IA y sube a Creator Hub |
 | Publicar en TikTok, YouTube Shorts, Discord | Redacta y programa la tanda | **Publica** desde tus cuentas |
@@ -246,7 +246,7 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 
 ### 7.3 Guiones: 6 plantillas (≤ 30 s)
 
-Todas [IDEA PROPIA]. El gancho va en los primeros 2 segundos. Siempre gameplay real. Se prueban con 3 a 5 variantes de gancho.
+La versión completa ya está escrita en [30 guiones de vídeo corto](../marketing/fish-and-fortune/guiones-videos.md) (15 de gameplay real que graba Aryan, 7 con IA de vídeo que exigen tu cuenta y créditos, y 8 renderizados por código; hay 6 especificaciones ya renderizadas) y en el [texto de la página del juego](../marketing/fish-and-fortune/pagina-del-juego.md). Esos textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL"). Abajo, el resumen de formatos. Todas [IDEA PROPIA]. El gancho va en los primeros 2 segundos. Siempre gameplay real. Se prueban con 3 a 5 variantes de gancho.
 
 | # | Formato | Gancho (0 a 2 s) | Cuerpo | Cierre |
 |---|---|---|---|---|

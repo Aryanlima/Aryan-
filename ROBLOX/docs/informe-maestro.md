@@ -269,6 +269,7 @@ Probabilidad (P) e impacto (I): A = alta, M = media, B = baja. [IDEA PROPIA] sal
 | 17 | Agotamiento: pocas horas semanales para tareas manuales (probar, grabar, publicar, responder) | A | M | Plan según tus horas (pregunta 9); automatizar lo demás | Aryan |
 | 18 | Competencia directa: **Fisch** sigue vigente en oct-2026 ([01 §3][r01]); el informe 07 no verificó su estado | M | M | Diferenciar F&F: lagos compartidos, banner global, bestiario, giro co-op; vigilar sus datos en trackers | Claude |
 | 19 | **Contagio de la ropa a la cuenta de los juegos**: una retirada por IP en un ítem de avatar puede acabar en sanciones a la cuenta y a DevEx | B | Muy A | Ropa solo con originales; revisar cada imagen contra marcas; no abrir cuentas alternas; ropa en piloto pequeño | Ambos |
+| 20 | **El nombre "Fish & Fortune"**: parecido con juegos existentes (Fisch, "Fortune Rod") y asociación de "Fortune" con juegos de azar con dinero; metadatos que insinúan recompensa económica no se priorizan | M | M | Comprobar a mano que el nombre está libre en Discover y en registros de marcas antes de fijarlo; sin monedas, billetes ni estética de casino en ningún material; título alternativo preparado ([página del juego](../marketing/fish-and-fortune/pagina-del-juego.md), notas del chequeo de nombres) | Aryan comprueba, Claude prepara |
 
 ---
 
