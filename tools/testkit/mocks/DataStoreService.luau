@@ -395,7 +395,7 @@ function DataStore:_commit(key, value, userIds, metadata)
 		error(sizeOrErr, 0)
 	end
 	if sizeOrErr > self._service.Limits.maxValueBytes then
-		error("105: Serialized value exceeds the " .. self._service.Limits.maxValueBytes .. " byte limit", 3)
+		error("105: Serialized value exceeds the " .. self._service.Limits.maxValueBytes .. " byte limit", 0)
 	end
 	local now = self._service:_time()
 	self._versionCounter += 1
@@ -445,10 +445,10 @@ function DataStore:UpdateAsync(key: string, transform: (any, any) -> ...any)
 	local thread = coroutine.create(transform)
 	local results = table.pack(coroutine.resume(thread, oldValue, keyInfo))
 	if not results[1] then
-		error(results[2], 2)
+		error(results[2], 0)
 	end
 	if coroutine.status(thread) ~= "dead" then
-		error("UpdateAsync: el callback cedio (yield); en Roblox no se permite ceder dentro del callback", 2)
+		error("UpdateAsync: el callback cedio (yield); en Roblox no se permite ceder dentro del callback", 0)
 	end
 	local newValue, userIds, metadata = results[2], results[3], results[4]
 	if newValue == nil then
@@ -463,11 +463,11 @@ function DataStore:IncrementAsync(key: string, delta: number?, userIds: { number
 	local entry = self._data[key]
 	local current = entry and entry.value or 0
 	if type(current) ~= "number" then
-		error("104: IncrementAsync on a non-number value", 2)
+		error("104: IncrementAsync on a non-number value", 0)
 	end
 	local newValue = current + (delta or 1)
 	if newValue ~= math.floor(newValue) then
-		error("104: IncrementAsync requires integer values", 2)
+		error("104: IncrementAsync requires integer values", 0)
 	end
 	self:_commit(key, newValue, userIds, nil)
 	return newValue
