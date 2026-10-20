@@ -1,6 +1,7 @@
 # Estado de la PC de Aryan (Windows)
 
-Fecha: 2026-10-20. Lo preparó Claude Code en la PC, a partir de la rama `claude/brave-meitner-esyqy8` (commit `eaf261b`).
+Fecha: 2026-10-20. Lo preparó Claude Code en la PC (rama `pc/aryan-local`, con lo último de `claude/brave-meitner-esyqy8` mezclado).
+Informes de los ayudantes que investigaron: `ROBLOX/docs/pc-investigacion/` (flujo, MCP, skills, pruebas).
 
 ## Sistema
 
@@ -9,14 +10,14 @@ Fecha: 2026-10-20. Lo preparó Claude Code en la PC, a partir de la rama `claude
 | Windows | 11 Pro, build 22631, x64 |
 | Git | 2.54.0 (con Git Bash en `C:\Program Files\Git\bin\bash.exe`) |
 | Node / npm | v24.21.0 / 11.19.0 |
-| VS Code | No instalado (no hace falta para lo de ahora) |
-| Roblox Studio | **No instalado** (no existe `%LOCALAPPDATA%\Roblox\Versions`) |
-| Claude Code | 2.1.304 (`C:\Users\Administrator\.local\bin\claude.exe`) |
+| VS Code | 1.142.0 (instalador oficial de Microsoft, firma verificada) |
+| Roblox Studio | Instalado en `C:\Program Files\Roblox\Versions\` (no en `%LOCALAPPDATA%`), sesión iniciada |
+| Claude Code | 2.1.304 |
 
 ## Toolchain de Roblox (con Rokit)
 
-Instalé Rokit con su script oficial (`rojo-rbx/rokit/scripts/install.ps1`, lo leí antes de ejecutarlo).
-Las herramientas están instaladas de forma **global** (`rokit add --global`), así que no hay ningún `rokit.toml` en el repo.
+Rokit se instaló con su script oficial (`rojo-rbx/rokit/scripts/install.ps1`, leído antes).
+Herramientas **globales** (`rokit add --global`): no hay `rokit.toml` en el repo.
 
 | Herramienta | Versión |
 |---|---|
@@ -25,37 +26,64 @@ Las herramientas están instaladas de forma **global** (`rokit add --global`), a
 | stylua | 2.6.0 |
 | selene | 0.32.0 |
 | luau-lsp | 1.70.1 |
-| lune | 0.11.0 (fijada así porque `.luaurc` y `tools/testkit/runner.luau` usan Lune 0.11) |
+| lune | 0.11.0 (fijada: `.luaurc` y `tools/testkit/runner.luau` usan Lune 0.11) |
 
-Nota: `CLAUDE.md` dice que el toolchain va en `ROBLOX/.toolchain/`. En Windows lo dejé global con Rokit, que es más simple.
-Si la nube quiere versiones fijas por proyecto, que añada un `rokit.toml` y aquí se corre `rokit install`.
+`CLAUDE.md` pide el toolchain en `ROBLOX/.toolchain/`; en Windows quedó global con Rokit. Si la nube añade un `rokit.toml`, aquí se corre `rokit install`.
+
+## Extensiones de VS Code
+
+`anthropic.claude-code`, `evaera.vscode-rojo`, `johnnymorganz.luau-lsp`, `johnnymorganz.stylua`, `kampfkarren.selene-vscode`.
+
+## Rojo ↔ Studio: FUNCIONA
+
+- `rojo plugin install` falla en esta PC ("Couldn't find registry keys"), porque Studio está instalado para toda la máquina.
+  Se puso a mano el `Rojo.rbxm` oficial de la release v7.7.1 en `%LOCALAPPDATA%\Roblox\Plugins\`.
+- Proyecto de prueba en `ROBLOX/.toolchain/rojo-prueba` (ignorado por git). Con `rojo serve` corriendo,
+  Studio conectó: el panel muestra "rojo-prueba · localhost:34872".
+- La nube todavía no tiene un `*.project.json` real. Cuando lo suba, se usará ese en vez del de prueba.
+
+## Skill `roblox-dev`
+
+En Windows sin modo desarrollador, `.claude/skills/roblox-dev` llega como un archivo de texto (el symlink no se crea).
+Arreglo sin tocar el repo: una junction `C:\Users\Administrator\.claude\skills\roblox-dev` → `ROBLOX\skills\roblox-dev`.
+Claude Code ya la detecta, y se actualiza sola con `git pull`.
+
+## MCP de Roblox Studio
+
+- Registrado en Claude Code (usuario): `claude mcp add --scope user Roblox_Studio -- cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat`.
+- Probado a mano por stdio: `initialize` responde (`RobloxStudio 1.0.0`) y `list_roblox_studios` devuelve `{"studios":[]}`,
+  porque **falta encender "Enable Studio as MCP server"** en Studio. No se puede activar sin la interfaz.
+- El plugin oficial `Roblox/roblox-studio-agent-plugin` (v0.2.2, MIT) existe y solo trae configuración y una skill de instalación.
+  No aparece en ningún catálogo que la CLI pueda ver (`claude-plugins-official`, `anthropic-plugin-directory`). Hace lo mismo que el registro manual,
+  así que no se instaló, para no tener el servidor duplicado.
 
 ## Pruebas
 
-No existe `tools/test.sh` ni `tools/README.md`. Corrí cada `*.spec.luau` con `lune run <archivo>` desde la raíz del repo:
+No existe `tools/test.sh`. Se corrió cada `*.spec.luau` con `lune run <archivo>` desde la raíz:
 
 | Archivo | Resultado |
 |---|---|
+| `ROBLOX/tests/Economy.spec.luau` | 22 pasan, 0 fallan |
+| `ROBLOX/tests/Net.spec.luau` | 20 pasan, 0 fallan |
+| `ROBLOX/tests/Odds.spec.luau` | 27 pasan, 0 fallan |
 | `tools/examples/ReceiptHandler.spec.luau` | 9 pasan, 0 fallan |
-| `tools/testkit/mocks/mocks.spec.luau` | 38 pasan, 0 fallan |
+| `tools/testkit/mocks/mocks.spec.luau` | 40 pasan, 0 fallan |
 | `tools/testkit/testkit.spec.luau` | 16 pasan, 0 fallan |
 
-Total: **63 pasan, 0 fallan.** Además `selene tools` da 0 errores y 0 avisos.
+Total: **134 pasan, 0 fallan** (corrido con la nube hasta `a47220b`). `selene tools`: 0 errores, 0 avisos.
 
-## MCP de Roblox Studio (pendiente: falta Studio)
+## Recomendaciones para la nube (de la investigación)
 
-Pasos confirmados en la documentación oficial (`Roblox/creator-docs`, `content/en-us/ai/coding-harness.md` y `content/en-us/studio/mcp.md`):
-
-1. Instalar Studio desde https://create.roblox.com/docs/studio/setup e iniciar sesión.
-2. En Studio: botón **Assistant** (arriba a la derecha) → **⋯** → **Manage MCP Servers** → activar **Enable Studio as MCP server**.
-3. En **Quick connect**, activar **Claude Code** (sale en la lista oficial). Si no aparece, reiniciar Studio.
-4. Plan B, según la documentación: `claude mcp add Roblox_Studio -- cmd.exe /c %LOCALAPPDATA%\Roblox\mcp.bat`.
-5. Verificar en Claude Code con `/mcp` y luego pedirle: "Usa el MCP de Roblox para listar lo que hay en Workspace".
-
-No encontré en esa documentación la opción `/plugin` → "Roblox Studio", así que no está confirmada.
+- Usar **Rojo** como vía de sincronización: todo vive en archivos, `rojo build` funciona sin Studio y genera el sourcemap para luau-lsp. No mezclarlo con Script Sync en las mismas carpetas.
+- Publicar sin clics: `rojo upload --api_key … --universe_id … --asset_id …` (existe en 7.7.1) con una API key de Open Cloud con el permiso `universe-places` Write.
+- Pruebas dentro de Roblox: Jest-Lua por la API Open Cloud **Luau Execution** sobre un place de pruebas. TestEZ y run-in-roblox están abandonados.
+- CI: no hay `.github/workflows` ni `stylua.toml`. Un CI mínimo sería selene + `stylua --check` + `rojo build` + `lune run` de los specs.
+- No instalar MCPs de terceros (Chrrxs, boshyxd): repiten lo que hace el oficial, se instalan con `npx @latest` sin versión fija y ejecutan Luau.
 
 ## Lo que Aryan tiene que hacer a mano
 
-- [ ] Instalar Roblox Studio e iniciar sesión.
-- [ ] Activar el MCP en Studio (pasos 2 y 3 de arriba) y avisar a Claude para verificarlo con `/mcp`.
-- [ ] (Opcional) Instalar VS Code si quiere editar código con Script Sync.
+- [x] Instalar Roblox Studio e iniciar sesión.
+- [x] Conectar Rojo en Studio (Plugins → Rojo → Connect).
+- [ ] En Studio: **Assistant → ⋯ → Manage MCP Servers → Enable Studio as MCP server**. Después, en una sesión nueva de Claude Code, `/mcp` debe mostrar `Roblox_Studio` conectado.
+- [ ] (Cuando haga falta publicar) Crear en create.roblox.com un place de pruebas y una API key de Open Cloud con permisos mínimos.
+      Guardarla en una variable de entorno de Windows, nunca en archivos ni en el chat.
