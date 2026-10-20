@@ -29,6 +29,7 @@ Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games
 | `LiveOps` | Ventanas de eventos y rotación, códigos con caducidad y un uso por jugador, bienvenida, temporada; configuración remota (ConfigService/DataStore, inyectada) validada antes de aplicarla. | servidor | `tests/LiveOps.spec.luau` |
 | `Analytics` | Envoltorio de `AnalyticsService` (economía, embudo FTUE, eventos propios): no-op sin servicio, valida y respeta los límites documentados. | servidor | `tests/Analytics.spec.luau` |
 | `UI` | Constructores de interfaz por código, móvil primero; paneles reutilizables de tienda y de probabilidades; formateo (`formatNumber`, `formatDuration`). | cliente | `tests/UI.spec.luau` |
+| `Art` | Arte intercambiable con respaldo: busca plantillas `<raíz>/<categoría>/<id>`, las **valida con lista blanca** (sin scripts), las clona, escala/orienta con un perfil y cae al generador procedural si faltan o son inválidas. Genérico (sin nada de un juego). | ambos | `tests/Art.spec.luau` |
 
 | Juego (`games/fish-and-fortune/src/`) | Qué es |
 |---|---|
@@ -39,17 +40,19 @@ Fecha: 2026-10-20. Alcance: `ROBLOX/packages/` (kit reutilizable), `ROBLOX/games
 | `shared/{Remotes,ClientLogic,Store}.luau` | Nombres de remotos; guía del tutorial y textos del cliente; contenedor de estado. |
 | `server/GameLogic.luau` | Reglas de juego sobre el perfil: lanzar/recoger, vender, canas, zonas, bestiario, temporada, VIP diario, offline, concesión de productos. |
 | `server/{Catalog,ProductIds,Schema,LiveOpsDefaults}.luau` | Catálogo y precios; **único archivo de IDs** (`0 -- TODO_ID`); esquema de datos; configuración de LiveOps por defecto. |
-| `server/{GameService,Main.server,WorldBuilder,StudioMemoryStore}.luau` | Pegamento con el motor: orquesta paquetes y remotos; mundo procedural; almacén en memoria solo para Studio. |
+| `server/{GameService,Main.server,WorldBuilder,StudioMemoryStore}.luau` | Pegamento con el motor: orquesta paquetes y remotos; mundo procedural (con arte opcional); almacén en memoria solo para Studio. |
+| `server/ArtDirector.luau`, `shared/ArtProfiles.luau` | Arte generado opcional: caña en la mano, escaparate de capturas, resumen de arranque; fichas (tamaño, pivote, presupuesto) de las 35 piezas. Ver sección 13. |
 | `client/*.luau` | `Main` (LocalScript), `Hud`, `Minigame`, `Feedback`, `Menus`. Solo presentación y solicitudes. |
 
 Mapa Rojo (`default.project.json`):
 
 ```
-ReplicatedStorage   Packages {Odds, Net, UI, Locale}    <- seguros para el cliente
-                    Shared   {Balance, Strings, FeatureFlags, FishingRules, Remotes, ClientLogic, Store}
+ReplicatedStorage   Packages {Odds, Net, UI, Locale, Art}    <- seguros para el cliente
+                    Shared   {Balance, Strings, FeatureFlags, FishingRules, Remotes, ClientLogic, Store, ArtProfiles}
 ServerScriptService ServerPackages {Data, Economy, Shop, LiveOps, Analytics}   <- SOLO servidor
                     Server   {Main (Script), GameService, GameLogic, Catalog, ProductIds, Schema,
-                              LiveOpsDefaults, WorldBuilder, StudioMemoryStore}
+                              LiveOpsDefaults, WorldBuilder, StudioMemoryStore, ArtDirector}
+ServerStorage       Art {creatures, rods, props}        <- plantillas de arte generado (vacías en el repo; .rbxm en art/models/)
 StarterPlayer.StarterPlayerScripts.Client {Main (LocalScript), Hud, Minigame, Feedback, Menus}
 ```
 
@@ -218,3 +221,36 @@ Los tests usan los dobles de `ROBLOX/tools/testkit/mocks` (`Clock`, `DataStoreSe
 3. Declara en `Balance` todo el contenido y escribe sus tests de coherencia (`tests/Balance.spec.luau`): odds válidas, valores > 0, FTUE ≤ 60 s.
 4. Rellena `ProductIds` con IDs reales y ejecuta `Shop.validateCatalog(catalogo, handlers, { allowPlaceholders = false })` como puerta previa a publicar.
 5. Revisa a mano todo lo marcado `REVIEW(money)` y haz un playtest con el checklist del README.
+6. Arte: define las fichas de tus piezas (como `ArtProfiles`), pasa `Art.new` a tu `WorldBuilder` y pide cada pieza con `place(categoría, id, { fallback = ... })` (sección 13); empieza sin arte y llénalo después.
+
+---
+
+## 13. Arte intercambiable (`Art`, `ArtProfiles`, `ArtDirector`)
+
+```
+                      ServerStorage/Art/<categoría>/<id>        (plantillas: Model con el nombre del id)
+                                  │  find
+   WorldBuilder ─┐                ▼
+   ArtDirector  ─┼─ place(cat, id, {parent, cframe, anchored?, scale?, fallback?}) ──► Art.Provider
+   (caña, escaparate)             │ validate (lista blanca) ──✗──► respaldo: `fallback` (procedural de siempre) o nada
+                                  │ ✓ clonar → girar → escalar (perfil) → pivote → normalizar (visual, anclado / soldado)
+                                  ▼
+                       Model en Workspace / personaje   (se replica solo)
+```
+
+**Decisiones y por qué**
+| Decisión | Motivo | Alternativa descartada |
+|---|---|---|
+| Un único punto (`Art.place`) decide arte o respaldo; el respaldo lo pasa quien llama | Que el generador procedural no se toque y siga siendo la verdad cuando no hay arte; probable con Lune | `if` repartidos por el código |
+| Plantillas en **`ServerStorage`** | Todo consumidor actual es del servidor y lo colocado se replica solo; el cliente no descarga plantillas ni puede alterarlas | `ReplicatedStorage` (replica todo a todos); queda como opción para `ViewportFrame` futuros |
+| **Lista blanca** de clases, no lista negra de scripts | Un asset generado o importado no puede traer código, remotos, sonidos ni constraints; lo desconocido se rechaza | Buscar solo `Script`/`LocalScript`/`ModuleScript` |
+| Clonar y normalizar; **nunca** asignar `MeshId` ni ejecutar nada | `MeshId` es de solo lectura para scripts; clonar conserva la malla ya subida | `AssetService:CreateMeshPartAsync`, `InsertService:LoadAsset` (cargar modelos en ejecución) |
+| Arte **solo visual**; la colisión (cubierta del muelle) es una parte propia invisible | Una malla generada no garantiza una superficie transitable ni una colisión buena | Colisión de la malla |
+| Geometría propia (cajas orientadas), no `Model:ScaleTo/GetBoundingBox/PivotTo` | Se prueba con Lune sin motor y se comporta igual en Studio | Métodos del motor |
+| Perfiles en datos (`ArtProfiles`) + manifiesto de prompts (`art/manifest.json`) con prueba de no desviación | Un solo sitio para el tamaño/presupuesto de cada pieza; los prompts viven con sus medidas | Constantes sueltas |
+| Farolas y barca **sin respaldo** | El procedural nunca las tuvo; sin arte el mundo no cambia | Crear versiones procedurales nuevas |
+
+**Persistencia:** las plantillas viven en el lugar guardado desde Studio y, cuando se aceptan, como `art/models/<categoría>/<id>.rbxm` mapeados por Rojo (`$ignoreUnknownInstances: true`, así `rojo serve` no borra lo hecho en Studio). Un `.rbxm` guarda la referencia al `MeshId`, no la malla; el `SurfaceAppearance` y los `MaterialVariant` no los actualiza la API de publicación de Open Cloud: se publica desde Studio. Detalle y alternativas: `docs/arte-con-ia-en-studio.md` §8.
+
+**Qué no cubre:** que el motor muestre bien cada modelo (aspecto, escala, soldaduras con el rig real), el recuento real de triángulos (solo se valida el atributo `ArtTriangles`) y los permisos de acceso a los assets de malla en un juego publicado. Todo ello requiere playtest en Studio.
+

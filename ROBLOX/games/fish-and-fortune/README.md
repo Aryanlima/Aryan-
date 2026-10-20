@@ -12,7 +12,7 @@ Arquitectura, flujos de compra y de datos, decisiones y riesgos: [`../../docs/ar
 
 | Área | Contenido |
 |---|---|
-| Mundo | 3 zonas construidas **por código** (`server/WorldBuilder.luau`): Lago Calmo, Río Cristal, Costa Dorada. Partes simples, colores agradables, iluminación y viaje entre zonas. Limpio y sustituible por arte generado con IA. |
+| Mundo | 3 zonas construidas **por código** (`server/WorldBuilder.luau`): Lago Calmo, Río Cristal, Costa Dorada. Partes simples, colores agradables, iluminación y viaje entre zonas. **Cada pieza se puede sustituir por arte generado con IA sin tocar código y con respaldo procedural** (ver la sección 11, "Arte intercambiable"). |
 | Pesca | Lanzamiento con minijuego de ~3 s (barra, marcador, zona perfecta), 25 criaturas (6 rarezas), 5 cañas, venta, bestiario con recompensas, **pesca automática** (pase), inventario con slots, ganancias **offline** con tope. |
 | Social / viral | **Banner global** al capturar un MÍTICO (MessagingService), códigos de canje, mensaje de bienvenida. |
 | LiveOps | 2 eventos rotativos semanales (**Marea Dorada** x2 monedas, **Luna Mítica** +3 suerte gratuita), temporada con 10 niveles (pista gratis + premium), configurables **sin republicar**. |
@@ -27,16 +27,17 @@ Estructura:
 ```
 default.project.json         proyecto Rojo
 src/shared/                  Balance (TODO el balance, solo números), Strings (TODOS los textos, ES + EN), FeatureFlags,
-                             FishingRules, Remotes, ClientLogic, Store
+                             FishingRules, Remotes, ClientLogic, Store, ArtProfiles (ficha de cada pieza de arte)
 src/server/                  Main.server (Script), GameService, GameLogic, Catalog, ProductIds (IDs), Schema,
-                             LiveOpsDefaults, WorldBuilder, StudioMemoryStore
+                             LiveOpsDefaults, WorldBuilder, StudioMemoryStore, ArtDirector (cana/escaparate de arte)
+art/                         manifest.json (prompts de arte con IA) y models/<categoria>/<id>.rbxm (arte aceptado)
 src/client/                  Main.client (LocalScript), Hud, Minigame, Feedback, Menus
 tests/                       *.spec.luau de la lógica del juego (Lune); ProjectStructure y ClientBoot construyen el lugar con
                              `rojo build` y comprueban la estructura y el arranque del cliente (ver `../../docs/verificacion-estructura.md`)
 tests/support/               ServerHarness (arnés de GameService, compartido) y BuiltPlace (construye el lugar con rojo)
 ```
 
-Los paquetes compartidos (`Data`, `Economy`, `Shop`, `Odds`, `Net`, `LiveOps`, `Analytics`, `UI`, `Locale`) se mapean desde `../../packages/`.
+Los paquetes compartidos (`Data`, `Economy`, `Shop`, `Odds`, `Net`, `LiveOps`, `Analytics`, `UI`, `Locale`, `Art`) se mapean desde `../../packages/`.
 
 ---
 
@@ -226,7 +227,7 @@ Hazlo en un lugar de pruebas, con un jugador nuevo (o borra su clave en el DataS
 
 ## 8. Qué falta (arte, sonido, miniaturas)
 
-* **Arte:** mapa y modelos (muelles, árboles, cartel, tienda), modelos de caña por tier, criaturas (iconos o modelos), skins de UI, partículas de captura, efecto del banner. El mundo actual es procedural y debe sustituirse respetando el contrato de `WorldBuilder` (`Workspace.World/<zona>/Spawn` y `CastTarget`).
+* **Arte:** el sistema para enchufar arte generado ya existe (sección 11) pero **no hay ninguna pieza generada todavía**: faltan por hacer en Studio (sesión del PC) los modelos de las criaturas, cañas, muelle, farolas, barca y árboles, y los materiales del suelo (`../../docs/arte-con-ia-en-studio.md`). Siguen sin existir: skins de UI, partículas de captura, efecto del banner, criaturas en el bestiario/tienda (necesitarían `ViewportFrame` en el cliente). El contrato del mundo (`Workspace.World/<zona>/Spawn`, `CastTarget`, `Sign`) no cambia con el arte.
 * **Sonido:** lanzar, mordisco, captura por rareza, MÍTICO, venta, compra, música ambiente.
 * **Icono y miniaturas** del juego (cumpliendo la guía de miniaturas de Roblox), 5-6 capturas con las criaturas más raras y un clip del banner MÍTICO (ROBLOX/research/05).
 * **Cuestionario de madurez**, descripción y título únicos, texto de la tienda revisado por una persona.
@@ -270,3 +271,34 @@ Verificadas contra `Roblox/creator-docs` (2026-10-20): `LocalizationService.Robl
 **Añadir o cambiar un texto.** Edita/añade la entrada en `Strings.luau` (ES **y** EN) y úsala con `L("clave", { args })` en el cliente o `toast(player, "toast.clave", { args })` en el servidor. La prueba escanea el código: falla si usas una clave que no existe, si dejas una clave sin usar o si escribes un texto visible a mano en el cliente.
 
 **Lo que no se localiza aquí.** (1) El nombre/descripción del **diálogo de compra de Roblox**, la ficha del juego, los iconos y las miniaturas: se traducen en el Creator Hub. (2) Los textos de la configuración remota de LiveOps (sección 5): un evento, temporada o bienvenida **nuevos** sin clave en `Strings.luau` se muestran con el texto configurado (en el idioma en que lo escribas); para traducirlos añade `event.<id>.name`, `season.<id>.name` o `welcome.<id>` y republica. (3) Los avisos de servidor y los logs (`warn`) siguen en español (no los ve el jugador). La traducción automática de Roblox está desactivada para esta interfaz (`AutoLocalize = false`) para que no vuelva a traducir lo ya localizado.
+
+---
+
+## 11. Arte intercambiable (modelos generados con IA, con respaldo procedural)
+
+**Idea:** el mundo, la caña y las criaturas tienen una ficha (`src/shared/ArtProfiles.luau`: tamaño objetivo, pivote, presupuesto de triángulos). El proveedor `../../packages/Art.luau` busca para cada pieza una **plantilla** en `ServerStorage/Art/<categoría>/<id>`; si no existe o no es válida, se usa el generador procedural de siempre. **Sin plantillas el juego es idéntico al de antes** (hay una prueba de firma del mundo).
+
+| Categoría | Ids | Dónde se usa |
+|---|---|---|
+| `creatures` | los 25 de `Balance.creatures` | Escaparate: al pescar una Rara o mejor (Legendaria o mejor en pesca automática) la criatura salta del agua 3,5 s sobre el punto de lanzamiento, visible para todos. Solo si hay arte de ESA criatura |
+| `rods` | los 5 de `Balance.rodOrder` | Caña en la mano del personaje (si no hay arte, la `Part` de colores de siempre) |
+| `props` | `pier`, `lantern`, `rowboat`, `pine_tree`, `palm_tree` | Muelle (con respaldo), árboles (con respaldo), farolas y barca (**sin** respaldo: sin arte no aparecen) |
+| materiales | `FF_ground_lake`, `FF_ground_river`, `FF_ground_coast`, `FF_pier_wood` | `MaterialVariant` en `MaterialService` aplicado al suelo y al muelle procedural |
+
+**Dónde viven (decisión de replicación):** `ServerStorage/Art`. Todo lo que hoy usa arte es del servidor (mundo, caña en el personaje, escaparate), y lo que el servidor coloca en `Workspace` o en el personaje se replica solo. Las plantillas **no se descargan al cliente** y un cliente tramposo no puede tocarlas. Si en el futuro el bestiario o la tienda muestran modelos 3D en un `ViewportFrame`, habrá que copiar esas plantillas a `ReplicatedStorage` (`Art` ya es seguro para el cliente: está en `ReplicatedStorage.Packages`).
+
+**Seguridad:** la validación (`Art.validate`) es una **lista blanca** de clases (`Model, Folder, MeshPart, Part, WedgePart, SurfaceAppearance, Decal, Texture, Attachment, WeldConstraint`): un asset con un script (en cualquier nivel), un remoto, un sonido, etc. se rechaza, se avisa **una vez** en la salida y se usa el respaldo. También se rechazan: modelo sin partes, `MeshPart` sin `MeshId` o con un `MeshId` que no es un asset de Roblox, tamaños absurdos o no finitos, más de 12 partes o 64 instancias, y `ArtTriangles` (atributo que escribe el script de archivado) por encima del presupuesto de la pieza o de 20.000. Nada se ejecuta: solo se clona y se normaliza (visual, sin colisiones, anclado). `MeshId` nunca se asigna por código (es de solo lectura para scripts).
+
+**Convención del modelo en su plantilla:** `Model` con el nombre exacto del id, ejes del mundo sin girar, alto en Y, frente (morro / punta de la caña) hacia −Z, un material, sin scripts. Si sale girado, el perfil corrige con `rotation`.
+
+**Cómo se llena:**
+1. Generar con IA dentro de Studio y archivar: `../../docs/arte-con-ia-en-studio.md` (runbook para la sesión del PC) y `../../docs/prompt-pc-arte-ia.md` (mensaje para pegar). Los prompts exactos, los lotes diarios y los criterios de aceptación están en `art/manifest.json`; el resultado se anota en `../../docs/arte-ia-informe.md`.
+2. Para versionar el arte aceptado: guardar cada modelo como `art/models/<categoría>/<id>.rbxm`. El proyecto Rojo ya mapea esas tres carpetas a `ServerStorage.Art.<categoría>` con `$ignoreUnknownInstances: true`, así que `rojo serve` **no borra** lo que haya en Studio y `rojo build` incluye los `.rbxm`. Los `MaterialVariant` se quedan en el lugar guardado desde Studio.
+3. **No publicar el lugar con `rojo upload`/`rbxcloud` mientras haya arte que solo esté en el lugar** (el build no lo trae y sobrescribiría la versión). Los `SurfaceAppearance` (texturas PBR) no los actualiza la API de publicación (`usage-place-publishing.md`): publicar desde Studio.
+
+**Al arrancar** el servidor escribe `[Art] arte generado: N de 35 piezas (M sin arte -> respaldo procedural, K rechazadas)` y una línea por cada plantilla rechazada con su motivo.
+
+**Pruebas:** `../../tests/Art.spec.luau` (proveedor: con arte, sin arte, arte inválido con script, arte a medias, escala/pivote/rotación, soldaduras, materiales), `tests/ArtProfiles.spec.luau` (fichas y manifiesto sin desviaciones, prompts sin marcas ni casino, lotes), `tests/ArtDirector.spec.luau` (caña y escaparate), `tests/ArtWorld.spec.luau` (`WorldBuilder` sobre el lugar construido por Rojo) y las pruebas de `GameService.spec.luau` con `ArtDirector`.
+
+**Sin verificar en Studio (`-- VERIFY:`):** que `generate_mesh` deje un `MeshId` de asset persistente; el recuento de triángulos real de cada malla (solo se valida el atributo `ArtTriangles`); el aspecto en el motor de la caña soldada a la mano, del escaparate y de la altura de la cubierta del muelle de arte; el comportamiento de `Massless`/`WeldConstraint` con el rig real; que el nombre y el contenido de las plantillas sobrevivan a un guardado/publicación desde Studio.
+
