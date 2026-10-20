@@ -18,7 +18,7 @@ Arquitectura, flujos de compra y de datos, decisiones y riesgos: [`../../docs/ar
 | LiveOps | 2 eventos rotativos semanales (**Marea Dorada** x2 monedas, **Luna Mítica** +3 suerte gratuita), temporada con 10 niveles (pista gratis + premium), configurables **sin republicar**. |
 | Monetización v1 | Pack de inicio, Pase 2x Dinero, Pase Auto-Pesca, Pase VIP, Pase de Temporada, Boost de Monedas 15 min, packs de monedas (3), pack de perlas, +10 slots. Servidor privado (VIP de Roblox). |
 | Cumplimiento | Panel **Probabilidades** siempre accesible (botón con texto), suma 100 %, columna base, desglose de suerte. Sin lenguaje de presión. **Sin suerte ni azar de pago en la v1** (sección 4). |
-| Idiomas | **ES (por defecto) y EN completos**, elegidos por jugador según su idioma de Roblox; todos los textos en un solo archivo (`src/shared/Strings.luau`). Ver la sección 10. |
+| Idiomas | **EN (por defecto/respaldo) y ES completos**, elegidos por jugador según su idioma de Roblox; todos los textos en un solo archivo (`src/shared/Strings.luau`). Ver la sección 10. |
 | Tutorial (FTUE) | Los 3 primeros lanzamientos están garantizados (Poco común, Poco común, Raro) y una guía en pantalla lleva de *lanzar* a *vender* a *comprar la primera caña*. Objetivo: primera captura y primera venta en **≤ 60 s** (probado en `tests/GameLogic.spec.luau` con un jugador simulado). |
 | Analítica | Embudo FTUE (6 pasos), embudo de tienda, eventos de economía (`LogEconomyEvent`), `first_join` con la **fuente** (referido, teletransporte, enlace, directo), capturas y MÍTICOS. |
 
@@ -31,7 +31,9 @@ src/shared/                  Balance (TODO el balance, solo números), Strings (
 src/server/                  Main.server (Script), GameService, GameLogic, Catalog, ProductIds (IDs), Schema,
                              LiveOpsDefaults, WorldBuilder, StudioMemoryStore
 src/client/                  Main.client (LocalScript), Hud, Minigame, Feedback, Menus
-tests/                       *.spec.luau de la lógica del juego (Lune)
+tests/                       *.spec.luau de la lógica del juego (Lune); ProjectStructure y ClientBoot construyen el lugar con
+                             `rojo build` y comprueban la estructura y el arranque del cliente (ver `../../docs/verificacion-estructura.md`)
+tests/support/               ServerHarness (arnés de GameService, compartido) y BuiltPlace (construye el lugar con rojo)
 ```
 
 Los paquetes compartidos (`Data`, `Economy`, `Shop`, `Odds`, `Net`, `LiveOps`, `Analytics`, `UI`, `Locale`) se mapean desde `../../packages/`.
@@ -52,10 +54,14 @@ Requisitos en tu PC (ver `../../docs/setup-en-tu-pc.md`): Roblox Studio, [Rojo](
 Comprobaciones locales (desde la raíz del repositorio):
 
 ```
-bash ROBLOX/tools/test.sh      # tests de lógica pura
-bash ROBLOX/tools/lint.sh      # selene + stylua --check + luau-lsp
+bash ROBLOX/tools/test.sh      # tests de lógica pura + estructura del lugar construido + arranque del cliente
+bash ROBLOX/tools/lint.sh      # selene + stylua --check + luau-lsp (con el sourcemap de Rojo de este juego)
 bash ROBLOX/tools/format.sh    # aplica StyLua
 ```
+
+* `lint.sh` genera `ROBLOX/.toolchain/sourcemaps/fish-and-fortune.json` (`rojo sourcemap --absolute`, ignorado por git) y lo pasa a luau-lsp: los `require(carpeta:WaitForChild("Modulo"))` de `Main.server`/`Main.client` se resuelven y se tipan contra `default.project.json`; un nombre que no exista es un error de análisis. Los `require` van con literales (`packages:WaitForChild("Odds")`), no por una función con nombres en variables, porque esas no se pueden comprobar.
+* Si añades, quitas o renombras un módulo/script/remoto: actualiza a propósito `EXPECTED` y las listas de `tests/ProjectStructure.spec.luau` (y `shared/Remotes.luau`). Esa prueba falla si el árbol de Rojo, los `require`, los remotos o `WorldBuilder` dejan de coincidir con lo que busca el cliente.
+* Sin el binario `rojo`, esas dos pruebas se **omiten con un aviso** (con `ARYAN_REQUIRE_ROJO=1` fallan).
 
 Para un build: `rojo build default.project.json -o FishAndFortune.rbxl` (el `.rbxl` no se versiona).
 
@@ -148,6 +154,11 @@ Defaults en `src/server/LiveOpsDefaults.luau` (viven en el servidor: no exponen 
 ## 6. Checklist de playtest manual
 
 Hazlo en un lugar de pruebas, con un jugador nuevo (o borra su clave en el DataStore de pruebas).
+
+**Arranque y estructura (primero; lo que no se puede comprobar sin Studio, ver `../../docs/verificacion-estructura.md` sección 4)**
+- [ ] Salida del servidor sin errores en rojo: aparece `[FishFortune] servidor iniciado` y ninguna advertencia `Infinite yield possible`.
+- [ ] En el Explorer, tras Play: `ReplicatedStorage.Remotes` con 23 RemoteEvents, `Workspace.World` con `lake`, `river` y `coast`, `Workspace.SpawnLocation` y la interfaz `FishFortune` en `PlayerGui`.
+- [ ] El `LocalScript` de `StarterPlayerScripts.Client.Main` se ejecuta (anidado en la carpeta `Client`) y la interfaz sale una sola vez al reaparecer.
 
 **Primeros 60 segundos (cronómetro en mano)**
 - [ ] Apareces en el muelle del Lago Calmo con una caña en la mano y ves "Pulsa LANZAR para pescar" (objetivo visible, cero menús previos).

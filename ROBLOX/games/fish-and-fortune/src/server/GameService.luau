@@ -488,7 +488,11 @@ function GameService.start(m: any)
 				warn("[Banner] no se pudo suscribir a los MITICOS globales: " .. tostring(err))
 			end
 		end)
-		liveOps:subscribe(MessagingService, LIVEOPS_TOPIC)
+		-- SubscribeAsync cede (red): fuera del hilo de arranque, para que un MessagingService lento no retrase el resto del
+		-- arranque (datos de jugadores, pesca automatica, PlayerAdded).
+		task.spawn(function()
+			liveOps:subscribe(MessagingService, LIVEOPS_TOPIC)
+		end)
 	end
 	liveOps:startPolling()
 
@@ -854,6 +858,8 @@ function GameService.start(m: any)
 			end
 			profile:markDirty()
 			pushState(player)
+			-- Si el personaje aparecio ANTES que el perfil, tiene la cana por defecto y esta en el Lago: se corrige aqui.
+			refreshRod(player)
 			if data.zone ~= "lake" then
 				teleportToZone(player, data.zone)
 			end
@@ -882,7 +888,14 @@ function GameService.start(m: any)
 	manager:startAutosave()
 
 	local function onCharacter(player: Player, character: Model)
-		task.defer(attachRod, player, character)
+		task.defer(function()
+			-- Si el perfil cargo ANTES que el personaje, onLoaded no tenia a quien mover: se coloca al aparecer (y tras morir).
+			local profile = profileOf(player)
+			if profile ~= nil and profile.data.zone ~= "lake" then
+				teleportToZone(player, profile.data.zone)
+			end
+			attachRod(player, character)
+		end)
 	end
 	Players.PlayerAdded:Connect(function(player: Player)
 		player.CharacterAdded:Connect(function(character: Model)

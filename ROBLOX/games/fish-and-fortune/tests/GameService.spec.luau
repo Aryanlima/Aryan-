@@ -10,266 +10,17 @@
 	Limites (lo que esto NO prueba): el motor real (replicacion, orden de scripts, Rojo), ni los servicios reales.
 	Es una ejecucion con dobles, no un playtest en Studio.
 
-	Rutas: se calculan a partir de la ubicacion de ESTE archivo (tests/ -> ../src, ../../../packages).
+	Rutas: se calculan a partir de la ubicacion de support/ServerHarness.luau (tests/support/ -> ../../src, ../../../../packages).
+	El arnes (buildWorld) vive en tests/support/ServerHarness.luau para compartirlo con ClientBoot.spec.
 ]]
-local luau = require("@lune/luau")
-local fs = require("@lune/fs")
 local testkit = require("@testkit")
 local Mocks = require("@testkit/mocks")
+local ServerHarness = require("./support/ServerHarness")
 
 local describe, it, expect, beforeEach = testkit.describe, testkit.it, testkit.expect, testkit.beforeEach
 
-local HERE = (debug.info(1, "s") :: string):gsub("[^/\\]+$", "")
-local GAME = HERE .. "../src/"
-local PACKAGES = HERE .. "../../../packages/"
-
-local FAKE_IDS = {
-	passes = { auto_fish = 1, double_coins = 2, luck_plus = 3, starter = 4, vip = 5, season_pass = 6 },
-	products = {
-		lucky_bait_15 = 11,
-		coin_boost_15 = 12,
-		coin_pack_small = 13,
-		coin_pack_medium = 14,
-		coin_pack_large = 15,
-		pearl_pack = 16,
-		slot_pack = 17,
-	},
-}
-
-local USER = 7001
-local KEY = "FishFortune_PlayerData_v1" -- DATASTORE_NAME de GameService
-
-local function buildWorld(overrides)
-	local opts = overrides or {}
-	local env = Mocks.new()
-	local world = {
-		env = env,
-		sent = {}, -- { {name=, player=, args={...}} } (servidor -> cliente)
-		remotes = {}, -- nombre -> remoto falso (RemoteEvent)
-		warnings = {},
-		analytics = {},
-		published = {},
-		bindToClose = nil,
-		policy = { ArePaidRandomItemsRestricted = false },
-		policyCalls = 0,
-		prompts = {}, -- PromptProductPurchase / PromptGamePassPurchase solicitados por el servidor
-	}
-
-	-- Remotos y otras instancias falsas
-	local function newInstance(className)
-		local instance = { ClassName = className, Name = "", Parent = nil }
-		if className == "RemoteEvent" then
-			instance.OnServerEvent = Mocks.Signal.new({ spawn = env.task.spawn })
-			function instance.FireClient(_self, player, ...)
-				table.insert(world.sent, { name = instance.Name, player = player, args = table.pack(...) })
-			end
-			function instance.FireAllClients(_self, ...)
-				table.insert(world.sent, { name = instance.Name, player = "ALL", args = table.pack(...) })
-			end
-			table.insert(world.remotes, instance)
-		end
-		function instance.Destroy() end
-		function instance.FindFirstChild()
-			return nil
-		end
-		return instance
-	end
-
-	local analyticsService = {}
-	for _, method in { "LogEconomyEvent", "LogFunnelStepEvent", "LogOnboardingFunnelStepEvent", "LogCustomEvent" } do
-		analyticsService[method] = function(_self, ...)
-			table.insert(world.analytics, { method = method, args = table.pack(...) })
-		end
-	end
-
-	local services = {
-		AnalyticsService = analyticsService,
-		DataStoreService = env.DataStoreService,
-		HttpService = {
-			GenerateGUID = function()
-				return "guid-" .. tostring(#world.warnings + 1)
-			end,
-			JSONDecode = function(_self, text)
-				return text
-			end,
-		},
-		MarketplaceService = env.MarketplaceService,
-		MessagingService = {
-			PublishAsync = function(_self, topic, message)
-				table.insert(world.published, { topic = topic, message = message })
-			end,
-			SubscribeAsync = function() end,
-		},
-		PolicyService = {
-			GetPolicyInfoForPlayerAsync = function()
-				world.policyCalls += 1
-				return world.policy
-			end,
-		},
-		Players = env.Players,
-		ReplicatedStorage = newInstance("ReplicatedStorage"),
-		RunService = env.RunService,
-		ConfigService = {
-			GetConfigAsync = function()
-				return { GetValue = function() end }
-			end,
-		},
-	}
-
-	local marketplace = env.MarketplaceService
-	local realPromptProduct, realPromptPass = marketplace.PromptProductPurchase, marketplace.PromptGamePassPurchase
-	marketplace.PromptProductPurchase = function(self, player, productId, ...)
-		table.insert(world.prompts, { kind = "product", id = productId })
-		return realPromptProduct(self, player, productId, ...)
-	end
-	marketplace.PromptGamePassPurchase = function(self, player, passId, ...)
-		table.insert(world.prompts, { kind = "pass", id = passId })
-		return realPromptPass(self, player, passId, ...)
-	end
-
-	local gameStub = {
-		PrivateServerId = "",
-		PrivateServerOwnerId = 0,
-		JobId = "",
-		GetService = function(_self, name)
-			local service = services[name]
-			if service == nil then
-				error("servicio no simulado en el arnes: " .. tostring(name), 2)
-			end
-			return service
-		end,
-		BindToClose = function(_self, callback)
-			world.bindToClose = callback
-		end,
-	}
-
-	local EnumWithAnalytics = setmetatable({
-		AnalyticsEconomyFlowType = { Source = "Source", Sink = "Sink" },
-	}, { __index = env.Enum })
-
-	-- Copia de los globales del runtime (string, math, table, pcall...) como base del entorno del codigo cargado.
-	local sandbox = table.clone((getfenv :: any)(0))
-	sandbox.game = gameStub
-	sandbox.Enum = EnumWithAnalytics
-	sandbox.task = env.task
-	sandbox.Instance = { new = newInstance }
-	sandbox.Random = {
-		new = function()
-			return {
-				NextNumber = function()
-					return opts.random and opts.random() or math.random()
-				end,
-			}
-		end,
-	}
-	sandbox.os = {
-		time = env.clock.osTime,
-		clock = env.clock.time,
-		date = os.date,
-	}
-	sandbox.warn = function(...)
-		local parts = {}
-		for _, part in { ... } do
-			table.insert(parts, tostring(part))
-		end
-		table.insert(world.warnings, table.concat(parts, " "))
-	end
-	sandbox.print = function() end
-	sandbox.Vector3 = {
-		new = function()
-			return {}
-		end,
-	}
-	sandbox.CFrame = {
-		new = function()
-			return {}
-		end,
-	}
-	sandbox.Color3 = {
-		fromRGB = function()
-			return {}
-		end,
-	}
-
-	local function load(path)
-		local source = fs.readFile(path)
-		local chunk = luau.load(source, { environment = sandbox, debugName = path })
-		return chunk()
-	end
-	world.load = load
-
-	local m = {
-		Odds = load(PACKAGES .. "Odds.luau"),
-		Net = load(PACKAGES .. "Net.luau"),
-		Locale = load(PACKAGES .. "Locale.luau"),
-		Data = load(PACKAGES .. "Data.luau"),
-		Economy = load(PACKAGES .. "Economy.luau"),
-		Shop = load(PACKAGES .. "Shop.luau"),
-		LiveOps = load(PACKAGES .. "LiveOps.luau"),
-		Analytics = load(PACKAGES .. "Analytics.luau"),
-		Balance = load(GAME .. "shared/Balance.luau"),
-		Strings = load(GAME .. "shared/Strings.luau"),
-		FishingRules = load(GAME .. "shared/FishingRules.luau"),
-		Remotes = load(GAME .. "shared/Remotes.luau"),
-		FeatureFlags = opts.flags or load(GAME .. "shared/FeatureFlags.luau"),
-		GameLogic = load(GAME .. "server/GameLogic.luau"),
-		Catalog = load(GAME .. "server/Catalog.luau"),
-		ProductIds = FAKE_IDS,
-		Schema = load(GAME .. "server/Schema.luau"),
-		WorldBuilder = {
-			build = function(zones)
-				local spawns = {}
-				for _, zone in zones do
-					spawns[zone.id] = {}
-				end
-				return { spawns = spawns, castTargets = {} }
-			end,
-		},
-		StudioMemoryStore = load(GAME .. "server/StudioMemoryStore.luau"),
-		LiveOpsDefaults = load(GAME .. "server/LiveOpsDefaults.luau"),
-	}
-	local GameService = load(GAME .. "server/GameService.luau")
-	world.api = GameService.start(m)
-	world.m = m
-
-	function world.remote(name)
-		for _, remote in world.remotes do
-			if remote.Name == name and remote.ClassName == "RemoteEvent" then
-				return remote
-			end
-		end
-		error("remoto inexistente: " .. name)
-	end
-	-- Dispara un remoto como si lo enviara el cliente del jugador.
-	function world.fire(player, name, ...)
-		world.remote(name).OnServerEvent:Fire(player, ...)
-		env.clock:advance(0.01)
-	end
-	function world.sentTo(name)
-		local list = {}
-		for _, entry in world.sent do
-			if entry.name == name then
-				table.insert(list, entry)
-			end
-		end
-		return list
-	end
-	function world.join(userId, name, props)
-		-- El stub de Player del testkit no trae CharacterAdded (GameService se conecta a el): se anade y SOLO
-		-- despues se dispara PlayerAdded.
-		local properties = table.clone(props or {})
-		properties.fire = false
-		local player = env.Players:AddPlayer(userId or USER, name or "Alice", properties)
-		player.CharacterAdded = Mocks.Signal.new({ spawn = env.task.spawn })
-		env.Players.PlayerAdded:Fire(player)
-		env.clock:advance(2) -- carga del perfil + loadPlayer + onLoaded
-		return player
-	end
-	function world.stored()
-		return env.DataStoreService:GetDataStore(KEY):_peek("Player_" .. USER)
-	end
-	return world
-end
+local buildWorld, FAKE_IDS, USER, KEY =
+	ServerHarness.buildWorld, ServerHarness.FAKE_IDS, ServerHarness.USER, ServerHarness.KEY
 
 describe("GameService (arnes de integracion con dobles)", function()
 	local world, env
@@ -789,4 +540,119 @@ describe("GameService (arnes de integracion con dobles)", function()
 			expect(utf8.len(shown)).toBe(20) -- antes: nil (corte por bytes en mitad de un caracter)
 		end
 	)
+end)
+
+----------------------------------------------------------------------------
+-- Arranque y ciclo de vida del personaje (hallazgos de docs/verificacion-estructura.md: ST-04 y ST-05)
+----------------------------------------------------------------------------
+
+-- Personaje falso: una mano (BasePart) para la cana y PivotTo registrado. El Vector3/CFrame del arnes llevan la zona en
+-- `position.zone` (ver support/ServerHarness.luau).
+local function fakeCharacter()
+	local pivots = {}
+	local hand = {
+		ClassName = "MeshPart",
+		Name = "RightHand",
+		CFrame = setmetatable({}, {
+			__mul = function()
+				return {}
+			end,
+		}),
+	}
+	function hand.IsA(_self, className)
+		return className == "BasePart" or className == "Instance"
+	end
+	local character = { ClassName = "Model", Name = "Personaje", pivots = pivots }
+	function character.FindFirstChild(_self, name)
+		if name == "RightHand" then
+			return hand
+		end
+		return nil
+	end
+	function character.PivotTo(_self, cframe)
+		table.insert(pivots, cframe)
+	end
+	return character
+end
+
+local function lastRodColor(world)
+	for index = #world.created, 1, -1 do
+		local instance = world.created[index]
+		if instance.ClassName == "Part" and instance.Name == "FishingRod" then
+			return instance.Color
+		end
+	end
+	return nil
+end
+
+local function rodColor(world, rodId)
+	local color = world.m.Balance.rods[rodId].color
+	return { r = color[1], g = color[2], b = color[3] }
+end
+
+describe("GameService: arranque y personaje", function()
+	it("un MessagingService lento no retrasa el arranque (SubscribeAsync no cede el hilo de arranque)", function()
+		local slow = buildWorld({ messagingStallSeconds = 60 })
+		-- si el arranque esperara a SubscribeAsync, el reloj simulado habria avanzado ~60 s antes de volver
+		expect(slow.env.clock:now() < 1).toBe(true)
+		slow.join()
+		expect(slow.api.manager:get(USER):isActive()).toBe(true)
+		slow.env.clock:assertNoErrors()
+	end)
+
+	it("si el perfil carga ANTES que el personaje, al aparecer se le pone su cana y se le lleva a su zona", function()
+		local world = buildWorld()
+		local env = world.env
+		local player = world.join()
+		local data = world.api.manager:get(USER).data
+		data.rod = "reed"
+		data.zone = "river"
+		local character = fakeCharacter()
+		player.Character = character
+		player.CharacterAdded:Fire(character)
+		env.clock:advance(0.1)
+		expect(lastRodColor(world)).toEqual(rodColor(world, "reed"))
+		expect(#character.pivots).toBe(1)
+		expect(character.pivots[1].position.zone).toBe("river")
+		env.clock:assertNoErrors()
+	end)
+
+	it("en el Lago no se teletransporta al aparecer (ya sale en su SpawnLocation)", function()
+		local world = buildWorld()
+		local player = world.join()
+		local character = fakeCharacter()
+		player.Character = character
+		player.CharacterAdded:Fire(character)
+		world.env.clock:advance(0.1)
+		expect(#character.pivots).toBe(0)
+		expect(lastRodColor(world)).toEqual(rodColor(world, "driftwood"))
+	end)
+
+	it("si el personaje aparece ANTES que el perfil, al cargar se corrige la cana y se le lleva a su zona", function()
+		local world = buildWorld()
+		local env = world.env
+		-- sesion 1: guardar cana y zona
+		local first = world.join()
+		local data = world.api.manager:get(USER).data
+		data.rod = "reed"
+		data.zone = "river"
+		world.api.manager:get(USER):markDirty()
+		env.Players:RemovePlayer(first)
+		env.clock:advance(5)
+		-- sesion 2: el personaje aparece antes de que termine de cargar el perfil (el DataStore tarda 0,5 s por peticion)
+		env.DataStoreService:SetLatency(0.5)
+		local second = env.Players:AddPlayer(USER, "Alice", { fire = false })
+		second.CharacterAdded = Mocks.Signal.new({ spawn = env.task.spawn })
+		env.Players.PlayerAdded:Fire(second)
+		local character = fakeCharacter()
+		second.Character = character
+		second.CharacterAdded:Fire(character)
+		env.clock:advance(0.01)
+		expect(lastRodColor(world)).toEqual(rodColor(world, "driftwood")) -- aun sin perfil: cana por defecto
+		env.clock:advance(8) -- termina de cargar el perfil -> onLoaded
+		expect(world.api.manager:get(USER).data.rod).toBe("reed")
+		expect(lastRodColor(world)).toEqual(rodColor(world, "reed"))
+		expect(character.pivots[#character.pivots].position.zone).toBe("river")
+		env.clock:assertNoErrors()
+	end)
 end)

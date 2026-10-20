@@ -20,27 +20,26 @@ local Workspace = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui") :: PlayerGui
-local packages = ReplicatedStorage:WaitForChild("Packages") :: Instance
-local shared = ReplicatedStorage:WaitForChild("Shared") :: Instance
-local client = script.Parent :: Instance
+local packages = ReplicatedStorage:WaitForChild("Packages")
+local shared = ReplicatedStorage:WaitForChild("Shared")
+local client = script.Parent
 
--- require por instancia a traves de una funcion tipada (luau-lsp sin sourcemap no resuelve `require(instancia)`).
-local requireModule: (ModuleScript) -> any = require
-
-local function load(container: Instance, name: string): any
-	return requireModule(container:WaitForChild(name) :: ModuleScript)
-end
-
-local UI = load(packages, "UI")
-local Net = load(packages, "Net")
-local Odds = load(packages, "Odds")
-local Locale = load(packages, "Locale")
-local Balance = load(shared, "Balance")
-local Strings = load(shared, "Strings")
-local FishingRules = load(shared, "FishingRules")
-local Remotes = load(shared, "Remotes")
-local ClientLogic = load(shared, "ClientLogic")
-local Store = load(shared, "Store")
+-- `require(instancia:WaitForChild("Nombre"))`: luau-lsp lo resuelve con el sourcemap de Rojo (ver tools/lint.sh) y tipa cada
+-- modulo; un nombre que no exista en default.project.json es un error del analisis, no un fallo al jugar.
+local UI = require(packages:WaitForChild("UI"))
+local Net = require(packages:WaitForChild("Net"))
+local Odds = require(packages:WaitForChild("Odds"))
+local Locale = require(packages:WaitForChild("Locale"))
+local Balance = require(shared:WaitForChild("Balance"))
+local Strings = require(shared:WaitForChild("Strings"))
+local FishingRules = require(shared:WaitForChild("FishingRules"))
+local Remotes = require(shared:WaitForChild("Remotes"))
+local ClientLogic = require(shared:WaitForChild("ClientLogic"))
+local Store = require(shared:WaitForChild("Store"))
+local Feedback = require(client:WaitForChild("Feedback"))
+local Menus = require(client:WaitForChild("Menus"))
+local Minigame = require(client:WaitForChild("Minigame"))
+local Hud = require(client:WaitForChild("Hud"))
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "FishFortune"
@@ -59,7 +58,7 @@ local locale = Locale.new(Strings)
 
 -- Idioma soportado del jugador. VERIFY: LocalizationService.RobloxLocaleId ("es-es", "en-us"...; solo lectura, no cede)
 -- viene de la documentacion oficial pero no se ha probado en Studio. Alternativa documentada: Player.LocaleId (propiedad
--- oculta, no esta en los tipos de luau-lsp). Sin dato valido => ES.
+-- oculta, no esta en los tipos de luau-lsp). Sin dato valido => el idioma por defecto de Strings (EN).
 local function currentLanguage(): string
 	local ok, localeId = pcall(function(): string
 		return LocalizationService.RobloxLocaleId
@@ -122,7 +121,12 @@ local function localizeSign(instance: Instance)
 	end
 end
 
-local remotes = ReplicatedStorage:WaitForChild(Remotes.folderName)
+-- La carpeta la crea el servidor al arrancar (GameService). Si el arranque del servidor fallo (mira SU consola), no llega
+-- nunca: con tiempo limite el cliente lo dice claro en vez de quedarse mudo con un "Infinite yield possible".
+local remotes = ReplicatedStorage:WaitForChild(Remotes.folderName, 30)
+if remotes == nil then
+	error("[FishFortune] el servidor no creo los remotos en 30 s (mira su consola)", 0)
+end
 local net = Net.newClient(remotes)
 
 local ctx: any = {
@@ -145,10 +149,10 @@ local ctx: any = {
 	serverText = serverText,
 }
 
-ctx.feedback = load(client, "Feedback").start(ctx)
-ctx.menus = load(client, "Menus").start(ctx)
-ctx.minigame = load(client, "Minigame").start(ctx)
-ctx.hud = load(client, "Hud").start(ctx)
+ctx.feedback = Feedback.start(ctx)
+ctx.menus = Menus.start(ctx)
+ctx.minigame = Minigame.start(ctx)
+ctx.hud = Hud.start(ctx)
 
 -- Servidor -> cliente (solo informacion para mostrar)
 net:onEvent("State", function(state: any)
