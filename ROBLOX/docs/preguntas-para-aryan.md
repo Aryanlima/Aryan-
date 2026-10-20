@@ -1,5 +1,11 @@
 # Preguntas para Aryan
 
+> **Actualización 2026-10-20: respuestas de Aryan.** Vive en **EE. UU.**, tiene **18 años o más**, publicará **como persona** y comprará las herramientas de IA que se recomienden.
+> Consecuencias: (1) el formulario fiscal que le toca es el **W-9**, no el W-8BEN (ese es para quienes no son de EE. UU.). Según la documentación oficial, con un W-9 válido en archivo no se exige retención de EE. UU. Se presenta en Creator Hub, en Finances > Taxes, y el 31-oct-2026 sigue siendo la fecha límite de los términos actuales. [OFICIAL] ([03 §5.4](../research/03-politicas-y-cumplimiento.md)).
+> (2) DevEx es para contribuyentes de EE. UU. con W-9; la tarifa mejorada de 0,0054 depende de que el JUGADOR sea de EE. UU., 18+ y verificado, no de dónde vive el creador.
+> (3) Al ser mayor de edad puede verificar su identidad él mismo, sin cuenta parental.
+> (4) Donde este documento diga «W-8BEN», léase **W-9** para Aryan; el resto de los datos no cambia. Pendiente: que un contador le confirme sus propios impuestos como creador de EE. UU. (esto no es asesoría fiscal).
+
 Estas son las cosas que **solo tú puedes responder** y que cambian decisiones del [informe maestro](informe-maestro.md) y del [plan de 90 días](plan-90-dias.md). Cada pregunta dice por qué importa y qué decidiremos según tu respuesta.
 
 Cómo responder: contesta en el chat o rellena la hoja del final. Una respuesta corta basta ("España, 24 años, persona"). Si no lo sabes, di "no sé" y lo averiguamos juntos.
@@ -255,7 +261,7 @@ Las etiquetas [OFICIAL], [TERCERO], [NO VERIFICADO] e [IDEA PROPIA] son las del 
 
 **Pregunta.** ¿Te gusta el concepto de pesca idle y colección? ¿Tienes preferencias de estética, nombre o temática? ¿Alguna de las otras 9 ideas te atrae más? ¿Quieres una marca propia?
 
-**Por qué importa.** Es la primera apuesta. Hay un competidor directo vigente (Fisch, [01 §3, §5][r01]) [TERCERO]; el nombre y la marca no deben parecerse a otros ni a marcas ajenas ([03 §4.2][r03]) [OFICIAL]. Se puede cambiar de juego ahora; después de la semana 3 cuesta semanas.
+**Por qué importa.** Es la primera apuesta. Hay un competidor directo vigente (Fisch, [01 §3, §5][r01]) [TERCERO]; el nombre y la marca no deben parecerse a otros ni a marcas ajenas ([03 §4.2][r03]) [OFICIAL]. "Fortune" también puede asociarse con juegos de azar con dinero y los metadatos que insinúan recompensa económica no se priorizan: hay un chequeo de nombres y tres títulos alternativos en la [página del juego](../marketing/fish-and-fortune/pagina-del-juego.md). Que el nombre esté libre solo se comprueba a mano (Discover y registros de marcas). Se puede cambiar de juego ahora; después de la semana 3 cuesta semanas.
 
 **Qué decido según tu respuesta.**
 

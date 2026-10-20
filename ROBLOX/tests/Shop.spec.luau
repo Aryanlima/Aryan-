@@ -545,6 +545,27 @@ describe("Shop", function()
 			expect((shop:promptProduct(player, "lucky_bait"))).toBe(true)
 		end)
 
+		it("si PolicyService falla, no se reintenta en cada consulta (memoria negativa 60 s)", function()
+			local calls = 0
+			local failing = newShop({
+				policy = {
+					GetPolicyInfoForPlayerAsync = function()
+						calls += 1
+						error("sin red")
+					end,
+				},
+			})
+			local player = join()
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(calls).toBe(3) -- 3 intentos
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(calls).toBe(3) -- sin mas consultas
+			env.clock:advance(61)
+			failing:getPolicy(player)
+			expect(calls).toBe(6)
+		end)
+
 		it("getPolicy cachea por jugador (una sola consulta)", function()
 			local calls = 0
 			local counting = newShop({
@@ -597,6 +618,52 @@ describe("Shop", function()
 					expect(offer.priceIsApproximate).toBe(false)
 				end
 			end
+		end)
+	end)
+
+	describe("elementos deshabilitados (enabled = false, flags de funcion)", function()
+		beforeEach(function()
+			shop:stop()
+			catalog.products.lucky_bait.enabled = false
+			catalog.passes.luck_plus.enabled = false
+			shop = newShop()
+			shop:start()
+		end)
+
+		it("no aparecen en getOffers y canOffer los marca no disponibles", function()
+			local player = join()
+			for _, offer in shop:getOffers(player) do
+				expect(offer.key).never.toBe("lucky_bait")
+				expect(offer.key).never.toBe("luck_plus")
+			end
+			expect(select(2, shop:canOffer(player, "product", "lucky_bait"))).toBe("unavailable")
+			expect(select(2, shop:promptPass(player, "luck_plus"))).toBe("unavailable")
+		end)
+
+		it("su recibo se rechaza (NotProcessedYet) sin conceder, sin registrar y sin consumirse", function()
+			local player, profile = join()
+			local receipt, decision = env.MarketplaceService:SimulatePurchase(player, 2002)
+			expect(decision).toBe(env.Enum.ProductPurchaseDecision.NotProcessedYet)
+			expect(handlerCalls).toBe(0)
+			expect(profile.data.purchases[receipt.PurchaseId]).toBeNil()
+			expect(env.MarketplaceService:GetReceiptStatus(receipt.PurchaseId)).toBe("pending")
+			expect(table.concat(logs, "\n")).toContain("DESHABILITADO")
+		end)
+
+		it("no se consulta la propiedad de un pase deshabilitado ni se le hace caso a su evento de compra", function()
+			local player = join()
+			env.MarketplaceService:GrantGamePass(USER, 112)
+			shop:loadPlayer(player)
+			expect(shop:ownsPass(player, "luck_plus")).toBe(false)
+			env.MarketplaceService:SimulateGamePassPurchase(player, 112)
+			expect(shop:ownsPass(player, "luck_plus")).toBe(false)
+		end)
+
+		it("el resto del catalogo no se ve afectado", function()
+			local player = join()
+			local _, decision = env.MarketplaceService:SimulatePurchase(player, 2001)
+			expect(decision).toBe(env.Enum.ProductPurchaseDecision.PurchaseGranted)
+			expect((shop:promptProduct(player, "coins_small"))).toBe(true)
 		end)
 	end)
 

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Pase de Temporada 1">
+<title>Pase de Temporada 1</title>
+<style>
+@font-face{font-family:'Fredoka';src:url('../../../specs-video/fonts/Fredoka.ttf') format('truetype');font-weight:300 700;}
+@font-face{font-family:'Nunito';src:url('../../../specs-video/fonts/Nunito.ttf') format('truetype');font-weight:200 1000;}
+text{font-family:'Fredoka','Nunito',sans-serif;font-weight:700;}
+</style>
+<defs>
+<linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFEFB0"/><stop offset=".45" stop-color="#FFC83D"/><stop offset="1" stop-color="#E08F0E"/></linearGradient>
+<linearGradient id="gGoldD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD25F"/><stop offset=".5" stop-color="#F0A81C"/><stop offset="1" stop-color="#B96A06"/></linearGradient>
+<linearGradient id="gTeal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6BEDEA"/><stop offset=".5" stop-color="#19C3C0"/><stop offset="1" stop-color="#0B8591"/></linearGradient>
+<linearGradient id="gCoral" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB39B"/><stop offset=".5" stop-color="#FF7A59"/><stop offset="1" stop-color="#DE4F33"/></linearGradient>
+<linearGradient id="gWood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D9985A"/><stop offset=".5" stop-color="#B27236"/><stop offset="1" stop-color="#8A5224"/></linearGradient>
+<linearGradient id="gWoodD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A86B34"/><stop offset="1" stop-color="#5E3818"/></linearGradient>
+<linearGradient id="gOcean" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2CA2D4"/><stop offset="1" stop-color="#0F6E9E"/></linearGradient>
+<linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8FBFF" stop-opacity=".85"/><stop offset="1" stop-color="#8FD9E8" stop-opacity=".55"/></linearGradient>
+<linearGradient id="gShade" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#04101F" stop-opacity=".35"/></linearGradient>
+<radialGradient id="gHoney" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#FFF2BE"/><stop offset=".5" stop-color="#FFC83D"/><stop offset="1" stop-color="#EE9418"/></radialGradient>
+<radialGradient id="gPearl" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#E7F2F9"/><stop offset="1" stop-color="#A9C7DE"/></radialGradient>
+<radialGradient id="gHalo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE9A0" stop-opacity=".95"/><stop offset=".5" stop-color="#FFC83D" stop-opacity=".4"/><stop offset="1" stop-color="#FFC83D" stop-opacity="0"/></radialGradient>
+<radialGradient id="gHaloM" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FF4FB8" stop-opacity=".75"/><stop offset=".55" stop-color="#A66BFF" stop-opacity=".3"/><stop offset="1" stop-color="#A66BFF" stop-opacity="0"/></radialGradient>
+<radialGradient id="gHaloT" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#8CF5F2" stop-opacity=".85"/><stop offset="1" stop-color="#19C3C0" stop-opacity="0"/></radialGradient>
+<filter id="fSh" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="9" stdDeviation="7" flood-color="#04101F" flood-opacity=".42"/></filter>
+<filter id="fShS" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="4" stdDeviation="3.2" flood-color="#04101F" flood-opacity=".38"/></filter>
+<filter id="fB2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2"/></filter>
+<filter id="fB5" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+<filter id="fB10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="fB24" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="24"/></filter>
+<filter id="fGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<g id="bg">
+  <radialGradient id="ibg_sp" cx=".5" cy=".42" r=".78"><stop offset="0" stop-color="#1FB6B8"/><stop offset="1" stop-color="#0A1F44"/></radialGradient>
+  <rect width="512" height="512" fill="url(#ibg_sp)"/>
+  <g opacity="0.1"><path d="M256 236L676 236L670.8 301.7Z" fill="#fff"/><path d="M256 236L644 396.7L614.1 455.4Z" fill="#fff"/><path d="M256 236L553 533L502.9 575.8Z" fill="#fff"/><path d="M256 236L416.7 624L354 644.4Z" fill="#fff"/><path d="M256 236L256 656L190.3 650.8Z" fill="#fff"/><path d="M256 236L95.3 624L36.6 594.1Z" fill="#fff"/><path d="M256 236L-41 533L-83.8 482.9Z" fill="#fff"/><path d="M256 236L-132 396.7L-152.4 334Z" fill="#fff"/><path d="M256 236L-164 236L-158.8 170.3Z" fill="#fff"/><path d="M256 236L-132 75.3L-102.1 16.6Z" fill="#fff"/><path d="M256 236L-41 -61L9.1 -103.8Z" fill="#fff"/><path d="M256 236L95.3 -152L158 -172.4Z" fill="#fff"/><path d="M256 236L256 -184L321.7 -178.8Z" fill="#fff"/><path d="M256 236L416.7 -152L475.4 -122.1Z" fill="#fff"/><path d="M256 236L553 -61L595.8 -10.9Z" fill="#fff"/><path d="M256 236L644 75.3L664.4 138Z" fill="#fff"/></g>
+  <circle cx="256" cy="246" r="190" fill="#FF7A59" opacity=".16" filter="url(#fB24)"/>
+  
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#FFC83D" stroke-opacity=".55" stroke-width="6"/>
+  <radialGradient id="vig_sp" cx=".5" cy=".5" r=".72"><stop offset=".72" stop-color="#04101F" stop-opacity="0"/><stop offset="1" stop-color="#04101F" stop-opacity=".55"/></radialGradient>
+  <rect width="512" height="512" fill="url(#vig_sp)"/>
+</g>
+<g id="subject"><g filter="url(#fShS)"><path d="M196 300L158 430L214 410L236 440L262 320Z" fill="url(#gCoral)" stroke="#0A1F44" stroke-width="5" stroke-linejoin="round"/><path d="M316 300L354 430L298 410L276 440L250 320Z" fill="#E4573A" stroke="#0A1F44" stroke-width="5" stroke-linejoin="round"/></g>
+    <g filter="url(#fSh)"><circle cx="256" cy="228" r="132" fill="url(#gGold)" stroke="#0A1F44" stroke-width="7"/></g>
+    <circle cx="256" cy="228" r="112" fill="none" stroke="#B96A06" stroke-opacity=".7" stroke-width="5" stroke-dasharray="3 13" stroke-linecap="round"/>
+    <circle cx="256" cy="228" r="96" fill="url(#gTeal)" stroke="#0A6B76" stroke-width="5"/>
+    <path d="M178 250Q200 222 222 250T266 250T310 250T334 240" stroke="#F4FBFF" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M186 284Q208 262 228 284T270 284T314 284" stroke="#F4FBFF" stroke-opacity=".6" stroke-width="10" fill="none" stroke-linecap="round"/>
+    <path d="M256,166L264.1,184.8L284.5,186.7L269.1,200.3L273.6,220.3L256,209.8L238.4,220.3L242.9,200.3L227.5,186.7L247.9,184.8Z" fill="url(#gGold)" stroke="#0A1F44" stroke-width="6" stroke-linejoin="round"/>
+    <g filter="url(#fShS)"><circle cx="356" cy="344" r="44" fill="#F4FBFF" stroke="#0A1F44" stroke-width="6"/>
+    <text x="356" y="362" font-size="62" text-anchor="middle" fill="#0A1F44" class="t" data-contrast="#0A1F44">1</text></g>
+    <path transform="translate(140 120)" d="M0 -14Q1.68 -1.68 14 0Q1.68 1.68 0 14Q-1.68 1.68 -14 0Q-1.68 -1.68 0 -14Z" fill="#F4FBFF" opacity="1" filter="url(#fGlow)"/><path transform="translate(398 120)" d="M0 -11Q1.3199999999999998 -1.3199999999999998 11 0Q1.3199999999999998 1.3199999999999998 0 11Q-1.3199999999999998 1.3199999999999998 -11 0Q-1.3199999999999998 -1.3199999999999998 0 -11Z" fill="#F4FBFF" opacity="1" filter="url(#fGlow)"/></g>
+</svg>

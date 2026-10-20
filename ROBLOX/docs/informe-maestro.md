@@ -1,5 +1,11 @@
 # Informe maestro: juegos de Roblox con microtransacciones e IA
 
+> **Actualización 2026-10-20: respuestas de Aryan.** Vive en **EE. UU.**, tiene **18 años o más**, publicará **como persona** y comprará las herramientas de IA que se recomienden.
+> Consecuencias: (1) el formulario fiscal que le toca es el **W-9**, no el W-8BEN (ese es para quienes no son de EE. UU.). Según la documentación oficial, con un W-9 válido en archivo no se exige retención de EE. UU. Se presenta en Creator Hub, en Finances > Taxes, y el 31-oct-2026 sigue siendo la fecha límite de los términos actuales. [OFICIAL] ([03 §5.4](../research/03-politicas-y-cumplimiento.md)).
+> (2) DevEx es para contribuyentes de EE. UU. con W-9; la tarifa mejorada de 0,0054 depende de que el JUGADOR sea de EE. UU., 18+ y verificado, no de dónde vive el creador.
+> (3) Al ser mayor de edad puede verificar su identidad él mismo, sin cuenta parental.
+> (4) Donde este documento diga «W-8BEN», léase **W-9** para Aryan; el resto de los datos no cambia. Pendiente: que un contador le confirme sus propios impuestos como creador de EE. UU. (esto no es asesoría fiscal).
+
 Para: Aryan. Fecha de los datos: 2026-10-20. Base: los informes 01 a 09 de `../research/` (08 y 09 tratan la ropa: sección 9).
 Este documento resume y decide; no repite las investigaciones. Cada dato lleva su etiqueta y un enlace al informe de origen.
 
@@ -269,6 +275,7 @@ Probabilidad (P) e impacto (I): A = alta, M = media, B = baja. [IDEA PROPIA] sal
 | 17 | Agotamiento: pocas horas semanales para tareas manuales (probar, grabar, publicar, responder) | A | M | Plan según tus horas (pregunta 9); automatizar lo demás | Aryan |
 | 18 | Competencia directa: **Fisch** sigue vigente en oct-2026 ([01 §3][r01]); el informe 07 no verificó su estado | M | M | Diferenciar F&F: lagos compartidos, banner global, bestiario, giro co-op; vigilar sus datos en trackers | Claude |
 | 19 | **Contagio de la ropa a la cuenta de los juegos**: una retirada por IP en un ítem de avatar puede acabar en sanciones a la cuenta y a DevEx | B | Muy A | Ropa solo con originales; revisar cada imagen contra marcas; no abrir cuentas alternas; ropa en piloto pequeño | Ambos |
+| 20 | **El nombre "Fish & Fortune"**: parecido con juegos existentes (Fisch, "Fortune Rod") y asociación de "Fortune" con juegos de azar con dinero; metadatos que insinúan recompensa económica no se priorizan | M | M | Comprobar a mano que el nombre está libre en Discover y en registros de marcas antes de fijarlo; sin monedas, billetes ni estética de casino en ningún material; título alternativo preparado ([página del juego](../marketing/fish-and-fortune/pagina-del-juego.md), notas del chequeo de nombres) | Aryan comprueba, Claude prepara |
 
 ---
 
@@ -366,7 +373,7 @@ Heurísticas [IDEA PROPIA] del informe 08 ([08 §6.3][r08]), con mínimo 20 íte
 | Contenido prohibido | Ítems políticos, religiosos, sangrientos, violentos, de autolesión, de drogas, sexuales, de boda o de citas, y texto excesivo. Hace arriesgados San Valentín, Pascua y un Halloween sangriento | [OFICIAL] | [09 §3, §7.3][r09] |
 | IP | Sin marcas, personajes, memes con dueño, tres rayas paralelas ni tipografías sin licencia. Si cae un aviso de IP pierdes los Robux del ítem | [OFICIAL] la regla; ejemplos [IDEA PROPIA] | [09 §5][r09] |
 | IA para ilustraciones | Solo planes de pago con derechos comerciales explícitos; revisar los términos el día de contratar. FLUX.1 [schnell] es Apache-2.0; FLUX.1 [dev] no es comercial para el modelo; Midjourney no indemniza | [TERCERO] | [09 §6.2][r09] |
-| **Qué se ha construido** | `tools/clothing-gen/`: generador procedural de ropa clásica (13 patrones, 17 paletas, control de calidad con lista de bloqueo de marcas y detector de casi-duplicados). Sus regiones están medidas contra la plantilla oficial. 8 pruebas pasan (comprobado hoy). **No probado en Studio ni subido a Roblox**; no hay IA generativa en el entorno de nube | [OFICIAL] la plantilla; el resto hecho y medido por nosotros | [09 §10][r09] |
+| **Qué se ha construido** | `ROBLOX/tools/clothing-gen/`: generador procedural de ropa clásica (13 patrones, 17 paletas, control de calidad con lista de bloqueo de marcas y detector de casi-duplicados). Sus regiones están medidas contra la plantilla oficial. 8 pruebas pasan (comprobado hoy). **No probado en Studio ni subido a Roblox**; no hay IA generativa en el entorno de nube | [OFICIAL] la plantilla; el resto hecho y medido por nosotros | [09 §10][r09] |
 | Ropa 3D con IA | Parcial: texturas y papeleo, sí; modelado, jaulas y rig, con criterio humano en Blender (límite 4.000 triángulos, jaulas válidas). Las mallas de IA 3D suelen fallar la validación de Roblox | [OFICIAL] el límite; [IDEA PROPIA] el resto | [09 §6.6][r09], [08 §4.5][r08] |
 | Presupuesto de un plan de 30 días | Mínimo: 3.120 R$ (12 clásicas + 3 en capas) ≈ 11,9 USD al valor DevEx; medio: 6.240 R$ ≈ 23,7 USD. Más caro si compras los Robux | [IDEA PROPIA] (cálculo) | [09 §11.1][r09] |
 

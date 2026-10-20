@@ -1,0 +1,15 @@
+{
+  "name": "fish-and-fortune-assets",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Placeholders de iconos, miniaturas, pases y productos de Fish & Fortune (SVG/HTML -> PNG con Chromium).",
+  "scripts": {
+    "render": "node render-assets.mjs",
+    "validate": "node render-assets.mjs --validate-only"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

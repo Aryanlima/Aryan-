@@ -1,7 +1,7 @@
 # Skills y herramientas de IA instaladas
 
 Fecha: 2026-10-20. Autor: agente de herramientas de IA (sesion Claude Code). Idioma: espanol.
-Base: `research/04-ia-studio-mcp-skills.md` (secciones 5, 7, 8 y 11).
+Base: `ROBLOX/research/04-ia-studio-mcp-skills.md` (secciones 5, 7, 8 y 11).
 
 Leyenda de fiabilidad: **[VERIFICADO]** = leido hoy en el propio archivo o en documentacion oficial;
 **[NO VERIFICADO]** = no pude confirmarlo; **[TERCERO]** = viene de un tercero.
@@ -51,10 +51,10 @@ Detalle completo en `ROBLOX/skills/roblox-dev/PROVENANCE.md`. Resumen:
   1. Fallback `npx ctx7@latest` y monitor `~/RobloxDocs`: se usarian solo con permiso. **Decision: no
      usarlos sin aprobacion explicita.**
   2. Ejemplo de recibo con efectos laterales dentro del callback de `UpdateAsync` (Roblox puede
-     re-ejecutarlo): **no copiar tal cual**; el patron de referencia es `tools/examples/ReceiptHandler.luau`.
+     re-ejecutarlo): **no copiar tal cual**; el patron de referencia es `ROBLOX/tools/examples/ReceiptHandler.luau`.
   3. Pruebas "contra un DataStore real" en dos ejemplos: **usar mocks o un lugar de pruebas**.
   4. Menciona `getAuthCookie` (Lune): **prohibido usarlo**.
-  5. No trata odds/Paid Random Items ni `PolicyService`: **manda `research/03`**.
+  5. No trata odds/Paid Random Items ni `PolicyService`: **manda `ROBLOX/research/03`**.
   6. Conflictos de estilo (`--!strict` frente a `.luaurc` en `nonstrict`) y flujo (`multi_edit` frente a
      archivos con Rojo): ver `LOCAL-NOTES.md`.
 - Limite de esta revision: busqueda automatica de patrones sobre todos los archivos y lectura atenta de
@@ -69,7 +69,7 @@ Detalle completo en `ROBLOX/skills/roblox-dev/PROVENANCE.md`. Resumen:
   actualizacion, repetir la revision.
 - **Datos que caducan**: Roblox publica cada semana; la skill esta verificada a 2026-10-17 (Studio
   0.743). Cifras de monetizacion y APIs nuevas pueden quedar viejas. Contrastar con la documentacion
-  oficial cuando importe (y con `research/02` y `research/03`).
+  oficial cuando importe (y con `ROBLOX/research/02` y `ROBLOX/research/03`).
 - **Coste de contexto**: `SKILL.md` ocupa ~26 KB y su descripcion pide cargarla en "cualquier tarea de
   Roblox". Aceptado; por eso no se instalan skills solapadas.
 - **Nombre de carpeta distinto del `name`** (`roblox-dev` frente a `roblox-dev-skill`): funciona en
@@ -178,10 +178,10 @@ red/escritura (seccion 3.2), y solo entonces cambiar el numero.
 - Sobre una muestra sintetica con `:connect()` y `wait()`: los detecta (2 hallazgos, codigo 1).
 - Sobre `ROBLOX/packages` (14:30 UTC: `Net.luau`, `Economy.luau` y `Odds.luau`; otro agente lo esta
   construyendo): **limpio, 0 hallazgos, codigo 0.** No se modifico nada. Repetir cuando haya mas codigo.
-- Sobre `tools/testkit` y `tools/examples` (solo lectura): da **falsos positivos esperables**: la regla de
+- Sobre `ROBLOX/tools/testkit` y `ROBLOX/tools/examples` (solo lectura): da **falsos positivos esperables**: la regla de
   "`ProcessReceipt` asignado en varios archivos" salta con los mocks y specs, y marca un `UpdateAsync` de un
   spec de mocks. Conclusion: ejecutarlo sobre codigo de juego (`ROBLOX/packages`, `ROBLOX/games/*/src`), no
-  sobre `tools/`.
+  sobre `ROBLOX/tools/`.
 
 ## 4. Politica de seguridad para el MCP de Studio (recordatorio)
 
@@ -195,7 +195,7 @@ Fuente: doc oficial `studio/mcp.md` y README del plugin oficial, leidos el 2026-
 
 ## 5. Que NO se instalo y por que
 
-Decision basada en `research/04-ia-studio-mcp-skills.md` §5 y §7 (lectura de READMEs del 2026-10-20 por
+Decision basada en `ROBLOX/research/04-ia-studio-mcp-skills.md` §5 y §7 (lectura de READMEs del 2026-10-20 por
 otro agente). **Hoy no se clonaron ni se revisaron estos repositorios**; las cifras son del informe y
 [NO VERIFICADO] por mi.
 
@@ -212,4 +212,4 @@ otro agente). **Hoy no se clonaron ni se revisaron estos repositorios**; las cif
 | Instaladores `curl ... \| bash` / `irm ... \| iex` de MSayib | Ejecutan codigo remoto con tus permisos; se instalo a mano tras leerlos |
 | `~/RobloxDocs` (volcado local de la API) | Lo crea el instalador de MSayib y su monitor hace peticiones de red; no se usa. La documentacion se consulta con `http_get` de Studio o por la red |
 | Context7 / `npx ctx7@latest` | Paquete sin fijar; solo con aprobacion explicita |
-| Pesos de Cube 3D en un pipeline propio | Licencia de investigacion en el LICENSE leido (`research/04` §3). Usar `generate_mesh` dentro de Studio |
+| Pesos de Cube 3D en un pipeline propio | Licencia de investigacion en el LICENSE leido (`ROBLOX/research/04` §3). Usar `generate_mesh` dentro de Studio |

@@ -1,0 +1,10 @@
+# Saltos de linea: siempre LF en el repositorio. En Windows (core.autocrlf=true) los .luau salian con CRLF y
+# stylua.toml pide line_endings = "Unix", lo que hacia fallar `format.sh --check` (hallazgo de la sesion del PC).
+* text=auto eol=lf
+*.sh text eol=lf
+*.luau text eol=lf
+*.png binary
+*.jpg binary
+*.mp4 binary
+*.ttf binary
+*.zip binary

@@ -1,6 +1,0 @@
-node_modules/
-.cache/
-.tmp/
-*.log
-# Los MP4 de ejemplo viven en out/ (se versionan a propósito); los intermedios no.
-out/_work/

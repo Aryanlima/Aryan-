@@ -9,7 +9,7 @@
 	  * gating por PolicyService (objetos que alteran probabilidades) y por precios/IDs placeholder,
 	  * escalera de precios en Robux configurable y validacion del catalogo (sin urgencia ni descuentos falsos).
 
-	Flujo de ProcessReceipt (ver docs/arquitectura.md):
+	Flujo de ProcessReceipt (ver ROBLOX/docs/arquitectura.md):
 	  1. validar recibo y producto            -> si no: NotProcessedYet (nunca se "traga" una compra)
 	  2. jugador presente y perfil activo      -> si no: NotProcessedYet (Roblox reintenta al volver a entrar)
 	  3. PurchaseId ya registrado?             -> guardar (si faltaba) y PurchaseGranted
@@ -33,13 +33,18 @@ export type Receipt = {
 export type PassDef = {
 	key: string,
 	id: number, -- 0 = placeholder TODO_ID: no se puede comprar hasta rellenarlo
+	assetId: number?, -- REVIEW(money): alias opcional (assetId del pase si difiere de su TargetId). Solo reconoce eventos y respalda precios
 	name: string,
 	description: string,
+	nameKey: string?, -- clave de localizacion (el cliente traduce); `name`/`description` son el texto de respaldo
+	descriptionKey: string?,
+	textArgs: { [string]: any }?, -- argumentos de las plantillas de texto (importes...)
 	tier: string?, -- escalon de la escalera de precios
 	priceRobux: number?, -- si falta, se resuelve desde `tier`
 	priceOverride: boolean?, -- true: precio fuera de la escalera (revisar a mano)
 	promoted: boolean?, -- los pases promocionados deben costar 50-800 R$ y NO pueden alterar azar
 	affectsOdds: boolean?, -- modifica probabilidades (suerte): requiere PolicyService
+	enabled: boolean?, -- false: no se ofrece, no se puede comprar y sus recibos se rechazan (flag de funcion)
 	oneTimeGrant: { [string]: any }?, -- { kind = "...", ... } concesion unica al poseerlo (p. ej. pack de inicio)
 }
 
@@ -48,12 +53,16 @@ export type ProductDef = {
 	id: number, -- 0 = placeholder TODO_ID
 	name: string,
 	description: string,
+	nameKey: string?,
+	descriptionKey: string?,
+	textArgs: { [string]: any }?,
 	kind: string, -- clave del handler de concesion
 	grant: { [string]: any }, -- datos para el handler
 	tier: string?,
 	priceRobux: number?,
 	priceOverride: boolean?,
 	affectsOdds: boolean?,
+	enabled: boolean?, -- false: no se ofrece, no se puede comprar y sus recibos se rechazan (flag de funcion)
 }
 
 export type Catalog = {
@@ -78,11 +87,14 @@ export type Config = {
 	now: (() -> number)?,
 	log: ((message: string) -> ())?,
 	random: (() -> number)?,
-	profileWaitSeconds: number?, -- por defecto 20
+	profileWaitSeconds: number?, -- por defecto 90 (>= espera del bloqueo de sesion de Data + reintentos de carga)
 	purchaseHistorySize: number?, -- por defecto 500
 	promptCooldownSeconds: number?, -- por defecto 3
 	onPurchaseGranted: ((player: any, product: ProductDef, receipt: Receipt) -> ...any)?, -- DESPUES de persistir
 	onPassChanged: ((player: any, pass: PassDef, owned: boolean) -> ...any)?,
+	-- Opcional: el juego puede vetar una oferta que el jugador pagaria sin recibir todo su valor (p. ej. un boost que ya
+	-- esta en su tope de acumulacion). Devuelve (true) o (false, motivo). Se evalua ANTES del prompt.
+	canPurchase: ((player: any, profile: any, item: any, itemKind: string) -> (boolean, string?))?,
 }
 
 local Shop = {}
@@ -96,7 +108,7 @@ Shop.DECISION_NOT_PROCESSED = "NotProcessedYet"
 -- Escalera de precios y validacion del catalogo
 ----------------------------------------------------------------------------
 
--- Escalera por defecto (hipotesis para A/B test, research/02 seccion 5.2): NO es un dato de mercado.
+-- Escalera por defecto (hipotesis para A/B test, ROBLOX/research/02 seccion 5.2): NO es un dato de mercado.
 Shop.DEFAULT_LADDER = {
 	impulse = 25,
 	entry = 49,
@@ -144,7 +156,7 @@ local function stripAccents(text: string): string
 	return string.lower(result)
 end
 
--- Lenguaje de presion/urgencia que NO debe aparecer en tiendas (menores; research/03 2.3).
+-- Lenguaje de presion/urgencia que NO debe aparecer en tiendas (menores; ROBLOX/research/03 2.3).
 local PRESSURE_PHRASES: { string } = {
 	"ultima oportunidad",
 	"ultimas unidades",
@@ -240,13 +252,29 @@ function Shop.validateCatalog(
 		if type(item.id) ~= "number" or item.id < 0 or item.id % 1 ~= 0 then
 			problem(label .. ": id invalido")
 		elseif item.id == 0 then
-			if not allowPlaceholders then
+			if not allowPlaceholders and item.enabled ~= false then
 				problem(label .. ": id placeholder (0 -- TODO_ID) sin rellenar")
 			end
 		elseif seenIds[item.id] ~= nil then
 			problem(label .. ": id " .. item.id .. " repetido con " .. seenIds[item.id])
 		else
 			seenIds[item.id] = label
+		end
+		-- REVIEW(money): alias opcional del pase (assetId distinto de su TargetId); ver ProductIds.luau.
+		if item.assetId ~= nil then
+			if type(item.assetId) ~= "number" or item.assetId <= 0 or item.assetId % 1 ~= 0 then
+				problem(label .. ": assetId invalido")
+			elseif item.id == 0 then
+				problem(
+					label .. ": tiene assetId pero su id esta en 0 (o la clave de passAssetIds no existe en passes)"
+				)
+			elseif item.assetId == item.id then
+				problem(label .. ": assetId igual al id (sobra: quitalo de passAssetIds)")
+			elseif seenIds[item.assetId] ~= nil then
+				problem(label .. ": assetId " .. item.assetId .. " repetido con " .. seenIds[item.assetId])
+			else
+				seenIds[item.assetId] = label .. " (assetId)"
+			end
 		end
 		local price = Shop.resolvePrice(catalog, item)
 		if price == nil then
@@ -322,7 +350,9 @@ type ShopData = {
 	nowFn: () -> number,
 	randomFn: () -> number,
 	owned: { [number]: { [string]: boolean } }, -- userId -> passKey -> poseido
+	ownershipUnknown: { [number]: { [string]: boolean } }, -- userId -> passKey: la consulta de propiedad FALLO (PASS-01)
 	policies: { [number]: any },
+	policyRetryAt: { [number]: number }, -- tras un fallo de PolicyService no se reintenta antes de esta hora
 	lastPrompt: { [number]: number },
 	priceCache: { [string]: number },
 	pendingHooks: { [string]: { player: any, product: ProductDef, receipt: Receipt } }, -- compras concedidas aun sin confirmar
@@ -330,6 +360,12 @@ type ShopData = {
 	connections: { any },
 }
 export type Shop = typeof(setmetatable({} :: ShopData, ShopImpl))
+
+-- Espera maxima del perfil dentro de ProcessReceipt. ProcessReceipt NO tiene reintento por tiempo (solo al volver a
+-- comprar o al reentrar) y su callback puede ceder todo lo que haga falta, asi que conviene esperar MAS que el
+-- bloqueo de sesion de Data (30 s por defecto) mas sus reintentos de carga: si no, una compra hecha justo al
+-- cambiar de servidor queda sin resolver hasta la proxima entrada del jugador.
+local DEFAULT_PROFILE_WAIT_SECONDS = 90
 
 -- ProcessReceipt solo debe asignarse UNA vez por servidor (varias asignaciones se pisan en silencio).
 local processReceiptOwner: any = nil
@@ -341,13 +377,24 @@ function Shop.new(config: Config): Shop
 	local productsById: { [number]: ProductDef } = {}
 	for _, product in config.catalog.products do
 		if product.id ~= 0 then
+			-- Un ID repetido haria que el recibo de un producto concediera OTRO (dinero real): no se arranca.
+			assert(productsById[product.id] == nil, "Shop.new: id de producto repetido " .. tostring(product.id))
 			productsById[product.id] = product
 		end
 	end
 	local passesById: { [number]: PassDef } = {}
 	for _, pass in config.catalog.passes do
 		if pass.id ~= 0 then
+			assert(passesById[pass.id] == nil, "Shop.new: id de pase repetido " .. tostring(pass.id))
 			passesById[pass.id] = pass
+		end
+	end
+	-- REVIEW(money): los alias (assetId) se indexan DESPUES de los IDs principales: un alias nunca puede pisar el ID de
+	-- otro pase (conceder el pase equivocado) y dos alias iguales tampoco. Solo sirve para reconocer el evento del prompt.
+	for _, pass in config.catalog.passes do
+		if pass.id ~= 0 and pass.assetId ~= nil and pass.assetId ~= pass.id then
+			assert(passesById[pass.assetId] == nil, "Shop.new: assetId de pase repetido " .. tostring(pass.assetId))
+			passesById[pass.assetId] = pass
 		end
 	end
 	local data: ShopData = {
@@ -363,7 +410,9 @@ function Shop.new(config: Config): Shop
 			return math.random()
 		end,
 		owned = {},
+		ownershipUnknown = {},
 		policies = {},
+		policyRetryAt = {},
 		lastPrompt = {},
 		priceCache = {},
 		pendingHooks = {},
@@ -451,12 +500,26 @@ function ShopImpl._processReceiptInner(self: Shop, receipt: Receipt): any
 		return notYet
 	end
 
+	if product.enabled == false then
+		-- Producto apagado por un flag de funcion (p. ej. suerte de pago en la v1). NO se concede y NO se confirma:
+		-- el recibo queda sin resolver (no se pierde ni se regala nada) hasta que una persona decida (ver README).
+		self:_log(
+			"REVIEW(money): recibo "
+				.. purchaseId
+				.. " de un producto DESHABILITADO ("
+				.. product.key
+				.. "): NotProcessedYet"
+		)
+		return notYet
+	end
+
 	-- 2. jugador y perfil
 	local player = self.cfg.players:GetPlayerByUserId(receipt.PlayerId)
 	if player == nil then
 		return notYet -- Roblox vuelve a llamar cuando el jugador entre de nuevo
 	end
-	local profile = self.cfg.waitForProfile(receipt.PlayerId, self.cfg.profileWaitSeconds or 20)
+	local profile =
+		self.cfg.waitForProfile(receipt.PlayerId, self.cfg.profileWaitSeconds or DEFAULT_PROFILE_WAIT_SECONDS)
 	if profile == nil or not profile:isActive() then
 		return notYet
 	end
@@ -537,18 +600,25 @@ function ShopImpl.getPolicy(self: Shop, player: any): { [string]: any }?
 	if service == nil then
 		return nil
 	end
+	-- Memoria negativa: si acaba de fallar, no se bloquea al llamador reintentando en cada consulta.
+	local retryAt = self.policyRetryAt[userId]
+	if retryAt ~= nil and self.nowFn() < retryAt then
+		return nil
+	end
 	for attempt = 1, 3 do
 		local ok, info = pcall(function(): any
 			return service:GetPolicyInfoForPlayerAsync(player)
 		end)
 		if ok and type(info) == "table" then
 			self.policies[userId] = info
+			self.policyRetryAt[userId] = nil
 			return info
 		end
 		if attempt < 3 then
 			self:_wait(attempt)
 		end
 	end
+	self.policyRetryAt[userId] = self.nowFn() + 60
 	self:_log("PolicyService no disponible para " .. tostring(userId) .. ": se trata como restringido")
 	return nil
 end
@@ -577,6 +647,23 @@ function ShopImpl._checkOwnership(self: Shop, player: any, pass: PassDef): (bool
 	return false, false
 end
 
+-- REVIEW(money) PASS-01: recuerda que la consulta de propiedad de un pase fallo (propiedad DESCONOCIDA, no "no poseido").
+function ShopImpl._markOwnershipUnknown(self: Shop, userId: number, passKey: string, unknown: boolean)
+	local byPlayer = self.ownershipUnknown[userId]
+	if unknown then
+		if byPlayer == nil then
+			byPlayer = {}
+			self.ownershipUnknown[userId] = byPlayer
+		end
+		byPlayer[passKey] = true
+	elseif byPlayer ~= nil then
+		byPlayer[passKey] = nil
+		if next(byPlayer) == nil then
+			self.ownershipUnknown[userId] = nil
+		end
+	end
+end
+
 function ShopImpl._setOwned(self: Shop, player: any, pass: PassDef, owned: boolean)
 	local userId = player.UserId
 	local byPlayer = self.owned[userId]
@@ -586,6 +673,7 @@ function ShopImpl._setOwned(self: Shop, player: any, pass: PassDef, owned: boole
 	end
 	local before = byPlayer[pass.key] == true
 	byPlayer[pass.key] = owned
+	self:_markOwnershipUnknown(userId, pass.key, false) -- ya se conoce
 	if before ~= owned and self.cfg.onPassChanged then
 		local ok, err = pcall(self.cfg.onPassChanged, player, pass, owned)
 		if not ok then
@@ -603,7 +691,7 @@ function ShopImpl._applyOneTimeGrant(self: Shop, player: any, pass: PassDef): bo
 	if grant == nil then
 		return true
 	end
-	local profile = self.cfg.waitForProfile(player.UserId, self.cfg.profileWaitSeconds or 20)
+	local profile = self.cfg.waitForProfile(player.UserId, self.cfg.profileWaitSeconds or DEFAULT_PROFILE_WAIT_SECONDS)
 	if profile == nil or not profile:isActive() then
 		return false
 	end
@@ -635,7 +723,7 @@ end
 function ShopImpl.loadPlayer(self: Shop, player: any)
 	local pending = 0
 	for _, pass in self.catalog.passes do
-		if pass.id ~= 0 then
+		if pass.id ~= 0 and pass.enabled ~= false then
 			pending += 1
 			self.taskLib.spawn(function()
 				local ok, owns = self:_checkOwnership(player, pass)
@@ -645,6 +733,7 @@ function ShopImpl.loadPlayer(self: Shop, player: any)
 						self:_applyOneTimeGrant(player, pass)
 					end
 				else
+					self:_markOwnershipUnknown(player.UserId, pass.key, true)
 					self:_log("no se pudo comprobar el pase " .. pass.key .. " de " .. tostring(player.UserId))
 				end
 				pending -= 1
@@ -662,13 +751,37 @@ end
 function ShopImpl.unloadPlayer(self: Shop, player: any)
 	local userId = player.UserId
 	self.owned[userId] = nil
+	self.ownershipUnknown[userId] = nil
 	self.policies[userId] = nil
+	self.policyRetryAt[userId] = nil
 	self.lastPrompt[userId] = nil
 end
 
 function ShopImpl._onPassPromptFinished(self: Shop, player: any, passId: number, wasPurchased: boolean)
 	local pass = self.passesById[passId]
-	if pass == nil or not wasPurchased then
+	if pass == nil then
+		-- REVIEW(money): un ID que no es de ningun pase del catalogo NI un alias (passAssetIds). Si ocurre con una compra real, el
+		-- pase comprado no se reconocera hasta reentrar: es la senal de que el ID cableado no es el que usa el motor (guia, "TargetId o assetId").
+		self:_log("PromptGamePassPurchaseFinished con un ID de pase DESCONOCIDO: " .. tostring(passId))
+		return
+	end
+	if pass.enabled == false then
+		return
+	end
+	if not wasPurchased then
+		-- REVIEW(money) PASS-01: si la consulta de entrada FALLO, el dueno real figura como "no poseido" (y se le ofrece comprarlo otra vez;
+		-- Roblox cierra ese prompt sin compra). Se aprovecha para re-verificar. Solo en ese caso: con la propiedad ya conocida,
+		-- cancelar un prompt no cuesta llamadas a Roblox.
+		local unknown = self.ownershipUnknown[player.UserId]
+		if unknown ~= nil and unknown[pass.key] == true then
+			local ok, owns = self:_checkOwnership(player, pass)
+			if ok then
+				self:_setOwned(player, pass, owns)
+				if owns and pass.oneTimeGrant then
+					self:_applyOneTimeGrant(player, pass)
+				end
+			end
+		end
 		return
 	end
 	-- Re-verificar (la cache de UserOwnsGamePassAsync se actualiza con este evento). Si la
@@ -694,8 +807,8 @@ function ShopImpl.canOffer(self: Shop, player: any, itemKind: string, key: strin
 	if item == nil then
 		return false, "unknown"
 	end
-	if item.id == 0 then
-		return false, "unavailable" -- placeholder TODO_ID
+	if item.id == 0 or item.enabled == false then
+		return false, "unavailable" -- placeholder TODO_ID o funcion apagada
 	end
 	if player.Parent == nil then
 		return false, "left"
@@ -713,6 +826,14 @@ function ShopImpl.canOffer(self: Shop, player: any, itemKind: string, key: strin
 	end
 	if itemKind == "pass" and self:ownsPass(player, key) then
 		return false, "owned"
+	end
+	local gate = self.cfg.canPurchase
+	if gate ~= nil then
+		local gateOk, allowed, why = pcall(gate, player, profile, item, itemKind)
+		if not gateOk or allowed ~= true then
+			-- ante la duda (error del gancho) NO se vende
+			return false, if gateOk and type(why) == "string" then why else "unavailable"
+		end
 	end
 	return true, nil
 end
@@ -792,7 +913,7 @@ function ShopImpl.refreshPrices(self: Shop)
 		return nil
 	end
 	for key, product in self.catalog.products do
-		if product.id ~= 0 then
+		if product.id ~= 0 and product.enabled ~= false then
 			local price = fetch(product.id, types.Product)
 			if price then
 				self.priceCache["product:" .. key] = price
@@ -800,8 +921,11 @@ function ShopImpl.refreshPrices(self: Shop)
 		end
 	end
 	for key, pass in self.catalog.passes do
-		if pass.id ~= 0 then
+		if pass.id ~= 0 and pass.enabled ~= false then
 			local price = fetch(pass.id, types.GamePass)
+			if price == nil and pass.assetId ~= nil then
+				price = fetch(pass.assetId, types.GamePass) -- respaldo: solo para MOSTRAR el precio
+			end
 			if price then
 				self.priceCache["pass:" .. key] = price
 			end
@@ -814,10 +938,13 @@ export type Offer = {
 	key: string,
 	name: string,
 	description: string,
+	nameKey: string?, -- claves de localizacion + argumentos: el cliente traduce en el idioma del jugador
+	descriptionKey: string?,
+	textArgs: { [string]: any }?,
 	priceRobux: number?,
 	priceIsApproximate: boolean,
 	available: boolean,
-	reason: string?, -- por que no esta disponible ("owned" | "restricted" | "unavailable" | "loading")
+	reason: string?, -- por que no esta disponible ("owned" | "restricted" | "unavailable" | "loading" | "maxed")
 	owned: boolean,
 }
 
@@ -825,6 +952,9 @@ export type Offer = {
 function ShopImpl.getOffers(self: Shop, player: any): { Offer }
 	local offers: { Offer } = {}
 	local function add(kind: string, key: string, item: any)
+		if item.enabled == false then
+			return -- funcion apagada: ni siquiera se muestra en la tienda
+		end
 		local cached = self.priceCache[kind .. ":" .. key]
 		local price = cached or Shop.resolvePrice(self.catalog, item)
 		local available, reason = self:canOffer(player, kind, key)
@@ -833,6 +963,9 @@ function ShopImpl.getOffers(self: Shop, player: any): { Offer }
 			key = key,
 			name = item.name,
 			description = item.description,
+			nameKey = item.nameKey,
+			descriptionKey = item.descriptionKey,
+			textArgs = item.textArgs,
 			priceRobux = price,
 			priceIsApproximate = cached == nil,
 			available = available,
@@ -867,6 +1000,10 @@ end
 	Registra el UNICO ProcessReceipt y escucha el fin de los prompts de pases.
 	Devuelve la funcion de ProcessReceipt por si el llamador quiere probarla directamente.
 ]]
+-- VERIFY: la referencia oficial de MarketplaceService (2026-10-20) llama a ProcessReceipt "legacy" y documenta
+-- BindReceiptHandler(Enum.ReceiptType.DeveloperProduct, handler, filter?) con Enum.ReceiptDecision. ProcessReceipt sigue
+-- funcionando y es lo que pide este proyecto; migrar a BindReceiptHandler es un cambio mecanico (misma logica,
+-- otro enum de retorno) que debe probarse en Studio con compras reales de prueba antes de adoptarlo.
 function ShopImpl.start(self: Shop): (receipt: Receipt) -> any
 	assert(not self.started, "Shop.start ya se ejecuto")
 	if processReceiptOwner ~= nil and processReceiptOwner ~= self then

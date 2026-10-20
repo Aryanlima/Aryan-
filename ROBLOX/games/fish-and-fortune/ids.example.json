@@ -1,0 +1,22 @@
+{
+  "_comentario": "Copia este archivo a ids.local.json y reemplaza cada 0 por el ID que muestra Creator Hub. Los IDs NO son secretos (se versionan). luck_plus y lucky_bait_15 son suerte de pago: APAGADOS en la v1, dejalos en 0 y NO los crees en Creator Hub.",
+  "_formato": "Cada valor es un numero entero sin comillas (o el mismo numero entre comillas dobles). Solo el numero: sin espacios, sin URL. Un pase puede ser { \"passId\": 111, \"assetId\": 222 } SOLO si la prueba de Studio demuestra que son distintos (guia: 'TargetId o assetId').",
+  "universeId": 0,
+  "passes": {
+    "auto_fish": 0,
+    "double_coins": 0,
+    "luck_plus": 0,
+    "starter": 0,
+    "vip": 0,
+    "season_pass": 0
+  },
+  "products": {
+    "lucky_bait_15": 0,
+    "coin_boost_15": 0,
+    "coin_pack_small": 0,
+    "coin_pack_medium": 0,
+    "coin_pack_large": 0,
+    "pearl_pack": 0,
+    "slot_pack": 0
+  }
+}

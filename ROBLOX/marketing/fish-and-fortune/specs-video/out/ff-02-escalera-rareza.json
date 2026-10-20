@@ -8,14 +8,14 @@
   "audio": "aac",
   "duration_s": 17.4,
   "frames": 522,
-  "size_mb": 6.79,
+  "size_mb": 6.89,
   "workers": 4,
-  "capture_fps": 19.3,
+  "capture_fps": 30,
   "timings_ms": {
-    "compilar+TTS+clips": 3,
-    "captura": 28270,
+    "compilar+TTS+clips": 2,
+    "captura": 18673,
     "audio": 0,
-    "codificar": 20955,
-    "total": 49304
+    "codificar": 11859,
+    "total": 30641
   }
 }

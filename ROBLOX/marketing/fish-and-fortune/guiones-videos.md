@@ -2,7 +2,9 @@
 
 Fecha: 2026-10-20. Idioma: español (con gancho y CTA en inglés para audiencia EN). Calendario completo: `plan-lanzamiento.md` §5. Marca, paleta y prompts reutilizables: `prompts-ia.md`.
 
-Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**, **[AJUSTAR A LO REAL]** (depende del juego construido; el juego aún no existía en `ROBLOX/games/` al escribir esto).
+Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**, **[AJUSTAR A LO REAL]**.
+
+**Estado del juego al escribir esto (2026-10-20):** `ROBLOX/games/fish-and-fortune/src` ya tiene la lógica de servidor y el balance, pero **aún no hay cliente/UI jugable**. Los datos de los guiones (zonas Lago Calmo / Río Cristal / Costa Dorada, 25 criaturas, rarezas, Míticos ≈ 0,04 % por lanzada con suerte 0, mini-juego de recogida en la zona perfecta, cañas, premios del bestiario, eventos Marea Dorada y Luna Mítica, código `WELCOME`) vienen de `Balance.luau` y son **provisionales**; ver `plan-lanzamiento.md` §0.1. Donde pone [AJUSTAR A LO REAL] falta la UI o la confirmación.
 
 ---
 
@@ -14,7 +16,7 @@ Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**,
 |---|---|---|---|
 | **A** | **Captura de gameplay real** [a grabar por Aryan o por la sesión de su PC] | 15 | El juego abierto (Studio o publicado), grabador (OBS, o grabación de pantalla del móvil) y CapCut/DaVinci para montar. **Claude no puede grabar** gameplay desde la nube |
 | **B** | **Generado por IA** (Veo / Kling / Runway; incluye PROMPT exacto) | 7 | **Cuenta + créditos de Aryan** en la herramienta elegida (ver §0.3). Es ambiente/marca/lore, **nunca gameplay** |
-| **C** | **Render por código con el pipeline** (`marketing/pipeline/`) | 8 (6 con spec ya hechos y renderizados en `specs-video/`) | Nada externo: `node render.mjs` (Node + Chromium + ffmpeg, ya funciona en esta sesión) |
+| **C** | **Render por código con el pipeline** (`ROBLOX/marketing/pipeline/`) | 8 (6 con spec ya hechos y renderizados en `specs-video/`) | Nada externo: `node render.mjs` (Node + Chromium + ffmpeg, ya funciona en esta sesión) |
 
 **Reglas comunes de cumplimiento (aplican a los 30)**
 
@@ -49,31 +51,31 @@ Etiquetas: **[OFICIAL]**, **[TERCERO]**, **[NO VERIFICADO]**, **[IDEA PROPIA]**,
 |---|---|---|---|---|---|
 | V01 | Teaser misterioso del lago | 15 s | B | D-14 · 17 nov | Veo/Kling/Runway |
 | V02 | Momento clipable: "X pescó un MÍTICO" | 20 s | A | D-8 · 23 nov | Grabar |
-| V03 | Gancho de marca "¿Tu próxima lanzada será MÍTICA?" | 18 s | C | D-11 · 20 nov | `ff-01-gancho-mitico` |
+| V03 | Gancho de marca "¿Podrás pescar un MÍTICO?" | 18 s | C | D-11 · 20 nov | `ff-01-gancho-mitico` |
 | V04 | Progresión: mi primera caña | 25 s | A | D+1 · 2 dic | Grabar |
 | V05 | Presentación de la mascota Fortu | 12 s | B | D-12 · 19 nov | Imagen + Kling/Veo |
-| V06 | "Probé el pez más raro del lago" | 28 s | A | D+2 · 3 dic | Grabar |
+| V06 | "Probé el pez más raro": intenté pescar al Espíritu del Lago | 28 s | A | D+2 · 3 dic | Grabar |
 | V07 | Escalera de rareza (top 3) | 17 s | C | D-2 · 29 nov | `ff-02-escalera-rareza` |
 | V08 | POV: eres quien pescó el Mítico | 15 s | A | D0 · 1 dic | Grabar |
 | V09 | La leyenda del lago (lore) | 20 s | B | D-9 · 22 nov | Veo/Kling/Runway |
-| V10 | Progresión 60 s: del lago al río | 30 s | A | D-5 · 26 nov | Grabar |
+| V10 | Progresión: del Lago Calmo al Río Cristal | 30 s | A | D-5 · 26 nov | Grabar |
 | V11 | Zonas: del lago a la costa | 15 s | C | D+4 · 5 dic | `ff-03-zonas-progresion` |
 | V12 | Bestiario: la criatura que no sabías | 20 s | A | D-7 · 24 nov | Grabar |
 | V13 | Loop relajante de pesca (ASMR) | 20 s | B | D-4 · 27 nov | Veo/Kling/Runway |
-| V14 | Comparativa: caña básica vs mejorada | 28 s | A | D+5 · 6 dic | Grabar |
+| V14 | Comparativa: Caña de Madera vs Caña de Fibra | 28 s | A | D+5 · 6 dic | Grabar |
 | V15 | Tutorial express de 15 s | 15 s | C | D+8 · 9 dic | `ff-06-tutorial-15s` |
 | V16 | Reto: completar el bestiario (día 1) | 30 s | A | D+6 · 7 dic | Grabar |
 | V17 | Amanecer de lanzamiento | 12 s | B | D-1 · 30 nov | Veo/Kling/Runway |
 | V18 | Pesco con amigos y pasa esto | 25 s | A | D+3 · 4 dic | Grabar (2+ cuentas) |
-| V19 | Anuncio de evento | 15 s | C | D+14 · 15 dic | `ff-04-evento-semanal` |
-| V20 | Tutorial real: lanzar bien | 20 s | A | D+10 · 11 dic | Grabar |
+| V19 | Anuncio de evento (Marea Dorada) | 15 s | C | D+12 · 13 dic | `ff-04-evento-semanal` |
+| V20 | Tutorial real: recoger en la zona perfecta | 20 s | A | D+10 · 11 dic | Grabar |
 | V21 | Teaser de evento de invierno | 15 s | B | D+11 · 12 dic | Veo/Kling/Runway |
-| V22 | Código de lanzamiento | 15 s | C | D0 · 1 dic | `ff-05-codigo-lanzamiento` |
+| V22 | Código WELCOME | 15 s | C | D0 · 1 dic | `ff-05-codigo-lanzamiento` |
 | V23 | Reacción de un amigo al banner | 20 s | A | D+9 · 10 dic | Grabar + amigo |
-| V24 | Reto: completar el bestiario (día 7) | 30 s | A | D+12 · 13 dic | Grabar |
+| V24 | Reto: completar el bestiario (día 7) | 30 s | A | D+13 · 14 dic | Grabar |
 | V25 | Comparativa de zonas con datos reales | 30 s | A | Banco | Grabar + datos |
-| V26 | Encuesta: ¿qué criatura quieres? | 15 s | C | D+13 · 14 dic | Spec a crear (variante de `ff-01`) |
-| V27 | Evento en vivo: primera hora | 25 s | A | D+15 · 16 dic | Grabar |
+| V26 | Encuesta: ¿qué criatura quieres? | 15 s | C | D+14 · 15 dic | Spec a crear (variante de `ff-01`) |
+| V27 | Marea Dorada en acción | 25 s | A | D+15 · 16 dic | Grabar |
 | V28 | Hito de comunidad (solo si es real) | 12 s | B | Banco | Veo/Kling/Runway |
 | V29 | Resumen de la semana con datos reales | 20 s | C | D+7 · 8 dic | Spec a crear (variante de `ff-03`) |
 | V30 | Balance de 30 días (honesto) | 30 s | A | Banco → D+30 · 31 dic | Grabar + datos |
@@ -106,24 +108,24 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **CTA:** "Busca Fish & Fortune en Roblox."
 - **EN:** "Everyone on the server saw it." / "Search Fish & Fortune on Roblox."
 - **Hashtags:** `#FishAndFortune #Roblox #RobloxFishing #Gaming`
-- **Origen A — plano a grabar [a grabar por Aryan o por la sesión de su PC]:** en un servidor con 2 cuentas de prueba, la cuenta B pesca el Mítico (si hace falta, con el comando de pruebas/admin del universo de pruebas **nunca en producción**) y la cuenta A graba la pantalla. Duración del clip crudo: 15–25 s. Si el comando de pruebas hace aparecer un Mítico "falso", **decirlo en la descripción** ("grabado en entorno de pruebas") para no engañar sobre la probabilidad.
+- **Origen A — plano a grabar [a grabar por Aryan o por la sesión de su PC]:** un Mítico sale de forma natural ≈ 1 de cada 2.500 lanzadas con suerte 0 (≈ 0,04 %, `Balance.luau`), así que **no se puede grabar "a pelo"**: en un servidor con 2 cuentas de prueba, la cuenta B pesca el Mítico (con un comando de pruebas/admin del universo de pruebas **nunca en producción**) y la cuenta A graba la pantalla. Duración del clip crudo: 15–25 s. Si el comando de pruebas hace aparecer un Mítico "falso", **decirlo en la descripción** ("grabado en entorno de pruebas") para no engañar sobre la probabilidad.
 - **Requiere de Aryan:** el juego jugable con el banner global [AJUSTAR A LO REAL: texto exacto del banner], 2 cuentas, grabador.
 
 ### V03 — Gancho de marca "¿Tu próxima lanzada será MÍTICA?" · 18 s · origen C
-- **Gancho (0–2 s):** "¿Tu próxima lanzada será MÍTICA?" sobre el lago con partículas.
+- **Gancho (0–2 s):** "¿Podrás pescar un MÍTICO?" sobre el lago con partículas (pregunta, no promesa: los Míticos son rarísimos).
 - **Formato:** render del pipeline, 9:16 (sin gameplay).
-- **Texto en pantalla / narración:** ver `specs-video/ff-01-gancho-mitico.json` (Lanza la caña → Pesca criaturas → Lagos compartidos → Un MÍTICO lo ve todo el servidor).
+- **Texto en pantalla / narración:** ver `specs-video/ff-01-gancho-mitico.json` (Lanza y recoge a tiempo → 25 criaturas en tu bestiario → 3 zonas por explorar → Un MÍTICO es rarísimo y se anuncia).
 - **CTA:** "Busca Fish & Fortune — gratis en Roblox · compras opcionales".
-- **EN:** "Will your next cast be MYTHIC?" (traducir el spec cambiando los textos).
+- **EN:** "Can you catch a MYTHIC?" (traducir el spec cambiando los textos).
 - **Hashtags:** `#FishAndFortune #Roblox #Pesca #CozyGames`
-- **Origen C:** `node marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4` → **ya renderizado** en `specs-video/out/ff-01-gancho-mitico.mp4` (1080×1920, 18,2 s). Fondo de gráficos de marca con emojis (Noto Color Emoji), no gameplay; lleva la línea legal "Imágenes de marca, no es gameplay".
+- **Origen C:** `node ROBLOX/marketing/pipeline/render.mjs ROBLOX/marketing/fish-and-fortune/specs-video/ff-01-gancho-mitico.json out/ff-01.mp4` → **ya renderizado** en `specs-video/out/ff-01-gancho-mitico.mp4` (1080×1920, 18,2 s). Fondo de gráficos de marca con emojis (Noto Color Emoji), no gameplay; lleva la línea legal "Imágenes de marca, no es gameplay".
 - **Requiere de Aryan:** nada para publicarlo; opcional voz (`narrationFile`) y sustituir fondos por clips reales (`bg {type:'video'}`).
 
 ### V04 — Progresión: mi primera caña · 25 s · origen A
 - **Gancho (0–2 s):** inventario vacío + caña de madera. Texto: "Empiezo con 0 monedas".
 - **Formato:** captura continua acelerada (x2–x4) con cortes; contador de monedas real visible.
-- **Texto en pantalla:** 0–2 s "Empiezo con 0 monedas" · mitad "Vendo mis primeras criaturas" · final "Mi primera caña mejorada" (cifras reales de la pantalla).
-- **Narración:** "Cero monedas. Pesco, vendo y mejoro la caña. En un par de minutos ya noto la diferencia."
+- **Texto en pantalla:** 0–2 s "Empiezo con la Caña de Madera" · mitad "Vendo mis primeras criaturas" · final "Caña de Junco (120 monedas)" (cifras reales de la pantalla; precios de `Balance.luau`).
+- **Narración:** "Empiezo con la caña de madera. Pesco, vendo y compro la de junco, que cuesta ciento veinte monedas. ¿Notas la diferencia?"
 - **CTA:** "¿Qué mejorarías primero? Cuéntamelo en comentarios."
 - **EN:** "Starting with 0 coins." / "What would you upgrade first?"
 - **Hashtags:** `#FishAndFortune #Roblox #RobloxFishing #Progresion`
@@ -143,26 +145,26 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
   **Negative:** `text, subtitles, watermark, logo, real brands, human faces, realistic photo, scary, extra fins, changing colors, morphing artifacts`
 - **Requiere de Aryan:** la imagen base de la mascota aprobada (generada por él en su herramienta de imagen); cuenta de vídeo IA. **Solo si la mascota existe en el juego** [AJUSTAR A LO REAL] (si no, es marca, no engaño, pero decirlo: "mascota de la marca").
 
-### V06 — "Probé el pez más raro del lago" · 28 s · origen A
-- **Gancho (0–2 s):** primer plano de la criatura más rara con su borde de rareza. Texto: "La criatura más rara del lago".
-- **Formato:** captura + inserto de la ficha del bestiario con su probabilidad **real** (de la tabla Odds).
-- **Texto en pantalla:** nombre real de la criatura · rareza real · "Probabilidad: [valor real del bestiario]" · "Intentos hasta pescarla: [número real]".
-- **Narración:** "Dicen que esta es la criatura más rara del lago. Estos son mis intentos. Spoiler: la probabilidad real es [X por ciento]."
-- **CTA:** "¿Cuántos intentos crees que te harían falta? Cuéntalo."
-- **EN:** "I tried to catch the rarest creature in the lake."
+### V06 — "Intenté pescar al Espíritu del Lago" · 28 s · origen A
+- **Gancho (0–2 s):** ficha del Espíritu del Lago (Mítico) con su probabilidad real. Texto: "Probabilidad base: 0,04 %" (leer el valor del panel Probabilidades, no de memoria).
+- **Formato:** captura de una sesión larga con **contador de lanzadas** en pantalla; inserto del panel Probabilidades.
+- **Texto en pantalla:** "Lanzada [n]" (contador real) · "Probabilidad base: [valor real del panel]" · resultado real al final (aunque sea "no salió").
+- **Narración:** "El Espíritu del Lago es el pez más raro del primer lago: la probabilidad base es de cero coma cero cuatro por ciento. Vamos a ver cuántas lanzadas aguanto… y si sale."
+- **CTA:** "¿Cuántas lanzadas crees que hacen falta? Dime tu número."
+- **EN:** "I tried to catch the Lake Spirit: base odds 0.04%."
 - **Hashtags:** `#FishAndFortune #Roblox #RobloxFishing #Bestiario`
-- **Origen A — plano:** sesión larga contada (cronómetro), mostrando todos los intentos; **no recortar intentos fallidos para fingir suerte**. Si necesitas acelerar con comandos de pruebas, etiquetar "entorno de pruebas".
-- **Requiere de Aryan:** criatura rara real y bestiario con odds visibles [AJUSTAR A LO REAL].
+- **Origen A — plano:** sesión larga real **sin recortar intentos fallidos** y sin presentar un resultado de entorno de pruebas como natural; si se usa auto-pesca o suerte (la Luna Mítica da +3 de suerte), decirlo. Honesto y gracioso: "no salió" también es contenido.
+- **Requiere de Aryan:** build jugable con el panel Probabilidades [AJUSTAR A LO REAL].
 
 ### V07 — Escalera de rareza (top 3) · 17 s · origen C
 - **Gancho:** "¿Qué tan RARO puede ser tu próximo pez?"
 - **Formato:** `top-list` del pipeline: #3 Criatura Rara → #2 Legendaria → #1 MÍTICA.
-- **Texto / narración:** ver `specs-video/ff-02-escalera-rareza.json` (sin porcentajes hasta que haya tabla real).
+- **Texto / narración:** ver `specs-video/ff-02-escalera-rareza.json` (Rara = Trucha Dorada 4,50 %; Legendaria = Carpa Ancestral 0,60 %; Mítica = Espíritu del Lago 0,04 %; **probabilidad base en el Lago Calmo, suerte 0**, calculada de los pesos de `Balance.luau`).
 - **CTA:** "¿Cuál te falta? Fish & Fortune · gratis en Roblox".
 - **EN:** "How rare can your next catch be?"
 - **Hashtags:** `#FishAndFortune #Roblox #Rareza #Coleccion`
-- **Origen C:** **ya renderizado** `specs-video/out/ff-02-escalera-rareza.mp4` (1080×1920, 17,4 s). Confirmar los nombres de rareza del juego real antes de publicar.
-- **Requiere de Aryan:** confirmar nombres de rareza; opcional añadir `stat` con porcentajes reales.
+- **Origen C:** **ya renderizado** `specs-video/out/ff-02-escalera-rareza.mp4` (1080×1920, 17,4 s). Si cambia el balance, recalcular los % (la fuente de verdad es el panel Probabilidades) o quitarlos.
+- **Requiere de Aryan:** confirmar que el balance no ha cambiado antes de publicar.
 
 ### V08 — POV: eres quien pescó el Mítico · 15 s · origen A
 - **Gancho (0–2 s):** cámara en primera persona sobre la caña que se dobla. Texto: "POV: algo enorme ha picado".
@@ -190,30 +192,30 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **Requiere de Aryan:** cuenta de vídeo IA; voz (opcional).
 
 ### V10 — Progresión 60 s: del lago al río · 30 s · origen A
-- **Gancho (0–2 s):** timelapse del lago inicial. Texto: "Del lago al río en 60 segundos".
-- **Formato:** captura acelerada (x8) + 3 cortes: ganar monedas → comprar caña → desbloquear zona 2.
+- **Gancho (0–2 s):** timelapse del Lago Calmo. Texto: "Del Lago Calmo al Río Cristal" (+ el tiempo real que tardas).
+- **Formato:** captura acelerada (x8) + 3 cortes: ganar monedas → comprar la Caña de Junco → desbloquear el **Río Cristal (2.000 monedas)**.
 - **Texto en pantalla:** contador real de monedas y nombre real de la zona 2. "Zona 2 desbloqueada" solo si el juego lo dice.
 - **Narración:** "Dos minutos, comprimidos en treinta segundos: pesco, vendo, mejoro y llego a la segunda zona."
 - **CTA:** "¿Hasta qué zona has llegado tú?"
 - **EN:** "From the lake to the river in 60 seconds."
 - **Hashtags:** `#FishAndFortune #Roblox #Progresion #RobloxFishing`
 - **Origen A — plano:** cuenta nueva con cronómetro; si el tiempo real a la zona 2 es mayor, **decir el tiempo real** en pantalla ("x8 de velocidad"). No prometer "en 60 segundos" si no es verdad: ajustar el gancho al tiempo real.
-- **Requiere de Aryan:** build con zona 2 (el MVP trae 3 zonas [AJUSTAR A LO REAL]).
+- **Requiere de Aryan:** build con la zona 2 (el balance trae 3 zonas).
 
 ### V11 — Zonas: del lago a la costa · 15 s · origen C
 - **Gancho:** "Del LAGO a la COSTA".
 - **Formato:** `progression` del pipeline: Zona 1 Lago → 2 Río → 3 Costa.
-- **Texto / narración:** ver `specs-video/ff-03-zonas-progresion.json`.
+- **Texto / narración:** ver `specs-video/ff-03-zonas-progresion.json` (Lago Calmo → Río Cristal → Costa Dorada).
 - **CTA:** "Empieza hoy — Fish & Fortune, gratis en Roblox".
 - **EN:** "From the lake to the coast."
 - **Hashtags:** `#FishAndFortune #Roblox #Explora #CozyGames`
-- **Origen C:** **ya renderizado** `specs-video/out/ff-03-zonas-progresion.mp4` (1080×1920, 15 s). Confirmar nombres y orden de zonas.
-- **Requiere de Aryan:** confirmar zonas reales.
+- **Origen C:** **ya renderizado** `specs-video/out/ff-03-zonas-progresion.mp4` (1080×1920, 15 s). Nombres y orden tomados de `Balance.luau`.
+- **Requiere de Aryan:** nada, salvo confirmar que no cambian los nombres.
 
 ### V12 — Bestiario: la criatura que no sabías que existía · 20 s · origen A
 - **Gancho (0–2 s):** ficha del bestiario con "???" que se revela. Texto: "¿Sabías que existe esta criatura?".
 - **Formato:** captura del bestiario: desplazamiento, ficha desbloqueada, estadística real.
-- **Texto en pantalla:** nombre real de la criatura · rareza · zona donde aparece (datos reales de la ficha).
+- **Texto en pantalla:** nombre real de la criatura · rareza · zona donde aparece (datos reales de la ficha) · el premio real del bestiario (p. ej. "Descubre 5 criaturas: 500 monedas").
 - **Narración:** "Este es mi bestiario. Me faltan estas criaturas. Esta aparece solo en [zona]."
 - **CTA:** "¿Cuántas llevas en tu bestiario?"
 - **EN:** "Did you know this creature exists?"
@@ -243,21 +245,21 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **EN:** "10 casts with each rod — real results."
 - **Hashtags:** `#FishAndFortune #Roblox #Comparativa #RobloxFishing`
 - **Origen A — plano:** dos tandas reales; mostrar el resultado aunque sea poco favorable (honestidad; si la mejora es pequeña, decirlo).
-- **Requiere de Aryan:** 2 cañas reales de tiers distintos; la mejora con Robux solo si es cosmética (concepto: cañas premium cosméticas, sin ventaja).
+- **Requiere de Aryan:** 2 cañas reales (p. ej. Caña de Madera frente a Caña de Fibra: la zona perfecta pasa de 0,14 a 0,18 y la suerte de 0 a 1 [`Balance.luau`]). Las cañas se compran con **monedas**, no con Robux.
 
 ### V15 — Tutorial express de 15 s · 15 s · origen C
 - **Gancho:** "3 tips para pescar mejor".
-- **Formato:** `bullets` del pipeline: mantén pulsado para lanzar más lejos · sigue el ritmo del minijuego · revisa tu bestiario antes de vender.
+- **Formato:** `bullets` del pipeline: recoge con el marcador en la zona perfecta · recoger perfecto da suerte extra, gratis · con mejores cañas la zona perfecta es más ancha (mecánica real de `Balance.minigame`).
 - **Texto / narración:** ver `specs-video/ff-06-tutorial-15s.json`.
 - **CTA:** "Pruébalo gratis — Fish & Fortune en Roblox".
 - **EN:** "3 tips to fish better."
 - **Hashtags:** `#FishAndFortune #Roblox #Tutorial #RobloxTips`
-- **Origen C:** **ya renderizado** `specs-video/out/ff-06-tutorial-15s.mp4` (14,2 s). **Confirmar cada tip contra los controles reales**; si cambian, editar el spec y re-renderizar.
-- **Requiere de Aryan:** confirmar controles.
+- **Origen C:** **ya renderizado** `specs-video/out/ff-06-tutorial-15s.mp4` (14,2 s). **Confirmar cada tip contra la UI final**; si cambian, editar el spec y re-renderizar.
+- **Requiere de Aryan:** confirmar la UI del mini-juego.
 
 ### V16 — Reto: completar el bestiario sin gastar Robux (día 1) · 30 s · origen A
 - **Gancho (0–2 s):** bestiario casi vacío. Texto: "Reto: completar el bestiario sin gastar Robux".
-- **Formato:** episodio 1 de una serie; progreso real mostrado "x/25" [AJUSTAR A LO REAL].
+- **Formato:** episodio 1 de una serie; progreso real mostrado "x/25" y los premios reales del bestiario (5, 10, 15, 20 y 25 criaturas; el completo da 40 perlas y 500.000 monedas).
 - **Texto en pantalla:** "Día 1 · [n]/[total] criaturas" · "0 Robux gastados" (solo si es cierto).
 - **Narración:** "Empiezo desde cero. Regla: ni un Robux. Veamos cuántas criaturas consigo hoy."
 - **CTA:** "Parte 2 en una semana. ¿Te sumas al reto?"
@@ -291,25 +293,25 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **Requiere de Aryan:** un amigo o 2.ª cuenta; consentimiento de quien aparezca.
 
 ### V19 — Anuncio de evento · 15 s · origen C
-- **Gancho:** "NUEVO EVENTO: Marea Brillante — del 15 al 22 de diciembre" (ejemplo).
+- **Gancho:** "Evento semanal: Marea Dorada — del lunes 14 al domingo 20 de diciembre" (evento real de la config: monedas por venta ×2).
 - **Formato:** `custom` 16:9 del pipeline (Discord / comunidad de YouTube); versión 9:16 con `--aspect 9:16`.
-- **Texto / narración:** ver `specs-video/ff-04-evento-semanal.json`. Nombre, fechas y premios son **ejemplo**: cambiar por los reales.
+- **Texto / narración:** ver `specs-video/ff-04-evento-semanal.json` (monedas por venta ×2, se suma a otros bonus con tope, se repite cada dos semanas). Fechas: semanas que empiezan el 30-nov, 14-dic y 28-dic; la Luna Mítica (+3 de suerte) las del 7-dic y 21-dic.
 - **CTA:** "¡Nos vemos en el lago!"
-- **EN:** "New event — Dec 15–22."
+- **EN:** "Weekly event: Golden Tide — Dec 14–20."
 - **Hashtags:** `#FishAndFortune #Roblox #Evento #CozyGames`
-- **Origen C:** **ya renderizado** `specs-video/out/ff-04-evento-semanal.mp4` (1920×1080, 15,1 s). Fechas reales y que coincidan con el config del juego.
-- **Requiere de Aryan:** datos reales del evento (solo si pasa G2: plan v1.2).
+- **Origen C:** **ya renderizado** `specs-video/out/ff-04-evento-semanal.mp4` (1920×1080, 15,1 s). Las fechas deben coincidir con la config remota (inicio lunes 00:00 UTC).
+- **Requiere de Aryan:** confirmar la config de eventos antes de publicar (no depende de G2: ya existe en el juego).
 
-### V20 — Tutorial real: lanzar bien · 20 s · origen A
-- **Gancho (0–2 s):** lanzamiento fallido. Texto: "Así NO se lanza".
+### V20 — Tutorial real: recoger en la zona perfecta · 20 s · origen A
+- **Gancho (0–2 s):** recogida fallida. Texto: "Así NO se recoge".
 - **Formato:** captura con comparación fallo/acierto; flechas y círculos de resaltado (permitido: "resaltados de mecánicas reales").
-- **Texto en pantalla:** "Mantén pulsado" · "Suelta en la zona" · nombres reales de controles.
-- **Narración:** "Si sueltas demasiado pronto, tu lanzada se queda corta. Mantén pulsado y suelta en la zona verde."
+- **Texto en pantalla:** "Espera al marcador" · "Recoge en la zona perfecta" · nombres reales de los controles.
+- **Narración:** "Un marcador va y viene. Si recoges fuera de la zona, pierdes la oportunidad de suerte extra. Recoge justo en la zona perfecta."
 - **CTA:** "¿Algún otro truco? Cuéntalo."
 - **EN:** "How to cast properly."
 - **Hashtags:** `#FishAndFortune #Roblox #Tutorial #RobloxTips`
-- **Origen A — plano:** 3 lanzadas: mala, normal, buena. **Confirmar** que la mecánica "mantener para lanzar" existe [AJUSTAR A LO REAL].
-- **Requiere de Aryan:** build final del control de lanzamiento.
+- **Origen A — plano:** 3 recogidas: mala, buena y perfecta (la perfecta da +1 punto de suerte gratis [`Balance.minigame`]).
+- **Requiere de Aryan:** build con el mini-juego y su UI.
 
 ### V21 — Teaser de evento de invierno · 15 s · origen B
 - **Gancho (0–2 s):** nieve cayendo sobre el lago. Texto: "El lago se viste de invierno".
@@ -322,17 +324,17 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **Origen B — PROMPT exacto:**
   `Vertical 9:16, a snowy lake at dusk, soft snowfall, warm lanterns glowing along a wooden pier, frozen edges on the shore, a bright teal-and-gold shimmer pulses in an open patch of dark water, slow gentle push-in, quiet winter ambience, no dialogue. stylized 3D cartoon look, soft rounded shapes, smooth shading, warm cozy lighting. deep navy #0A1F44, lagoon teal #19C3C0, sunlit gold #FFC83D, coral orange #FF7A59, foam white #F4FBFF.`
   **Negative:** `text, subtitles, watermark, logo, real brands, human faces, realistic photo, horror, casino, coins, flicker, morphing artifacts`
-- **Requiere de Aryan:** evento confirmado; cuenta de vídeo IA.
+- **Requiere de Aryan:** evento festivo confirmado (no está en la config por defecto: es el contenido v1.3 del plan 90); cuenta de vídeo IA.
 
 ### V22 — Código de lanzamiento · 15 s · origen C
-- **Gancho:** "Código de LANZAMIENTO".
-- **Formato:** `custom` con 3 pasos y fecha de caducidad real.
-- **Texto / narración:** ver `specs-video/ff-05-codigo-lanzamiento.json` (código `LANZAMIENTO`, caduca el 15 dic 23:59 UTC, un canje por cuenta).
-- **CTA:** "Código LANZAMIENTO — un canje por cuenta".
-- **EN:** "Launch code: LANZAMIENTO (one per account)."
+- **Gancho:** "Código WELCOME".
+- **Formato:** `custom` con 3 pasos y la recompensa real.
+- **Texto / narración:** ver `specs-video/ff-05-codigo-lanzamiento.json` (código `WELCOME` = 1.000 monedas + 5 perlas, un canje por cuenta; **sin caducidad** en la config actual, por eso el vídeo no afirma ninguna).
+- **CTA:** "Código WELCOME — un canje por cuenta".
+- **EN:** "Code WELCOME: 1,000 coins + 5 pearls (one per account)."
 - **Hashtags:** `#FishAndFortune #Roblox #Codigo #RobloxCodes`
-- **Origen C:** **ya renderizado** `specs-video/out/ff-05-codigo-lanzamiento.mp4` (1080×1920, 14,9 s). **No publicar hasta que el código exista, esté validado en servidor y la caducidad sea real.**
-- **Requiere de Aryan:** el código funcionando (ver `plan-lanzamiento.md` §7); la recompensa real se enseña en el juego, no se promete aquí.
+- **Origen C:** **ya renderizado** `specs-video/out/ff-05-codigo-lanzamiento.mp4` (1080×1920, 14,9 s). **No publicar hasta que el botón "Códigos" exista y el canje esté probado.** Si Aryan añade una caducidad (`expiresAt`), poner la fecha real en el vídeo.
+- **Requiere de Aryan:** el canje funcionando (ver `plan-lanzamiento.md` §7).
 
 ### V23 — Reacción de un amigo al banner · 20 s · origen A
 - **Gancho (0–2 s):** cara/pantalla del amigo en el momento del aviso. Texto: "Su cara al ver el aviso".
@@ -377,16 +379,16 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 - **Origen C:** spec a crear (copia de `ff-01-gancho-mitico.json`, cambiando textos). Se renderiza con la misma orden.
 - **Requiere de Aryan:** decidir las opciones.
 
-### V27 — Evento en vivo: primera hora · 25 s · origen A
-- **Gancho (0–2 s):** pantalla de evento con criaturas nuevas. Texto: "Probé el evento en su primera hora".
-- **Formato:** captura del evento real; mostrar qué se consigue jugando y qué es opcional (cosmético).
-- **Texto en pantalla:** criaturas del evento con rareza real, fechas reales del evento.
-- **Narración:** "Primera hora del evento. Esto es lo que he conseguido jugando y esto es lo que es opcional."
-- **CTA:** "Termina el [fecha real]."
+### V27 — Marea Dorada en acción · 25 s · origen A
+- **Gancho (0–2 s):** venta de criaturas con el multiplicador activo. Texto: "Marea Dorada: ¿cuánto cambia vender?"
+- **Formato:** captura de la misma venta con y sin evento (monedas por venta ×2, que se suma a otros bonus con tope); cifras reales de la pantalla.
+- **Texto en pantalla:** monedas antes/durante el evento (reales); "Hasta el lunes 21, 00:00 UTC".
+- **Narración:** "Esta semana las monedas por venta se multiplican por dos. Así cambia vender lo mismo con y sin evento."
+- **CTA:** "Termina el lunes 21 de diciembre a las 00:00 UTC (hora de tu zona: míralo en el juego)."
 - **EN:** "I tried the event in its first hour."
 - **Hashtags:** `#FishAndFortune #Roblox #Evento #RobloxFishing`
-- **Origen A:** requiere que el evento 1 esté en producción (plan v1.2, solo si pasa G2).
-- **Requiere de Aryan:** evento publicado.
+- **Origen A:** requiere el juego en producción con la config de eventos.
+- **Requiere de Aryan:** el evento activo en esa fecha.
 
 ### V28 — Hito de comunidad (solo si es real) · 12 s · origen B (banco)
 - **Gancho (0–2 s):** fuegos artificiales sobre el lago. Texto: "¡[hito real]!" p. ej. "Ya somos [n] en el grupo" con cifra real.
@@ -430,4 +432,4 @@ Formato de cada ficha: **Gancho (0–2 s)** · **Formato** · **Texto en pantall
 
 **B (IA):** generar clips de 5–8 s sin texto; revisar uno por uno (IP, rostros, "artefactos" raros); montar y añadir texto y la etiqueta "Escena creada con IA · no es gameplay"; activar el interruptor de IA de la plataforma.
 
-**C (pipeline):** `node marketing/pipeline/render.mjs <spec.json> <salida.mp4>`; opciones útiles: `--aspect 9:16|16:9|1:1|4:5`, `--scale 0.5` (preview), `--stills 1,5,9` (fotogramas de revisión), `--crf 21 --report`. Ver `specs-video/README.md`.
+**C (pipeline):** `node ROBLOX/marketing/pipeline/render.mjs <spec.json> <salida.mp4>`; opciones útiles: `--aspect 9:16|16:9|1:1|4:5`, `--scale 0.5` (preview), `--stills 1,5,9` (fotogramas de revisión), `--crf 21 --report`. Ver `specs-video/README.md`.

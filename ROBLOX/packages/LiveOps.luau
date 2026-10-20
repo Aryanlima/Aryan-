@@ -5,10 +5,10 @@
 	la configuracion vive en una fuente remota (ConfigService / DataStore, inyectada con `fetch`) y los
 	servidores la refrescan cada pocos minutos y/o al recibir un aviso de MessagingService.
 
-	Principios de honestidad (research/03 2.3):
+	Principios de honestidad (ROBLOX/research/03 2.3):
 	  * Los temporizadores son exactos (endsAt - now) y NO se reinician solos: un evento solo se repite si
 	    su configuracion define explicitamente un ciclo (`cycle`).
-	  * Maximo 10 eventos activos/proximos a la vez (limite documentado en research/07 [F28]).
+	  * Maximo 10 eventos activos/proximos a la vez (limite documentado en ROBLOX/research/07 [F28]).
 	  * Una configuracion invalida NUNCA reemplaza a la buena: se registra el problema y se sigue con la anterior.
 
 	Sin dependencias del motor: se prueba con Lune.
@@ -241,6 +241,18 @@ function LiveOps.validateConfig(config: any, now: number?, maxActiveOrUpcoming: 
 			else
 				if def.startsAt ~= nil and not isFinite(def.startsAt) then
 					problem("codigo '" .. code .. "': startsAt invalido")
+				end
+				-- Los premios numericos deben ser finitos, >= 0 y razonables (un NaN/negativo/1e300 de la configuracion
+				-- remota llegaria tal cual a la logica del juego). Los valores no numericos los interpreta el juego.
+				for rewardKey, rewardValue in def.reward do
+					if
+						type(rewardValue) == "number"
+						and (not isFinite(rewardValue) or rewardValue < 0 or rewardValue > 1e9)
+					then
+						problem(
+							"codigo '" .. code .. "': premio '" .. tostring(rewardKey) .. "' fuera de rango (0..1e9)"
+						)
+					end
 				end
 				if def.expiresAt ~= nil then
 					if not isFinite(def.expiresAt) then

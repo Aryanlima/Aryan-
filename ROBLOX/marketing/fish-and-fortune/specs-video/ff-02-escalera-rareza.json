@@ -2,7 +2,7 @@
   "id": "ff-02-escalera-rareza",
   "template": "top-list",
   "title": "Fish & Fortune — la escalera de rareza: Raro, Legendario, Mítico (9:16, ~22 s)",
-  "_nota": "Video de marca (NO es gameplay). Los nombres de rareza (Raro / Legendario / Mítico) son los del concepto; confirmar contra los nombres reales del juego antes de publicar. No se muestran porcentajes porque aún no hay tabla de odds real: cuando exista (módulo Odds), añadir cada porcentaje REAL con stat:{label:'PROB.',to:'0,5%'} (texto, se muestra tal cual).",
+  "_nota": "Video de marca (NO es gameplay). Nombres de rareza y criaturas de ROBLOX/games/fish-and-fortune/src/shared/Balance.luau (2026-10-20). Los % son la probabilidad BASE en el Lago Calmo (suerte 0): peso 45, 6 y 0,4 sobre un total de 999,4 = 4,50 %, 0,60 % y 0,04 %. Si cambia Balance, recalcular (la UI 'Probabilidades' del juego es la fuente de verdad) o quitar los stat.",
   "aspect": "9:16",
   "fps": 30,
   "palette": {
@@ -49,24 +49,36 @@
   "items": [
     {
       "title": "Criatura *Rara*",
-      "sub": "Brilla un poco más que el resto",
+      "sub": "Ej.: Trucha Dorada",
       "emoji": "🐠",
-      "narration": "Tres: las criaturas raras brillan un poco más.",
-      "duration": 4.4
+      "narration": "Tres: las raras, como la trucha dorada.",
+      "duration": 4.4,
+      "stat": {
+        "label": "BASE EN EL LAGO",
+        "to": "4,50 %"
+      }
     },
     {
       "title": "Criatura *Legendaria*",
-      "sub": "Aparece muy de vez en cuando",
-      "emoji": "🦑",
-      "narration": "Dos: las legendarias aparecen muy de vez en cuando.",
-      "duration": 4.4
+      "sub": "Ej.: Carpa Ancestral",
+      "emoji": "🐟",
+      "narration": "Dos: las legendarias, como la carpa ancestral.",
+      "duration": 4.4,
+      "stat": {
+        "label": "BASE EN EL LAGO",
+        "to": "0,60 %"
+      }
     },
     {
       "title": "Criatura *MÍTICA*",
-      "sub": "Todo el servidor se entera",
+      "sub": "Ej.: Espíritu del Lago",
       "emoji": "🐋",
-      "narration": "Uno: la mítica. Todo el servidor se entera.",
-      "duration": 4.4
+      "narration": "Uno: las míticas, como el espíritu del lago. Rarísimas.",
+      "duration": 4.4,
+      "stat": {
+        "label": "BASE EN EL LAGO",
+        "to": "0,04 %"
+      }
     }
   ],
   "cta": {
@@ -86,5 +98,5 @@
     },
     "sfx": true
   },
-  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Imágenes de marca, no es gameplay."
+  "legal": "Fish & Fortune es gratis con compras opcionales con Robux. Probabilidades base del Lago Calmo sin suerte extra: consulta el panel Probabilidades del juego. Imágenes de marca, no es gameplay."
 }

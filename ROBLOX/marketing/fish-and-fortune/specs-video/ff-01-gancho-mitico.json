@@ -2,7 +2,7 @@
   "id": "ff-01-gancho-mitico",
   "template": "hook-gameplay-cta",
   "title": "Fish & Fortune — gancho: ¿y si tu próxima lanzada es un MÍTICO? (9:16, ~20 s)",
-  "_nota": "Video de marca con gráficos del pipeline (NO es gameplay): úsalo en TikTok/Shorts/Reels, nunca en la página del juego de Roblox. Si grabas gameplay real, ponlo como bg {type:'video', src:'../clips/xxx.mp4'} en cada escena. Ajustar a lo real: nombre del banner global y de la rareza MÍTICO. Ver specs-video/README.md.",
+  "_nota": "Video de marca con gráficos del pipeline (NO es gameplay): úsalo en TikTok/Shorts/Reels, nunca en la página del juego de Roblox. Datos alineados con ROBLOX/games/fish-and-fortune/src/shared/Balance.luau (2026-10-20): 3 zonas, 25 criaturas, rareza MITICO, mini-juego de recogida, aviso global (Balance.mythicBanner). Revisar antes de publicar si cambia el balance. Si grabas gameplay real, ponlo como bg {type:'video', src:'../clips/xxx.mp4'}. Ver specs-video/README.md.",
   "aspect": "9:16",
   "fps": 30,
   "palette": {
@@ -42,7 +42,7 @@
   },
   "hook": {
     "kicker": "🎣 PESCA RELAJANTE",
-    "text": "¿Tu próxima lanzada será *MÍTICA*?",
+    "text": "¿Podrás pescar un *MÍTICO*?",
     "emoji": "🌊",
     "chip": "🐟 Fish & Fortune",
     "duration": 2.4
@@ -52,8 +52,8 @@
       "id": "lanza",
       "kind": "caption",
       "duration": 3.4,
-      "text": "*Lanza* la caña",
-      "narration": "Lanza la caña y espera la picada.",
+      "text": "Lanza y *recoge a tiempo*",
+      "narration": "Lanza la caña y recoge justo en la zona perfecta.",
       "stickers": [
         {
           "emoji": "🎣",
@@ -77,8 +77,8 @@
       "id": "bestiario",
       "kind": "caption",
       "duration": 3.6,
-      "text": "Pesca *criaturas* y completa tu bestiario",
-      "narration": "Pesca criaturas y completa tu bestiario.",
+      "text": "Descubre *25 criaturas* en tu bestiario",
+      "narration": "Descubre 25 criaturas y completa tu bestiario.",
       "bg": {
         "type": "rays",
         "particles": "sparks"
@@ -124,15 +124,15 @@
       "id": "lagos",
       "kind": "caption",
       "duration": 3.4,
-      "text": "Lagos *compartidos* con otros jugadores",
-      "narration": "Comparte el lago con otros jugadores.",
+      "text": "*3 zonas* por explorar",
+      "narration": "Del Lago Calmo al Río Cristal y la Costa Dorada.",
       "bg": {
         "type": "gradient",
         "particles": "stars"
       },
       "stickers": [
         {
-          "emoji": "🏞️",
+          "emoji": "🗺️",
           "at": 0.8,
           "x": 0.5,
           "y": 0.46,
@@ -142,8 +142,8 @@
       ],
       "chips": [
         {
-          "emoji": "👥",
-          "text": "Juega con amigos",
+          "emoji": "🏞️",
+          "text": "Lago · Río · Costa",
           "at": 1.6,
           "x": 0.5,
           "y": 0.64,
@@ -155,8 +155,8 @@
       "id": "mitico",
       "kind": "caption",
       "duration": 4.0,
-      "text": "Un *MÍTICO* lo ve todo el servidor",
-      "narration": "Si alguien pesca un mítico, se entera todo el servidor.",
+      "text": "Un *MÍTICO* es rarísimo y se anuncia",
+      "narration": "Los míticos son rarísimos, y cuando alguien pesca uno, se anuncia en pantalla.",
       "bg": {
         "type": "rays",
         "particles": "confetti"

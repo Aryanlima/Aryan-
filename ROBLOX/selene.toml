@@ -1,0 +1,13 @@
+# Configuracion de selene (linter). std "luau+roblox_lite": ver roblox_lite.yml.
+std = "luau+roblox_lite"
+
+# Rutas relativas a esta carpeta (ROBLOX/): los scripts de tools/ ejecutan selene con ROBLOX/ como directorio de trabajo.
+exclude = ["research/**", ".git/**", "node_modules/**", "**/node_modules/**", "**/venv/**", ".toolchain/**", "tools/.bin/**", "tools/.cache/**"]
+
+[lints]
+# selene no entiende el escape \u{XXXX} de Luau y lo marca como invalido; Luau si rechaza escapes malos al compilar.
+bad_string_escape = "allow"
+
+[config]
+# Los parametros/variables con prefijo _ se permiten sin usar (callbacks de mocks).
+unused_variable = { allow_unused_self = true, ignore_pattern = "^_" }

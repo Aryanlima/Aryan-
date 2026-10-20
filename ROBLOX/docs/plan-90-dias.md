@@ -1,5 +1,11 @@
 # Plan de 90 días
 
+> **Actualización 2026-10-20: respuestas de Aryan.** Vive en **EE. UU.**, tiene **18 años o más**, publicará **como persona** y comprará las herramientas de IA que se recomienden.
+> Consecuencias: (1) el formulario fiscal que le toca es el **W-9**, no el W-9 (ese es para quienes no son de EE. UU.). Según la documentación oficial, con un W-9 válido en archivo no se exige retención de EE. UU. Se presenta en Creator Hub, en Finances > Taxes, y el 31-oct-2026 sigue siendo la fecha límite de los términos actuales. [OFICIAL] ([03 §5.4](../research/03-politicas-y-cumplimiento.md)).
+> (2) DevEx es para contribuyentes de EE. UU. con W-9; la tarifa mejorada de 0,0054 depende de que el JUGADOR sea de EE. UU., 18+ y verificado, no de dónde vive el creador.
+> (3) Al ser mayor de edad puede verificar su identidad él mismo, sin cuenta parental.
+> (4) Donde este documento diga «W-9», léase **W-9** para Aryan; el resto de los datos no cambia. Pendiente: que un contador le confirme sus propios impuestos como creador de EE. UU. (esto no es asesoría fiscal).
+
 Para: Aryan. Hoy es martes 2026-10-20 (día 0). El día 90 es el lunes 2027-01-18. Este plan convierte el [informe maestro](informe-maestro.md) en un calendario de semanas, con qué hace Claude y qué debe hacer Aryan a mano.
 
 ## 0. Cómo leer este plan
@@ -25,11 +31,11 @@ Semanas de lunes a domingo. La semana 0 dura hasta el domingo 1-nov. L = día de
 
 | Semana | Fechas | Objetivo | Claude | Aryan | Salida o puerta | Horas Aryan |
 |---|---|---|---|---|---|:-:|
-| **S0** | 20 oct a 1 nov | Papeles, cuentas, claves, Studio | Guías paso a paso, hoja de datos para el W-8BEN, lista de permisos mínimos de claves, lectura de políticas | **W-8BEN antes del miércoles 28-oct**, cuenta, verificación, Plus, Creator Hub, claves, instalar Studio | Papeles hechos; Studio conectado | 5 a 6 |
+| **S0** | 20 oct a 1 nov | Papeles, cuentas, claves, Studio | Guías paso a paso, hoja de datos para el W-9, lista de permisos mínimos de claves, lectura de políticas | **W-9 antes del miércoles 28-oct**, cuenta, verificación, Plus, Creator Hub, claves, instalar Studio | Papeles hechos; Studio conectado | 5 a 6 |
 | S1 | 2 a 8 nov | Núcleo técnico + primera prueba en Studio | Verificar y completar el núcleo (datos, compras, política, remotos, analítica, config) con tests | Abrir el juego en Studio y jugarlo; copiar errores | **H1**: el juego abre y se juega en Studio | 3 |
 | S2 | 9 a 15 nov | Fish & Fortune jugable | Bucle de pesca, tienda, UI móvil, zonas | Jugar 30 min por sesión; decir qué aburre | **H2**: MVP jugable | 4 |
 | S3 | 16 a 22 nov | MVP completo, eventos, analítica | Eventos por config, códigos, embudo de analítica, tabla de odds (sin azar de pago) | Probar en móvil real; grabar clips | **H3**: MVP completo | 5 |
-| S4 | 23 a 29 nov | **G0** + preparar lanzamiento | Arreglos, textos de tienda, guiones, kit de marketing, borrador del cuestionario de madurez | 5 a 10 personas juegan; cuestionario; iconos; pases y productos; decidir tarifa/Plus | **G0**; checklist de lanzamiento | 8 |
+| S4 | 23 a 29 nov | **G0** + preparar lanzamiento | Arreglos, textos de tienda, guiones, kit de marketing, borrador del cuestionario de madurez | 5 a 10 personas juegan; cuestionario; iconos; pases y productos; **comprobar que el nombre está libre (Discover y registros de marcas)**; decidir tarifa/Plus | **G0**; checklist de lanzamiento | 8 |
 | S5 | 30 nov a 6 dic | **Lanzamiento suave + G1** | Parche rápido, informe diario de analítica, clips | Publicar en producción (aprobación), comprar anuncios de prueba, publicar clips | **G1** (días L+1 a L+4) | 6 |
 | S6 | 7 a 13 dic | **G2** (D7) + 1.a actualización | Actualización v1.1 con datos, informe | Revisar, publicar, outreach a creadores | **G2** | 5 |
 | S7 | 14 a 20 dic | **G3** económica + decidir 2.º juego | Cálculo ingreso vs coste, evento 1 | Decidir según G2/G3; clips | **G3**; decisión sobre Rumble Rotation | 4 |
@@ -38,6 +44,8 @@ Semanas de lunes a domingo. La semana 0 dura hasta el domingo 1-nov. L = día de
 | S10 | 4 a 10 ene | Inicio **G5**; 2.º juego en construcción | Prototipo del 2.º juego (si procede) | Probar; revisar Términos y políticas nuevas | G5 en curso | 4 |
 | S11 | 11 a 17 ene | G0 del 2.º juego; informe de 90 días | Informe de 90 días, propuesta de los siguientes 90 | Playtest del 2.º juego | Informe listo | 4 |
 | S12 | 18 a 24 ene | **Día 90: decisión** | Escenarios, presupuesto | Decidir: continuar, pausar o cambiar el peso de juegos y ropa | Decisión | 3 |
+
+**Aviso sobre las horas:** el [plan de lanzamiento de marketing](../marketing/fish-and-fortune/plan-lanzamiento.md) estima 5 a 8 h/semana solo de marketing en las semanas de lanzamiento (S4 a S6). Si tu tiempo total ronda las 5 h/semana, usa su "mínimo viable" (12 clips, Discord, 1 test de anuncios y 3 creadores) o baja el ritmo de clips; las horas de la tabla son una estimación media, no un tope.
 
 Carril rápido [IDEA PROPIA]: si tienes más de 15 h/semana y el juego pasa H1 en la semana 1, L puede adelantarse a la semana 4 (23 a 29 nov). No lo adelantes por ansiedad: lo que decide es pasar G0.
 
@@ -52,8 +60,8 @@ Orden de prioridad. Lo que va primero tiene fecha límite.
 | 1 | Responder las 4 preguntas urgentes (país, edad, persona o empresa, cuenta existente) | Aryan | Hoy | Sin esto no se sabe qué formulario fiscal ni si DevEx existe en tu país | [preguntas-para-aryan.md](preguntas-para-aryan.md) |
 | 2 | Cuenta de Roblox en orden: correo verificado, contraseña única, **2FA activado** | Aryan | Hoy | 2FA es requisito para publicar a todas las edades y protege la cuenta única de la que cuelga todo | [OFICIAL] [03 §3.3][r03] |
 | 3 | **Verificación de edad o identidad** (estimación facial si eres menor de 18; documento de identidad si tienes 18+) | Aryan | Hoy o mañana | Necesaria para publicar a todas las edades, para añadir enlaces sociales (16+) y desbloquea más cuota de assets. Hazlo solo dentro de Roblox, nunca enviando tu documento a terceros | [OFICIAL] [03 §3.3, §5.1][r03] |
-| 4 | **Formulario fiscal: W-8BEN (persona) o W-8BEN-E (empresa)** en Creator Hub > Finances > Taxes | Aryan | **Antes del miércoles 28-oct** (límite oficial: sábado 31-oct) | Si falta información, desde el 1-nov puede aplicarse una retención de respaldo de **24 % sobre todo el pago**. Con información válida, la retención va de 0 a 30 % solo sobre la parte de fuente de EE. UU. (según país y convenio). Para reducirla, el formulario debe estar completo, incluir un número de identificación fiscal (NIF/TIN) y tu país de ciudadanía debe coincidir con tu país de residencia permanente. Se presenta solo por Creator Hub, nunca por correo | [OFICIAL] [03 §5.4][r03] |
-| 4b | Preparar los datos del W-8BEN: nombre legal, país, dirección, NIF/TIN, país del convenio | Claude prepara la lista, Aryan rellena | Hoy | Claude no puede firmar ni presentar por ti. La tasa que te toca depende de tu país: pregúntala a un contador local | [OFICIAL] [03 §5.4][r03] |
+| 4 | **Formulario fiscal: W-9 (persona) o W-9-E (empresa)** en Creator Hub > Finances > Taxes | Aryan | **Antes del miércoles 28-oct** (límite oficial: sábado 31-oct) | Si falta información, desde el 1-nov puede aplicarse una retención de respaldo de **24 % sobre todo el pago**. Con información válida, la retención va de 0 a 30 % solo sobre la parte de fuente de EE. UU. (según país y convenio). Para reducirla, el formulario debe estar completo, incluir un número de identificación fiscal (NIF/TIN) y tu país de ciudadanía debe coincidir con tu país de residencia permanente. Se presenta solo por Creator Hub, nunca por correo | [OFICIAL] [03 §5.4][r03] |
+| 4b | Preparar los datos del W-9: nombre legal, dirección, número de seguro social (SSN) o EIN; no aplica convenio | Claude prepara la lista, Aryan rellena | Hoy | Claude no puede firmar ni presentar por ti. Con un W-9 válido no se exige retención de EE. UU. [OFICIAL]; tus propios impuestos de creador, consúltalos con un contador | [OFICIAL] [03 §5.4][r03] |
 | 5 | Comprobar que **DevEx existe en tu país** y qué método de cobro tienes (PayPal, banco, otro) | Aryan | Esta semana | Roblox dice "más de cien países" pero la lista no se pudo leer. Mira el Help Center de DevEx y la cobertura de Tipalti | [NO VERIFICADO] [03 §5.3][r03] |
 | 6 | Que el **nombre legal coincida** en Roblox, portal DevEx y cuenta bancaria | Aryan | Esta semana | Si no coincide, el pago puede fallar | [OFICIAL] [03 §10][r03] |
 | 7 | **Plus o Premium**: decidir si activar Plus (4,99 USD/mes) | Aryan | Esta semana | Mantenerlo 2 meses seguidos exime de la tarifa de 1.000 Robux por juego. Si lo activas el 22-oct, los 2 meses se cumplen hacia el 22-dic. Comprueba en Creator Hub si está disponible en tu país. Plus o Premium también es obligatorio para publicar y mantener ropa y accesorios de avatar a la venta ([08 §2.2][r08]), así que sirve para las dos líneas | [OFICIAL] la regla [03 §3.3][r03]; precio [TERCERO] (resumen de página oficial) [02 §2.3][r02] |
@@ -76,7 +84,7 @@ Orden de prioridad. Lo que va primero tiene fecha límite.
 | Configs (eventos sin republicar) y experimentos | `universe:read` y `universe:write` | Cuando haya eventos | [OFICIAL] [06 §6.3][r06] |
 | Tests de motor en CI (Luau Execution) | No pedir todavía: límites y nombre del permiso sin verificar | Más adelante | [NO VERIFICADO] [06 §4.3][r06] |
 
-Prueba de que todo está bien al final de la semana 0: (1) W-8BEN presentado, (2) cuenta con 2FA y verificación, (3) Studio abierto con el MCP conectado, (4) un universo de pruebas privado creado, (5) tope de pérdida escrito.
+Prueba de que todo está bien al final de la semana 0: (1) W-9 presentado, (2) cuenta con 2FA y verificación, (3) Studio abierto con el MCP conectado, (4) un universo de pruebas privado creado, (5) tope de pérdida escrito.
 
 ---
 
@@ -169,7 +177,7 @@ El informe 08 recomienda **juegos como motor y ropa como línea secundaria** ([0
 | Cuándo | Qué | Coste aproximado | Condición |
 |---|---|---|---|
 | S0 (15 min) | Verificación en Creator Hub (ver tarea 13): suelo de precio, anticipo vigente, Plus o Premium, ID | 0 | Siempre |
-| S1 a S2 | **Prueba de pipeline: 3 prendas clásicas** generadas con `tools/clothing-gen`, probadas gratis en Studio (Block Avatar) y **subidas a mano** al Creator Dashboard. Puerta: ≥ 2 de 3 aprobadas en ≤ 24 h | 240 R$ de subida + 30 R$ de anticipo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
+| S1 a S2 | **Prueba de pipeline: 3 prendas clásicas** generadas con `ROBLOX/tools/clothing-gen`, probadas gratis en Studio (Block Avatar) y **subidas a mano** al Creator Dashboard. Puerta: ≥ 2 de 3 aprobadas en ≤ 24 h | 240 R$ de subida + 30 R$ de anticipo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
 | Desde S6 | **Piloto en el Marketplace: 5 ítems 3D en capas** con una sola base validada en Blender | ≈ 3.400 R$ (680 R$ por ítem) | Puerta de S1 a S2 superada; horas disponibles |
 | S10 en adelante | **Tienda de avatar dentro de Fish & Fortune**: 5 a 10 ítems propios exclusivos de tu juego (por Place ID) y menú de inspección activo para ganar 40 % por ítems de otros | Subida 80 R$ + anticipo según tipo por ítem | G4 pasado: ≥ 100 a 200 jugadores diarios |
 | S10 a S12 | Medir a 30 días: unidades por ítem, aprobación, suelo real, ingresos vs gasto | 0 | Con 5 ítems solo se mide tiempo por ítem, aprobación y suelo real; los criterios de matar o duplicar exigen un mínimo de 20 ítems publicados ([informe maestro §9.4](informe-maestro.md)) |
@@ -221,6 +229,8 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 
 ## 7. Marketing con IA
 
+El calendario detallado de marketing para los 30 días del lanzamiento (D-14 a D+15), con la prueba de anuncios, los códigos de canje, los eventos y la encuesta a jugadores, está en [plan-lanzamiento.md](../marketing/fish-and-fortune/plan-lanzamiento.md). Lo de abajo es el resumen; si hay diferencias, manda ese documento para el detalle de marketing y este plan para fechas y puertas.
+
 ### 7.1 Reglas que condicionan todo
 
 | Regla | Etiqueta | Fuente |
@@ -238,7 +248,7 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 |---|---|---|
 | Guiones, ganchos, textos en pantalla, descripciones, hashtags | Los escribe y varía | Aprueba |
 | Calendario de publicaciones y seguimiento | Lo mantiene | Lo cumple |
-| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (en construcción, ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
+| Renderizado de clips con subtítulos y escenas | Con el pipeline de vídeo del repositorio (`ROBLOX/marketing/pipeline`, en construcción; ver [00-LEEME.md](../00-LEEME.md)) | Revisa |
 | **Grabación del gameplay real** | No puede (requiere el juego abierto en tu equipo) | **La graba** (OBS u otra herramienta) |
 | Iconos y miniaturas con IA de imagen | Prepara prompts y especificaciones (512x512, círculo, 16:9) | Genera con tus cuentas de IA y sube a Creator Hub |
 | Publicar en TikTok, YouTube Shorts, Discord | Redacta y programa la tanda | **Publica** desde tus cuentas |
@@ -246,7 +256,7 @@ El 0,01 USD por Robux es la cifra nominal con la que Roblox calcula su "26,6 %" 
 
 ### 7.3 Guiones: 6 plantillas (≤ 30 s)
 
-Todas [IDEA PROPIA]. El gancho va en los primeros 2 segundos. Siempre gameplay real. Se prueban con 3 a 5 variantes de gancho.
+La versión completa ya está escrita en [30 guiones de vídeo corto](../marketing/fish-and-fortune/guiones-videos.md) (15 de gameplay real que graba Aryan, 7 con IA de vídeo que exigen tu cuenta y créditos, y 8 renderizados por código; hay 6 especificaciones ya renderizadas) y en el [texto de la página del juego](../marketing/fish-and-fortune/pagina-del-juego.md). Esos textos dependen de cómo quede el juego (marcados "AJUSTAR A LO REAL"). Abajo, el resumen de formatos. Todas [IDEA PROPIA]. El gancho va en los primeros 2 segundos. Siempre gameplay real. Se prueban con 3 a 5 variantes de gancho.
 
 | # | Formato | Gancho (0 a 2 s) | Cuerpo | Cierre |
 |---|---|---|---|---|
@@ -311,7 +321,7 @@ Se miden en Creator Analytics (gratis) y se consolidan con la API de consulta de
 
 | Área | Claude (automatizable) | Aryan (a mano) |
 |---|---|---|
-| Papeles | Hoja de datos, guía, recordatorios | **W-8BEN, identidad, impuestos, aceptar términos, método de cobro** |
+| Papeles | Hoja de datos, guía, recordatorios | **W-9, identidad, impuestos, aceptar términos, método de cobro** |
 | Cuentas y claves | Define permisos mínimos y los usa | **Crea cuentas y claves**, las guarda como secretos |
 | Código | Escribe, prueba (Lune), pasa linters, documenta | **Prueba en Studio y en móvil real**; revisa todo lo de dinero |
 | Publicación | Compila y prepara la versión | **Aprueba y publica a producción**; cuestionario de madurez fiel; crear universo |

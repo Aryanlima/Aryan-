@@ -1,0 +1,578 @@
+{
+  "generated": "2026-10-20",
+  "rules": {
+    "icon": "512x512 cuadrado (>=512), preview a 150x150",
+    "thumbnail": "16:9, ideal 1920x1080, <3 MB, jpg/gif/png/tga/bmp, sin elementos clave en el borde inferior",
+    "passAndProduct": "<=512x512, jpg/png/bmp, sin detalles importantes fuera del circulo"
+  },
+  "totalBytes": 8371112,
+  "totalMB": 7.98,
+  "disabledV1": [
+    {
+      "key": "passes.luck_plus",
+      "name": "Pase Suerte+",
+      "why": "altera probabilidades: objeto aleatorio de pago; apagado en v1 (paidLuckEnabled=false)"
+    },
+    {
+      "key": "products.lucky_bait_15",
+      "name": "Cebo de Suerte (15 min)",
+      "why": "altera probabilidades: objeto aleatorio de pago; apagado en v1 (paidLuckEnabled=false)"
+    }
+  ],
+  "files": [
+    {
+      "id": "icon-a-mitico",
+      "file": "icon/icon-a-mitico.png",
+      "group": "icon",
+      "key": "(ninguna: icono del juego)",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 199585,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 230
+      },
+      "textContrast": []
+    },
+    {
+      "id": "icon-b-fortu",
+      "file": "icon/icon-b-fortu.png",
+      "group": "icon",
+      "key": "(ninguna: icono del juego)",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 110633,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 230
+      },
+      "textContrast": []
+    },
+    {
+      "id": "icon-c-salto",
+      "file": "icon/icon-c-salto.png",
+      "group": "icon",
+      "key": "(ninguna: icono del juego)",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 187966,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 210
+      },
+      "textContrast": []
+    },
+    {
+      "id": "thumb-1-mitico-es",
+      "file": "thumbnails/thumb-1-mitico-es.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [
+        "\"¿UN MÍTICO?\" depende del contorno (fondo 4.33:1, contorno 10.51:1)"
+      ],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 576993,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 11.18,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "¿UN MÍTICO?",
+          "fill": "#FFC83D",
+          "vsBackground": 4.33,
+          "vsOutline": 10.51,
+          "bottomEdge": 390
+        }
+      ]
+    },
+    {
+      "id": "thumb-2-bestiario-es",
+      "file": "thumbnails/thumb-2-bestiario-es.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 634361,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 10.17,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "COMPLETA EL",
+          "fill": "#FFC83D",
+          "vsBackground": 5.67,
+          "vsOutline": 10.51,
+          "bottomEdge": 385
+        },
+        {
+          "text": "BESTIARIO",
+          "fill": "#FFC83D",
+          "vsBackground": 5.96,
+          "vsOutline": 10.51,
+          "bottomEdge": 536
+        }
+      ]
+    },
+    {
+      "id": "thumb-3-amigos-es",
+      "file": "thumbnails/thumb-3-amigos-es.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [
+        "\"AMIGOS\" depende del contorno (fondo 3.23:1, contorno 10.51:1)"
+      ],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 506777,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 11.78,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "PESCA CON",
+          "fill": "#FFC83D",
+          "vsBackground": 4.53,
+          "vsOutline": 10.51,
+          "bottomEdge": 380
+        },
+        {
+          "text": "AMIGOS",
+          "fill": "#FFC83D",
+          "vsBackground": 3.23,
+          "vsOutline": 10.51,
+          "bottomEdge": 553
+        }
+      ]
+    },
+    {
+      "id": "thumb-4-zonas-es",
+      "file": "thumbnails/thumb-4-zonas-es.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 582852,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 9.89,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "EXPLORA",
+          "fill": "#FFC83D",
+          "vsBackground": 6.06,
+          "vsOutline": 10.51,
+          "bottomEdge": 385
+        },
+        {
+          "text": "3 ZONAS",
+          "fill": "#FFC83D",
+          "vsBackground": 5.88,
+          "vsOutline": 10.51,
+          "bottomEdge": 538
+        }
+      ]
+    },
+    {
+      "id": "thumb-1-mitico-en",
+      "file": "thumbnails/thumb-1-mitico-en.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [
+        "\"A MYTHIC?\" depende del contorno (fondo 4.35:1, contorno 10.51:1)"
+      ],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 579566,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 11.18,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "A MYTHIC?",
+          "fill": "#FFC83D",
+          "vsBackground": 4.35,
+          "vsOutline": 10.51,
+          "bottomEdge": 390
+        }
+      ]
+    },
+    {
+      "id": "thumb-2-bestiario-en",
+      "file": "thumbnails/thumb-2-bestiario-en.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 638759,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 10.17,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "FILL THE",
+          "fill": "#FFC83D",
+          "vsBackground": 6.6,
+          "vsOutline": 10.51,
+          "bottomEdge": 385
+        },
+        {
+          "text": "BESTIARY",
+          "fill": "#FFC83D",
+          "vsBackground": 6.06,
+          "vsOutline": 10.51,
+          "bottomEdge": 536
+        }
+      ]
+    },
+    {
+      "id": "thumb-3-amigos-en",
+      "file": "thumbnails/thumb-3-amigos-en.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [
+        "\"FRIENDS\" depende del contorno (fondo 3.21:1, contorno 10.51:1)"
+      ],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 503239,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 11.78,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "FISH WITH",
+          "fill": "#FFC83D",
+          "vsBackground": 4.54,
+          "vsOutline": 10.51,
+          "bottomEdge": 380
+        },
+        {
+          "text": "FRIENDS",
+          "fill": "#FFC83D",
+          "vsBackground": 3.21,
+          "vsOutline": 10.51,
+          "bottomEdge": 553
+        }
+      ]
+    },
+    {
+      "id": "thumb-4-zonas-en",
+      "file": "thumbnails/thumb-4-zonas-en.png",
+      "group": "thumbnail",
+      "key": "(ninguna: miniatura)",
+      "errors": [],
+      "warnings": [],
+      "w": 1920,
+      "h": 1080,
+      "format": "PNG",
+      "bytes": 574515,
+      "textContrast": [
+        {
+          "text": "Fish & Fortune",
+          "fill": "#F4FBFF",
+          "vsBackground": 9.89,
+          "vsOutline": 15.54,
+          "bottomEdge": 183
+        },
+        {
+          "text": "EXPLORE",
+          "fill": "#FFC83D",
+          "vsBackground": 6.13,
+          "vsOutline": 10.51,
+          "bottomEdge": 385
+        },
+        {
+          "text": "3 ZONES",
+          "fill": "#FFC83D",
+          "vsBackground": 5.89,
+          "vsOutline": 10.51,
+          "bottomEdge": 538
+        }
+      ]
+    },
+    {
+      "id": "auto_fish",
+      "file": "passes/auto_fish.png",
+      "group": "pass",
+      "key": "passes.auto_fish",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 94561,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 210
+      },
+      "textContrast": []
+    },
+    {
+      "id": "double_coins",
+      "file": "passes/double_coins.png",
+      "group": "pass",
+      "key": "passes.double_coins",
+      "errors": [],
+      "warnings": [
+        "\"x2\" depende del contorno (fondo 1.18:1, contorno 10.51:1)"
+      ],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 96201,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 220
+      },
+      "textContrast": [
+        {
+          "text": "x2",
+          "fill": "#FFC83D",
+          "vsBackground": 1.18,
+          "vsOutline": 10.51,
+          "bottomEdge": 395
+        }
+      ]
+    },
+    {
+      "id": "starter",
+      "file": "passes/starter.png",
+      "group": "pass",
+      "key": "passes.starter",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 181086,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 230
+      },
+      "textContrast": []
+    },
+    {
+      "id": "vip",
+      "file": "passes/vip.png",
+      "group": "pass",
+      "key": "passes.vip",
+      "errors": [],
+      "warnings": [
+        "\"VIP\" depende del contorno (fondo 1.8:1, contorno 15.54:1)"
+      ],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 194459,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 210
+      },
+      "textContrast": [
+        {
+          "text": "VIP",
+          "fill": "#F4FBFF",
+          "vsBackground": 1.8,
+          "vsOutline": 15.54,
+          "bottomEdge": 418
+        }
+      ]
+    },
+    {
+      "id": "season_pass",
+      "file": "passes/season_pass.png",
+      "group": "pass",
+      "key": "passes.season_pass",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 197665,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 210
+      },
+      "textContrast": [
+        {
+          "text": "1",
+          "fill": "#0A1F44",
+          "vsBackground": 15.54,
+          "vsOutline": null,
+          "bottomEdge": 377
+        }
+      ]
+    },
+    {
+      "id": "coin_boost_15",
+      "file": "products/coin_boost_15.png",
+      "group": "product",
+      "key": "products.coin_boost_15",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 192920,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 220
+      },
+      "textContrast": []
+    },
+    {
+      "id": "coin_pack_small",
+      "file": "products/coin_pack_small.png",
+      "group": "product",
+      "key": "products.coin_pack_small",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 97635,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 180
+      },
+      "textContrast": []
+    },
+    {
+      "id": "coin_pack_medium",
+      "file": "products/coin_pack_medium.png",
+      "group": "product",
+      "key": "products.coin_pack_medium",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 96747,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 220
+      },
+      "textContrast": []
+    },
+    {
+      "id": "coin_pack_large",
+      "file": "products/coin_pack_large.png",
+      "group": "product",
+      "key": "products.coin_pack_large",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 93967,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 220
+      },
+      "textContrast": []
+    },
+    {
+      "id": "pearl_pack",
+      "file": "products/pearl_pack.png",
+      "group": "product",
+      "key": "products.pearl_pack",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 203384,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 190
+      },
+      "textContrast": []
+    },
+    {
+      "id": "slot_pack",
+      "file": "products/slot_pack.png",
+      "group": "product",
+      "key": "products.slot_pack",
+      "errors": [],
+      "warnings": [],
+      "w": 512,
+      "h": 512,
+      "format": "PNG",
+      "bytes": 195904,
+      "safeZone": {
+        "outsidePx": 0,
+        "outsideBBox": null,
+        "subjectMaxRadius": 230
+      },
+      "textContrast": []
+    }
+  ]
+}
