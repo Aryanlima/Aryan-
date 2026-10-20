@@ -545,6 +545,27 @@ describe("Shop", function()
 			expect((shop:promptProduct(player, "lucky_bait"))).toBe(true)
 		end)
 
+		it("si PolicyService falla, no se reintenta en cada consulta (memoria negativa 60 s)", function()
+			local calls = 0
+			local failing = newShop({
+				policy = {
+					GetPolicyInfoForPlayerAsync = function()
+						calls += 1
+						error("sin red")
+					end,
+				},
+			})
+			local player = join()
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(calls).toBe(3) -- 3 intentos
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(failing:getPolicy(player)).toBeNil()
+			expect(calls).toBe(3) -- sin mas consultas
+			env.clock:advance(61)
+			failing:getPolicy(player)
+			expect(calls).toBe(6)
+		end)
+
 		it("getPolicy cachea por jugador (una sola consulta)", function()
 			local calls = 0
 			local counting = newShop({

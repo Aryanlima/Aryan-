@@ -1,8 +1,8 @@
 {
   "id": "ff-04-evento-semanal",
   "template": "custom",
-  "title": "Fish & Fortune — anuncio de evento semanal (16:9 para Discord/YouTube comunidad, ~16 s)",
-  "_nota": "Video de marca (NO es gameplay). Nombre, fechas y premios del evento son un EJEMPLO coherente con el plan (evento 1 = 15 dic, v1.2): cambiar por los datos reales del evento antes de publicar. Fechas SIEMPRE reales (sin urgencia falsa): inicio y fin deben coincidir con el config del juego.",
+  "title": "Fish & Fortune — evento semanal Marea Dorada, 14-20 dic (16:9 para Discord/YouTube comunidad, ~15 s)",
+  "_nota": "Video de marca (NO es gameplay). Evento REAL de la config por defecto (Balance.liveOps): 'Marea Dorada' = monedas por venta x2, se repite cada 2 semanas (ciclo de 7 días desde el lunes 2026-10-19 00:00 UTC): semanas que empiezan el 30-nov, 14-dic y 28-dic; 'Luna Mítica' (+3 de suerte) las del 7-dic y 21-dic. Confirmar fechas con la config remota antes de publicar; inicio lunes 00:00 UTC, fin lunes siguiente 00:00 UTC.",
   "aspect": "16:9",
   "fps": 30,
   "palette": {
@@ -41,39 +41,39 @@
     "particles": "sparks"
   },
   "hook": {
-    "kicker": "📅 NUEVO EVENTO",
-    "text": "Evento *Marea Brillante*",
-    "emoji": "🌟",
-    "chip": "Del 15 al 22 de diciembre",
+    "kicker": "📅 EVENTO SEMANAL",
+    "text": "*Marea Dorada*",
+    "emoji": "🌊",
+    "chip": "Del lunes 14 al domingo 20 de diciembre",
     "duration": 2.4
   },
   "scenes": [
     {
       "id": "que-hay",
       "kind": "bullets",
-      "text": "Qué trae el *evento*",
+      "text": "Qué *cambia* esta semana",
       "duration": 6.5,
       "items": [
         {
-          "emoji": "🐠",
-          "text": "Criaturas exclusivas del evento"
+          "emoji": "🪙",
+          "text": "Monedas por venta x2"
         },
         {
-          "emoji": "📖",
-          "text": "Nuevas entradas en el bestiario"
+          "emoji": "➕",
+          "text": "Se suma a otros bonus, con tope"
         },
         {
-          "emoji": "🎣",
-          "text": "Se pesca jugando, sin pagar"
+          "emoji": "🔁",
+          "text": "Se repite cada dos semanas"
         }
       ],
-      "narration": "Criaturas exclusivas, nuevas entradas en el bestiario y todo se consigue jugando.",
+      "narration": "Las monedas por venta se multiplican por dos. Se suma a otros bonus, con tope, y se repite cada dos semanas.",
       "captions": false
     },
     {
       "id": "fechas",
       "kind": "caption",
-      "text": "Del *15* al *22 de diciembre*",
+      "text": "Del *14* al *20 de diciembre*",
       "duration": 4.0,
       "bg": {
         "type": "rays",
@@ -89,7 +89,7 @@
           "rot": -6
         }
       ],
-      "narration": "Disponible del quince al veintidós de diciembre."
+      "narration": "Del lunes catorce al domingo veinte de diciembre."
     }
   ],
   "cta": {

@@ -10,12 +10,12 @@
   "frames": 426,
   "size_mb": 4.67,
   "workers": 4,
-  "capture_fps": 22.7,
+  "capture_fps": 36.3,
   "timings_ms": {
-    "compilar+TTS+clips": 2,
-    "captura": 20579,
+    "compilar+TTS+clips": 1,
+    "captura": 12870,
     "audio": 0,
-    "codificar": 20848,
-    "total": 41504
+    "codificar": 10486,
+    "total": 23419
   }
 }

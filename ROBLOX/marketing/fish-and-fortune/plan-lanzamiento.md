@@ -12,12 +12,35 @@ Documentos hermanos: `pagina-del-juego.md` (título, textos, ícono/miniaturas),
 
 1. **Estrategia en una frase:** no comprar crecimiento antes de saber si el juego retiene. Primero se prueba con una **muestra pequeña de pago** (G1), se **mide** y solo entonces se escala con creadores y contenido [coherente con `07` §3.5 y §6.3].
 2. **Motor de contenido:** el momento "X pescó un MÍTICO" (banner global) es el único gancho propio y clipable del juego [`07` concepto 1]. Los 30 guiones giran en torno a él, a la progresión por zonas y al bestiario.
-3. **Tres fases:** **Pre-lanzamiento** (D-14 a D-1: cuentas, teasers, G0, assets moderados), **Lanzamiento suave** (D0 a D+6: publicar, 1 campaña de Sponsored Ads de prueba, G1), **Escalado condicional** (D+7 a D+15: solo si pasa G1/G2 → creadores, evento 1, códigos).
+3. **Tres fases:** **Pre-lanzamiento** (D-14 a D-1: cuentas, teasers, G0, assets moderados), **Lanzamiento suave** (D0 a D+6: publicar, 1 campaña de Sponsored Ads de prueba, G1), **Escalado condicional** (D+7 a D+15: solo si pasa G1/G2 → creadores, eventos semanales con fechas reales, códigos).
 4. **Dinero:** prueba de anuncios de **8.000 Robux** repartidos en 4 días (≈ 30 créditos; ver §6 para la conversión en USD y los 3 escenarios). No se repone por ánimo: solo tras un arreglo concreto.
 5. **Decisión de escalar** (G3): ingreso a 7 días por visitante nuevo (neto del 30 % de Roblox) **≥ coste por play**. Hasta entonces, los anuncios sirven para comprar muestra y señales, no para ganar dinero [`07` §3.5].
 6. **Cumplimiento** primero: sin "Robux gratis", sin urgencia falsa, sin presionar a menores a comprar, odds reales, divulgación de IA y de colaboraciones, nada de música con derechos (§1).
 7. **Tiempo de Aryan:** el plan de 90 días le asigna 4–8 h/semana **en total** (S3 5 h, S4 8 h, S5 6 h, S6 5 h). Este plan de marketing suma ≈ 6–8 h/semana en modo completo y ≈ 3–4 h/semana en modo mínimo: **hay que recortar al modo mínimo o ampliar horas** (§5 y §11). Mínimo viable: 9 clips + Discord + 1 test de anuncios + 3 creadores.
 8. **Qué NO puede hacer Claude desde la nube:** grabar el gameplay, publicar en TikTok/YouTube/Discord, enviar mensajes a creadores, pagar anuncios, generar con las cuentas de IA de Aryan. Todo eso está marcado como **[ARYAN]**.
+
+
+## 0.1 Qué hay ya construido (leído de `ROBLOX/games/fish-and-fortune/src` el 2026-10-20; todo **provisional** hasta el playtest)
+
+El otro agente ya ha escrito la lógica del servidor y el balance (solo `server/` y `shared/`; **todavía no hay cliente ni UI**, así que no hay nada jugable que grabar). Lo que importa para marketing, citando el código:
+
+| Dato real | Valor en `Balance.luau` / `Catalog.luau` | Consecuencia para el marketing |
+|---|---|---|
+| Zonas | 3: **Lago Calmo** (gratis), **Río Cristal** (se desbloquea con 2.000 monedas), **Costa Dorada** (30.000 monedas) | Los vídeos y la página usan estos nombres (`specs-video/`) |
+| Criaturas | **25** (9 en el lago, 8 en el río, 8 en la costa) en 6 rarezas: Común, Poco común, Raro, Épico, Legendario, **Mítico** | "25 criaturas" es cierto ahora mismo |
+| Míticos | **Espíritu del Lago**, **Reina del Río**, **Leviatán de la Marea**; peso 0,4 frente a ~936–999 por zona ⇒ **≈ 0,04 % por lanzada con suerte 0** (1 de cada ~2.500) | Son **rarísimos**: no prometer ni insinuar que "caerá uno". El gancho es "¿podrás pescar uno?", no "pesca uno". Grabar un Mítico para un clip exige entorno de pruebas (y decirlo) |
+| Mini-juego | Un marcador va y viene (periodo 1,5 s, ventana de 3 s); hay que recoger en la **zona perfecta**; recoger perfecto da **+1 punto de suerte gratis**; las cañas ensanchan la zona (0,14 → 0,22) | Los tutoriales (V15, V20, `ff-06`) usan esto, no "mantener pulsado" |
+| Cañas | 5: Madera (0), Junco (120), Fibra (2.500), Carbono (30.000), Dorada (400.000), **precios en monedas** | Comparativas reales (V14) |
+| Monedas y perlas | Monedas (blandas) y **perlas** (duras y escasas: bestiario, temporada, packs) | Vocabulario de marca: "monedas" y "perlas" |
+| Bestiario | Premios por 5/10/15/20/25 criaturas y por completar cada zona; completo = 40 perlas + 500.000 monedas | Material de V12/V16/V24 con premios reales |
+| Eventos (config por defecto) | **Marea Dorada** (monedas por venta ×2) y **Luna Mítica** (+3 de suerte), alternando **semana a semana** desde el lunes 19-oct-2026 00:00 UTC | Ya hay eventos semanales: ver §8 (con fechas reales) |
+| Códigos | `WELCOME` = 1.000 monedas + 5 perlas; el sistema admite `startsAt`/`expiresAt` y **un canje por cuenta** | ver §7 |
+| Temporada 1 | Por defecto empieza el 19-oct y **termina el 14-dic-2026 00:00 UTC** (8 semanas desde el ancla) | **Alerta:** hay que mover `startsAt` a L (1-dic) antes de vender el pase de temporada; si no, se vendería un pase que caduca a las 2 semanas |
+| Aviso de Mítico | `mythicBanner`: tema de mensajería `FishFortune_Mythic`, 6 s en pantalla, 5 s de enfriamiento por servidor | Si el aviso viaja entre servidores, lo ven jugadores de otros servidores (la frase "lo ve todo el servidor" sigue siendo cierta) |
+| Tienda | Pases: Auto-Pesca, 2x Dinero, **Suerte+**, Pack de inicio, VIP, Temporada 1 (premios fijos, sin azar). Productos: Cebo de Suerte (15 min), Boost de Monedas, packs de monedas/perlas, espacios | **No promocionar Suerte+ ni Cebo de Suerte** (alteran probabilidades = objeto aleatorio de pago; un pase promocionado no puede darlos [OFICIAL `passes.md` vía `03` §2.1]; D9 decía "sin suerte en v1"). Sí se pueden mostrar Temporada 1, Auto-Pesca, VIP, 2x Dinero y Pack de inicio con lenguaje neutro |
+| Probabilidades | El módulo `Odds` genera a la vez la tirada y la UI "Probabilidades" (2 decimales) | "Probabilidades visibles" es una característica real (cuando exista la UI) |
+
+**Lo que falta para poder grabar y lanzar (pedirlo al agente del juego / Aryan):** cliente y UI (mini-juego, bestiario, panel Probabilidades, botón Códigos, aviso de Mítico), evento `first_join` con la fuente y mover las fechas de la Temporada 1.
 
 ---
 
@@ -98,13 +121,13 @@ Entregables: cuentas (TikTok, YouTube, Discord, grupo Roblox, Instagram opcional
 
 ### Fase 2 — Lanzamiento suave (D0 a D+6: 1-dic a 7-dic)
 Objetivos: publicar en producción, ver que no hay errores graves, pasar G1 con un test de pago pequeño y mucho contenido orgánico "honesto".
-Qué es "suave": no se anuncia a lo grande, no se lanzan creadores todavía (salvo los conocidos), parche rápido en 48 h si falla algo. El **código de lanzamiento** se publica en D0.
+Qué es "suave": no se anuncia a lo grande, no se lanzan creadores todavía (salvo los conocidos), parche rápido en 48 h si falla algo. El código **`WELCOME`** se difunde en D0.
 Salida: lectura de G1 (D+5/D+6) y decisión.
 
 ### Fase 3 — Escalado condicional (D+7 a D+15: 8-dic a 16-dic)
 Solo si G1 ≥ "iterar" y no hay errores críticos.
 - **Oleada 1 de creadores** (D+4, ya con datos parciales de G1): 10 invitaciones.
-- **G2** (8–11 dic) → **oleada 2** (20 invitaciones) y **Evento 1** (15 dic, v1.2) solo si G2 pasa.
+- **G2** (8–11 dic) → **oleada 2** (20 invitaciones) y, solo si G2 pasa, el contenido nuevo v1.2 del plan 90 (15 dic). Los eventos semanales Marea Dorada / Luna Mítica ya existen en la config y se comunican siempre (§8).
 - **G3** (11–15 dic): decide la 2.ª campaña de anuncios.
 - **Feedback sistemático** (§9) y recopilación de datos reales para V29/V30.
 
@@ -128,24 +151,24 @@ Leyenda: **[ARYAN]** = tiene que hacerlo él; **[CLAUDE]** = lo hace/prepara est
 | D-5 | jue 26 | Pre | Arreglos | **V10** progresión (A) | [ARYAN] decidir L definitivo; [CLAUDE] kit de anuncios |
 | D-4 | vie 27 | Pre | | **V13** loop relajante (B) | [ARYAN] enlazar redes en la página del juego (social links, 16+) |
 | D-3 | sáb 28 | Pre | Publicar en producción (aprobación) | — | [ARYAN] subir vídeo de gameplay real (≤ 3/mes); crear **campaña de anuncios** y enviarla a moderación (assets hasta 48 h) |
-| D-2 | dom 29 | Pre | Fin S4: **G0 decidido** | **V07** escalera de rareza (C, `ff-02`) | Si G0 pasa: **anunciar fecha**. [ARYAN] probar el código `LANZAMIENTO` en el universo de pruebas |
+| D-2 | dom 29 | Pre | Fin S4: **G0 decidido** | **V07** escalera de rareza (C, `ff-02`) | Si G0 pasa: **anunciar fecha**. [ARYAN] probar el código `WELCOME` en el universo de pruebas |
 | D-1 | lun 30 | Pre | Aprobación del juego | **V17** amanecer de lanzamiento (B), solo con fecha firme | [ARYAN] revisar campaña aprobada; programar inicio D+1 00:00; mensaje en Discord y grupo |
-| **D0 = L** | **mar 1-dic** | Lanzamiento suave | **v1.0 en producción** | **V22** código (C, `ff-05`) + **V08** POV mítico (A) | [ARYAN] publicar; verificar compras y datos; activar código `LANZAMIENTO`; vigilar errores y reportes (panel de Seguridad) |
+| **D0 = L** | **mar 1-dic** | Lanzamiento suave | **v1.0 en producción** | **V22** código WELCOME (C, `ff-05`) + **V08** POV mítico (A) | [ARYAN] publicar; verificar compras y datos; comprobar que `WELCOME` canjea; vigilar errores y reportes (panel de Seguridad). Evento activo esta semana: **Marea Dorada** (monedas ×2, 30-nov a 6-dic) |
 | D+1 | mié 2 | Suave | **G1 día 1** | **V04** primera caña (A) | Ads ON (objetivo Plays, New Players); [CLAUDE] informe diario (CPP, plays, D0) |
 | D+2 | jue 3 | Suave | G1 día 2 | **V06** probé el pez más raro (A) | [CLAUDE] informe; regla de parada diaria (§6.4) |
 | D+3 | vie 4 | Suave | G1 día 3 | **V18** pesco con amigos (A) | Parche de 48 h si hace falta (1 arreglo permitido en G1) |
 | D+4 | sáb 5 | Suave | G1 día 4 (fin ads) | **V11** zonas (C, `ff-03`) | **Oleada 1 de creadores** (10 invitaciones, condicional: sin errores críticos y D1 parcial ≥ 8 %) |
 | D+5 | dom 6 | Suave | **G1: lectura D1** | **V14** comparativa de cañas (A) | [CLAUDE] informe G1 con muestra y IC; decisión provisional |
 | D+6 | lun 7 | Suave | G1 cerrado | **V16** reto día 1 (A) | **Decisión G1:** invertir / iterar / matar (§2.2). S6 empieza |
-| D+7 | mar 8 | Escalado | **G2 abre** (8–11) | **V29** resumen semana 1 (C, solo con datos reales) | v1.1 (arreglos con datos); si G1 = iterar: segunda creatividad |
+| D+7 | mar 8 | Escalado | **G2 abre** (8–11) | **V29** resumen semana 1 (C, solo con datos reales) | v1.1 (arreglos con datos); si G1 = iterar: segunda creatividad. **Luna Mítica (+3 de suerte) activa del 7 al 13 dic**: anotarlo al leer G2 (puede inflar retención/sesión) |
 | D+8 | mié 9 | Esc. | G2 | **V15** tutorial express (C, `ff-06`) | Encuesta semanal en Discord (§9) |
 | D+9 | jue 10 | Esc. | G2 | **V23** reacción de un amigo (A) | **Oleada 2 de creadores** (20, solo si D1 ≥ 8 % y sin críticos) |
 | D+10 | vie 11 | Esc. | **G2 decidido**; **G3 abre** | **V20** tutorial real (A) | [CLAUDE] cohorte G1/G2: D7, compradores; ingreso 7 d vs CPP |
-| D+11 | sáb 12 | Esc. | G3 | **V21** teaser evento invierno (B, solo si el evento es real) | Preparar evento 1 en Creator Hub (Experience Event con hasta 5 miniaturas) |
-| D+12 | dom 13 | Esc. | G3 | **V24** reto día 7 (A) | Informe semanal 2 |
-| D+13 | lun 14 | Esc. | G3 | **V26** encuesta de criatura (C) | Anunciar evento 1 en Discord y grupo (≥ 24 h antes) |
-| D+14 | mar 15 | Esc. | **G3 decidido**; **v1.2 Evento 1** (solo si G2 pasa) | **V19** anuncio de evento (C, `ff-04`) | Código `LANZAMIENTO` **caduca hoy 23:59 UTC**; código del evento activo; decidir 2.ª campaña de anuncios |
-| D+15 | mié 16 | Esc. | | **V27** evento en vivo (A) | [CLAUDE] informe de 30 días parcial; calendario de los siguientes 30 (reserva: V25, V28, V30) |
+| D+11 | sáb 12 | Esc. | G3 | **V21** teaser evento de invierno (B, solo si el evento festivo es real) | Preparar el Experience Event de Roblox para Marea Dorada (hasta 5 miniaturas) |
+| D+12 | dom 13 | Esc. | G3 | **V19** anuncio de Marea Dorada (C, `ff-04`; empieza mañana) | Informe semanal 2; publicar el aviso en Discord/grupo |
+| D+13 | lun 14 | Esc. | G3 | **V24** reto día 7 (A) | **Marea Dorada empieza hoy 00:00 UTC** (monedas ×2 hasta el lun 21 00:00 UTC) |
+| D+14 | mar 15 | Esc. | **G3 decidido**; contenido nuevo v1.2 del plan 90 (solo si G2 pasa) | **V26** encuesta de criatura (C) | Si se creó un código `LANZAMIENTO` con caducidad, **vence hoy 23:59 UTC** (§7); decidir 2.ª campaña de anuncios |
+| D+15 | mié 16 | Esc. | | **V27** Marea Dorada en acción (A) | [CLAUDE] informe de 30 días parcial; calendario de los siguientes 30 (reserva: V25, V28, V30) |
 
 **Si no se llega a todo (mínimo viable, 9 clips):** publicar solo V01 (D-14), V03 (D-11), V02 (D-8), V22 y V08 (D0), V06 (D+2), V14 (D+5), V15 (D+8) y V19 (D+14), y omitir los demás; **no** omitir G0, el estado de la página, los anuncios de prueba ni el informe diario de G1.
 
@@ -251,43 +274,50 @@ Segunda campaña con el **mismo diseño**, presupuesto ≤ 2× el de G1 (≈ 16.
 
 ### 7.2 Calendario de códigos (30 días)
 
-| Código | Cuándo | Caduca | Recompensa (propuesta; [AJUSTAR A LO REAL]) | Fuente / medición | Contenido asociado |
+El juego ya trae el código **`WELCOME`** (1.000 monedas + 5 perlas, un canje por cuenta, sin caducidad en la config actual) y el sistema admite `startsAt`/`expiresAt`; los códigos solo aceptan A–Z, 0–9 y guion (máx. 32). Los demás códigos se añaden por configuración remota, sin republicar.
+
+| Código | Cuándo | Caduca | Recompensa | Fuente / medición | Contenido asociado |
 |---|---|---|---|---|---|
-| `LANZAMIENTO` | D0 (1-dic) | **15-dic 23:59 UTC** (D+14) | Boost de lanzamiento corto (p. ej. cebo/2× dinero 15–30 min) | `code_redeemed:LANZAMIENTO`; todos los canales | **V22** (render listo) |
-| `CREADOR-<NOMBRE>` | Con cada creador (D+4 en adelante) | 14 días desde su vídeo | Cosmético pequeño o boost; el creador no cobra por canje | Canjes + `first_join` por creador | Vídeo del creador |
-| `EVENTO-<NOMBRE>` | Con cada evento (D+14 = evento 1) | Fin real del evento | Cosmético/boost del evento | Reactivación de dormidos | V19/V27 |
-| `HITO-<N>` | Solo cuando se cumpla un hito **real** (p. ej. N criaturas pescadas por la comunidad) | 7 días | Boost para todos | Comunidad | V28 (si hay hito) |
-| `OPINA` (código de encuesta) | Solo con una encuesta real (§9) | 7 días | Cosmético pequeño, **independiente de lo que responda** | Participación en la encuesta | Post en Discord |
+| `WELCOME` | Ya existe; se difunde desde D0 (1-dic) | **No caduca** (config actual): **no afirmar caducidad** en ningún vídeo | 1.000 monedas + 5 perlas [dato real de `Balance.luau`] | `code_redeemed:WELCOME`; todos los canales | **V22** (render `ff-05`, ya alineado) |
+| `LANZAMIENTO` (opcional) | Solo si Aryan quiere un código con caducidad para reactivar | `expiresAt` = **15-dic 23:59 UTC** (D+14) | Una recompensa pequeña distinta de `WELCOME` (decidir) | Comparar canjes de `WELCOME` vs `LANZAMIENTO` | Versión de `ff-05` con la fecha real |
+| `CREADOR-<NOMBRE>` | Con cada creador (D+4 en adelante) | 14 días desde su vídeo (`expiresAt` real) | Pequeña, sin Robux; el creador no cobra por canje | Canjes + `first_join` por creador | Vídeo del creador |
+| `HITO-<N>` | Solo con un hito **real** | 7 días | Boost pequeño | Comunidad | V28 (si hay hito) |
+| `OPINA` | Solo con una encuesta real (§9) | 7 días | Cosmético/boost pequeño, **independiente de lo que responda** | Participación | Post en Discord |
 
-**Métricas:** canjes/día por código, % de canjeadores con D1 vs. no canjeadores, % de canjes en las primeras 24 h tras la publicación, tasa de intentos inválidos (abuso), proporción de canjes por cuentas nuevas (< 1 día) sospechosas.
+**Métricas:** canjes/día por código, % de canjeadores con D1 vs. no canjeadores, % de canjes en las primeras 24 h tras la publicación, intentos inválidos (abuso), cuentas nuevas sospechosas.
 
-**Pasos [ARYAN] / juego:** el sistema de códigos debe existir y estar probado en el universo de pruebas **antes** de publicar V22; la sesión del juego (otro agente) implementa el módulo; marketing solo difunde códigos que existan.
+**Pasos [ARYAN] / juego:** el botón "Códigos" y el canje deben existir y estar probados en el universo de pruebas **antes** de publicar V22; la recompensa y el texto del vídeo se leen de la config, no de la memoria.
 
 ---
 
 ## 8. Plan de eventos semanales
 
-Base: eventos de **7 a 30 días**, máximo 10 publicados o próximos [OFICIAL‡ `07` §4.2]; Roblox permite usar **hasta 5 miniaturas** por evento [OFICIAL `discovery.md`]. Cadencia del plan de 90 días: v1.1 parche (8–11 dic), **v1.2 Evento 1 (15 dic, solo si G2 pasa)**, evento festivo (22–24 dic) [`plan-90-dias.md` §5].
+Base: eventos de **7 a 30 días**, máximo 10 publicados o próximos [OFICIAL‡ `07` §4.2]; Roblox permite **hasta 5 miniaturas** por evento [OFICIAL `discovery.md`]. **El juego ya trae dos eventos semanales** en su config por defecto (`Balance.liveOps`), que alternan cada semana a partir del lunes 19-oct-2026 00:00 UTC: **Marea Dorada** (monedas por venta ×2, "se suma a otros bonus, con tope") y **Luna Mítica** (+3 puntos de suerte). Son gratuitos para todos y **predecibles** (mismo horario siempre): no hay urgencia falsa.
 
-### 8.1 Qué se propone en estas 3 semanas [IDEA PROPIA; requiere que el juego lo soporte → coordinar con el agente del juego]
+### 8.1 Calendario real de eventos en la ventana del plan
 
-| Semana | Fechas | Evento | Mecánica (config) | Marketing asociado | Condición |
-|---|---|---|---|---|---|
-| **S1** | 1–6 dic | **Sin evento** (estabilidad del lanzamiento); solo el código `LANZAMIENTO` | — | Lanzamiento, G1 | — |
-| **S2** | 7–13 dic | **"Criatura de la semana"** (mini-evento recurrente): una criatura destacada con **probabilidad real mostrada** y el mismo horario cada lunes 00:00 UTC (predecible, sin urgencia falsa) | Entrada de config con criatura + multiplicador; probabilidad visible en el bestiario | V24 (reto), V26 (encuesta); post en Discord los domingos con la criatura de la semana siguiente | Si el juego lo soporta; si no, se pasa a S3 |
-| **S3** | 14–20 dic | **Evento 1 (7 días): 15–22 dic** "Marea Brillante" (nombre de ejemplo): criaturas exclusivas jugando, entradas de bestiario nuevas, código de evento; pase de temporada 1 opcional [plan v1.2] | Evento por config + **Experience Event** de Roblox con hasta 5 miniaturas | V21 (teaser), V19 (anuncio), V27 (en vivo) | **Solo si G2 pasa** |
-| S4 (fuera de ventana) | 21–27 dic | Evento festivo de invierno (hasta 30 días) [plan v1.3] | | V21 | G2/G3 |
+| Semana (lun 00:00 UTC → lun 00:00 UTC) | Evento activo | Qué comunicar | Efecto a vigilar en las métricas |
+|---|---|---|---|
+| 30-nov → 7-dic (**incluye L = 1-dic, G1**) | **Marea Dorada** (ventas ×2) | Mencionarlo como parte del lanzamiento (si se mantiene activo) | Acelera la progresión inicial y el ingreso de monedas: **anotarlo al leer G1/G3**; si se quiere medir sin él, ponerlo en la config antes de L |
+| 7-dic → 14-dic (**G2**) | **Luna Mítica** (+3 de suerte) | "Esta semana tu suerte sube": **no** decir que "salen más Míticos" sin enseñar la probabilidad real del panel | Más rarezas altas ⇒ puede inflar sesión y retención: **anotarlo al leer G2** |
+| 14-dic → 21-dic | **Marea Dorada** | **V19** (anuncio el dom 13) + **V27** (en acción) | Lectura limpia de G3 |
+| 21-dic → 28-dic | Luna Mítica | Evento festivo del plan 90 si procede (V21) | — |
+
+El **contenido nuevo** del plan de 90 días (v1.2: criaturas exclusivas + Pase de Temporada 1, 15-dic; evento festivo 22–24 dic) sigue siendo condicional a G2 y se comunica aparte [`plan-90-dias.md` §5].
 
 ### 8.2 Calendario de comunicación por evento (plantilla)
-- **T-72 h:** teaser (IA o render) con **fechas reales**; creación del Experience Event en Roblox (miniaturas ES/EN).
-- **T-24 h:** anuncio en Discord/grupo; recordatorio en TikTok/Shorts.
-- **Día 1:** vídeo de gameplay del evento (A) + render de anuncio (C).
-- **Mitad del evento:** clip de un momento real (p. ej. criatura del evento pescada).
-- **Último día:** recordatorio con fecha/hora exactas (real; no "últimas horas" si hay margen).
-- **T+24 h:** post-mortem con datos reales (cuántos jugaron, criaturas del evento pescadas; cifras pequeñas incluidas).
+- **T-72 h:** teaser (IA o render) con **fechas reales**; crear el Experience Event en Roblox (miniaturas ES/EN, hasta 5).
+- **T-24 h:** anuncio en Discord/grupo; recordatorio en TikTok/Shorts (V19).
+- **Día 1:** vídeo de gameplay del evento (A) + render (C).
+- **Mitad del evento:** clip de un momento real.
+- **Último día:** recordatorio con fecha/hora exactas (lunes 00:00 UTC; convertir a la hora local de la audiencia).
+- **T+24 h:** post-mortem con datos reales.
 
-### 8.3 Cumplimiento de eventos
-Precios/ofertas: **no** usar "oferta limitada" ni temporizadores que se reinicien; descuentos reales; lenguaje neutro ("Ver artículo", "Abrir tienda") en cualquier tienda de evento [OFICIAL `03` §2.3]. Cualquier objeto aleatorio comprado con Robux queda fuera de v1 (D9).
+### 8.3 Temporada 1 (alerta de fechas)
+La config por defecto fija la Temporada 1 del 19-oct al **14-dic-2026 00:00 UTC**. Antes de vender o anunciar el **Pase de Temporada 1** ("premios fijos, sin azar" [`Catalog.luau`]), **mover `startsAt` a L (1-dic)** (o la fecha real de lanzamiento) para que la temporada dure lo prometido; la config es remota y no requiere republicar. Anunciar solo fechas reales.
+
+### 8.4 Cumplimiento de eventos
+Descuentos reales; nada de "oferta limitada" ni temporizadores que se reinicien; lenguaje neutro ("Ver artículo", "Abrir tienda") [OFICIAL `03` §2.3]. **Suerte+** y **Cebo de Suerte** (alteran probabilidades) no se promocionan; un evento gratuito de suerte (Luna Mítica) no es un objeto aleatorio de pago, pero la UI de probabilidades debe reflejar la suerte activa [`Odds.luau`].
 
 ---
 
@@ -349,7 +379,7 @@ Precios/ofertas: **no** usar "oferta limitada" ni temporizadores que se reinicie
 
 **Capturas/grabaciones de gameplay [a grabar por Aryan o por la sesión de su PC]:** al menos 5 clips verticales: banner de Mítico (V02/V08), primeros 3 minutos (V04/V10), bestiario (V12), lanzamiento de caña (V20), 2 jugadores en el mismo lago (V18). En **servidor privado/entorno de pruebas**, sin nombres ajenos.
 
-**Peticiones al agente del juego (antes de L) [coordinar]:** 1) evento `first_join` con la fuente (launch data); 2) sistema de códigos validado en servidor con caducidad; 3) banner global de Mítico con texto estable; 4) bestiario con probabilidades visibles desde la tabla `Odds`; 5) botón "Códigos" visible; 6) eventos por config con fechas reales.
+**Peticiones al agente del juego (antes de L) [coordinar]:** 1) evento `first_join` con la fuente (launch data); 2) botón "Códigos" y canje de `WELCOME` probados; 3) banner global de Mítico con texto estable; 4) panel "Probabilidades" y bestiario (la lógica ya existe; falta la UI); 5) botón "Códigos" visible; 6) mover las fechas de la Temporada 1 (por defecto termina el 14-dic) y confirmar los eventos por config.
 
 **Tiempo estimado de Aryan (solo marketing, por semana) [IDEA PROPIA]:** modo completo ≈ 6–8 h (pre-lanzamiento y lanzamiento), 5–6 h (escalado); modo mínimo ≈ 3–4 h/semana (9 clips, Discord, 1 test de anuncios, 3 creadores). Compárese con las horas totales del plan 90 (S3 5 h, S4 8 h, S5 6 h, S6 5 h, S7 4 h): hay que elegir el modo mínimo salvo que se amplíen.
 

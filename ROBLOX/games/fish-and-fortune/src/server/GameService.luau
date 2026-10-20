@@ -1,0 +1,808 @@
+--!strict
+--[[
+	GameService: orquesta el servidor de Fish & Fortune. SOLO pega piezas (el codigo con reglas esta en
+	GameLogic y en los paquetes, que si tienen tests): datos de jugador, tienda, LiveOps, remotos, pesca
+	automatica y banner global de MITICOS.
+
+	Autoridad del servidor: todos los remotos del cliente solo SOLICITAN; aqui se valida (packages/Net)
+	y se decide. Nada de lo que envia el cliente se usa como cantidad.
+
+	// REVIEW(money): onPurchaseGranted / Shop.start / handlers de concesion / Data.attach tocan dinero real
+	// y datos de jugador. Revisar con una persona antes de publicar. No se ha probado en Studio.
+]]
+
+local AnalyticsService = game:GetService("AnalyticsService")
+local DataStoreService = game:GetService("DataStoreService")
+local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local MessagingService = game:GetService("MessagingService")
+local PolicyService = game:GetService("PolicyService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local GameService = {}
+
+local PASS_KEYS = { "auto_fish", "double_coins", "luck_plus", "starter", "vip", "season_pass" }
+local DATASTORE_NAME = "FishFortune_PlayerData_v1" -- NO cambiar el nombre una vez publicado (seria un almacen vacio)
+local LIVEOPS_CONFIG_KEY = "FishFortune_LiveOps" -- clave de ConfigService (JSON)
+local LIVEOPS_TOPIC = "FishFortune_LiveOpsUpdated"
+
+-- Todos los modulos llegan inyectados (`m`): asi este archivo no depende de rutas de instancias.
+function GameService.start(m: any)
+	local balance = m.Balance
+	local random = Random.new()
+	local isPrivateServer = game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0
+	local jobId = if game.JobId ~= "" then game.JobId else HttpService:GenerateGUID(false)
+
+	----------------------------------------------------------------------------
+	-- Mundo
+	----------------------------------------------------------------------------
+	local zoneList = {}
+	for _, zoneId in balance.zoneOrder do
+		table.insert(zoneList, { id = zoneId, name = balance.zones[zoneId].name })
+	end
+	local world = m.WorldBuilder.build(zoneList)
+
+	----------------------------------------------------------------------------
+	-- Paquetes
+	----------------------------------------------------------------------------
+	local analytics = m.Analytics.new({ service = AnalyticsService, enums = Enum })
+
+	local rules = m.FishingRules.new(balance, m.Odds)
+	local logic = m.GameLogic.new({
+		balance = balance,
+		rules = rules,
+		economy = m.Economy,
+		rng = function(): number
+			return random:NextNumber()
+		end,
+		clock = os.clock,
+		onTransaction = function(tx: any)
+			if tx.player ~= nil then
+				analytics:economy(tx.player, tx.flow, tx.currency, tx.amount, tx.endingBalance, tx.reason, tx.sku)
+			end
+		end,
+	})
+
+	local schema = m.Schema.build(m.GameLogic.template(), m.Shop.DATA_TEMPLATE)
+
+	-- En Studio sin acceso a la API de DataStores se usa un almacen en memoria (SIN persistencia) para poder jugar.
+	local function pickDataStore(): any
+		local realStore = DataStoreService:GetDataStore(DATASTORE_NAME)
+		if RunService:IsStudio() then
+			local reachable = pcall(function()
+				realStore:GetAsync("__studio_probe")
+			end)
+			if not reachable then
+				warn("[Data] Studio sin acceso a DataStores: se usa un almacen en MEMORIA (no se guarda nada).")
+				return m.StudioMemoryStore.new()
+			end
+			warn("[Data] Studio con acceso a la API: se escribe en el DataStore REAL. Usa un lugar de pruebas.")
+		end
+		return realStore
+	end
+
+	local manager = m.Data.new({
+		dataStore = pickDataStore(),
+		schema = schema,
+		jobId = jobId,
+		autosaveSeconds = 120,
+	})
+
+	-- LiveOps: configuracion remota SIN republicar (ConfigService), con valores por defecto en Balance.
+	local function fetchRemoteConfig(): any
+		-- VERIFY: ConfigService:GetConfigAsync() (yield, devuelve ConfigSnapshot) y snapshot:GetValue(key)
+		-- (Variant) segun creator-docs ConfigService.yaml / ConfigSnapshot.yaml. El formato exacto del valor
+		-- JSON (string o tabla) y el limite de tamano por clave NO estan verificados: se aceptan ambos.
+		local service = game:GetService("ConfigService")
+		local snapshot = service:GetConfigAsync()
+		local value = snapshot:GetValue(LIVEOPS_CONFIG_KEY)
+		if value == nil then
+			return nil
+		end
+		if type(value) == "string" then
+			return HttpService:JSONDecode(value)
+		end
+		return value
+	end
+	local liveOps = m.LiveOps.new({
+		defaults = balance.liveOps,
+		fetch = fetchRemoteConfig,
+		pollSeconds = 120,
+		log = function(message: string)
+			warn("[LiveOps] " .. message)
+		end,
+	})
+
+	local catalog = m.Catalog.build(m.ProductIds, balance)
+	local grants = logic:shopHandlers(os.time)
+	for _, problem in m.Shop.validateCatalog(catalog, grants) do
+		warn("[Shop] catalogo: " .. problem)
+	end
+	local pendingIds = m.Shop.validateCatalog(catalog, grants, { allowPlaceholders = false })
+	if #pendingIds > 0 then
+		warn(
+			"[Shop] hay " .. #pendingIds .. " pases/productos con ID 0 (TODO_ID): no se ofreceran. Ver ProductIds.luau"
+		)
+	end
+
+	local shop: any = nil -- se crea mas abajo (necesita los handlers); `context` lo usa en tiempo de ejecucion
+
+	-- Estado transitorio por jugador (no se guarda)
+	local runtimes: { [number]: any } = {}
+	local dirty: { [number]: boolean } = {}
+	local funnelSessions: { [number]: string } = {}
+
+	local function profileOf(player: Player): any?
+		local profile = manager:get(player.UserId)
+		if profile ~= nil and profile:isActive() then
+			return profile
+		end
+		return nil
+	end
+
+	local function markDirty(player: Player)
+		dirty[player.UserId] = true
+	end
+
+	----------------------------------------------------------------------------
+	-- Remotos
+	----------------------------------------------------------------------------
+	local remotesFolder = Instance.new("Folder")
+	remotesFolder.Name = m.Remotes.folderName
+	remotesFolder.Parent = ReplicatedStorage
+
+	local net = m.Net.newServer({
+		folder = remotesFolder,
+		globalRate = { capacity = 40, refillPerSecond = 20 },
+		onAbuse = function(player: Player, rejections: number)
+			-- Solo se registra (escalar a expulsion por una unica senal da falsos positivos).
+			warn(("[Net] %s supero el umbral de solicitudes invalidas (%d)"):format(player.Name, rejections))
+			analytics:custom(player, "net_abuse", 1)
+		end,
+	})
+	for _, name in m.Remotes.outbound do
+		net:outbound(name)
+	end
+	local t = m.Net.t
+
+	----------------------------------------------------------------------------
+	-- Contexto de reglas por jugador
+	----------------------------------------------------------------------------
+	local function context(player: Player): any
+		local passes: { [string]: boolean } = {}
+		for _, key in PASS_KEYS do
+			passes[key] = shop:ownsPass(player, key)
+		end
+		return {
+			player = player,
+			passes = passes,
+			events = liveOps:getModifierSources(),
+			-- PolicyService: sin datos => restringido (conservador). Cacheado por jugador en Shop.getPolicy.
+			paidRandomAllowed = m.Odds.paidRandomAllowed(shop:getPolicy(player)),
+			now = os.time(),
+		}
+	end
+
+	local function toast(player: Player, text: string)
+		net:fireClient("Toast", player, text)
+	end
+
+	local function ftue(player: Player, data: any, step: number, name: string)
+		if data.ftue.step >= step then
+			return
+		end
+		data.ftue.step = step
+		analytics:ftue(player, step, name)
+	end
+
+	----------------------------------------------------------------------------
+	-- Estado enviado al cliente
+	----------------------------------------------------------------------------
+	local function buildState(player: Player, profile: any): any
+		local data = profile.data
+		local c = context(player)
+		local luck, luckSources = logic:luck(data, c)
+		local now = c.now
+		local season = liveOps:getSeason(now)
+		local events = {}
+		for _, event in liveOps:getActiveEvents(now) do
+			table.insert(events, {
+				id = event.id,
+				name = event.name,
+				description = event.description,
+				endsAt = event.endsAt,
+				modifiers = event.modifiers,
+			})
+		end
+		return {
+			serverNow = now,
+			coins = data.wallet.coins,
+			pearls = data.wallet.pearls,
+			inventory = data.inventory,
+			inventoryCount = logic:inventoryCount(data),
+			capacity = logic:capacity(data),
+			rod = data.rod,
+			ownedRods = data.ownedRods,
+			zone = data.zone,
+			unlockedZones = data.unlockedZones,
+			luck = luck,
+			luckSources = luckSources,
+			coinMultiplier = logic:coinMultiplier(data, c),
+			autoFish = data.autoFish,
+			passes = c.passes,
+			paidRandomRestricted = not c.paidRandomAllowed,
+			boosts = data.boosts,
+			bestiary = data.bestiary,
+			bestiaryClaimed = data.bestiaryClaimed,
+			discoveries = logic:discoveries(data),
+			season = if season
+				then {
+					id = season.id,
+					name = season.name,
+					endsAt = season.endsAt,
+					points = data.season.points,
+					claimedFree = data.season.claimedFree,
+					claimedPremium = data.season.claimedPremium,
+				}
+				else nil,
+			events = events,
+			dailyAvailable = c.passes.vip and data.daily.lastClaimDay < math.floor(now / 86400),
+			isPrivateServer = isPrivateServer,
+			ftueStep = data.ftue.step,
+			totalCasts = data.stats.casts,
+		}
+	end
+
+	local function pushState(player: Player)
+		local profile = profileOf(player)
+		if profile == nil then
+			return
+		end
+		dirty[player.UserId] = nil
+		net:fireClient("State", player, buildState(player, profile))
+	end
+
+	task.spawn(function()
+		-- Envia el estado como mucho 4 veces por segundo por jugador (agrupa cambios).
+		while true do
+			task.wait(0.25)
+			local pending = {}
+			for userId in dirty do
+				table.insert(pending, userId)
+			end
+			for _, userId in pending do
+				local player = Players:GetPlayerByUserId(userId)
+				if player then
+					pushState(player)
+				else
+					dirty[userId] = nil
+				end
+			end
+		end
+	end)
+
+	----------------------------------------------------------------------------
+	-- Tienda
+	----------------------------------------------------------------------------
+	shop = m.Shop.new({
+		catalog = catalog,
+		marketplace = MarketplaceService,
+		players = Players,
+		decision = Enum.ProductPurchaseDecision,
+		infoTypes = { Product = Enum.InfoType.Product, GamePass = Enum.InfoType.GamePass },
+		policy = PolicyService,
+		waitForProfile = function(userId: number, timeoutSeconds: number): any?
+			return manager:waitForProfile(userId, timeoutSeconds)
+		end,
+		grants = grants,
+		onPurchaseGranted = function(player: Player, product: any, receipt: any)
+			-- Solo corre DESPUES de confirmar el guardado.
+			analytics:funnel(player, "shop", 3, "purchase_granted", funnelSessions[player.UserId])
+			analytics:custom(
+				player,
+				"purchase_" .. product.key,
+				1,
+				{ CustomField01 = tostring(receipt.CurrencySpent or 0) }
+			)
+			toast(player, "Compra recibida: " .. product.name)
+			markDirty(player)
+		end,
+		onPassChanged = function(player: Player, _pass: any, _owned: boolean)
+			markDirty(player)
+		end,
+	})
+	shop:start()
+	task.spawn(function()
+		shop:refreshPrices() -- precios reales (regionales); si falla se muestran los de la escalera con "~"
+	end)
+
+	----------------------------------------------------------------------------
+	-- Capturas
+	----------------------------------------------------------------------------
+	local lastMythicPublish = 0
+
+	local function announceMythic(player: Player, result: any)
+		analytics:custom(player, "mythic_caught", 1, { CustomField01 = result.creatureId })
+		local isVip = shop:ownsPass(player, "vip")
+		local payload = {
+			player = player.DisplayName,
+			creature = result.name,
+			zone = balance.zones[result.zone].name,
+			vip = isVip,
+		}
+		net:fireAllClients("Banner", payload)
+		if isPrivateServer then
+			return
+		end
+		local now = os.clock()
+		if now - lastMythicPublish < balance.mythicBanner.cooldownSeconds then
+			return -- MessagingService tiene cuotas: el banner local ya se mostro
+		end
+		lastMythicPublish = now
+		task.spawn(function()
+			local message = { j = jobId, p = string.sub(player.DisplayName, 1, 40), c = result.creatureId, v = isVip }
+			local ok, err = pcall(function()
+				MessagingService:PublishAsync(balance.mythicBanner.topic, message)
+			end)
+			if not ok then
+				warn("[Banner] no se pudo publicar el MITICO: " .. tostring(err))
+			end
+		end)
+	end
+
+	local function onCatch(player: Player, profile: any, result: any)
+		profile:markDirty()
+		local data = profile.data
+		net:fireClient("Catch", player, {
+			id = result.creatureId,
+			name = result.name,
+			rarity = result.rarity,
+			value = result.value,
+			isNew = result.isNew,
+			stored = result.stored,
+			autoSoldFor = result.autoSoldFor,
+			quality = result.quality,
+			tutorial = result.tutorial,
+		})
+		analytics:custom(player, "catch", 1, { CustomField01 = result.rarity })
+		ftue(player, data, 3, "first_catch")
+		if balance.rarities[result.rarity].order >= balance.rarities.Rare.order then
+			ftue(player, data, 6, "first_rare")
+		end
+		if result.rarity == "Mythic" then
+			announceMythic(player, result)
+		end
+		markDirty(player)
+	end
+
+	-- Banner global recibido de otros servidores.
+	if not isPrivateServer then
+		task.spawn(function()
+			local ok, err = pcall(function()
+				MessagingService:SubscribeAsync(balance.mythicBanner.topic, function(message: any)
+					local data = message.Data
+					if type(data) ~= "table" or data.j == jobId then
+						return
+					end
+					local creature = rules:creature(tostring(data.c))
+					if creature == nil or type(data.p) ~= "string" or not utf8.len(data.p) or #data.p > 60 then
+						return
+					end
+					net:fireAllClients("Banner", {
+						player = data.p,
+						creature = creature.name,
+						zone = balance.zones[creature.zone].name,
+						vip = data.v == true,
+					})
+				end)
+			end)
+			if not ok then
+				warn("[Banner] no se pudo suscribir a los MITICOS globales: " .. tostring(err))
+			end
+		end)
+		liveOps:subscribe(MessagingService, LIVEOPS_TOPIC)
+	end
+	liveOps:startPolling()
+
+	local function attachRod(player: Player, character: Model)
+		local profile = profileOf(player)
+		local rodId = if profile then profile.data.rod else "driftwood"
+		local rod = balance.rods[rodId]
+		local old = character:FindFirstChild("FishingRod")
+		if old then
+			old:Destroy()
+		end
+		local hand = character:FindFirstChild("RightHand") or character:FindFirstChild("Right Arm")
+		if hand == nil or not hand:IsA("BasePart") then
+			return
+		end
+		local part = Instance.new("Part")
+		part.Name = "FishingRod"
+		part.Size = Vector3.new(0.25, 0.25, 5)
+		part.Color = Color3.fromRGB(rod.color[1], rod.color[2], rod.color[3])
+		part.Material = Enum.Material.Wood
+		part.CanCollide = false
+		part.Massless = true
+		part.CFrame = hand.CFrame * CFrame.new(0, -0.4, -2.2)
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = hand
+		weld.Part1 = part
+		weld.Parent = part
+		part.Parent = character
+	end
+
+	local function refreshRod(player: Player)
+		local character = player.Character
+		if character ~= nil then
+			attachRod(player, character)
+		end
+	end
+
+	----------------------------------------------------------------------------
+	-- Handlers de remotos (todos validados por packages/Net)
+	----------------------------------------------------------------------------
+	local function withProfile(
+		handler: (player: Player, profile: any, ...any) -> ...any
+	): (player: Player, ...any) -> ...any
+		return function(player: Player, ...: any)
+			local profile = profileOf(player)
+			if profile == nil then
+				return
+			end
+			handler(player, profile, ...)
+		end
+	end
+
+	net:event("RequestState", {
+		args = {},
+		rate = { capacity = 4, refillPerSecond = 1 },
+		handler = function(player: Player)
+			pushState(player)
+		end,
+	})
+
+	net:event("Cast", {
+		args = {},
+		rate = { capacity = 3, refillPerSecond = 1.5 },
+		handler = withProfile(function(player: Player, profile: any)
+			local runtime = runtimes[player.UserId]
+			if runtime == nil then
+				return
+			end
+			local session, reason = logic:startCast(profile.data, runtime)
+			if session == nil then
+				net:fireClient("CastFailed", player, reason)
+				return
+			end
+			ftue(player, profile.data, 2, "first_cast")
+			net:fireClient("CastStarted", player, {
+				id = session.id,
+				zone = session.zone,
+				center = session.center,
+				width = session.width,
+				duration = balance.minigame.durationSeconds,
+				period = balance.minigame.markerPeriod,
+			})
+		end),
+	})
+
+	net:event("Reel", {
+		args = { t.integer(1, 2147483647), t.number({ min = 0, max = 30 }) },
+		rate = { capacity = 4, refillPerSecond = 2 },
+		handler = withProfile(function(player: Player, profile: any, castId: number, elapsed: number)
+			local runtime = runtimes[player.UserId]
+			if runtime == nil then
+				return
+			end
+			local result, reason = logic:reel(profile.data, runtime, context(player), castId, elapsed)
+			if result == nil then
+				net:fireClient("CastFailed", player, reason)
+				return
+			end
+			onCatch(player, profile, result)
+		end),
+	})
+
+	net:event("SellAll", {
+		args = {},
+		rate = { capacity = 3, refillPerSecond = 0.5 },
+		handler = withProfile(function(player: Player, profile: any)
+			local earned, count = logic:sellAll(profile.data, context(player))
+			if count == 0 then
+				toast(player, "No tienes nada que vender.")
+				return
+			end
+			profile:markDirty()
+			ftue(player, profile.data, 4, "first_sale")
+			toast(player, ("Vendiste %d capturas por %d monedas."):format(count, earned))
+			markDirty(player)
+		end),
+	})
+
+	local function simpleAction(
+		name: string,
+		validators: { any },
+		rate: any,
+		action: (player: Player, profile: any, ...any) -> (boolean, string?),
+		okText: string?
+	)
+		net:event(name, {
+			args = validators,
+			rate = rate,
+			handler = withProfile(function(player: Player, profile: any, ...: any)
+				local ok, reason = action(player, profile, ...)
+				if ok then
+					profile:markDirty()
+					if okText then
+						toast(player, okText)
+					end
+				else
+					net:fireClient("CastFailed", player, reason or "error")
+				end
+				markDirty(player)
+			end),
+		})
+	end
+
+	local slowRate = { capacity = 4, refillPerSecond = 0.5 }
+
+	simpleAction(
+		"BuyRod",
+		{ t.oneOf(balance.rodOrder) },
+		slowRate,
+		function(player: Player, profile: any, rodId: string)
+			local ok, reason = logic:buyRod(profile.data, rodId, player)
+			if ok then
+				ftue(player, profile.data, 5, "first_rod")
+				refreshRod(player)
+			end
+			return ok, reason
+		end,
+		"Cana comprada y equipada."
+	)
+
+	simpleAction(
+		"EquipRod",
+		{ t.oneOf(balance.rodOrder) },
+		slowRate,
+		function(player: Player, profile: any, rodId: string)
+			local ok, reason = logic:equipRod(profile.data, rodId)
+			if ok then
+				refreshRod(player)
+			end
+			return ok, reason
+		end,
+		nil
+	)
+
+	simpleAction(
+		"UnlockZone",
+		{ t.oneOf(balance.zoneOrder) },
+		slowRate,
+		function(player: Player, profile: any, zoneId: string)
+			return logic:unlockZone(profile.data, zoneId, player)
+		end,
+		"Zona desbloqueada."
+	)
+
+	local function teleportToZone(player: Player, zoneId: string)
+		local character = player.Character
+		local position = world.spawns[zoneId]
+		if character ~= nil and position ~= nil then
+			character:PivotTo(CFrame.new(position + Vector3.new(0, 3, 0)))
+		end
+	end
+
+	simpleAction(
+		"TravelZone",
+		{ t.oneOf(balance.zoneOrder) },
+		slowRate,
+		function(player: Player, profile: any, zoneId: string)
+			local ok, reason = logic:travel(profile.data, zoneId)
+			if ok then
+				teleportToZone(player, zoneId)
+			end
+			return ok, reason
+		end,
+		nil
+	)
+
+	net:event("SetAutoFish", {
+		args = { t.boolean() },
+		rate = slowRate,
+		handler = withProfile(function(player: Player, profile: any, enabled: boolean)
+			if enabled and not shop:ownsPass(player, "auto_fish") then
+				toast(player, "La pesca automatica necesita el Pase Auto-Pesca.")
+				return
+			end
+			profile.data.autoFish = enabled
+			profile:markDirty()
+			markDirty(player)
+		end),
+	})
+
+	local rewardIds = {}
+	for _, reward in balance.bestiary.rewards do
+		table.insert(rewardIds, reward.id)
+	end
+	simpleAction(
+		"ClaimBestiary",
+		{ t.oneOf(rewardIds) },
+		slowRate,
+		function(player: Player, profile: any, rewardId: string)
+			return logic:claimBestiary(profile.data, rewardId, player)
+		end,
+		"Recompensa del bestiario reclamada."
+	)
+
+	simpleAction(
+		"ClaimSeason",
+		{ t.integer(1, #balance.season.tiers), t.oneOf({ "free", "premium" }) },
+		slowRate,
+		function(player: Player, profile: any, tier: number, track: string)
+			return logic:claimSeason(profile.data, tier, track, context(player))
+		end,
+		"Recompensa de temporada reclamada."
+	)
+
+	simpleAction("ClaimDaily", {}, slowRate, function(player: Player, profile: any)
+		return logic:claimDaily(profile.data, context(player))
+	end, "Perlas diarias VIP reclamadas.")
+
+	simpleAction("BuySlotsWithPearls", {}, slowRate, function(player: Player, profile: any)
+		return logic:buySlotsWithPearls(profile.data, player)
+	end, "Espacio de inventario ampliado.")
+
+	local codeMessages: { [string]: string } = {
+		invalid = "Ese codigo no es valido.",
+		unknown = "Ese codigo no existe.",
+		notStarted = "Ese codigo todavia no esta activo.",
+		expired = "Ese codigo ha caducado.",
+		already = "Ya canjeaste ese codigo.",
+	}
+	net:event("RedeemCode", {
+		args = { t.string({ minLength = 1, maxLength = 32 }) },
+		rate = { capacity = 3, refillPerSecond = 0.1 },
+		handler = withProfile(function(player: Player, profile: any, code: string)
+			local result = liveOps:redeemCode(profile.data.redeemedCodes, code, os.time())
+			if not result.ok then
+				toast(player, codeMessages[result.reason or "invalid"] or "Codigo no valido.")
+				return
+			end
+			logic:grantReward(profile.data, result.reward, "TimedReward", "redeem_code", player)
+			profile:markDirty()
+			analytics:custom(player, "code_redeemed", 1)
+			toast(player, "Codigo canjeado.")
+			markDirty(player)
+			task.spawn(function()
+				profile:save() -- guarda ya: un codigo canjeado no debe perderse si el servidor cae
+			end)
+		end),
+	})
+
+	net:event("RequestOffers", {
+		args = {},
+		rate = { capacity = 3, refillPerSecond = 0.5 },
+		handler = function(player: Player)
+			funnelSessions[player.UserId] = HttpService:GenerateGUID(false)
+			analytics:funnel(player, "shop", 1, "open_shop", funnelSessions[player.UserId])
+			net:fireClient("Offers", player, shop:getOffers(player))
+		end,
+	})
+
+	net:event("RequestPurchase", {
+		args = { t.oneOf({ "pass", "product" }), t.string({ minLength = 1, maxLength = 32, pattern = "^[%w_]+$" }) },
+		rate = { capacity = 3, refillPerSecond = 0.3 },
+		handler = function(player: Player, kind: string, key: string)
+			-- El cliente pide por CLAVE de catalogo; el servidor decide si se ofrece y abre el prompt de Roblox.
+			local ok, reason
+			if kind == "pass" then
+				ok, reason = shop:promptPass(player, key)
+			else
+				ok, reason = shop:promptProduct(player, key)
+			end
+			if ok then
+				analytics:funnel(player, "shop", 2, "prompt_" .. key, funnelSessions[player.UserId])
+			else
+				net:fireClient("CastFailed", player, reason or "error")
+			end
+		end,
+	})
+
+	----------------------------------------------------------------------------
+	-- Ciclo de vida del jugador
+	----------------------------------------------------------------------------
+	local function onLoaded(player: Player, profile: any)
+		runtimes[player.UserId] = m.GameLogic.newRuntime()
+		task.spawn(function()
+			-- 1. propiedad de pases + concesiones unicas + politica (se cachea para no ceder despues)
+			shop:loadPlayer(player)
+			shop:getPolicy(player)
+			if not profile:isActive() then
+				return
+			end
+			local data = profile.data
+			local c = context(player)
+			-- 2. temporada y offline
+			local season = liveOps:getSeason(c.now)
+			logic:seasonSync(data, if season then season.id else 0)
+			local earned, seconds = logic:applyOffline(data, c)
+			if earned > 0 then
+				toast(player, ("Mientras no estabas (%d min): +%d monedas."):format(math.floor(seconds / 60), earned))
+			end
+			-- 3. bienvenida (una vez por id)
+			local welcome = liveOps:getWelcome(data.seenWelcome, c.now)
+			if welcome then
+				data.seenWelcome = welcome.id
+				toast(player, welcome.message)
+			end
+			ftue(player, data, 1, "joined")
+			profile:markDirty()
+			pushState(player)
+			if data.zone ~= "lake" then
+				teleportToZone(player, data.zone)
+			end
+		end)
+	end
+
+	manager:attach(Players, function(callback: () -> ())
+		game:BindToClose(callback)
+	end, {
+		onLoaded = onLoaded,
+		onRemoving = function(player: Player, profile: any?)
+			if profile ~= nil then
+				profile.data.lastSeen = os.time() -- base del calculo de ganancias offline
+				profile:markDirty()
+			end
+			net:forget(player)
+			shop:unloadPlayer(player)
+			analytics:forget(player)
+			runtimes[player.UserId] = nil
+			dirty[player.UserId] = nil
+			funnelSessions[player.UserId] = nil
+		end,
+	})
+	manager:startAutosave()
+
+	local function onCharacter(player: Player, character: Model)
+		task.defer(attachRod, player, character)
+	end
+	Players.PlayerAdded:Connect(function(player: Player)
+		player.CharacterAdded:Connect(function(character: Model)
+			onCharacter(player, character)
+		end)
+	end)
+	for _, player in Players:GetPlayers() do
+		player.CharacterAdded:Connect(function(character: Model)
+			onCharacter(player, character)
+		end)
+	end
+
+	----------------------------------------------------------------------------
+	-- Pesca automatica (pase Auto-Pesca)
+	----------------------------------------------------------------------------
+	task.spawn(function()
+		while true do
+			task.wait(1)
+			local now = os.clock()
+			for _, player in Players:GetPlayers() do
+				local profile = profileOf(player)
+				local runtime = runtimes[player.UserId]
+				if profile ~= nil and runtime ~= nil and profile.data.autoFish and now >= runtime.nextAutoAt then
+					runtime.nextAutoAt = now + logic:autoInterval(profile.data)
+					local result = logic:autoCast(profile.data, context(player))
+					if result ~= nil then
+						onCatch(player, profile, result)
+					end
+				end
+			end
+		end
+	end)
+
+	print("[FishFortune] servidor iniciado (" .. (if isPrivateServer then "servidor privado" else "publico") .. ")")
+	return { manager = manager, shop = shop, liveOps = liveOps, logic = logic, net = net }
+end
+
+return GameService

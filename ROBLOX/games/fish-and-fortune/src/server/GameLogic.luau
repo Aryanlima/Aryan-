@@ -254,6 +254,17 @@ function GameLogic.grantProduct(self: Logic, player: any, profile: any, product:
 	return false
 end
 
+-- Handlers de concesion para packages/Shop (uno por `kind` del catalogo).
+function GameLogic.shopHandlers(
+	self: Logic,
+	now: () -> number
+): { [string]: (player: any, profile: any, product: any, receipt: any?) -> boolean }
+	local function handler(player: any, profile: any, product: any, _receipt: any?): boolean
+		return self:grantProduct(player, profile, product, now())
+	end
+	return { currency = handler, boost = handler, slots = handler }
+end
+
 ----------------------------------------------------------------------------
 -- Lanzar y recoger
 ----------------------------------------------------------------------------

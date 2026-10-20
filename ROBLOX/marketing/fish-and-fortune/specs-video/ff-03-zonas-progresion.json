@@ -2,7 +2,7 @@
   "id": "ff-03-zonas-progresion",
   "template": "progression",
   "title": "Fish & Fortune — del lago a la costa: progresión por zonas (9:16, ~17 s)",
-  "_nota": "Video de marca (NO es gameplay). Las 3 zonas (Lago, Río, Costa) son las 3 primeras del concepto 1 (el MVP trae 3 de 6); confirmar con el juego real y reordenar/renombrar. El contador grande muestra el número de zona, no estadísticas inventadas.",
+  "_nota": "Video de marca (NO es gameplay). Zonas reales de Balance.luau: Lago Calmo, Río Cristal (se desbloquea con 2.000 monedas) y Costa Dorada (30.000 monedas). El contador grande muestra el número de zona, no estadísticas.",
   "aspect": "9:16",
   "fps": 30,
   "palette": {
@@ -52,22 +52,22 @@
       "prefix": "ZONA ",
       "stages": [
         {
-          "label": "Lago tranquilo",
+          "label": "Lago Calmo",
           "value": 1,
           "emoji": "🏞️"
         },
         {
-          "label": "Río",
+          "label": "Río Cristal",
           "value": 2,
           "emoji": "🌊"
         },
         {
-          "label": "Costa",
+          "label": "Costa Dorada",
           "value": 3,
           "emoji": "🏖️"
         }
       ],
-      "narration": "Empieza en el lago, sigue por el río y llega a la costa.",
+      "narration": "Empieza en el Lago Calmo, sigue por el Río Cristal y llega a la Costa Dorada.",
       "bg": {
         "type": "grid",
         "particles": "stars"

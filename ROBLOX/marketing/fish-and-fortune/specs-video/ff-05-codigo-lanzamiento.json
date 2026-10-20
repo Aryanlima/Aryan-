@@ -1,8 +1,8 @@
 {
   "id": "ff-05-codigo-lanzamiento",
   "template": "custom",
-  "title": "Fish & Fortune — cómo canjear el código de lanzamiento (9:16, ~17 s)",
-  "_nota": "NO PUBLICAR hasta que el código exista, esté validado en servidor y la caducidad sea real. 'LANZAMIENTO' y la fecha 15 dic son los valores del plan (plan-lanzamiento.md §7); cambiar si el juego usa otros. Sin promesas de Robux: el código solo da la recompensa que el juego realmente dé (no se menciona aquí).",
+  "title": "Fish & Fortune — cómo canjear el código WELCOME (9:16, ~15 s)",
+  "_nota": "Código REAL de la config por defecto (Balance.liveOps.codes): WELCOME = 1.000 monedas + 5 perlas, un canje por cuenta, SIN caducidad en la config actual (si se añade expiresAt, añadir la fecha real al vídeo; no afirmar caducidad que no exista). NO publicar hasta que el botón 'Códigos' exista en la UI y el canje esté probado en el universo de pruebas.",
   "aspect": "9:16",
   "fps": 30,
   "palette": {
@@ -42,7 +42,7 @@
   },
   "hook": {
     "kicker": "🎁 CÓDIGO",
-    "text": "Código de *LANZAMIENTO*",
+    "text": "Código *WELCOME*",
     "emoji": "🎣",
     "chip": "Fish & Fortune",
     "duration": 2.2
@@ -64,21 +64,21 @@
         },
         {
           "emoji": "3️⃣",
-          "text": "Escribe LANZAMIENTO"
+          "text": "Escribe WELCOME"
         }
       ],
-      "narration": "Abre el juego, toca códigos y escribe lanzamiento.",
+      "narration": "Abre el juego, toca códigos y escribe welcome.",
       "captions": false
     },
     {
-      "id": "caduca",
+      "id": "recompensa",
       "kind": "caption",
       "duration": 3.4,
-      "text": "Caduca el *15 de diciembre*",
-      "narration": "Un canje por cuenta. Caduca el quince de diciembre.",
+      "text": "Recibes *1.000 monedas* y *5 perlas*",
+      "narration": "Recibes mil monedas y cinco perlas. Un canje por cuenta.",
       "stickers": [
         {
-          "emoji": "⏳",
+          "emoji": "🎁",
           "at": 0.7,
           "x": 0.5,
           "y": 0.46,
@@ -88,7 +88,7 @@
       ],
       "chips": [
         {
-          "text": "Hasta las 23:59 UTC",
+          "text": "Un canje por cuenta",
           "at": 1.5,
           "x": 0.5,
           "y": 0.64,
@@ -98,11 +98,11 @@
     }
   ],
   "cta": {
-    "text": "Código *LANZAMIENTO*",
+    "text": "Código *WELCOME*",
     "sub": "Un canje por cuenta",
     "button": "▶ JUGAR EN ROBLOX",
     "emoji": "🎁",
-    "code": "LANZAMIENTO",
+    "code": "WELCOME",
     "codeLabel": "CÓDIGO",
     "duration": 4.0
   },

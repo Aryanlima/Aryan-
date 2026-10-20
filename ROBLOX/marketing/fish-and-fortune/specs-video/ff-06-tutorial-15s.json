@@ -2,7 +2,7 @@
   "id": "ff-06-tutorial-15s",
   "template": "custom",
   "title": "Fish & Fortune — 3 tips para pescar mejor (tutorial de ~15 s, 9:16)",
-  "_nota": "Video de marca (NO es gameplay). Los 3 tips se basan en el bucle del concepto 1 (lanzar con 'hold', minijuego de ~3 s, bestiario): confirmar cada tip contra el juego real antes de publicar; si cambian los controles, editar el texto. Ideal: sustituir el fondo por 3 clips reales cortos (bg {type:'video',src:...}).",
+  "_nota": "Video de marca (NO es gameplay). Tips basados en la mecánica real de FishingRules/Balance.minigame: un marcador va y viene y hay que recoger en la zona perfecta; recoger perfecto da +1 punto de suerte gratis; mejores cañas ensanchan la zona perfecta (sweetSpot 0,14 → 0,22). Confirmar con la UI final. Ideal: fondo con 3 clips reales.",
   "aspect": "9:16",
   "fps": 30,
   "palette": {
@@ -55,21 +55,21 @@
       "items": [
         {
           "emoji": "👆",
-          "text": "Mantén pulsado para lanzar más lejos",
+          "text": "Recoge con el marcador en la zona perfecta",
           "at": 0.8
         },
         {
           "emoji": "🎯",
-          "text": "Sigue el ritmo del minijuego",
+          "text": "Recoger perfecto da suerte extra, gratis",
           "at": 3.2
         },
         {
           "emoji": "📖",
-          "text": "Revisa tu bestiario antes de vender",
+          "text": "Con mejores cañas, la zona perfecta es más ancha",
           "at": 5.6
         }
       ],
-      "narration": "Mantén pulsado para lanzar más lejos, sigue el ritmo del minijuego y revisa tu bestiario antes de vender.",
+      "narration": "Recoge cuando el marcador esté en la zona perfecta. Una recogida perfecta da suerte extra gratis. Y con mejores cañas, la zona perfecta es más ancha.",
       "captions": false
     }
   ],

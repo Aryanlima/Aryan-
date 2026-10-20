@@ -323,6 +323,7 @@ type ShopData = {
 	randomFn: () -> number,
 	owned: { [number]: { [string]: boolean } }, -- userId -> passKey -> poseido
 	policies: { [number]: any },
+	policyRetryAt: { [number]: number }, -- tras un fallo de PolicyService no se reintenta antes de esta hora
 	lastPrompt: { [number]: number },
 	priceCache: { [string]: number },
 	pendingHooks: { [string]: { player: any, product: ProductDef, receipt: Receipt } }, -- compras concedidas aun sin confirmar
@@ -364,6 +365,7 @@ function Shop.new(config: Config): Shop
 		end,
 		owned = {},
 		policies = {},
+		policyRetryAt = {},
 		lastPrompt = {},
 		priceCache = {},
 		pendingHooks = {},
@@ -537,18 +539,25 @@ function ShopImpl.getPolicy(self: Shop, player: any): { [string]: any }?
 	if service == nil then
 		return nil
 	end
+	-- Memoria negativa: si acaba de fallar, no se bloquea al llamador reintentando en cada consulta.
+	local retryAt = self.policyRetryAt[userId]
+	if retryAt ~= nil and self.nowFn() < retryAt then
+		return nil
+	end
 	for attempt = 1, 3 do
 		local ok, info = pcall(function(): any
 			return service:GetPolicyInfoForPlayerAsync(player)
 		end)
 		if ok and type(info) == "table" then
 			self.policies[userId] = info
+			self.policyRetryAt[userId] = nil
 			return info
 		end
 		if attempt < 3 then
 			self:_wait(attempt)
 		end
 	end
+	self.policyRetryAt[userId] = self.nowFn() + 60
 	self:_log("PolicyService no disponible para " .. tostring(userId) .. ": se trata como restringido")
 	return nil
 end
@@ -663,6 +672,7 @@ function ShopImpl.unloadPlayer(self: Shop, player: any)
 	local userId = player.UserId
 	self.owned[userId] = nil
 	self.policies[userId] = nil
+	self.policyRetryAt[userId] = nil
 	self.lastPrompt[userId] = nil
 end
 

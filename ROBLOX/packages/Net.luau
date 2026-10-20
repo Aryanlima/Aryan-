@@ -414,6 +414,13 @@ function Server.func(self: Server, name: string, def: FunctionDef)
 	end
 end
 
+-- Remoto SOLO servidor -> cliente (no escucha OnServerEvent: lo que el cliente dispare se ignora).
+function Server.outbound(self: Server, name: string)
+	assert(self.remotes[name] == nil, "remoto duplicado: " .. name)
+	local remote = self:_createRemote("RemoteEvent", name)
+	self.remotes[name] = { kind = "event", remote = remote, rate = nil }
+end
+
 function Server.fireClient(self: Server, name: string, player: any, ...: any)
 	local record = self.remotes[name]
 	assert(record and record.kind == "event", "remoto desconocido: " .. name)

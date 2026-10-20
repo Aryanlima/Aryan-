@@ -145,17 +145,17 @@ Tamaños: generar al doble y reducir. Íconos: 1024×1024 → 512×512. Miniatur
 `Game logo wordmark that reads exactly "Fish & Fortune", rounded friendly bold letters, the ampersand in sunlit gold #FFC83D, the other letters foam white #F4FBFF with a deep navy #0A1F44 outline, a tiny golden koi-like fish swimming through the ampersand, centered on a transparent or plain deep navy background, vector-like clean shapes, no extra text.`
 - Verificar la ortografía del texto generado y recomponer en Figma con Fredoka si falla.
 
-### 3.4 Criaturas por rareza (arte de bestiario; nombres de trabajo **[AJUSTAR A LO REAL]**)
+### 3.4 Criaturas por rareza (arte de bestiario; nombres reales de `Balance.luau`, Lago Calmo)
 Plantilla: `A single original cartoon [CRIATURA] centered on a soft vignette background, [DETALLES], glowing [COLOR DE RAREZA] outline and soft aura. STYLE_BLOCK. PALETTE_BLOCK. Clean silhouette readable at 110 px, no text.`
 
 | Rareza | Color de aura | Descripción de ejemplo (originales) |
 |---|---|---|
-| Común | gris-azul `#9FB3C8` | "a small round silver pond fish with a plain pale belly" |
-| Poco común | verde `#4CD38A` | "a green-striped river perch with a tiny fin crest" |
-| Raro | azul `#3FA2FF` | "a lantern-tailed eel with a soft blue glow" |
-| Épico | violeta `#A66BFF` | "a ribbon-finned ray with violet shimmer patterns" |
-| Legendario | oro `#FFB020` | "a crowned golden carp with long flowing fins" |
-| **Mítico** | magenta `#FF4FB8` | "a giant gentle whale-like lake spirit with bioluminescent patterns and a trail of tiny light particles" |
+| Común (Pececillo, Perca, Carpa) | gris-azul `#9FB3C8` | "a small round silver minnow with a plain pale belly" |
+| Poco común (Branquia Azul, Bagre) | verde `#4CD38A` | "a bluegill-like sunfish with bright blue gill covers and a green-striped body" |
+| Raro (Trucha Dorada) | azul `#3FA2FF` | "a trout with golden speckled scales and a soft blue glow along the fins" |
+| Épico (Koi Lunar) | violeta `#A66BFF` | "a pale moon-colored koi with violet shimmer patterns and crescent-shaped markings" |
+| Legendario (Carpa Ancestral) | oro `#FFB020` | "an ancient golden carp with moss on its scales and long flowing whisker-fins" |
+| **Mítico** (Espíritu del Lago; también Reina del Río y Leviatán de la Marea) | magenta `#FF4FB8` | "a giant gentle whale-like lake spirit with bioluminescent patterns and a trail of tiny light particles" |
 
 ### 3.5 Fondos de zona (16:9, sin personajes)
 `Wide 16:9 environment concept, [ZONA], WORLD_BLOCK adapted to the zone. STYLE_BLOCK. PALETTE_BLOCK. No characters, empty center for gameplay, bottom 15% plain.`
