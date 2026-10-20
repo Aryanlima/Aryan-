@@ -1,0 +1,185 @@
+# Comprobacion automatica en una maquina limpia de GitHub (ver ROBLOX/docs/ci.md).
+#
+# Dos trabajos independientes:
+#   luau          instala el toolchain fijado en ROBLOX/rokit.toml y corre pruebas, lint, formato y `rojo build`.
+#   clothing-gen  pruebas de Python del generador de ropa (no usa Roblox).
+#
+# NO corre: el renderizador de video (ROBLOX/marketing/pipeline), ni la puerta previa a publicar
+# (ROBLOX/games/fish-and-fortune/tests/ReleaseGate.spec.luau, que solo se activa con FF_RELEASE_CHECK=1).
+# No usa secretos: solo el token automatico de GitHub, de solo lectura, para evitar limites de la API.
+name: CI
+
+on:
+  # Si un cambio toca SOLO documentos/investigacion/marketing, no se ejecuta (ni las pruebas ni el lint leen esas carpetas:
+  # solo miran games/, packages/, tests/ y tools/).
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "ROBLOX/research/**"
+      - "ROBLOX/marketing/**"
+      - "ROBLOX/docs/**"
+      - "**/*.md"
+  pull_request:
+    paths-ignore:
+      - "ROBLOX/research/**"
+      - "ROBLOX/marketing/**"
+      - "ROBLOX/docs/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Si llega un push nuevo a la misma rama/PR, cancela la ejecucion anterior (ya obsoleta).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Rokit (gestor del toolchain). Para actualizar: cambiar la version Y el sha256 del zip de Linux
+  # (se calcula con `sha256sum rokit-X.Y.Z-linux-x86_64.zip` tras bajarlo de la pagina de releases).
+  ROKIT_VERSION: "1.2.0"
+  ROKIT_ZIP_SHA256: "951a7f3ec3d2a5e021fd1867d32f69f010ee4c2927f644b759578afc59c65fc0"
+  # Definiciones de tipos de Roblox para luau-lsp: archivo del commit del tag 1.70.1 de luau-lsp (el de rokit.toml).
+  GLOBAL_TYPES_REF: "0382dc76ca9b73df3c8e7c9cd85a8dd493cbd0ae"
+  GLOBAL_TYPES_SHA256: "2857efa8245485f8c25c19c018ee1ef9b46afab4efd2ea70fc3257cd3faf7080"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  luau:
+    name: Luau (pruebas, lint, formato, build)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Solo se guarda tool-storage (binarios descargados). NO se guarda ~/.rokit/auth.toml (ahi queda el token).
+      - name: Restaurar cache del toolchain
+        id: toolchain-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.rokit/tool-storage
+          key: rokit-${{ runner.os }}-${{ runner.arch }}-${{ env.ROKIT_VERSION }}-${{ hashFiles('ROBLOX/rokit.toml') }}
+
+      - name: Instalar Rokit (version y hash fijos)
+        run: |
+          zip_url="https://github.com/rojo-rbx/rokit/releases/download/v${ROKIT_VERSION}/rokit-${ROKIT_VERSION}-linux-x86_64.zip"
+          work="$(mktemp -d)"
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 3 --retry-delay 2 -o "$work/rokit.zip" "$zip_url"
+          echo "${ROKIT_ZIP_SHA256}  $work/rokit.zip" | sha256sum --check --strict
+          unzip -q "$work/rokit.zip" rokit -d "$work"
+          chmod +x "$work/rokit"
+          "$work/rokit" self-install
+          echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+          "$HOME/.rokit/bin/rokit" --version
+
+      - name: Instalar herramientas de ROBLOX/rokit.toml
+        working-directory: ROBLOX
+        env:
+          ROKIT_GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # Con token la API de GitHub da mas margen de peticiones; si falla, se sigue sin token.
+          rokit authenticate github --token "$ROKIT_GITHUB_TOKEN" || echo "::warning::rokit authenticate fallo; se instala sin token"
+          # --no-trust-check: en CI no hay nadie para confirmar; los manifiestos son los de este repositorio.
+          rokit install --no-trust-check
+          for tool in rojo stylua selene lune luau-lsp; do
+            printf '%-9s ' "$tool"
+            "$tool" --version | head -n 1
+          done
+
+      - name: Guardar cache del toolchain
+        if: steps.toolchain-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.rokit/tool-storage
+          key: ${{ steps.toolchain-cache.outputs.cache-primary-key }}
+
+      # luau-lsp necesita (a) los tipos de Lune de `lune setup` (~/.lune/.typedefs/0.11.0/, alias `lune` de ROBLOX/.luaurc)
+      # y (b) globalTypes.d.luau en ROBLOX/.toolchain/share/ (donde lo busca tools/lint.sh).
+      - name: Preparar tipos para luau-lsp
+        run: |
+          # `lune setup` escribe un .luaurc en la carpeta actual: se corre en una carpeta temporal con una copia de
+          # rokit.toml (el "shim" de Rokit decide la version de lune leyendo el rokit.toml de la carpeta actual).
+          setup_dir="$(mktemp -d)"
+          cp ROBLOX/rokit.toml "$setup_dir/"
+          (cd "$setup_dir" && lune setup)
+          mkdir -p ROBLOX/.toolchain/share
+          types="ROBLOX/.toolchain/share/globalTypes.d.luau"
+          curl --proto '=https' --tlsv1.2 -fsSL --retry 3 --retry-delay 2 -o "$types" \
+            "https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/${GLOBAL_TYPES_REF}/scripts/globalTypes.d.luau"
+          echo "${GLOBAL_TYPES_SHA256}  $types" | sha256sum --check --strict
+
+      - name: Pruebas (Lune)
+        env:
+          # Las pruebas de estructura (ProjectStructure.spec.luau) construyen el lugar con rojo; en CI rojo DEBE estar
+          # disponible: con esta variable, si falta, fallan en vez de omitirse en silencio.
+          ARYAN_REQUIRE_ROJO: "1"
+        run: |
+          status=0
+          bash ROBLOX/tools/test.sh 2>&1 | tee "$RUNNER_TEMP/test.log" || status=$?
+          # Resumen visible en la pagina de la ejecucion (aunque haya fallos)
+          { echo "### Pruebas"; echo '```'; tail -n 2 "$RUNNER_TEMP/test.log"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: Lint (selene, stylua, luau-lsp)
+        run: |
+          bash ROBLOX/tools/lint.sh 2>&1 | tee "$RUNNER_TEMP/lint.log"
+          # lint.sh se salta la comprobacion de tipos (y sale con 0) si faltan luau-lsp o los tipos: aqui no puede pasar en silencio.
+          grep -q '== luau-lsp analyze' "$RUNNER_TEMP/lint.log" || { echo "::error::lint.sh no ejecuto la comprobacion de tipos (luau-lsp)"; exit 1; }
+
+      - name: Formato (stylua --check)
+        run: bash ROBLOX/tools/format.sh --check
+
+      # Se corre desde ROBLOX/ para que el shim de Rokit encuentre rokit.toml y use el rojo fijado.
+      - name: Construir Fish and Fortune (rojo build)
+        working-directory: ROBLOX
+        run: |
+          mkdir -p "$RUNNER_TEMP/build"
+          rojo build games/fish-and-fortune/default.project.json -o "$RUNNER_TEMP/build/fish-and-fortune.rbxl"
+          ls -l "$RUNNER_TEMP/build/fish-and-fortune.rbxl"
+
+      - name: Guardar el .rbxl (se puede abrir en Studio; caduca en 7 dias)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fish-and-fortune-rbxl
+          path: ${{ runner.temp }}/build/fish-and-fortune.rbxl
+          retention-days: 7
+          if-no-files-found: error
+
+  clothing-gen:
+    name: clothing-gen (pruebas de Python)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: ROBLOX/tools/clothing-gen
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Instalar Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: ROBLOX/tools/clothing-gen/requirements.txt
+
+      - name: Crear entorno virtual e instalar dependencias
+        run: |
+          python -m venv venv
+          venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Comprobar plantillas oficiales (verify_layout.py)
+        run: venv/bin/python verify_layout.py
+
+      - name: Pruebas (unittest)
+        run: venv/bin/python -m unittest discover -s tests -v

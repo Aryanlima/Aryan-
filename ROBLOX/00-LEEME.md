@@ -54,6 +54,7 @@ Estos comandos funcionan en el entorno de nube donde se construyó el proyecto (
 | Una sola prueba | `lune run ROBLOX/tests/Odds.spec.luau` | Lo mismo para un archivo |
 | Filtrar por nombre | `bash ROBLOX/tools/test.sh -t "ProcessReceipt"` | Solo pruebas cuyo nombre contiene ese texto |
 | Linter, formato y tipos | `bash ROBLOX/tools/lint.sh` y `bash ROBLOX/tools/format.sh --check` | selene, stylua y luau-lsp. Al escribir esto: `lint: OK` (selene 0 errores y 0 avisos; stylua sin diferencias) |
+| Comprobación automática en GitHub | Se ejecuta sola en cada push y pull request (pestaña **Actions** del repositorio) | Mismas pruebas, lint, formato y `rojo build` en una máquina limpia, más las pruebas de clothing-gen. Cómo leer el resultado y qué hacer si falla: [docs/ci.md](docs/ci.md) |
 | Ropa: pruebas del generador | `cd ROBLOX/tools/clothing-gen && venv/bin/python -m unittest discover -s tests` | Al escribir esto: 8 pruebas OK. Para generar ejemplos: `./run_demo.sh` |
 | Vídeos promocionales | `cd ROBLOX/marketing/pipeline && node render.mjs specs/ejemplo-gancho.json out/ejemplo-gancho.mp4` | Renderiza un vídeo desde un archivo de especificación (necesita Node 20+, Chromium y ffmpeg). Los agentes de marketing informan de que funciona en la sesión de nube; no lo ejecuté yo al escribir esto ni se probó en tu PC |
 | Ejecutar los juegos | Abrir el proyecto en Roblox Studio con Rojo o Script Sync | Ver [docs/setup-en-tu-pc.md](docs/setup-en-tu-pc.md). **Nunca probado por nosotros** |
