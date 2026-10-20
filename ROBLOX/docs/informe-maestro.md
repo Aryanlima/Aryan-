@@ -1,6 +1,6 @@
 # Informe maestro: juegos de Roblox con microtransacciones e IA
 
-Para: Aryan. Fecha de los datos: 2026-10-20. Base: los informes 01 a 08 de `../research/` (09, sobre producir ropa con IA, está pendiente; ver sección 9).
+Para: Aryan. Fecha de los datos: 2026-10-20. Base: los informes 01 a 09 de `../research/` (08 y 09 tratan la ropa: sección 9).
 Este documento resume y decide; no repite las investigaciones. Cada dato lleva su etiqueta y un enlace al informe de origen.
 
 ## 0. Cómo leer este documento
@@ -196,6 +196,8 @@ Estado: **[IDEA PROPIA]** salvo donde se indica. Las marcadas "provisional" depe
 | Los ítems de avatar son Robux ganados elegibles para DevEx a **0,0038** (no a 0,0054) y tienen 30 días de retención en cada venta | **[OFICIAL]** | [08 §2.6][r08] |
 | Ropa y accesorios: vendedores activos, medianas, ventas por ítem | [TERCERO débil] / [NO VERIFICADO]: Roblox no publica pagos por ítems de avatar | [08 §3.1][r08] |
 | Si el reparto progresivo del Marketplace (30 a 70 % según el precio sobre el "suelo") aplica también a la ropa 2D | [NO VERIFICADO] | [08 §2.4][r08] |
+| **No existe API oficial** para subir ropa ni accesorios de avatar (subida manual) | **[OFICIAL]** | [09 §8][r09] |
+| Reglas de IA para ítems de avatar en los Términos de Uso y Normas de la Comunidad (la política del Marketplace no menciona IA) | [NO VERIFICADO] las primeras; [OFICIAL] la ausencia en la política | [09 §4][r09] |
 
 ### 6.2 Impuestos
 
@@ -284,7 +286,7 @@ Probabilidad (P) e impacto (I): A = alta, M = media, B = baja. [IDEA PROPIA] sal
 
 ## 9. Juegos vs ropa
 
-> **Estado de 09:** el informe `09-ropa-produccion-con-ia.md` (cómo producir ropa con IA) no existía cuando se escribió esta sección. Lo marcado "pendiente de 09" se completará al llegar. El informe 08 (comparación) sí está integrado.
+> Esta sección integra el informe 08 (comparación y economía) y el 09 (producción con IA y automatización).
 
 ### 9.1 Veredicto
 
@@ -331,11 +333,16 @@ Tamaño de cartera de ropa para llegar a 100 USD netos al mes: ~877 unidades ven
 | Fase | Cuándo | Qué | Condición |
 |---|---|---|---|
 | 0. Verificar | Semana 0 (15 minutos) | Comprobar en Creator Hub el suelo de precio, si el reparto progresivo vale para 2D, el precio de Plus/Premium en tu país y si el ID verificado está disponible a tu edad | Siempre ([08 §7][r08]) |
-| 1. Tienda de avatar **dentro de Fish & Fortune** | Cuando el juego tenga ≥ 100 a 200 jugadores diarios | 5 a 10 ítems propios exclusivos del juego (70 % en lugar de 30 %), más 40 % de comisión por ítems de otros comprados en tu juego | Pasa G4 ([08 §6.2][r08]) |
-| 2. Piloto en el Marketplace | Desde S6, solo si respondes "ropa" o "las dos" en la pregunta 11 y tienes horas | **5 ítems 3D** (≈ 3.400 R$) con una sola base validada: medir tiempo por ítem, aprobación y suelo real | Plus activo; ID verificado |
-| 3. Escalar | Semanas 6 a 16 | 20 a 30 ítems en total | Solo si cumple los criterios de 9.4 |
+| 1. **Prueba de pipeline** | Semanas 1 a 2 | **3 prendas clásicas** hechas con la herramienta del repositorio, probadas gratis en Studio (Block Avatar) y subidas a mano: 3 × 80 R$ de subida (+ 10 R$ de anticipo cada una al publicar). Puerta: **≥ 2 de 3 aprobadas en ≤ 24 h**. No es una fuente de ingresos: mide aprobación y tiempo | Respondes "ropa" o "las dos"; ID, 2FA y Plus activos ([09 §11.2][r09]) |
+| 2. Piloto en el Marketplace | Desde S6 | **5 ítems 3D en capas** (≈ 3.400 R$) con una sola base validada: medir tiempo por ítem, aprobación y suelo real | Fase 1 superada; horas disponibles ([08 §6.2][r08]) |
+| 3. Tienda de avatar **dentro de Fish & Fortune** | Desde S10 | 5 a 10 ítems propios exclusivos del juego (70 % en lugar de 30 %), más 40 % de comisión por ítems de otros comprados en tu juego | Pasa G4: ≥ 100 a 200 jugadores diarios ([08 §6.2][r08]) |
+| 4. Escalar | Semanas 6 a 16 | 20 a 30 ítems en total | Solo si cumple los criterios de 9.4 |
 
-**No recomendado** al principio [08 §6.1][r08]: ropa clásica 2D como negocio en el Marketplace (a 5 R$ por prenda se cobra ~1,5 R$ por venta y hacen falta ~54 ventas solo para recuperar subida y anticipo), Limiteds pagados (5.000 a 20.000 R$ de anticipo) y accesorios con máscara emisiva (anticipo x5).
+**Halloween (sáb 31-oct) no se persigue:** la moderación tarda hasta 24 h y un lote solo llega si se sube antes del 27-oct, y todavía faltan tus requisitos. Las fechas con margen son **Black Friday (27-nov; subir antes del 13-nov)** y **Navidad (25-dic; subir entre el 1 y el 10-dic)**. El efecto real de la estacionalidad en las ventas de ropa no tiene datos [NO VERIFICADO] ([09 §7.3][r09]).
+
+**Discrepancia entre 08 y 09, resuelta:** 08 dice que la ropa clásica 2D no compensa como negocio (a 5 R$ por prenda hacen falta ~54 ventas solo para recuperar subida y anticipo); 09 propone un plan de 30 días con 12 a 24 clásicas. Decisión: la clásica sirve **solo como prueba barata del pipeline** (≤ 3 ítems); si se arriesga dinero, es en 3D. [IDEA PROPIA]
+
+**No recomendado** al principio [08 §6.1][r08], [09 §11.3][r09]: ropa clásica 2D como negocio, Limiteds pagados (5.000 a 20.000 R$ de anticipo), accesorios con máscara emisiva (anticipo x5), cuerpos y cabezas, y más de 12 ítems por tema sin datos.
 
 ### 9.4 Criterios para matar o duplicar la ropa
 
@@ -348,15 +355,26 @@ Heurísticas [IDEA PROPIA] del informe 08 ([08 §6.3][r08]), con mínimo 20 íte
 | **Duplicar** | Un ítem con ≥ 100 unidades al mes a ≥ 1,5x el suelo, o 3 ítems con ≥ 30 unidades al mes: crear una colección diferenciada (5 a 8 piezas) |
 | **Matar la tienda dentro del juego** | Con ≥ 500 jugadores diarios durante 30 días, si las ventas de ítems son < 5 % de los Robux del juego |
 
-### 9.5 Pendiente de 09
+### 9.5 Producir ropa con IA: lo que dice 09
 
-| Tema | Estado |
+| Tema | Hallazgo | Etiqueta | Fuente |
+|---|---|---|---|
+| **Subida** | **No hay API oficial** para subir ropa ni accesorios de avatar. Clásica: Creator Dashboard. 3D: Studio > Save to Roblox. Se hace **a mano**. Automatizarlo con la cookie de la cuenta es una violación probable de las normas y un riesgo para la cuenta que cobra tus juegos: no se hace | [OFICIAL] | [09 §8][r09] |
+| Requisitos y costes | ID verificado (o cuenta parental vinculada con ID), 2FA, Plus o Premium activo para publicar y mantener a la venta; subida de 80 R$ por envío (no se devuelve si se rechaza); anticipo de 10 R$ (clásica) o 600 R$ (3D en capas) | [OFICIAL] | [09 §2][r09], [08 §2][r08] |
+| Imagen clásica | Tras subirla no se puede reemplazar (solo nombre, descripción, venta y precio): un diseño defectuoso cuesta otra subida de 80 R$. Por eso el control de calidad va **antes** de subir | [OFICIAL] por ausencia de la opción | [09 §0][r09] |
+| IA | La política del Marketplace **no menciona IA**, pero tú respondes por lo que subes. Las reglas de IA de los Términos de Uso y las Normas de la Comunidad no se pudieron leer. Un diseño 100 % IA puede ser difícil de proteger si te lo copian | [OFICIAL] / [NO VERIFICADO] / [TERCERO] | [09 §4][r09] |
+| Contenido prohibido | Ítems políticos, religiosos, sangrientos, violentos, de autolesión, de drogas, sexuales, de boda o de citas, y texto excesivo. Hace arriesgados San Valentín, Pascua y un Halloween sangriento | [OFICIAL] | [09 §3, §7.3][r09] |
+| IP | Sin marcas, personajes, memes con dueño, tres rayas paralelas ni tipografías sin licencia. Si cae un aviso de IP pierdes los Robux del ítem | [OFICIAL] la regla; ejemplos [IDEA PROPIA] | [09 §5][r09] |
+| IA para ilustraciones | Solo planes de pago con derechos comerciales explícitos; revisar los términos el día de contratar. FLUX.1 [schnell] es Apache-2.0; FLUX.1 [dev] no es comercial para el modelo; Midjourney no indemniza | [TERCERO] | [09 §6.2][r09] |
+| **Qué se ha construido** | `tools/clothing-gen/`: generador procedural de ropa clásica (13 patrones, 17 paletas, control de calidad con lista de bloqueo de marcas y detector de casi-duplicados). Sus regiones están medidas contra la plantilla oficial. 8 pruebas pasan (comprobado hoy). **No probado en Studio ni subido a Roblox**; no hay IA generativa en el entorno de nube | [OFICIAL] la plantilla; el resto hecho y medido por nosotros | [09 §10][r09] |
+| Ropa 3D con IA | Parcial: texturas y papeleo, sí; modelado, jaulas y rig, con criterio humano en Blender (límite 4.000 triángulos, jaulas válidas). Las mallas de IA 3D suelen fallar la validación de Roblox | [OFICIAL] el límite; [IDEA PROPIA] el resto | [09 §6.6][r09], [08 §4.5][r08] |
+| Presupuesto de un plan de 30 días | Mínimo: 3.120 R$ (12 clásicas + 3 en capas) ≈ 11,9 USD al valor DevEx; medio: 6.240 R$ ≈ 23,7 USD. Más caro si compras los Robux | [IDEA PROPIA] (cálculo) | [09 §11.1][r09] |
+
+**Quién hace qué** ([09 §9][r09]):
+
+| Claude | Aryan |
 |---|---|
-| Flujo de producción de ropa con IA (herramientas, tiempos, calidad, validación) | **Pendiente de 09** |
-| Costes de herramientas de ropa con IA | Pendiente de 09; mientras tanto, [05 §10][r05] da el stack general |
-| Plantillas oficiales y herramienta `clothing-gen` del repositorio (en `../tools/clothing-gen/`, en construcción) | Pendiente de 09 y del otro agente |
-
-Existe una carpeta con plantillas de ropa clásica en `../tools/clothing-gen/`. Que exista no hace de la ropa un mejor negocio: esa comparación ya está hecha arriba.
+| Diseños procedurales en lote, comprobaciones de calidad e IP, textos y manifiesto, calendario, informes a partir de las transacciones exportadas | ID, 2FA, Plus o Premium, probar en Studio (Block Avatar), **subir y pagar a mano**, fijar precio, responder moderación y apelaciones, DevEx e impuestos |
 
 **Regla vigente:** **juegos primero**, ropa como línea secundaria. La respuesta de Aryan a la pregunta 11 de [preguntas-para-aryan.md](preguntas-para-aryan.md) puede cambiarlo.
 
@@ -382,7 +400,7 @@ Existe una carpeta con plantillas de ropa clásica en `../tools/clothing-gen/`. 
 | Arquitectura técnica, compras, datos, CI, analítica | [06 stack técnico][r06] |
 | Descubrimiento, diseño, portafolio, puertas, 10 conceptos | [07 diseño, crecimiento y conceptos][r07] |
 | Ropa vs juegos (reglas, reparto, economía, recomendación) | [08 ropa vs juegos][r08] |
-| Producción de ropa con IA | 09 (pendiente) |
+| Producción de ropa con IA, subida, políticas y calendario | [09 ropa y producción con IA][r09] |
 
 [r01]: ../research/01-mejores-juegos.md
 [r02]: ../research/02-monetizacion-y-economia.md
@@ -392,3 +410,4 @@ Existe una carpeta con plantillas de ropa clásica en `../tools/clothing-gen/`. 
 [r06]: ../research/06-stack-tecnico.md
 [r07]: ../research/07-diseno-crecimiento-y-conceptos.md
 [r08]: ../research/08-ropa-vs-juegos.md
+[r09]: ../research/09-ropa-produccion-con-ia.md

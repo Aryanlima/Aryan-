@@ -1,0 +1,21 @@
+{
+  "id": "ff-04-evento-semanal",
+  "out": "out/ff-04-evento-semanal.mp4",
+  "width": 1920,
+  "height": 1080,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 15.1,
+  "frames": 453,
+  "size_mb": 6.38,
+  "workers": 4,
+  "capture_fps": 13.2,
+  "timings_ms": {
+    "compilar+TTS+clips": 1,
+    "captura": 35878,
+    "audio": 0,
+    "codificar": 18436,
+    "total": 54402
+  }
+}

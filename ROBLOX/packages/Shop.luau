@@ -81,8 +81,8 @@ export type Config = {
 	profileWaitSeconds: number?, -- por defecto 20
 	purchaseHistorySize: number?, -- por defecto 500
 	promptCooldownSeconds: number?, -- por defecto 3
-	onPurchaseGranted: ((player: any, product: ProductDef, receipt: Receipt) -> ())?, -- DESPUES de persistir
-	onPassChanged: ((player: any, pass: PassDef, owned: boolean) -> ())?,
+	onPurchaseGranted: ((player: any, product: ProductDef, receipt: Receipt) -> ...any)?, -- DESPUES de persistir
+	onPassChanged: ((player: any, pass: PassDef, owned: boolean) -> ...any)?,
 }
 
 local Shop = {}
@@ -203,7 +203,11 @@ local FORBIDDEN_FIELDS: { string } = {
 	Valida el catalogo. Devuelve una lista de problemas (vacia = correcta).
 	Opciones: allowPlaceholders (los IDs 0 TODO_ID son validos en desarrollo; por defecto true).
 ]]
-function Shop.validateCatalog(catalog: Catalog, grants: { [string]: any }?, options: { allowPlaceholders: boolean? }?): { string }
+function Shop.validateCatalog(
+	catalog: Catalog,
+	grants: { [string]: any }?,
+	options: { allowPlaceholders: boolean? }?
+): { string }
 	local problems: { string } = {}
 	local function problem(message: string)
 		table.insert(problems, message)
@@ -250,7 +254,9 @@ function Shop.validateCatalog(catalog: Catalog, grants: { [string]: any }?, opti
 		elseif price < 1 or price % 1 ~= 0 then
 			problem(label .. ": precio invalido")
 		elseif not ladderValues[price] and not item.priceOverride then
-			problem(label .. ": precio " .. price .. " fuera de la escalera (usa priceOverride = true si es a proposito)")
+			problem(
+				label .. ": precio " .. price .. " fuera de la escalera (usa priceOverride = true si es a proposito)"
+			)
 		end
 		for _, field in FORBIDDEN_FIELDS do
 			if item[field] ~= nil then
@@ -282,7 +288,9 @@ function Shop.validateCatalog(catalog: Catalog, grants: { [string]: any }?, opti
 			end
 		end
 		if pass.oneTimeGrant and grants and grants[pass.oneTimeGrant.kind] == nil then
-			problem("pase '" .. key .. "': no hay handler para oneTimeGrant.kind = " .. tostring(pass.oneTimeGrant.kind))
+			problem(
+				"pase '" .. key .. "': no hay handler para oneTimeGrant.kind = " .. tostring(pass.oneTimeGrant.kind)
+			)
 		end
 	end
 	for key, product in catalog.products do

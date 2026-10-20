@@ -4,6 +4,7 @@
   "title": "Cubo Rush — gancho + gameplay + CTA (juego de ejemplo)",
   "aspect": "9:16",
   "fps": 30,
+  "encode": { "crf": 24, "preset": "veryfast" },
   "palette": "neon",
   "typography": { "heading": "Inter", "body": "Inter", "headingWeight": 900 },
   "brand": { "name": "CUBO RUSH", "handle": "@cuborush.oficial" },

@@ -1,0 +1,21 @@
+{
+  "id": "cubo-rush-progresion-16x9",
+  "out": "out/ejemplo-progresion.mp4",
+  "width": 1920,
+  "height": 1080,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 15.4,
+  "frames": 462,
+  "size_mb": 4.81,
+  "workers": 4,
+  "capture_fps": 21.1,
+  "timings_ms": {
+    "compilar+TTS+clips": 1,
+    "captura": 23263,
+    "audio": 0,
+    "codificar": 13009,
+    "total": 36337
+  }
+}

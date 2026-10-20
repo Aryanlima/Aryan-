@@ -78,6 +78,7 @@
       if (sc.bg) { bg = VP.createBg(sc.bg, W, H, pal); root.appendChild(bg.el); }
       const safeEl = $('div', 'safe', root);
       const fit = $('div', 'fit', safeEl);
+      if (sc.hasCaptions && !base.land && ['cta', 'counter', 'bullets', 'stages'].includes(sc.kind)) fit.classList.add('top'); // deja sitio a los subtítulos
       const C = Object.assign({}, base, { root, safeEl, fit });
       const kind = VP.kinds[sc.kind];
       if (!kind) throw new Error('Tipo de escena desconocido: ' + sc.kind);
@@ -103,10 +104,11 @@
       else spec.scenes.forEach(() => { const sg = $('div', 'seg', prog); segs.push($('div', 'fill', sg)); });
     }
     const subCfg = spec.subtitles || {};
-    let subsEl = null, subLine = null, curChunk = -2, subWords = [];
+    let subsEl = null, subLine = null, curChunk = -2, subWords = [], defY = 0.7;
     if (subCfg.enabled !== false && spec.captions && spec.captions.length) {
       subsEl = $('div', '', ovl); subsEl.id = 'subs';
-      subsEl.style.top = (H * (subCfg.y != null ? subCfg.y : base.land ? 0.84 : 0.7)) + 'px';
+      defY = subCfg.y != null ? subCfg.y : base.land ? 0.88 : 0.7;
+      subsEl.style.top = (H * defY) + 'px';
       subsEl.style.translate = '0 -50%';
       subsEl.style.setProperty('--subsize', '1');
       const sz = (subCfg.size || (base.land ? 64 : 84)) * u;
@@ -131,6 +133,7 @@
     function setChunk(idx) {
       subsEl.innerHTML = ''; subWords = [];
       if (idx < 0) return;
+      subsEl.style.top = (H * (caps[idx].y != null ? caps[idx].y : defY)) + 'px';
       subLine = $('div', 'line', subsEl);
       caps[idx].words.forEach((w) => { const e = $('span', 'sw', subLine, w.w); subWords.push({ e, w }); });
       // una sola línea que siempre cabe en la zona segura

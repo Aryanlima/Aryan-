@@ -1,0 +1,21 @@
+{
+  "id": "mundo-mascotas-top3",
+  "out": "out/ejemplo-top.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 13.6,
+  "frames": 408,
+  "size_mb": 3.86,
+  "workers": 4,
+  "capture_fps": 24.4,
+  "timings_ms": {
+    "compilar+TTS+clips": 1,
+    "captura": 17925,
+    "audio": 0,
+    "codificar": 9363,
+    "total": 27366
+  }
+}

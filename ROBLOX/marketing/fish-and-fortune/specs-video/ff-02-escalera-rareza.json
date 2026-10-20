@@ -36,6 +36,10 @@
   "brand": {
     "name": "FISH & FORTUNE"
   },
+  "bg": {
+    "type": "rays",
+    "particles": "sparks"
+  },
   "hook": {
     "kicker": "🎣 FISH & FORTUNE",
     "text": "¿Qué tan *RARO* puede ser tu próximo pez?",

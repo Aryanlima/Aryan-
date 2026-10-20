@@ -197,16 +197,16 @@ Las etiquetas [OFICIAL], [TERCERO], [NO VERIFICADO] e [IDEA PROPIA] son las del 
 
 **Pregunta.** Entre hacer juegos de Roblox con microtransacciones y vender ropa o accesorios de avatar, ¿cuál te interesa más? ¿Tienes gusto o experiencia en diseño, moda o ilustración?
 
-**Por qué importa.** El informe 08 compara ambas líneas ([08 §5-6][r08]; el 09, sobre producir ropa con IA, está pendiente). Resumen con datos oficiales: el creador de una prenda cobra 30 % en el Marketplace desde el 14-jul-2026 (antes 70 % en ropa 2D); dentro de **tu propio** juego cobra 70 % (30 % + 40 %); los ítems de avatar no cobran la tarifa 0,0054; cada prenda 3D en capas cuesta 680 R$ de subida y anticipo; y para publicar hace falta ID verificado, 2FA y Plus o Premium activo ([08 §2][r08]) [OFICIAL]. Las cifras de mercado de ropa son de terceros débiles [TERCERO débil]. El informe 08 recomienda juegos como motor (≈ 75 a 80 %) y ropa como línea secundaria. Una infracción de IP en ropa puede afectar a la cuenta que también cobra tus juegos ([08 §4.7][r08]) [OFICIAL].
+**Por qué importa.** Los informes 08 y 09 comparan ambas líneas y explican cómo producir ropa ([08 §5-6][r08], [09][r09]). Resumen con datos oficiales: el creador de una prenda cobra 30 % en el Marketplace desde el 14-jul-2026 (antes 70 % en ropa 2D); dentro de **tu propio** juego cobra 70 % (30 % + 40 %); los ítems de avatar no cobran la tarifa 0,0054; cada prenda 3D en capas cuesta 680 R$ de subida y anticipo; y para publicar hace falta ID verificado, 2FA y Plus o Premium activo ([08 §2][r08]) [OFICIAL]. Las cifras de mercado de ropa son de terceros débiles [TERCERO débil]. El informe 08 recomienda juegos como motor (≈ 75 a 80 %) y ropa como línea secundaria. Una infracción de IP en ropa puede afectar a la cuenta que también cobra tus juegos ([08 §4.7][r08]) [OFICIAL]. **No hay API oficial para subir ropa: la subida y el pago son siempre a mano** ([09 §8][r09]) [OFICIAL], y cada prenda se prueba en Studio antes de subirla.
 
 **Qué decido según tu respuesta.**
 
 | Si respondes... | Decido... |
 |---|---|
 | Juegos | Seguir el plan; ropa como línea secundaria solo dentro de tus propios juegos (70 %) |
-| Ropa | Te lo desaconsejo como motor inicial (ver 08); si insistes, empezamos por un piloto de 5 prendas 3D y los criterios de parada de 9.4 del informe maestro, sin abandonar el plan de juegos |
-| Las dos | Juegos primero (ya hay base construida); ropa en paralelo con tiempo limitado, empezando por la tienda de avatar dentro de Fish & Fortune y un piloto de 5 prendas 3D desde la semana 6 |
-| No sé | Decidimos con el informe 08 (ya integrado), el 09 cuando llegue y la revisión del día 90 |
+| Ropa | Te lo desaconsejo como motor inicial (ver 08); si insistes, empezamos por una prueba de 3 prendas clásicas (≈ 270 R$) y un piloto de 5 prendas 3D, con los criterios de parada de 9.4 del informe maestro, sin abandonar el plan de juegos |
+| Las dos | Juegos primero (ya hay base construida); ropa en paralelo con tiempo limitado: prueba de 3 prendas clásicas en las semanas 1 a 2, piloto de 5 prendas 3D desde la semana 6 y tienda de avatar dentro de Fish & Fortune desde la semana 10 |
+| No sé | Decidimos con los informes 08 y 09 (ya integrados) y la revisión del día 90 |
 
 ### 12. ¿En qué idioma y para qué mercado? [Pronto]
 
@@ -313,3 +313,4 @@ Copia esta tabla y complétala.
 [r05]: ../research/05-ia-assets-y-marketing.md
 [r07]: ../research/07-diseno-crecimiento-y-conceptos.md
 [r08]: ../research/08-ropa-vs-juegos.md
+[r09]: ../research/09-ropa-produccion-con-ia.md

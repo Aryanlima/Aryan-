@@ -230,7 +230,12 @@ function LiveOps.validateConfig(config: any, now: number?, maxActiveOrUpcoming: 
 	else
 		for code, def in config.codes do
 			if type(code) ~= "string" or LiveOps.normalizeCode(code) ~= code then
-				problem("codigo '" .. tostring(code) .. "': debe estar en MAYUSCULAS (A-Z, 0-9, guion) y <= " .. MAX_CODE_LENGTH)
+				problem(
+					"codigo '"
+						.. tostring(code)
+						.. "': debe estar en MAYUSCULAS (A-Z, 0-9, guion) y <= "
+						.. MAX_CODE_LENGTH
+				)
 			elseif type(def) ~= "table" or type(def.reward) ~= "table" or next(def.reward) == nil then
 				problem("codigo '" .. code .. "': sin reward")
 			else
@@ -309,10 +314,9 @@ type ImplData = {
 export type LiveOpsInstance = typeof(setmetatable({} :: ImplData, Impl))
 
 function LiveOps.new(config: Config): LiveOpsInstance
-	local nowFn: () -> number = config.now
-		or function(): number
-			return os.time()
-		end
+	local nowFn: () -> number = config.now or function(): number
+		return os.time()
+	end
 	local ok, problems = LiveOps.validateConfig(config.defaults, nil, config.maxActiveOrUpcoming)
 	assert(ok, "LiveOps: la configuracion por defecto es invalida: " .. table.concat(problems, "; "))
 	local data: ImplData = {
@@ -480,7 +484,10 @@ function Impl.getUpcomingEvents(self: LiveOpsInstance, horizonSeconds: number, n
 end
 
 -- Fuentes de multiplicador de los eventos activos, en el formato de Economy.combineMultipliers.
-function Impl.getModifierSources(self: LiveOpsInstance, now: number?): { { id: string, kind: string, value: number, active: boolean } }
+function Impl.getModifierSources(
+	self: LiveOpsInstance,
+	now: number?
+): { { id: string, kind: string, value: number, active: boolean } }
 	local sources = {}
 	for _, event in self:getActiveEvents(now) do
 		for kind, value in event.modifiers do
@@ -529,7 +536,12 @@ end
 	mismo paso (un solo uso por jugador) y devuelve una COPIA de la recompensa; el llamador la concede y
 	guarda el perfil. Los codigos son por jugador: un limite global necesitaria un almacen compartido.
 ]]
-function Impl.redeemCode(self: LiveOpsInstance, redeemed: { [string]: number }, rawCode: any, now: number?): RedeemResult
+function Impl.redeemCode(
+	self: LiveOpsInstance,
+	redeemed: { [string]: number },
+	rawCode: any,
+	now: number?
+): RedeemResult
 	local code = LiveOps.normalizeCode(rawCode)
 	if code == nil then
 		return { ok = false, reason = "invalid" }

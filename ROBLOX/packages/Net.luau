@@ -35,7 +35,7 @@ export type RateConfig = { capacity: number, refillPerSecond: number }
 export type EventDef = {
 	args: { Validator },
 	rate: RateConfig?,
-	handler: (player: any, ...any) -> (),
+	handler: (player: any, ...any) -> ...any,
 }
 
 export type FunctionDef = {
@@ -49,11 +49,11 @@ export type ServerConfig = {
 	createRemote: ((className: string, name: string) -> any)?,
 	clock: Clock?,
 	globalRate: RateConfig?, -- limite combinado por jugador (todos los remotos)
-	onReject: ((player: any, remoteName: string, reason: string) -> ())?,
+	onReject: ((player: any, remoteName: string, reason: string) -> ...any)?,
 	abuseThreshold: number?, -- rechazos por ventana para disparar onAbuse (por defecto 30)
 	abuseWindowSeconds: number?, -- (por defecto 10)
-	onAbuse: ((player: any, rejections: number) -> ())?,
-	log: ((message: string) -> ())?,
+	onAbuse: ((player: any, rejections: number) -> ...any)?,
+	log: ((message: string) -> ...any)?,
 }
 
 local Net = {}
@@ -333,16 +333,15 @@ function Server._reject(self: Server, player: any, name: string, reason: string)
 end
 
 -- Devuelve (true) o (false, motivo). Consume fichas del limite del remoto y del global.
-function Server._admit(self: Server, player: any, name: string, record: RemoteRecord, ...: any): (boolean, string?)
+function Server._admit(self: Server, player: any, name: string, record: RemoteRecord): (boolean, string?)
 	local userId = userIdOf(player)
 
 	local globalRate = self.config.globalRate
 	if globalRate then
-		local bucket = self.globalBuckets[userId]
-		if bucket == nil then
-			bucket = Net.newBucket(globalRate.capacity, globalRate.refillPerSecond, self.clock)
-			self.globalBuckets[userId] = bucket
-		end
+		local existing: TokenBucket? = self.globalBuckets[userId]
+		local bucket: TokenBucket = existing
+			or Net.newBucket(globalRate.capacity, globalRate.refillPerSecond, self.clock)
+		self.globalBuckets[userId] = bucket
 		if not bucket:take(1) then
 			return false, "rate-global"
 		end
@@ -355,11 +354,9 @@ function Server._admit(self: Server, player: any, name: string, record: RemoteRe
 			perPlayer = {}
 			self.buckets[userId] = perPlayer
 		end
-		local bucket = perPlayer[name]
-		if bucket == nil then
-			bucket = Net.newBucket(rate.capacity, rate.refillPerSecond, self.clock)
-			perPlayer[name] = bucket
-		end
+		local existing: TokenBucket? = perPlayer[name]
+		local bucket: TokenBucket = existing or Net.newBucket(rate.capacity, rate.refillPerSecond, self.clock)
+		perPlayer[name] = bucket
 		if not bucket:take(1) then
 			return false, "rate"
 		end
@@ -373,7 +370,7 @@ function Server.event(self: Server, name: string, def: EventDef)
 	local record: RemoteRecord = { kind = "event", remote = remote, rate = def.rate }
 	self.remotes[name] = record
 	remote.OnServerEvent:Connect(function(player: any, ...: any)
-		local admitted, why = self:_admit(player, name, record, ...)
+		local admitted, why = self:_admit(player, name, record)
 		if not admitted then
 			self:_reject(player, name, why or "rate")
 			return
@@ -397,7 +394,7 @@ function Server.func(self: Server, name: string, def: FunctionDef)
 	local record: RemoteRecord = { kind = "function", remote = remote, rate = def.rate }
 	self.remotes[name] = record
 	remote.OnServerInvoke = function(player: any, ...: any): ...any
-		local admitted, why = self:_admit(player, name, record, ...)
+		local admitted, why = self:_admit(player, name, record)
 		if not admitted then
 			self:_reject(player, name, why or "rate")
 			return nil
@@ -479,11 +476,9 @@ end
 
 -- Dispara al servidor con un limite de cortesia local (el limite autoritativo es el del servidor).
 function Client.fire(self: Client, name: string, ...: any)
-	local bucket = self.buckets[name]
-	if bucket == nil then
-		bucket = Net.newBucket(6, 3, self.clock)
-		self.buckets[name] = bucket
-	end
+	local existing: TokenBucket? = self.buckets[name]
+	local bucket: TokenBucket = existing or Net.newBucket(6, 3, self.clock)
+	self.buckets[name] = bucket
 	if not bucket:take(1) then
 		return
 	end

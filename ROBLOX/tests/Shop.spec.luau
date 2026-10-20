@@ -147,7 +147,10 @@ describe("Shop", function()
 			end,
 			profileWaitSeconds = 5,
 			onPurchaseGranted = function(player, product, receipt)
-				table.insert(grantedHooks, { userId = player.UserId, key = product.key, purchaseId = receipt.PurchaseId })
+				table.insert(
+					grantedHooks,
+					{ userId = player.UserId, key = product.key, purchaseId = receipt.PurchaseId }
+				)
 			end,
 		}
 		for k, v in overrides or {} do
@@ -580,7 +583,11 @@ describe("Shop", function()
 		end)
 
 		it("refreshPrices usa el precio real de Roblox (regional) cuando esta disponible", function()
-			env.MarketplaceService:RegisterProduct(2001, { Name = "Monedas", PriceInRobux = 79 }, env.Enum.InfoType.Product)
+			env.MarketplaceService:RegisterProduct(
+				2001,
+				{ Name = "Monedas", PriceInRobux = 79 },
+				env.Enum.InfoType.Product
+			)
 			local player = join()
 			shop:refreshPrices()
 			local offers = shop:getOffers(player)

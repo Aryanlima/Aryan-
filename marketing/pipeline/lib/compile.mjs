@@ -130,7 +130,7 @@ export async function compileSpec(raw, { specDir, opts = {} }) {
 
   let sz = spec.safeZone;
   if (sz === 'none') sz = { t: 40, b: 40, l: 40, r: 40 };
-  else if (!sz || sz === 'auto' || typeof sz === 'string') sz = land ? { t: 80, b: 80, l: 120, r: 120 } : H > W * 1.1 ? { t: 170, b: 340, l: 96, r: 96 } : { t: 90, b: 140, l: 90, r: 90 };
+  else if (!sz || sz === 'auto' || typeof sz === 'string') sz = land ? { t: 100, b: 90, l: 120, r: 120 } : H > W * 1.1 ? { t: 170, b: 340, l: 96, r: 96 } : { t: 90, b: 140, l: 90, r: 90 };
   const safe = { t: sz.t * scale, b: sz.b * scale, l: sz.l * scale, r: sz.r * scale };
 
   const specDir_ = specDir;
@@ -341,7 +341,10 @@ export async function compileSpec(raw, { specDir, opts = {} }) {
       let a, b;
       if (r._nar) { a = start + delay; b = a + r._nar.duration; }
       else { a = start + (r.kind === 'hook' ? 0.2 : 0.35); b = end - 0.3 - (raws[i + 1] ? trs[i + 1].d : 0); }
-      captions.push(...chunkWords(toks, a, Math.max(a + 0.4, b), land));
+      const ch = chunkWords(toks, a, Math.max(a + 0.4, b), land);
+      if (r.subY != null) ch.forEach((c) => { c.y = r.subY; });
+      captions.push(...ch);
+      if (ch.length) sc.hasCaptions = true;
     }
     scenes.push(sc);
   }

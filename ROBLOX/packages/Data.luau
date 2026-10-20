@@ -72,9 +72,9 @@ export type Config = {
 }
 
 export type AttachHandlers = {
-	onLoaded: ((player: any, profile: any) -> ())?,
-	onLoadFailed: ((player: any, reason: string) -> ())?,
-	onRemoving: ((player: any, profile: any?) -> ())?,
+	onLoaded: ((player: any, profile: any) -> ...any)?,
+	onLoadFailed: ((player: any, reason: string) -> ...any)?,
+	onRemoving: ((player: any, profile: any?) -> ...any)?,
 }
 
 local Data = {}
@@ -408,7 +408,7 @@ function Manager._forget(self: Manager, profile: Profile)
 	end
 end
 
-local function backoff(manager: Manager, config: RetryConfig?, defaults: { attempts: number, baseDelay: number, maxDelay: number })
+local function backoff(config: RetryConfig?, defaults: { attempts: number, baseDelay: number, maxDelay: number })
 	local cfg: RetryConfig = config or {}
 	return cfg.attempts or defaults.attempts, cfg.baseDelay or defaults.baseDelay, cfg.maxDelay or defaults.maxDelay
 end
@@ -417,8 +417,13 @@ end
 	Ejecuta `attempt` (que devuelve (ok, resultadoOError)) con reintentos y backoff exponencial + jitter.
 	Los errores no reintentables cortan de inmediato.
 ]]
-function Manager._retry(self: Manager, label: string, config: RetryConfig?, attempt: () -> (boolean, any)): (boolean, any)
-	local attempts, delay, maxDelay = backoff(self, config, { attempts = 5, baseDelay = 1, maxDelay = 16 })
+function Manager._retry(
+	self: Manager,
+	label: string,
+	config: RetryConfig?,
+	attempt: () -> (boolean, any)
+): (boolean, any)
+	local attempts, delay, maxDelay = backoff(config, { attempts = 5, baseDelay = 1, maxDelay = 16 })
 	local lastError: any = nil
 	for index = 1, attempts do
 		local ok, result = attempt()
@@ -429,7 +434,9 @@ function Manager._retry(self: Manager, label: string, config: RetryConfig?, atte
 		if not isRetriable(result) or index == attempts then
 			break
 		end
-		self:_log(label .. ": intento " .. index .. "/" .. attempts .. " fallo (" .. tostring(result) .. "), reintentando")
+		self:_log(
+			label .. ": intento " .. index .. "/" .. attempts .. " fallo (" .. tostring(result) .. "), reintentando"
+		)
 		local jitter = 1 + self.randomFn() * 0.25
 		self:_wait(math.min(delay, maxDelay) * jitter)
 		delay = math.min(delay * 2, maxDelay)
@@ -543,7 +550,10 @@ function Manager._loadInner(self: Manager, userId: number, shouldCancel: (() -> 
 	local key = self:keyFor(userId)
 
 	-- Una liberacion previa del mismo jugador en este servidor puede seguir en curso.
-	while self.profiles[userId] ~= nil do
+	local function existingProfile(): Profile?
+		return self.profiles[userId]
+	end
+	while existingProfile() ~= nil do
 		if shouldCancel and shouldCancel() then
 			return nil, "cancelled"
 		end
@@ -659,7 +669,7 @@ function Manager._persist(self: Manager, profile: Profile, releasing: boolean): 
 			return nil
 		end
 		lockLost = false
-		local new = table.clone(old)
+		local new: { [string]: any } = table.clone(old)
 		new.schemaVersion = schemaVersion
 		new.data = snapshot
 		new.savedAt = now
@@ -672,7 +682,9 @@ function Manager._persist(self: Manager, profile: Profile, releasing: boolean): 
 	end
 
 	local defaultReleaseRetry: RetryConfig = { attempts = 8 }
-	local retryConfig: RetryConfig? = if releasing then (self.cfg.releaseRetry or defaultReleaseRetry) else self.cfg.retry
+	local retryConfig: RetryConfig? = if releasing
+		then (self.cfg.releaseRetry or defaultReleaseRetry)
+		else self.cfg.retry
 	local ok, result = self:_retry("save " .. profile.key, retryConfig, function()
 		return pcall(function()
 			self.store:UpdateAsync(profile.key, transform)
@@ -772,7 +784,12 @@ end
 	Integra con Players: carga al entrar, libera al salir, expulsa si falla la carga y guarda en BindToClose.
 	`players` = servicio Players (o doble). `bindToClose` = function(callback) game:BindToClose(callback).
 ]]
-function Manager.attach(self: Manager, players: any, bindToClose: ((callback: () -> ()) -> ())?, handlers: AttachHandlers?)
+function Manager.attach(
+	self: Manager,
+	players: any,
+	bindToClose: ((callback: () -> ()) -> ())?,
+	handlers: AttachHandlers?
+)
 	local hooks: AttachHandlers = handlers or {}
 
 	self.onProfileLost = function(profile: Profile)

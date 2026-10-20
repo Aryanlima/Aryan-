@@ -35,6 +35,8 @@ venv/bin/python -m clothgen set --pattern stripes --palette sunset --param orien
 venv/bin/python -m clothgen shirt --pattern triangles --palette neon --text-front "NIGHT SHIFT" --collar "#ff2bd6" --cuff "#0b0b1a" --out out/demo --id neon
 venv/bin/python -m clothgen tshirt --pattern tiedye --palette candy --shape hexagon --text "GOOD VIBES" --out out/demo --id tee1
 venv/bin/python -m clothgen tile --pattern camo --palette desert --size 512 --out out/tiles   # tesela seamless para texturas 3D
+venv/bin/python -m clothgen seamless --input mi_imagen_ia.png --out out/tiles/mi_tesela.png   # hace seamless una imagen cualquiera
+venv/bin/python -m clothgen shirt --pattern image --param path=out/tiles/mi_tesela.png --param scale=0.5 --out out/demo --id ia-01   # usa TU tesela como estampado
 venv/bin/python -m clothgen batch --config batch.example.json --out out/example
 venv/bin/python -m clothgen collection --n 24 --theme christmas --kind set --lang en --unique-patterns --out out/xmas
 venv/bin/python -m clothgen qc --dir out/example
@@ -58,10 +60,13 @@ Cada ítem produce: `<id>-shirt.png` / `<id>-pants.png` (585×559 RGBA) o `<id>-
 | `waves` | `size`, `amp` |
 | `speckle` | `density` |
 | `solid` | — |
+| `image` | `path=tu_tesela.png`, `scale` (repite TU imagen —p. ej. salida de una IA con licencia comercial— un número entero de veces alrededor del cuerpo) |
+
+`clothgen seamless` convierte cualquier imagen en tesela sin costura (mezcla de bordes con la imagen desplazada media vuelta); en una prueba con un degradado sintético la costura bajó de 168 a 11 (escala 0-255) según `qc.tile_seam_score`.
 
 Paletas (`--palette`): `sunset ocean forest candy mono autumn neon pastel midnight desert berry mint halloween christmas valentine spring summer`, o una lista `'#ff0000,#00ff00,...'`. Para patrones de 2 colores el generador reordena la paleta para asegurar contraste legible.
 
-Opciones de prenda: `--sleeve long|short|sleeveless`, `--length long|shorts`, `--torso-coverage 0..1` (pantalón), `--hem`, `--cuff`, `--collar`, `--text-front`, `--text-back`.
+Opciones de prenda: `--sleeve long|short|sleeveless`, `--length long|shorts`, `--torso-coverage 0..1` (pantalón), `--hem`, `--cuff`, `--collar`, `--text-front`, `--text-back`, `--font ruta.ttf`, `--text-size`. Sin `--font` se usa la fuente integrada de Pillow (Aileron Regular según el código fuente de Pillow; su licencia exacta [NO VERIFICADO] aquí): para texto en ítems comerciales usa una fuente con licencia clara, p. ej. las OFL (Fredoka/Nunito) que ya están en `ROBLOX/marketing/fish-and-fortune/specs-video/fonts/`.
 
 ### Cómo se evita la costura
 El torso es un cilindro de 384 px (R 64 + FRONT 128 + L 64 + BACK 128), cada brazo/pierna de 256 px (4 caras de 64). Todos los patrones se evalúan sobre esa coordenada "desenrollada" y son periódicos en ese período, así que el borde derecho de BACK enlaza con el izquierdo de R. `tests/test_periodic.py` lo comprueba llamando a cada patrón dos vueltas seguidas y exigiendo `f(U + C) == f(U)`.

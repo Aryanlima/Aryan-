@@ -68,6 +68,34 @@ def belt_wrap_score(arr, part):
     return float(wrap), float(np.max(diffs))
 
 
+def skin_tone_fraction(arr_rgba) -> float:
+    """Fraccion de pixeles opacos con color tipo piel (heuristica burda: tono 8-45 grados, sat 0.15-0.65, valor > 0.45).
+
+    Solo sirve para AVISAR: un diseno muy 'color piel' puede leerse como desnudez y ser moderado.
+    """
+    a = arr_rgba[..., 3] > 0
+    if not a.any():
+        return 0.0
+    rgb = arr_rgba[..., :3][a].astype(np.float64) / 255.0
+    mx, mn = rgb.max(axis=1), rgb.min(axis=1)
+    d = mx - mn
+    sat = np.where(mx > 0, d / np.maximum(mx, 1e-9), 0)
+    r, g, b = rgb[:, 0], rgb[:, 1], rgb[:, 2]
+    h = np.zeros_like(mx)
+    m = d > 1e-9
+    rm = m & (mx == r)
+    gm = m & (mx == g) & ~rm
+    bm = m & ~rm & ~gm
+    h[rm] = (60 * ((g[rm] - b[rm]) / d[rm])) % 360
+    h[gm] = 60 * ((b[gm] - r[gm]) / d[gm]) + 120
+    h[bm] = 60 * ((r[bm] - g[bm]) / d[bm]) + 240
+    skin = (h >= 8) & (h <= 45) & (sat >= 0.15) & (sat <= 0.65) & (mx > 0.45)
+    return float(skin.mean())
+
+
+MAX_TEXT_CHARS = 24   # decision propia: la politica dice "no excessive text"; esto es un umbral de aviso
+
+
 def check_clothing(path, kind="shirt", texts=None, blocklist=None) -> dict:
     """QC de un PNG de camisa/pantalon. Devuelve dict con 'ok' y detalles."""
     res = {"file": str(path), "kind": kind, "problems": [], "warnings": []}
@@ -109,6 +137,13 @@ def check_clothing(path, kind="shirt", texts=None, blocklist=None) -> dict:
             res["warnings"].append(f"costura de cierre visible en {part}: {wrap:.1f} > max interno {mx:.1f}")
     res["seams"] = seams
     res["sha1"] = hashlib.sha1(Path(path).read_bytes()).hexdigest()[:12]
+    skin = skin_tone_fraction(arr)
+    res["skin_tone_fraction"] = round(skin, 3)
+    if skin > 0.35:
+        res["warnings"].append(f"{skin:.0%} de los pixeles parecen color piel: riesgo de leerse como desnudez; revisa a mano")
+    total_chars = sum(len(t) for t in (texts or []) if t)
+    if total_chars > MAX_TEXT_CHARS * 2:
+        res["warnings"].append(f"{total_chars} caracteres de texto: la politica pide no incluir texto excesivo")
     hits = check_text(texts or [], blocklist)
     if hits:
         res["problems"].append(f"textos con posible marca/IP: {hits}")

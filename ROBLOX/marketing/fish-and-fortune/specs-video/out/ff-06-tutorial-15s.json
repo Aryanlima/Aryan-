@@ -1,0 +1,21 @@
+{
+  "id": "ff-06-tutorial-15s",
+  "out": "out/ff-06-tutorial-15s.mp4",
+  "width": 1080,
+  "height": 1920,
+  "codec": "h264",
+  "pix_fmt": "yuv420p",
+  "audio": "aac",
+  "duration_s": 14.2,
+  "frames": 426,
+  "size_mb": 4.67,
+  "workers": 4,
+  "capture_fps": 22.7,
+  "timings_ms": {
+    "compilar+TTS+clips": 2,
+    "captura": 20579,
+    "audio": 0,
+    "codificar": 20848,
+    "total": 41504
+  }
+}

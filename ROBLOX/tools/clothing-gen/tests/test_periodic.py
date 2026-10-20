@@ -52,6 +52,22 @@ class Periodic(unittest.TestCase):
             self.assertTrue(np.allclose(out[:H], out[H:], atol=1e-6), f"{name}: NO periodico en v")
 
 
+class ImagePattern(unittest.TestCase):
+    def test_image_pattern_periodic(self):
+        """El patron `image` (tesela de usuario) tambien cierra al dar la vuelta."""
+        import tempfile
+        from PIL import Image
+        from clothgen.patterns import PATTERNS_WITH_FILE
+        rng = np.random.default_rng(0)
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "t.png"
+            Image.fromarray((rng.random((64, 48, 3)) * 255).astype("uint8")).save(p)
+            for C, H in ((384, 128), (256, 128)):
+                U, V = _grid(C, H, 2 * C)
+                out = PATTERNS_WITH_FILE["image"](U, V, float(C), float(H), get_palette("mono"), path=str(p), scale=1.5)
+                self.assertTrue(np.allclose(out[:, :C], out[:, C:], atol=1e-6))
+
+
 class Layout(unittest.TestCase):
     def test_sizes_match_official_table(self):
         """Tabla oficial: 128x128 FRONT/BACK; 64x128 lados; 128x64 UP/DOWN torso; 64x64 U/D limbs."""
