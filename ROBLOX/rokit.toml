@@ -2,9 +2,10 @@
 # (ROBLOX/) instala exactamente estas versiones. Formato `alias = "propietario/repo@version"` dentro de [tools].
 #
 # Formato [VERIFICADO en el codigo fuente de Rokit (lib/manifests/rokit.rs, commit c8f2799 de 2026-09-27)]; el
-# README de Rokit NO describe rokit.toml. Existencia de las paginas de release de las 5 versiones comprobada el
-# 2026-10-20 (rojo v7.7.1, StyLua v2.6.0, selene 0.31.0, lune v0.11.0, luau-lsp 1.70.1). NO se probo `rokit install`
-# (Rokit no esta instalado en este entorno) ni que los binarios de release coincidan con los compilados con cargo.
+# README de Rokit NO describe rokit.toml. [VERIFICADO EN WINDOWS 11 por la sesion del PC de Aryan, 2026-10-20]:
+# `rokit install` funciona con este formato. Aviso: alli quedo instalada selene 0.32.0 (la global); el proyecto fija 0.31.0.
+# Existencia de las paginas de release de las 5 versiones comprobada el 2026-10-20 (rojo v7.7.1, StyLua v2.6.0,
+# selene 0.31.0, lune v0.11.0, luau-lsp 1.70.1). No se comprobo que los binarios de release coincidan con los compilados con cargo.
 #
 # Estas versiones son las del toolchain local compilado por ROBLOX/tools/setup.sh (ROBLOX/.toolchain/, ignorado por
 # git): mantenerlas sincronizadas con las constantes del inicio de ese script. Sin Rokit, setup.sh sigue funcionando.

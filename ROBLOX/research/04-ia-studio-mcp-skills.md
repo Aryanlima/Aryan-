@@ -403,3 +403,14 @@ rojo init
 - MCP de terceros: [boshyxd/robloxstudio-mcp](https://github.com/boshyxd/robloxstudio-mcp), [Chrrxs/robloxstudio-mcp](https://github.com/Chrrxs/robloxstudio-mcp)
 - Toolchain: [Rojo](https://github.com/rojo-rbx/rojo) ([release](https://github.com/rojo-rbx/rojo/releases/latest)), [Argon](https://github.com/argon-rbx/argon) ([release](https://github.com/argon-rbx/argon/releases/latest)), [pesde](https://github.com/pesde-pkg/pesde) ([releases](https://github.com/pesde-pkg/pesde/releases)), [luau-lsp](https://github.com/JohnnyMorganz/luau-lsp) ([release](https://github.com/JohnnyMorganz/luau-lsp/releases/latest)), [StyLua](https://github.com/JohnnyMorganz/StyLua), [Selene](https://github.com/Kampfkarren/selene), [Wally](https://github.com/UpliftGames/wally), [Rokit](https://github.com/rojo-rbx/rokit)
 - Prensa y blogs (solo vía buscador, no abiertos): [TechCrunch 2026-04-16](https://techcrunch.com/2026/04/16/robloxs-ai-assistant-gets-new-agentic-tools-to-plan-build-and-test-games/), [sorceress.games](https://sorceress.games/blog/stack-the-best-ai-for-roblox-game-development-studio-2026) (blog de proveedor), [Ropilot vs Assistant](https://ropilot.ai/blog/ropilot-vs-roblox-assistant) (competidor), [hilo "What's your setup to use Claude Code?"](https://devforum.roblox.com/t/what%E2%80%99s-your-setup-to-use-claude-code/4684713), [guía Vinegar/Wine](https://devforum.roblox.com/t/guide-to-setup-claudecodex-mcp-on-roblox-studio-vinegarwine/4770012)
+
+## 14. Correcciones posteriores (2026-10-20, verificadas desde el PC de Aryan)
+
+La sesión del PC puede abrir `create.roblox.com` y el DevForum (la nube no). Detalle y citas en [`../docs/pc-investigacion/`](../docs/pc-investigacion/).
+
+- **Script Sync ya NO es beta:** salió en versión completa el 2026-06-17 según el anuncio de staff. Resuelve la duda de la sección 12 punto 4 y corrige la sección 6.1, que lo daba como contradictorio.
+- **Planning Mode** existe (`/plan` en Assistant) pero **no** se puede usar desde el MCP ni desde Claude Code.
+- **`ProcessReceipt`:** la documentación lo llama "legacy" pero **no está deprecado**. Existe `MarketplaceService:BindReceiptHandler(...)`, que devuelve `Enum.ReceiptDecision`; si conviven, gana el nuevo. El código del repositorio sigue usando `ProcessReceipt`, que es válido.
+- **MCP integrado de Studio:** probado en Windows de punta a punta (disco, Rojo, Studio, MCP): 28 herramientas. En esta versión de Studio, la opción está en el ícono AI Assistant, luego `...`, Settings, MCP Servers. Studio tarda unos segundos en conectarse al proxy MCP; si se pregunta enseguida la lista sale vacía.
+- **El plugin oficial `Roblox/roblox-studio-agent-plugin`** no aparece en los catálogos que ve la CLI y hace lo mismo que registrar el MCP a mano, así que no se instaló en el PC.
+- **Publicar sin clics:** `rojo upload` existe en la 7.7.1 y usa una API key de Open Cloud con el permiso `universe-places` Write. Las claves caducan tras 60 días sin uso.
