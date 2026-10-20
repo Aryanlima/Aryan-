@@ -69,6 +69,7 @@ Las pruebas usan Lune y simulaciones (mocks) de los servicios de Roblox: demuest
 - 3 documentos de decisión en `docs/` ([informe maestro](docs/informe-maestro.md), [plan de 90 días](docs/plan-90-dias.md), [preguntas para Aryan](docs/preguntas-para-aryan.md)) que resumen, deciden y enlazan cada dato a su informe.
 - Un toolchain local sin Studio (Lune, StyLua, selene, Rojo, luau-lsp) y 481 pruebas en verde (2 omitidas a propósito: la puerta previa a publicar) con el linter limpio (2026-10-20).
 - Una **revisión independiente del código de dinero y datos** ([resultado y estado de cada hallazgo](docs/revision-codigo-dinero.md)): 0 críticos, 3 altos, 7 medios y 8 bajos; los arreglos de mayor impacto ya están aplicados con pruebas nuevas, y quedan propuestos los de impacto bajo y dos decisiones de diseño tuyas.
+- **Publicar sin sorpresas** ([guía por etapas con puertas y marcha atrás](docs/publicar-paso-a-paso.md); [mensaje para la sesión del PC](docs/prompt-pc-mision-2.md); [investigación de pases, productos y experiencia privada](docs/pc-investigacion/verificacion-pases-y-publicacion.md)). Herramientas: `ROBLOX/tools/wire-ids.mjs` (cablea los IDs validando todo), `create-items.mjs` (crea pases/productos por Open Cloud, BETA) y `publish-place.mjs` (sube el lugar solo a una experiencia privada).
 
 ### Hecho, pero SIN probar en Roblox
 

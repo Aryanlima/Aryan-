@@ -79,7 +79,9 @@ export async function run(options, deps = {}) {
 		return 0;
 	}
 	const apiKey = (env.ROBLOX_API_KEY ?? "").trim();
-	if (apiKey === "") {
+	const viaProxy = env.ROBLOX_API_KEY_VIA_PROXY === "1"; // sesion de la nube con "secreto de red": el proxy anade x-api-key
+	const authHeaders = apiKey ? { "x-api-key": apiKey } : {};
+	if (apiKey === "" && !viaProxy) {
 		logErr("ERROR: falta la variable de entorno ROBLOX_API_KEY (clave con permiso universe-places:write sobre ESTA experiencia). Nunca en un archivo ni en el chat.");
 		return 2;
 	}
@@ -90,12 +92,12 @@ export async function run(options, deps = {}) {
 		logErr(`ERROR: ${error.message}`);
 		return 2;
 	}
-	const redact = (text) => String(text).split(apiKey).join("[clave oculta]");
+	const redact = (text) => (apiKey ? String(text).split(apiKey).join("[clave oculta]") : String(text));
 
 	try {
 		// 1. La experiencia debe ser PRIVADA (falla cerrado)
 		if (!options.skipVisibilityCheck) {
-			const response = await doFetch(new URL(`/cloud/v2/universes/${universe}`, origin), { headers: { "x-api-key": apiKey } });
+			const response = await doFetch(new URL(`/cloud/v2/universes/${universe}`, origin), { headers: authHeaders });
 			if (!response.ok) {
 				logErr(`ERROR: no se pudo comprobar si la experiencia es privada (HTTP ${response.status}). No se sube nada.`);
 				logErr("  Anade a la clave el permiso de lectura de la experiencia, o confirma EN CREATOR HUB que es privada y repite con --skip-visibility-check.");
@@ -124,7 +126,7 @@ export async function run(options, deps = {}) {
 		url.searchParams.set("versionType", versionType);
 		const upload = await doFetch(url, {
 			method: "POST",
-			headers: { "x-api-key": apiKey, "Content-Type": "application/octet-stream" },
+			headers: { ...authHeaders, "Content-Type": "application/octet-stream" },
 			body: bytes,
 		});
 		const text = await upload.text();

@@ -69,13 +69,13 @@ Para un build: `rojo build default.project.json -o FishAndFortune.rbxl` (el `.rb
 
 ## 3. Crear los pases y productos en Creator Hub y pegar los IDs
 
-`src/server/ProductIds.luau` es el **único archivo con IDs**. Cada ID vale `0 -- TODO_ID` hasta que lo rellenes; un ID en 0 **oculta el objeto de la tienda** y bloquea su compra (no rompe nada).
+`src/server/ProductIds.luau` es el **único archivo con IDs**. Cada ID vale `0 -- TODO_ID` hasta que lo rellenes; un ID en 0 **oculta el objeto de la tienda** y bloquea su compra (no rompe nada). **No lo edites a mano**: guía completa, con etapas, puertas y marcha atrás, en [`../../docs/publicar-paso-a-paso.md`](../../docs/publicar-paso-a-paso.md).
 
-1. Creator Hub → tu experiencia → **Monetización**.
-2. Crea cada **pase** (Passes) y cada **producto de desarrollador** (Developer Products) con el nombre y precio sugerido de las tablas de abajo. Los precios salen de la escalera `Catalog.ladder`; son hipótesis para A/B test, no datos de mercado.
-3. Copia el ID de cada uno y sustituye el `0` correspondiente en `ProductIds.luau`. Para los pases, usa el **ID del pase** (el `TargetId` que usa `PromptGamePassPurchase`), no el assetId; verifícalo con una compra de prueba.
-4. Activa los pases/productos (*Item for sale*). Los pases deben estar a la venta para aparecer también fuera del juego.
-5. Antes de publicar, ejecuta la puerta de calidad: `Shop.validateCatalog(catalogo, handlers, { allowPlaceholders = false })` (el test `tests/Catalog.spec.luau` muestra cómo) — falla si queda algún `0`.
+1. Crea la experiencia de prueba **privada** (guía, Etapa 1) y, en Creator Hub → **Monetización**, cada **pase** (Passes) y cada **producto de desarrollador** (Developer Products). La lista exacta —nombre y descripción en EN/ES, precio sugerido e ícono— está en `store-items.json` (generado del código por `lune run ROBLOX/tools/dump-store-items.luau`; una prueba falla si se desactualiza). Los precios salen de la escalera `Catalog.ladder`; son hipótesis para A/B test, no datos de mercado. Se puede hacer a mano o con `node ROBLOX/tools/create-items.mjs --universe <ID> --apply` (API BETA; clave solo en la variable `ROBLOX_API_KEY`).
+2. Copia los IDs a `ids.local.json` (parte de `ids.example.json`; **sí se versiona**, no son secretos) y ejecuta `node ROBLOX/tools/wire-ids.mjs --dry-run` y luego `node ROBLOX/tools/wire-ids.mjs`: valida (sin 0 en lo habilitado, sin repetidos, sin negativos ni decimales), reescribe `ProductIds.luau` con formato de StyLua y corre la puerta `FF_RELEASE_CHECK=1 bash ROBLOX/tools/test.sh` (restaura el archivo si falla).
+3. Para los pases, `REVIEW(money)`: la documentación de Roblox se contradice sobre si el ID es el `TargetId` o el assetId. Se resuelve con la prueba de la guía (Etapa 3.3); si difieren, `"vip": { "passId": <TargetId>, "assetId": <assetId> }` en `ids.local.json` y el juego usa `passId` para el diálogo y la propiedad y acepta el otro como alias (`ProductIds.passAssetIds`).
+4. Activa los pases/productos (*Item for sale*) solo cuando la experiencia sea privada y estés probando, o en la publicación (Etapa 5). **No marques nada como "Listed"** hasta decidirlo tú.
+5. Puerta previa a publicar: `FF_RELEASE_CHECK=1 bash ROBLOX/tools/test.sh` (ReleaseGate: sin IDs 0 en lo habilitado, y el servidor real con los IDs reales: prompts, recibos y pases).
 
 **Pases (Game Passes)**
 

@@ -99,7 +99,7 @@ async function request(ctx, method, route, { form, query } = {}) {
 			url.searchParams.set(key, String(value));
 		}
 	}
-	const response = await ctx.fetch(url, { method, headers: { "x-api-key": ctx.apiKey }, body: form });
+	const response = await ctx.fetch(url, { method, headers: ctx.apiKey ? { "x-api-key": ctx.apiKey } : {}, body: form });
 	const text = await response.text();
 	if (!response.ok) {
 		throw new Error(`${method} ${route}: ${describeApiError(response.status, text)}`);
@@ -199,8 +199,12 @@ export async function run(options, deps = {}) {
 		return 0;
 	}
 
-	const apiKey = env.ROBLOX_API_KEY;
-	if (!apiKey || apiKey.trim() === "") {
+	// Dos formas de tener la clave: la variable de entorno ROBLOX_API_KEY (sesion del PC) o, en la sesion de la nube con un
+	// "secreto de red" (docs/dar-acceso-a-claude.md), ROBLOX_API_KEY_VIA_PROXY=1: el proxy anade la cabecera x-api-key y esta
+	// herramienta no ve la clave nunca [NO VERIFICADO: comportamiento del proxy].
+	const apiKey = (env.ROBLOX_API_KEY ?? "").trim();
+	const viaProxy = env.ROBLOX_API_KEY_VIA_PROXY === "1";
+	if (apiKey === "" && !viaProxy) {
 		logErr("ERROR: falta la variable de entorno ROBLOX_API_KEY. Pidele a Aryan que cree la clave (permisos minimos) y la guarde en una variable de entorno; NUNCA en un archivo ni en el chat.");
 		return 2;
 	}
@@ -211,7 +215,7 @@ export async function run(options, deps = {}) {
 		logErr(`ERROR: ${error.message}`);
 		return 2;
 	}
-	const ctx = { base, apiKey: apiKey.trim(), fetch: deps.fetch ?? globalThis.fetch, endpoints: endpoints(universe) };
+	const ctx = { base, apiKey, fetch: deps.fetch ?? globalThis.fetch, endpoints: endpoints(universe) };
 	const delayMs = options.delayMs ?? 450;
 
 	try {
@@ -305,7 +309,7 @@ export async function run(options, deps = {}) {
 		log("Siguiente paso: node ROBLOX/tools/wire-ids.mjs --dry-run   (y luego sin --dry-run).");
 		return 0;
 	} catch (error) {
-		logErr(`ERROR: ${String(error.message).split(ctx.apiKey).join("[clave oculta]")}`);
+		logErr(`ERROR: ${ctx.apiKey ? String(error.message).split(ctx.apiKey).join("[clave oculta]") : String(error.message)}`);
 		logErr("Nada se borro. Lo ya creado esta en Creator Hub y en ids.local.json; al repetir el comando no se duplica.");
 		return 1;
 	}

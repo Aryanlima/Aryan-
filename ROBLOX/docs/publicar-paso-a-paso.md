@@ -118,6 +118,8 @@ Las descripciones exactas (EN y ES) están en `store-items.json`. Los precios so
 1. **[ARYAN]** Crea una clave de API (Creator Hub → *API Keys* → *Create API Key*) con **solo** estos permisos, **limitada a la experiencia de prueba** y con caducidad corta (7 días): *Game Passes* lectura+escritura, *Developer Products* lectura+escritura, *Place Publishing (universe-places)* escritura y, si aparece, lectura de la experiencia. La pegas **tú** en una variable de entorno de Windows llamada `ROBLOX_API_KEY` (Panel de control → "Editar las variables de entorno de esta cuenta" → Nueva) y abres una terminal nueva. **Nunca** en un archivo, ni en el chat, ni en un comando que se vea.
 2. **[PC]** `node ROBLOX/tools/create-items.mjs --universe <ID>` (muestra el plan; revisarlo) y luego `... --apply`. Crea los 11 **fuera de venta**, no duplica si se repite y guarda los IDs en `ids.local.json`.
 
+**Camino A desde la nube (cuando exista el acceso por "secreto de red", ver [`dar-acceso-a-claude.md`](dar-acceso-a-claude.md)):** `create-items.mjs`, `publish-place.mjs` y `wire-ids.mjs` también funcionan desde la sesión de la nube con `ROBLOX_API_KEY_VIA_PROXY=1`: la herramienta no envía ni ve la clave (la añade el proxy de Anthropic). Mismas salvaguardas (privada, fuera de venta, nada público). Que el proxy se comporte así es **[NO VERIFICADO]**. Crear la experiencia (Etapa 1) sigue siendo desde Studio.
+
 **Camino B, a mano (plan B si la API falla o la interfaz difiere):** Creator Hub → la experiencia → **Monetization → Passes → Create pass** (ícono, nombre, descripción, categoría, precio); **Monetization → Developer Products → Create developer product** (ícono, nombre, descripción, categoría, precio). Copiar cada ID con **⋯ → Copy Asset ID** al archivo `ids.local.json`. **No marcar nada como "Listed"** (Monetization → Shop): eso los saca a la tienda de Roblox fuera del juego.
 
 **Puerta:** los 11 existen, con nombre y precio como en la tabla, y todos **fuera de venta o sin Listed**. `ids.local.json` completo.
@@ -178,7 +180,7 @@ Solo si tú lo decides. Invita a personas concretas, con la experiencia **todav�
 | **Audiencia** | Solo 16+ (gratis, etiqueta *Content May Vary*) o todas las edades | `publish-games-and-places.md` |
 | **Tarifa 1.000 Robux** (o Plus/Premium 2 meses seguidos) | Para llegar a menores de 16. Reembolsable según una página; **las dos páginas oficiales se contradicen** (90 días tras ser elegible / 25 jugadores en 60 días): no contar con ella | `kids-and-select.md` |
 | **Verificación de identidad / edad** | Estimación facial si eres menor de 18; documento si tienes 18 o más. Más 2FA | `publish-games-and-places.md` |
-| **Formulario fiscal W-8BEN** (o W-8BEN-E) | Creator Hub → Finances → Taxes. **Antes del 31-oct-2026** si quieres cobrar con retención correcta; sin él puede aplicarse 24 % a todo el pago. Independiente de publicar, pero **urgente** | `tax-information.md` |
+| **Formulario fiscal W-9** | Aryan vive en EE. UU., tiene 18+ y publica como persona (respuestas del 2026-10-20): le toca el **W-9**, no el W-8BEN. Creator Hub → Finances → Taxes, **antes del 31-oct-2026**; con W-9 válido no se exige retención de EE. UU. Independiente de publicar, pero **urgente**. Confirmar con un contador | `tax-information.md`, `preguntas-para-aryan.md` |
 | **Cuestionario de madurez veraz** | Se contesta pensando en lo más maduro que puede ver un jugador. Datos falsos → moderación del juego **y de tu cuenta** | `content-maturity.md` |
 | **¿"Listed"?** | Si los pases/productos salen en la tienda de Roblox fuera del juego | `passes.md` |
 | **Crear/ revocar la clave de API** | Es tu cuenta | `api-keys.md` |
@@ -194,7 +196,7 @@ Solo si tú lo decides. Invita a personas concretas, con la experiencia **todav�
 - [ ] Cuestionario de madurez respondido **tú mismo y con la verdad**. Para la v1: sin apuestas jugables, sin objetos aleatorios de pago, sin chat propio, sin IA, sin comercio.
 - [ ] Audiencia decidida (16+ o todas las edades) y, si es el caso, tarifa/Plus resuelta por ti.
 - [ ] Verificación de edad hecha (cuenta con 2+ días de antigüedad) y 2FA activada.
-- [ ] W-8BEN presentado.
+- [ ] W-9 presentado en Creator Hub (Finances → Taxes).
 - [ ] Copia local del `.rbxl` y de los IDs (versionados).
 - [ ] Máximo 5 juegos nuevos por día (aquí es 1).
 - [ ] Entendido que **cada actualización futura vuelve a pasar por los requisitos de publicación** (documentación oficial).

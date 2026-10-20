@@ -177,6 +177,7 @@ Dos vías, ambas hacia la experiencia **privada**:
   - Caducidad: poner fecha (p. ej. 7 días). Sin uso durante 60 días se desactiva sola. Restricción por IP: opcional (CIDR).
 - **Dónde guardarla (Windows):** variable de entorno de **usuario** `ROBLOX_API_KEY` (Panel de control → "Editar las variables de entorno de esta cuenta" → Nueva), y **abrir una terminal nueva**. **Nunca** en un archivo del repo, en `ids.local.json`, en un comando pegado en el chat ni en un mensaje. Las herramientas del repo no la aceptan por argumento y no la imprimen. Tras la misión: **borrar la clave en Creator Hub** (revocar) y la variable.
 - Quien crea la clave es **Aryan** (es su cuenta); la sesión del PC solo guía.
+- **Desde la nube** (guía `dar-acceso-a-claude.md`): en vez de una variable de entorno, un *secreto de red* con la cabecera `x-api-key` que añade el proxy; las herramientas lo admiten con `ROBLOX_API_KEY_VIA_PROXY=1` (no envían ninguna clave). [NO VERIFICADO el comportamiento del proxy.]
 
 ---
 
@@ -189,10 +190,10 @@ Todo [OFICIAL leído] en `publish-games-and-places.md`, `kids-and-select.md` y `
 - **Para todas las edades (Kids 5-8 y Select 9-15):** lo anterior **más** verificación (estimación facial si es menor de 18; **documento** si tiene 18 o más), **2FA**, y **una** de: Roblox Plus/Premium activo **2 meses seguidos**, o **tarifa única reembolsable de 1.000 Robux por juego**; **cuestionario completo** con resultado Minimal/Mild/Moderate; y superar la **evaluación** (250 jugadas únicas de jugadores muy comprometidos en 60 días).
 - **Reembolso de la tarifa:** `kids-and-select.md` dice "automáticamente 90 días después de que el juego sea elegible (o 90 días después de pagar si nunca lo es)"; `publish-games-and-places.md` dice "25 jugadores muy comprometidos durante 60 días sin moderación". **Las dos páginas se contradicen** → no contar con el reembolso. No se reembolsa si el juego se retira permanentemente por infracciones graves.
 - **Cuestionario de madurez:** debe ser **veraz** ("base your answers on the most mature or extreme content players can encounter"); información inexacta expone el juego **y la cuenta** a moderación. Para Fish & Fortune v1: sin violencia, sin apuestas jugables, sin chat propio, sin IA, **sin objetos aleatorios de pago** (suerte de pago apagada; lanzar la caña no cuesta Robux ni monedas), sin comercio. Aryan debe responder cada pregunta leyéndola; si la respuesta correcta cambia algo del juego, **se reenvía el cuestionario**.
-- **Dinero:** los pases/productos pasan a venderse a todo el público permitido; `PolicyService` y la tienda honesta (research/03) aplican. DevEx: mínimo 30.000 Robux ganados; **la información fiscal (W-8BEN) debe estar antes del 31-oct-2026** (independiente de publicar, pero urgente) — ver `pc-investigacion/verificacion-monetizacion.md` §4.
+- **Dinero:** los pases/productos pasan a venderse a todo el público permitido; `PolicyService` y la tienda honesta (research/03) aplican. DevEx: mínimo 30.000 Robux ganados; **la información fiscal debe estar antes del 31-oct-2026** (independiente de publicar, pero urgente). Aryan vive en EE. UU., 18+, como persona: le toca el **W-9**, no el W-8BEN (`preguntas-para-aryan.md`, 2026-10-20) — ver `verificacion-monetizacion.md` §4.
 - **Tope:** hasta **5 juegos nuevos por día**; revocar el acceso público y volver a publicar no cuenta.
 - **Fuera del juego:** pases y productos solo aparecen en la Shop de Roblox si están **Listed** (decisión aparte de Aryan).
-- **Lo que SOLO puede hacer Aryan:** pagar la tarifa o decidir Plus/Premium; verificar identidad/edad; 2FA; W-8BEN/Impuestos; crear la clave de API; responder el cuestionario; pulsar "Publicar"/"Public".
+- **Lo que SOLO puede hacer Aryan:** pagar la tarifa o decidir Plus/Premium; verificar identidad/edad; 2FA; W-9/Impuestos; crear la clave de API; responder el cuestionario; pulsar "Publicar"/"Public".
 
 ---
 

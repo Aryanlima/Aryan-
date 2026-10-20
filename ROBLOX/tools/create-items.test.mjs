@@ -134,6 +134,18 @@ test("--apply crea los 11 objetos FUERA DE VENTA, con icono, guarda ids.local.js
 	}
 });
 
+test("ROBLOX_API_KEY_VIA_PROXY=1 (secreto de red de la nube): no necesita la clave y no envia x-api-key", async () => {
+	const server = await startServer();
+	try {
+		const ctx = setup(server, { ROBLOX_API_KEY: undefined, ROBLOX_API_KEY_VIA_PROXY: "1" });
+		assert.equal(await run({ ...base, apply: true, out: ctx.out }, ctx.deps), 0, ctx.errs.join("\n"));
+		assert.ok(server.requests.length > 11);
+		assert.ok(server.requests.every((r) => r.key === undefined));
+	} finally {
+		await server.close();
+	}
+});
+
 test("es IDEMPOTENTE: repetir el comando no crea duplicados", async () => {
 	const server = await startServer();
 	try {

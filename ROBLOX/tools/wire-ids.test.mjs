@@ -25,13 +25,21 @@ import {
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.join(HERE, "wire-ids.mjs");
-const REAL_PRODUCT_IDS = fs.readFileSync(DEFAULT_TARGET, "utf8");
+// OJO: ProductIds.luau cambia cuando se cablean los IDs reales; estas pruebas NO pueden depender de que este todo en 0.
+// Por eso usan CURRENT (el archivo tal cual esta) solo para leer la estructura y comprobar el viaje de ida y vuelta, y
+// BASELINE (el mismo archivo con todo en 0, generado por la propia herramienta) como archivo de partida de cada prueba.
+const CURRENT_PRODUCT_IDS = fs.readFileSync(DEFAULT_TARGET, "utf8").replace(/\r\n/g, "\n");
 const REAL_FLAGS = fs.readFileSync(FEATURE_FLAGS_FILE, "utf8");
 const EXAMPLE = path.join(path.dirname(path.dirname(DEFAULT_TARGET)), "..", "ids.example.json");
 
-const structure = parseProductIds(REAL_PRODUCT_IDS);
+const structure = parseProductIds(CURRENT_PRODUCT_IDS);
 const PASS_KEYS = structure.passes.map((e) => e.key);
 const PRODUCT_KEYS = structure.products.map((e) => e.key);
+const ZERO_RESULT = {
+	passes: new Map(PASS_KEYS.map((k) => [k, { passId: 0, assetId: null }])),
+	products: new Map(PRODUCT_KEYS.map((k) => [k, 0])),
+};
+const BASELINE = renderProductIds(structure, ZERO_RESULT);
 
 /** IDs buenos y distintos para todo lo habilitado; lo apagado se queda en 0. */
 function goodIds() {
@@ -52,7 +60,7 @@ function sandbox(idsJson) {
 	const target = path.join(dir, "ProductIds.luau");
 	const flags = path.join(dir, "FeatureFlags.luau");
 	const ids = path.join(dir, "ids.local.json");
-	fs.writeFileSync(target, REAL_PRODUCT_IDS);
+	fs.writeFileSync(target, BASELINE);
 	fs.writeFileSync(flags, REAL_FLAGS);
 	fs.writeFileSync(ids, typeof idsJson === "string" ? idsJson : JSON.stringify(idsJson, null, 2));
 	return { dir, target, flags, ids };
@@ -82,12 +90,15 @@ test("IDs buenos: sin errores", () => {
 	assert.equal(result.products.size, 7);
 });
 
-test("el render de un archivo con todo en 0 reproduce EXACTAMENTE el ProductIds.luau actual (idempotente)", () => {
-	const zero = {
-		passes: new Map(PASS_KEYS.map((k) => [k, { passId: 0, assetId: null }])),
-		products: new Map(PRODUCT_KEYS.map((k) => [k, 0])),
+test("viaje de ida y vuelta: leer el ProductIds.luau ACTUAL (con ceros o con IDs reales) y volver a generarlo da EXACTAMENTE el mismo texto", () => {
+	const assetOf = new Map(structure.passAssetIds.map((e) => [e.key, e.id]));
+	const current = {
+		passes: new Map(structure.passes.map((e) => [e.key, { passId: e.id, assetId: assetOf.get(e.key) ?? null }])),
+		products: new Map(structure.products.map((e) => [e.key, e.id])),
 	};
-	assert.equal(renderProductIds(structure, zero), REAL_PRODUCT_IDS.replace(/\r\n/g, "\n"));
+	assert.equal(renderProductIds(structure, current), CURRENT_PRODUCT_IDS);
+	// y el archivo de partida de las pruebas (todo en 0) tambien es canonico
+	assert.equal(renderProductIds(parseProductIds(BASELINE), ZERO_RESULT), BASELINE);
 });
 
 test("render + parse son inversos y ponen los numeros en su clave", () => {
@@ -221,7 +232,7 @@ test("run --dry-run valida y muestra el resumen pero NO escribe ni corre la puer
 	let gateCalled = false;
 	const code = run({ ids: box.ids, target: box.target, flags: box.flags, dryRun: true }, { ...cap.deps, runGate: () => (gateCalled = true) });
 	assert.equal(code, 0);
-	assert.equal(fs.readFileSync(box.target, "utf8"), REAL_PRODUCT_IDS);
+	assert.equal(fs.readFileSync(box.target, "utf8"), BASELINE);
 	assert.equal(gateCalled, false);
 	assert.match(cap.out.join("\n"), /11 ID\(s\) cambian/);
 	assert.match(cap.out.join("\n"), /luck_plus .* 0 +-> 0 +igual +<- apagado a proposito/);
@@ -238,7 +249,7 @@ test("run escribe ProductIds.luau, conserva la cabecera y corre la puerta; el re
 	};
 	assert.equal(run({ ids: box.ids, target: box.target, flags: box.flags }, { ...cap.deps, runGate: okGate }), 0);
 	const written = fs.readFileSync(box.target, "utf8");
-	assert.ok(written.startsWith(parseProductIds(REAL_PRODUCT_IDS).header));
+	assert.ok(written.startsWith(structure.header));
 	assert.match(written, /auto_fish = 7000000001,/);
 	assert.equal(gateCalls, 1);
 	assert.match(cap.out.join("\n"), /PUERTA OK/);
@@ -257,7 +268,7 @@ test("si la puerta FALLA, se restaura ProductIds.luau y el codigo de salida es 1
 		{ ...cap.deps, runGate: () => ({ status: 1, output: "FAIL  games/fish-and-fortune/tests/ReleaseGate.spec.luau\n" }) },
 	);
 	assert.equal(code, 1);
-	assert.equal(fs.readFileSync(box.target, "utf8"), REAL_PRODUCT_IDS);
+	assert.equal(fs.readFileSync(box.target, "utf8"), BASELINE);
 	assert.match(cap.err.join("\n"), /LA PUERTA FALLO/);
 	assert.match(cap.err.join("\n"), /RESTAURO/);
 });
@@ -281,7 +292,7 @@ test("si el formato de StyLua falla, se restaura el archivo", () => {
 		{ ...cap.deps, runFormat: () => ({ status: 1, output: "Diff in ProductIds.luau" }), runGate: () => assert.fail("no debe correr la puerta") },
 	);
 	assert.equal(code, 1);
-	assert.equal(fs.readFileSync(box.target, "utf8"), REAL_PRODUCT_IDS);
+	assert.equal(fs.readFileSync(box.target, "utf8"), BASELINE);
 });
 
 test("datos invalidos: codigo 1, no se escribe nada y no se corre la puerta", () => {
@@ -291,7 +302,7 @@ test("datos invalidos: codigo 1, no se escribe nada y no se corre la puerta", ()
 	const cap = capture();
 	const code = run({ ids: box.ids, target: box.target, flags: box.flags }, { ...cap.deps, runGate: () => assert.fail("no debe correr la puerta") });
 	assert.equal(code, 1);
-	assert.equal(fs.readFileSync(box.target, "utf8"), REAL_PRODUCT_IDS);
+	assert.equal(fs.readFileSync(box.target, "utf8"), BASELINE);
 	assert.match(cap.err.join("\n"), /NO SE CAMBIO NADA/);
 	assert.match(cap.err.join("\n"), /passes\.vip: es negativo/);
 });
@@ -328,7 +339,7 @@ test("el ejemplo ids.example.json FALLA con un mensaje claro mientras tenga cero
 	assert.match(result.stderr, /NO SE CAMBIO NADA/);
 	assert.match(result.stderr, /passes\.auto_fish: ID 0 \(TODO_ID\) pero este pase esta HABILITADO/);
 	assert.doesNotMatch(result.stderr, /luck_plus/); // apagado a proposito: no es un problema
-	assert.equal(fs.readFileSync(DEFAULT_TARGET, "utf8"), REAL_PRODUCT_IDS); // y no toco nada
+	assert.equal(fs.readFileSync(DEFAULT_TARGET, "utf8").replace(/\r\n/g, "\n"), CURRENT_PRODUCT_IDS); // y no toco nada
 });
 
 test("CLI real: --dry-run con IDs buenos sale con 0; opciones desconocidas con 2", () => {

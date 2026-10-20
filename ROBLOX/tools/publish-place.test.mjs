@@ -75,6 +75,17 @@ test("--apply en una experiencia PRIVADA: comprueba visibilidad, sube una versio
 	}
 });
 
+test("ROBLOX_API_KEY_VIA_PROXY=1: sube sin enviar x-api-key (lo anade el proxy de la nube)", async () => {
+	const server = await startServer();
+	try {
+		const ctx = setup(server, { ROBLOX_API_KEY: undefined, ROBLOX_API_KEY_VIA_PROXY: "1" });
+		assert.equal(await run({ ...ids, apply: true, rbxl: ctx.rbxl }, ctx.deps), 0, ctx.errs.join("\n"));
+		assert.ok(server.requests.every((r) => r.key === undefined));
+	} finally {
+		await server.close();
+	}
+});
+
 test("--publish usa versionType=Published (solo si la experiencia es privada)", async () => {
 	const server = await startServer();
 	try {
