@@ -279,7 +279,11 @@ function Runner:run(options: { exit: boolean?, silent: boolean?, filter: string?
 		for _, hook in hooks do
 			local ok, err = runner:_runFunction(hook, runner._timeout)
 			if not ok then
-				return false, { message = label .. " fallo en '" .. suiteName .. "': " .. tostring(err.message), trace = err.trace }
+				return false,
+					{
+						message = label .. " fallo en '" .. suiteName .. "': " .. tostring(err.message),
+						trace = err.trace,
+					}
 			end
 		end
 		return true, nil

@@ -1,0 +1,58 @@
+{
+  "id": "cubo-rush-oferta",
+  "template": "offer",
+  "title": "Oferta relámpago con código de canje (juego de ejemplo)",
+  "aspect": "9:16",
+  "fps": 30,
+  "palette": "gold",
+  "brand": { "name": "CUBO RUSH", "handle": "@cuborush.oficial" },
+
+  "hook": { "kicker": "⏰ SOLO 24 HORAS", "text": "*OFERTA* RELÁMPAGO", "emoji": "🔥", "duration": 2.0 },
+
+  "offer": {
+    "kicker": "⚠ OFERTA LIMITADA ⚠",
+    "headline": "Pack *Súper Héroe*",
+    "discount": "-50%",
+    "discountLabel": "SOLO HOY",
+    "items": [
+      { "emoji": "🦸", "label": "Skin épica" },
+      { "emoji": "⚡", "label": "x2 Velocidad" },
+      { "emoji": "🪙", "label": "5.000 monedas" }
+    ],
+    "code": "SUPER50",
+    "codeLabel": "CÓDIGO DE CANJE",
+    "endsIn": 9000,
+    "duration": 6.4,
+    "captions": false,
+    "narration": "Solo hoy, el pack súper héroe con cincuenta por ciento de descuento."
+  },
+
+  "scenes": [
+    {
+      "kind": "bullets",
+      "text": "Cómo *canjearlo*",
+      "items": [
+        { "emoji": "1️⃣", "text": "Abre Cubo Rush" },
+        { "emoji": "2️⃣", "text": "Toca el botón «Código»" },
+        { "emoji": "3️⃣", "text": "Escribe SUPER50" }
+      ],
+      "narration": "Abre el juego, toca código, y escribe súper cincuenta."
+    }
+  ],
+
+  "cta": {
+    "text": "¡NO TE LO *PIERDAS*!",
+    "sub": "La oferta termina pronto",
+    "button": "CANJEAR AHORA",
+    "emoji": "🎁",
+    "narration": "Canjéalo ahora."
+  },
+
+  "subtitles": { "enabled": true, "y": 0.74 },
+  "audio": {
+    "music": { "style": "hype", "volume": 0.6 },
+    "sfx": true,
+    "narration": { "engine": "espeak", "voice": "es-la", "speed": 150, "pitch": 48 }
+  },
+  "legal": "Cubo Rush es un juego de ejemplo. Los códigos son ficticios."
+}

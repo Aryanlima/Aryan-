@@ -1,0 +1,71 @@
+# Lista AYUDA (no garantia legal): palabras que NO deben aparecer en textos ni nombres de tus items.
+# Una por linea, en minusculas. Edita y amplia con las marcas/IP que veas en tendencias.
+# Fuente de la regla [OFICIAL]: Marketplace policy (no usar branding de Roblox; solo vender
+# lo que tengas permiso de vender): https://github.com/Roblox/creator-docs/blob/main/content/en-us/marketplace/marketplace-policy.md
+roblox
+robux
+nike
+adidas
+puma
+supreme
+gucci
+prada
+chanel
+versace
+balenciaga
+louis vuitton
+off-white
+yeezy
+vans
+champion
+under armour
+north face
+ralph lauren
+tommy hilfiger
+calvin klein
+disney
+pixar
+marvel
+spider-man
+spiderman
+batman
+superman
+star wars
+harry potter
+pokemon
+pikachu
+nintendo
+mario
+zelda
+sonic
+minecraft
+fortnite
+among us
+five nights
+poppy playtime
+squid game
+hello kitty
+sanrio
+barbie
+lego
+naruto
+one piece
+dragon ball
+demon slayer
+jujutsu
+sprunki
+labubu
+skibidi
+taylor swift
+mrbeast
+bts
+blackpink
+coca-cola
+pepsi
+mcdonald
+nfl
+nba
+fifa
+real madrid
+barcelona
+manchester

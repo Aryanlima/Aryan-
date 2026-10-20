@@ -133,6 +133,9 @@
       if (idx < 0) return;
       subLine = $('div', 'line', subsEl);
       caps[idx].words.forEach((w) => { const e = $('span', 'sw', subLine, w.w); subWords.push({ e, w }); });
+      // una sola línea que siempre cabe en la zona segura
+      const avail = subsEl.clientWidth, wd = subLine.offsetWidth;
+      if (wd > avail) subLine.style.fontSize = (parseFloat(getComputedStyle(subLine).fontSize) * avail / wd * 0.98) + 'px';
     }
     function updateSubs(t) {
       let idx = -1;
@@ -145,10 +148,10 @@
       const accent = subCfg.color || pal.accent;
       subWords.forEach(({ e, w }) => {
         const act = t >= w.t0 && t < w.t1 + 0.0;
-        const k = act ? 1 + 0.16 * Math.sin(clamp((t - w.t0) / 0.14) * Math.PI * 0.5) : 1;
+        const k = act ? 1 + 0.07 * Math.sin(clamp((t - w.t0) / 0.14) * Math.PI * 0.5) : 1;
         e.style.color = act ? accent : (t >= w.t1 ? '#ffffff' : '#ffffff');
         e.style.transform = `scale(${k.toFixed(3)})`;
-        e.style.opacity = t >= w.t0 - 1e-6 || subCfg.style === 'static' ? '1' : '0.55';
+        e.style.opacity = subCfg.style === 'reveal' && t < w.t0 - 1e-6 ? '0.35' : '1';
       });
     }
 

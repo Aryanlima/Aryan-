@@ -4,10 +4,13 @@
 	IncrementAsync / RemoveAsync en memoria, con simulacion de fallos y limites.
 
 	IMPORTANTE: es un modelo SIMPLIFICADO para probar logica (reintentos, idempotencia,
-	manejo de errores). Los textos de error, codigos y limites son aproximaciones
-	[NO VERIFICADO contra la documentacion oficial]; ajustalos en `DataStoreService.Limits`
-	o por opciones. No reproduce colas de throttling, replicacion ni el cooldown
-	de escritura por clave (opcional: `enforceWriteCooldown`).
+	manejo de errores). Los limites (50 caracteres de nombre/clave, 4 MiB de valor, presupuestos
+	60 + 40/jugador por minuto) proceden de roblox-dev/references/datastore-persistence.md [TERCERO,
+	2026-10] y los textos/codigos de error son aproximaciones [NO VERIFICADO contra la documentacion
+	oficial, no accesible desde esta red]; ajustalos en `DataStoreService.Limits` o por opciones.
+	No reproduce la cola real de peticiones (30 por cola; aqui un presupuesto agotado falla al
+	instante con "301"), replicacion ni ListKeysAsync/OrderedDataStore. El cooldown de escritura
+	por clave es opcional (`enforceWriteCooldown`, 6 s, valor del modelo no verificado).
 
 	Uso:
 		local service = DataStoreService.new({ clock = clock, players = players })

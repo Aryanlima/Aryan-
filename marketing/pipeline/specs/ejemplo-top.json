@@ -1,0 +1,41 @@
+{
+  "id": "mundo-mascotas-top3",
+  "template": "top-list",
+  "title": "Top 3 mascotas más OP (juego de ejemplo)",
+  "aspect": "9:16",
+  "fps": 30,
+  "palette": "candy",
+  "brand": { "name": "MUNDO MASCOTAS", "handle": "@mundomascotas" },
+
+  "hook": { "text": "TOP 3 MASCOTAS *MÁS OP*", "emoji": "🏆", "sub": "la #1 te sorprenderá", "duration": 2.2 },
+
+  "items": [
+    {
+      "title": "Dragón de *Hielo*",
+      "sub": "Congela a todos los jefes",
+      "emoji": "🐉",
+      "stat": { "label": "PODER", "from": 0, "to": 9800, "prefix": "⚡" },
+      "narration": "Número tres: el dragón de hielo."
+    },
+    {
+      "title": "Zorro *Arcoíris*",
+      "sub": "Multiplica tus monedas",
+      "emoji": "🦊",
+      "stat": { "label": "MONEDAS", "from": 1, "to": 5, "prefix": "x" },
+      "narration": "Número dos: el zorro arcoíris."
+    },
+    {
+      "title": "Gato *Cósmico*",
+      "sub": "La más rara del juego",
+      "emoji": "🐱",
+      "stat": { "label": "RAREZA", "from": 0, "to": 99, "suffix": "%" },
+      "narration": "Y el número uno: el gato cósmico."
+    }
+  ],
+
+  "cta": { "text": "¿CUÁL *ELIGES*?", "sub": "Cuéntalo en los comentarios", "button": "👇 JUEGA AHORA", "emoji": "🐾" },
+
+  "subtitles": { "enabled": true, "y": 0.74 },
+  "audio": { "music": { "style": "arcade", "volume": 0.5 }, "sfx": true },
+  "legal": "Mundo Mascotas es un juego de ejemplo. No afiliado a ninguna marca."
+}

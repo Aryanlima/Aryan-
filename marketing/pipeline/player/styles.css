@@ -9,7 +9,6 @@ body { width: 100vw; height: 100vh; }
   font-family: var(--f-body, 'Inter', 'DejaVu Sans', sans-serif);
   color: var(--c-text, #fff);
   -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision;
-  font-variant-emoji: emoji;
 }
 .scene { position: absolute; inset: 0; overflow: hidden; will-change: transform, opacity; }
 .bg, .bg-canvas, .bg-media, .bg-scrim { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -23,7 +22,7 @@ body { width: 100vw; height: 100vh; }
   display: flex; align-items: center; justify-content: center;
 }
 .fit { width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--u) * 28); text-align: center; transform-origin: 50% 50%; position: relative; }
-.fit.top { justify-content: flex-start; }
+.fit.top { height: 100%; justify-content: flex-start; }
 .fit.spread { height: 100%; justify-content: space-between; }
 .abs { position: absolute; }
 
@@ -68,9 +67,9 @@ body { width: 100vw; height: 100vh; }
 #progress.solid { display: block; background: rgba(255,255,255,0.25); border-radius: 99px; overflow: hidden; }
 #progress.solid .fill { background: linear-gradient(90deg, var(--c-accent), var(--c-accent2)); }
 #subs { position: absolute; left: var(--sl); right: var(--sr); display: flex; justify-content: center; align-items: center; text-align: center; }
-#subs .line { font-family: var(--f-head); font-weight: 900; font-size: calc(var(--u) * 84); line-height: 1.08; text-transform: var(--tt, uppercase); color: #fff;
-  -webkit-text-stroke: calc(var(--u) * 14) #000; paint-order: stroke fill; text-shadow: 0 calc(var(--u) * 8) 0 rgba(0,0,0,0.55); transform-origin: 50% 70%; }
-#subs .sw { display: inline-block; margin: 0 0.1em; transform-origin: 50% 70%; }
+#subs .line { white-space: nowrap; font-family: var(--f-head); font-weight: 900; font-size: calc(var(--u) * 84); line-height: 1.08; text-transform: var(--tt, uppercase); color: #fff;
+  -webkit-text-stroke: calc(var(--u) * 11) #000; paint-order: stroke fill; text-shadow: 0 calc(var(--u) * 7) 0 rgba(0,0,0,0.55); transform-origin: 50% 70%; }
+#subs .sw { display: inline-block; margin: 0 0.2em; transform-origin: 50% 70%; }
 #brand { position: absolute; }
 #flash { background: #fff; opacity: 0; }
 #legal { position: absolute; left: var(--sl); right: var(--sr); text-align: center; font-weight: 600; font-size: calc(var(--u) * 24); color: rgba(255,255,255,0.7); text-shadow: 0 1px 4px rgba(0,0,0,0.8); }

@@ -1,0 +1,44 @@
+{
+  "id": "cubo-rush-progresion-16x9",
+  "template": "before-after",
+  "title": "Antes / después + progresión, 16:9 (juego de ejemplo)",
+  "aspect": "16:9",
+  "fps": 30,
+  "palette": "lime",
+  "brand": { "name": "CUBO RUSH" },
+
+  "hook": { "text": "De *NOOB* a *PRO* en 7 días", "emoji": "📈", "duration": 2.0 },
+
+  "scenes": [
+    {
+      "id": "antes-despues",
+      "kind": "compare",
+      "text": "Tu cuenta: *DÍA 1* vs *DÍA 7*",
+      "duration": 5.6,
+      "before": { "label": "DÍA 1", "bg": { "type": "gradient", "seed": 2 } },
+      "after": { "label": "DÍA 7", "bg": { "type": "runner", "particles": "coins" } },
+      "stats": [
+        { "label": "Monedas", "before": 120, "after": 48500 },
+        { "label": "Nivel", "before": 3, "after": 47 }
+      ]
+    },
+    {
+      "id": "progresion",
+      "kind": "stages",
+      "text": "Tu camino a *LEYENDA*",
+      "duration": 5.6,
+      "suffix": " pts",
+      "stages": [
+        { "label": "Novato", "value": 0, "emoji": "🌱" },
+        { "label": "Corredor", "value": 1500, "emoji": "👟" },
+        { "label": "Veloz", "value": 12000, "emoji": "⚡" },
+        { "label": "Leyenda", "value": 100000, "emoji": "👑" }
+      ],
+      "bg": { "type": "grid" }
+    }
+  ],
+
+  "cta": { "text": "EMPIEZA *HOY*", "sub": "Busca Cubo Rush en Roblox", "button": "▶ JUGAR GRATIS", "emoji": "🚀" },
+
+  "audio": { "music": { "style": "epic", "volume": 0.55 }, "sfx": true }
+}

@@ -82,7 +82,10 @@ function Mocks.new(options)
 		GetService = function(_, name: string)
 			local service = services[name]
 			if service == nil then
-				error("[mocks] servicio no simulado: " .. tostring(name) .. " (anadelo en Mocks.new o env.game.services)", 2)
+				error(
+					"[mocks] servicio no simulado: " .. tostring(name) .. " (anadelo en Mocks.new o env.game.services)",
+					2
+				)
 			end
 			return service
 		end,

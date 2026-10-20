@@ -27,7 +27,9 @@ function RunService.new(options)
 	self._isStudio = opts.isStudio == true
 	self._isRunning = opts.isRunning ~= false
 	self._elapsed = 0
-	for _, name in { "Heartbeat", "Stepped", "PreSimulation", "PostSimulation", "RenderStepped", "PreRender", "PreAnimation" } do
+	for _, name in
+		{ "Heartbeat", "Stepped", "PreSimulation", "PostSimulation", "RenderStepped", "PreRender", "PreAnimation" }
+	do
 		self[name] = Signal.new({ spawn = spawn })
 	end
 	return self
