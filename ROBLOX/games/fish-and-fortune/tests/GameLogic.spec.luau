@@ -151,7 +151,8 @@ describe("GameLogic", function()
 			clock = session.startedAt - 0.5 -- aun no ha picado
 			local result, reason = logic:reel(data, runtime, ctx(), session.id, 0.6)
 			expect(result).toBeNil()
-			expect(reason).toBe("impossible-time")
+			expect(reason).toBe("too-early")
+			expect(runtime.cast).toBeTruthy() -- sigue activo: se puede recoger cuando pique
 		end)
 
 		it("rechaza recoger demasiado pronto sin gastar el lanzamiento", function()
@@ -167,7 +168,7 @@ describe("GameLogic", function()
 		it("rechaza tiempos imposibles (el cliente dice haber esperado mas de lo que paso)", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
-			clock = 1
+			clock = session.startedAt + 1
 			local result, reason = logic:reel(data, runtime, ctx(), session.id, 2.9)
 			expect(result).toBeNil()
 			expect(reason).toBe("impossible-time")

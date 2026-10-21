@@ -183,6 +183,9 @@ function FishingRules.evaluateReel(
 	if now > cast.expiresAt then
 		return nil, "expired"
 	end
+	if now < cast.startedAt then
+		return nil, "too-early" -- todavia no ha picado (el lanzamiento sigue activo)
+	end
 	local serverElapsed = now - cast.startedAt
 	if clientElapsed ~= clientElapsed or clientElapsed < minigame.minReelSeconds then
 		return nil, "too-early"
