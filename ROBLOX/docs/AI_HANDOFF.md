@@ -12,9 +12,10 @@ Actualizado: 2026-10-21 (2.ª parte), sesión del PC (rama `pc/aryan-local`).
 ## Mecánica de pesca (commits fb2e8a2 y siguiente)
 Solo se lanza desde el muelle u orilla (`WorldBuilder.canFishAt`, validado en el servidor), hay espera de picada (`bite` 1,5-4 s) y recoger fuera de la zona verde = el pez se escapa (`missed`). 649 pruebas OK. Codex lo revisó: 1 hallazgo válido (recoger antes de la picada, arreglado) y 2 no aplicables (la comprobación del lago es un anillo exacto; `startCast` no se bloquea con una sesión vieja).
 
-## En curso (Codex, ramas `codex/003-mundo-visual`, `codex/004-ui-visual`, `codex/005-audio`)
-Mundo con Terrain, interfaz visual y audio. Al terminar: revisar el diff, correr pruebas, mezclar y ver en Studio. Faltan los IDs de sonido reales (`SoundIds.luau` vacío): buscar con `search_asset` con Studio abierto.
-Ropilot (pedido por Aryan): su plugin ejecuta código recibido de ropilot.ai con `loadstring` dentro de Studio y pide cuenta y créditos; no instalado a la espera de que Aryan decida (el MCP oficial de Studio ya cubre lo mismo).
+## Mundo, interfaz y audio (Codex, mezclado; commit db9dbe2) — verificado en Studio el 21-oct
+Mundo con Terrain (agua real, orilla de arena, muelle con barandas y farolas, barca, árboles), botones con reflejo y letra legible, `Audio.luau` (sin sonidos aún). 650 pruebas OK. Codex no pudo correr `test.sh`/`lint.sh`/git en su sandbox: Claude commitea y verifica. Bugs que Codex dejó y Claude arregló: `UIGradient` en TextButton volvía la letra ilegible; el agua de Terrain no reemplaza tierra (hay que `Air` antes); el anillo de arena enterraba el muelle; tofu del emoji 🪙; `UIStroke` contorneaba la letra.
+**Pendiente visual (el dueño dijo que aún "parece malo"):** cartel de zona enorme y feo (tablero rosa + base oscura); agua demasiado plana, sin espuma ni reflejos; sin partículas al pescar ni cámara que siga el corcho; el texto de ayuda de abajo sigue diciendo "Press REEL IN…" mientras se espera la picada; el chat de Studio tapa el HUD; íconos y miniatura finales; **audio: faltan los IDs reales** (`SoundIds.luau` vacío, buscar con `search_asset` y Studio abierto). Hacer comparación Ropilot vs flujo propio con el mismo encargo (el MCP de Ropilot se carga al reiniciar Claude).
+Ropilot: conectado a Claude y Codex (`claude mcp list`), sin usar todavía.
 
 ## Decisiones
 - La nube orquesta y escribe en `claude/brave-meitner-esyqy8`; el PC commitea en `pc/aryan-local`; Codex trabaja en `codex/<tarea>`.
