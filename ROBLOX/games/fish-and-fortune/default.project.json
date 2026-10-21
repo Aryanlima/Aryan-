@@ -54,7 +54,10 @@
 
     "Lighting": {
       "$className": "Lighting",
-      "$ignoreUnknownInstances": true
+      "$ignoreUnknownInstances": true,
+      "$properties": {
+        "Technology": "Future"
+      }
     }
   }
 }
