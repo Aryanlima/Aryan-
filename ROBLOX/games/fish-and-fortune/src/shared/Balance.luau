@@ -226,6 +226,9 @@ Balance.minigame = {
 	perfectLuck = 1, -- puntos de suerte GRATIS por recoger en la zona perfecta
 	goodLuck = 0.4,
 	castCooldownSeconds = 1, -- minimo entre lanzamientos
+	biteMinSeconds = 1.5, -- espera hasta que pica (al azar entre min y max); antes no se puede recoger
+	biteMaxSeconds = 4,
+	fishReach = 7, -- studs desde la orilla o el muelle en los que se puede lanzar
 	timingTolerance = 0.35, -- el tiempo que dice el cliente no puede superar al del servidor en mas de esto
 	maxLagSeconds = 2.5, -- ...ni quedarse por debajo en mas de esto
 }

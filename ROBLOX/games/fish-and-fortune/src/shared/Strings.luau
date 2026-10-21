@@ -145,6 +145,16 @@ local entries: { [string]: Entry } = {
 	["fail.inventory-full"] = { es = "Mochila llena: vende tus capturas.", en = "Your bag is full: sell your catches." },
 	["fail.expired"] = { es = "Se soltó el pez. Vuelve a lanzar.", en = "The fish got away. Cast again." },
 	["fail.stale"] = { es = "Se soltó el pez. Vuelve a lanzar.", en = "The fish got away. Cast again." },
+	["fail.missed"] = {
+		es = "¡Se escapó! Recoge cuando la marca esté en la zona verde.",
+		en = "It got away! Reel in when the marker is in the green zone.",
+	},
+	["fail.not-at-water"] = {
+		es = "Ve al muelle o a la orilla para pescar.",
+		en = "Go to the pier or the shore to fish.",
+	},
+	["hint.wait_bite"] = { es = "Espera a que pique...", en = "Wait for a bite..." },
+	["hint.bite"] = { es = "¡PICA! ¡Recoge en la zona verde!", en = "BITE! Reel in on the green zone!" },
 	["fail.not-enough-coins"] = { es = "No tienes monedas suficientes.", en = "You don't have enough coins." },
 	["fail.not-enough-pearls"] = { es = "No tienes perlas suficientes.", en = "You don't have enough pearls." },
 	["fail.locked"] = { es = "Esa zona todavía está bloqueada.", en = "That zone is still locked." },

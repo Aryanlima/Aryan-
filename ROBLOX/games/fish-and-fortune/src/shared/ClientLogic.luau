@@ -79,6 +79,8 @@ ClientLogic.FAILURE_REASONS = {
 	"cooldown",
 	"inventory-full",
 	"expired",
+	"missed",
+	"not-at-water",
 	"stale",
 	"not-enough-coins",
 	"not-enough-pearls",

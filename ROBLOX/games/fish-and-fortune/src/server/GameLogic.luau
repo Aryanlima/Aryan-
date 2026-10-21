@@ -421,7 +421,7 @@ function GameLogic.reel(
 	end
 	local quality, reason = self.rules:evaluateReel(cast, clientElapsed, self.clock())
 	if quality == nil then
-		if reason == "expired" or reason == "stale" then
+		if reason == "expired" or reason == "stale" or reason == "missed" then
 			runtime.cast = nil -- se soltó
 			runtime.nextCastAt = self.clock() + self.balance.minigame.castCooldownSeconds
 		end

@@ -387,6 +387,36 @@ end
 	`zones` = lista ordenada de { id, name, nameKey } (Balance.zoneOrder; `name` en espanol y `nameKey` = clave de Strings).
 	`art` = proveedor de arte opcional (packages/Art); nil = todo procedural, como siempre.
 ]]
+-- Formas del agua por zona (las mismas medidas que buildWater/buildPier), relativas al origen de la zona.
+local WATER_SHAPES: { [string]: { origin: Vector3, shape: string } } = {}
+
+local function flatDistance(a: Vector3, b: Vector3): number
+	return Vector2.new(a.X - b.X, a.Z - b.Z).Magnitude
+end
+
+--[[
+	Se puede pescar en el muelle o en la orilla (a `reach` studs del borde del agua), nunca tierra adentro ni nadando.
+	Lo usa el SERVIDOR al lanzar (no se confia en el cliente) y el cliente solo para la pista de la UI.
+]]
+function WorldBuilder.canFishAt(zoneId: string, position: Vector3, reach: number): boolean
+	local water = WATER_SHAPES[zoneId]
+	if water == nil then
+		return false
+	end
+	local rel = position - water.origin
+	if math.abs(rel.X) <= 4.5 and rel.Z <= 2 and rel.Z >= -41 then
+		return true -- sobre el muelle
+	end
+	if water.shape == "disc" then
+		local d = flatDistance(rel, Vector3.new(0, 0, -45))
+		return d >= 55 - reach and d <= 55 + reach
+	elseif water.shape == "river" then
+		local edge = math.abs(math.abs(rel.X) - 30)
+		return edge <= reach and rel.Z >= -125 and rel.Z <= 45
+	end
+	return math.abs(rel.Z + 20) <= reach and math.abs(rel.X) <= 90
+end
+
 function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string } }, art: ArtLike?): WorldInfo
 	local existing = Workspace:FindFirstChild("World")
 	if existing then
@@ -444,6 +474,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			style.name = zone.name
 			style.nameKey = zone.nameKey
 			buildZone(world, style, art)
+			WATER_SHAPES[zone.id] = { origin = style.origin, shape = style.waterShape }
 			info.spawns[zone.id] = style.origin + Vector3.new(0, 6, 12)
 			info.castTargets[zone.id] = style.origin + Vector3.new(0, 0.9, -52)
 		end

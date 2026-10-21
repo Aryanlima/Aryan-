@@ -97,7 +97,7 @@ describe("GameLogic", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
 			local t = perfectTime(session.center)
-			clock = t
+			clock = session.startedAt + t
 			expect(logic:reel(data, runtime, ctx(), session.id, t)).toBeTruthy()
 			local again, reason = logic:startCast(data, runtime)
 			expect(again).toBeNil()
@@ -116,22 +116,42 @@ describe("GameLogic", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
 			local t = perfectTime(session.center)
-			clock = t + 0.05
+			clock = session.startedAt + t + 0.05
 			local result = logic:reel(data, runtime, ctx(), session.id, t)
 			expect(result.quality).toBe("perfect")
 			expect(result.luck).toBeGreaterThanOrEqual(Balance.minigame.perfectLuck)
 			expect(data.stats.perfectCasts).toBe(1)
 		end)
 
-		it("recoger lejos de la zona da calidad ok (sin bonus), pero siempre hay captura", function()
+		it("recoger fuera de la zona verde: el pez se escapa (sin captura) y hay que volver a lanzar", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
-			local t = Balance.minigame.markerPeriod / 2 -- marcador en el extremo (posicion 1)
-			clock = t
-			local result = logic:reel(data, runtime, ctx(), session.id, t)
-			expect(result.quality).toBe("ok")
-			expect(result.creatureId).toBeTruthy()
-			expect(data.stats.catches).toBe(1)
+			local t = Balance.minigame.markerPeriod / 2 -- marcador en el extremo (posicion 1), lejos del centro
+			clock = session.startedAt + t
+			local result, reason = logic:reel(data, runtime, ctx(), session.id, t)
+			expect(result).toBeNil()
+			expect(reason).toBe("missed")
+			expect(runtime.cast).toBeNil()
+			expect(data.stats.catches).toBe(0)
+		end)
+
+		it("picada: el minijuego empieza entre biteMin y biteMax segundos despues de lanzar", function()
+			for _, value in { 0, 0.5, 0.9999 } do
+				rngValue = value
+				local session = logic:startCast(data, GameLogic.newRuntime())
+				expect(session.bite).toBeGreaterThanOrEqual(Balance.minigame.biteMinSeconds)
+				expect(session.bite).toBeLessThanOrEqual(Balance.minigame.biteMaxSeconds)
+				expect(session.startedAt).toBeCloseTo(clock + session.bite, 6)
+			end
+		end)
+
+		it("recoger antes de la picada no cuenta: el servidor lo rechaza", function()
+			local runtime = GameLogic.newRuntime()
+			local session = logic:startCast(data, runtime)
+			clock = session.startedAt - 0.5 -- aun no ha picado
+			local result, reason = logic:reel(data, runtime, ctx(), session.id, 0.6)
+			expect(result).toBeNil()
+			expect(reason).toBe("impossible-time")
 		end)
 
 		it("rechaza recoger demasiado pronto sin gastar el lanzamiento", function()
@@ -156,7 +176,7 @@ describe("GameLogic", function()
 		it("rechaza NaN y tiempos atrasados (stale)", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
-			clock = 3.9
+			clock = session.startedAt + 3.9
 			expect((select(2, logic:reel(data, runtime, ctx(), session.id, 0 / 0)))).toBe("too-early")
 			local _, reason = logic:reel(data, runtime, ctx(), session.id, 0.5)
 			expect(reason).toBe("stale")
@@ -178,7 +198,7 @@ describe("GameLogic", function()
 			local runtime = GameLogic.newRuntime()
 			local session = logic:startCast(data, runtime)
 			local t = perfectTime(session.center)
-			clock = t
+			clock = session.startedAt + t
 			expect((select(2, logic:reel(data, runtime, ctx(), session.id + 1, t)))).toBe("no-cast")
 			expect(logic:reel(data, runtime, ctx(), session.id, t)).toBeTruthy()
 			expect((select(2, logic:reel(data, runtime, ctx(), session.id, t)))).toBe("no-cast")
@@ -608,10 +628,9 @@ describe("GameLogic", function()
 				clock = t
 				local session = logic:startCast(data, runtime)
 				expect(session).toBeTruthy()
+				-- espera la picada y recoge en la zona verde (el jugador razonable acierta; fallar ya no pesca)
 				local elapsed = perfectTime(session.center)
-				-- el jugador reacciona con ~0.5 s de retraso sobre el momento ideal
-				elapsed = math.max(elapsed, 1.0)
-				clock = t + elapsed
+				clock = session.startedAt + elapsed
 				local result = logic:reel(data, runtime, ctx(), session.id, elapsed)
 				expect(result).toBeTruthy()
 				t = clock + 1.5 -- animacion de captura + enfriamiento

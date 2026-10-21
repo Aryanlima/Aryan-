@@ -86,7 +86,8 @@ describe("GameService (arnes de integracion con dobles)", function()
 		local started = world.sentTo("CastStarted")
 		expect(#started).toBe(1)
 		local session = started[1].args[1]
-		expect(session.center >= 0.25 and session.center <= 0.75).toBe(true)
+		local mg = world.m.Balance.minigame
+		expect(session.center >= mg.centerMin and session.center <= mg.centerMax).toBe(true)
 		env.clock:advance(0.8)
 		world.fire(player, "Reel", session.id, 0.8)
 		local catches = world.sentTo("Catch")

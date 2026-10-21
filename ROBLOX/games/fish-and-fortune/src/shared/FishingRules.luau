@@ -12,7 +12,8 @@ export type Quality = "perfect" | "good" | "ok"
 export type CastSession = {
 	id: number,
 	zone: string,
-	startedAt: number, -- reloj del servidor (os.clock)
+	startedAt: number, -- reloj del servidor: momento de la PICADA (lanzamiento + bite)
+	bite: number, -- segundos de espera hasta la picada
 	center: number, -- centro de la zona perfecta (0..1)
 	width: number, -- anchura de la zona perfecta
 	expiresAt: number,
@@ -152,13 +153,17 @@ function FishingRules.newCast(
 	local minigame = self.balance.minigame
 	local rod = self.balance.rods[rodId]
 	local center = minigame.centerMin + rng() * (minigame.centerMax - minigame.centerMin)
+	-- Picada: el minijuego empieza cuando muerde el pez (startedAt), no al lanzar.
+	local bite = minigame.biteMinSeconds + rng() * (minigame.biteMaxSeconds - minigame.biteMinSeconds)
+	local startedAt = now + bite
 	return {
 		id = id,
 		zone = zoneId,
-		startedAt = now,
+		startedAt = startedAt,
+		bite = bite,
 		center = center,
 		width = rod.sweetSpot,
-		expiresAt = now + minigame.durationSeconds + minigame.graceSeconds,
+		expiresAt = startedAt + minigame.durationSeconds + minigame.graceSeconds,
 	}
 end
 
@@ -198,7 +203,7 @@ function FishingRules.evaluateReel(
 	elseif distance <= half * minigame.goodWidthFactor then
 		return "good", nil
 	end
-	return "ok", nil
+	return nil, "missed" -- fuera de la zona verde (y de su margen): el pez se escapa
 end
 
 function FishingRules.qualityLuck(self: Rules, quality: Quality?): number

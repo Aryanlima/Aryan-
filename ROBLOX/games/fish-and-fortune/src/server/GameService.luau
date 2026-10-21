@@ -603,6 +603,17 @@ function GameService.start(m: any)
 			if runtime == nil then
 				return
 			end
+			-- Solo desde el muelle o la orilla de SU zona: la posicion la mide el servidor, no el cliente.
+			local character = player.Character
+			local root = if character ~= nil then character:FindFirstChild("HumanoidRootPart") else nil
+			if
+				root == nil
+				or not root:IsA("BasePart")
+				or not m.WorldBuilder.canFishAt(profile.data.zone, root.Position, balance.minigame.fishReach)
+			then
+				net:fireClient("CastFailed", player, "not-at-water")
+				return
+			end
 			local session, reason = logic:startCast(profile.data, runtime)
 			if session == nil then
 				net:fireClient("CastFailed", player, reason)
@@ -614,6 +625,7 @@ function GameService.start(m: any)
 				zone = session.zone,
 				center = session.center,
 				width = session.width,
+				bite = session.bite,
 				duration = balance.minigame.durationSeconds,
 				period = balance.minigame.markerPeriod,
 			})

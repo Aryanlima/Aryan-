@@ -135,8 +135,8 @@ function Minigame.start(ctx: any): any
 	end
 
 	local function reel()
-		if not casting or session == nil then
-			return
+		if not casting or session == nil or os.clock() < startedClock then
+			return -- todavia no ha picado: recoger antes no hace nada
 		end
 		local elapsed = os.clock() - startedClock
 		ctx.net:fire("Reel", session.id, elapsed)
@@ -156,15 +156,22 @@ function Minigame.start(ctx: any): any
 		session = payload
 		casting = true
 		waiting = false
-		startedClock = os.clock()
+		startedClock = os.clock() + (payload.bite or 0) -- el minijuego empieza con la PICADA
 		sweet.Size = UDim2.new(payload.width, 0, 1, 0)
 		sweet.Position = UDim2.new(payload.center - payload.width / 2, 0, 0, 0)
-		title.Text = L("hint.reel") -- en el idioma actual del jugador
-		overlay.Visible = true
+		title.Text = L("hint.bite") -- en el idioma actual del jugador
+		overlay.Visible = (payload.bite or 0) <= 0 -- sin espera, la barra sale ya
 		placeBobber(payload.zone)
+		ctx.feedback.toast(L("hint.wait_bite"))
 		stopRender()
 		renderConnection = RunService.RenderStepped:Connect(function()
 			local elapsed = os.clock() - startedClock
+			if elapsed < 0 then
+				return -- esperando la picada: solo se ve el corcho
+			end
+			if not overlay.Visible then
+				overlay.Visible = true
+			end
 			marker.Position = UDim2.new(rules:markerPosition(elapsed), 0, 0.5, 0)
 			if elapsed > balance.minigame.durationSeconds + balance.minigame.graceSeconds - 0.2 then
 				-- tiempo agotado en el cliente: el pez se suelta (el servidor tambien lo da por perdido)

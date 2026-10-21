@@ -40,6 +40,23 @@ local FAKE_IDS = {
 local USER = 7001
 local KEY = "FishFortune_PlayerData_v1" -- DATASTORE_NAME de GameService
 
+-- Picada inmediata y zona perfecta donde cae un "Reel" a 0.8 s (las pruebas de integracion recogen a 0.8):
+-- asi siguen probando el flujo completo. Las reglas de picada y zona se prueban en GameLogic/FishingRules.
+local function harnessBalance(balance, opts)
+	if opts.realMinigame then
+		return balance
+	end
+	local minigame = table.clone(balance.minigame)
+	minigame.biteMinSeconds = 0
+	minigame.biteMaxSeconds = 0
+	local phase = (0.8 % minigame.markerPeriod) / minigame.markerPeriod
+	local center = if phase < 0.5 then phase * 2 else (1 - phase) * 2
+	minigame.centerMin = center
+	minigame.centerMax = center
+	balance.minigame = minigame
+	return balance
+end
+
 local function buildWorld(overrides)
 	local opts = overrides or {}
 	local env = Mocks.new(opts.mocks)
@@ -221,7 +238,7 @@ local function buildWorld(overrides)
 		Shop = load(PACKAGES .. "Shop.luau"),
 		LiveOps = load(PACKAGES .. "LiveOps.luau"),
 		Analytics = load(PACKAGES .. "Analytics.luau"),
-		Balance = load(GAME .. "shared/Balance.luau"),
+		Balance = harnessBalance(load(GAME .. "shared/Balance.luau"), opts),
 		Strings = load(GAME .. "shared/Strings.luau"),
 		FishingRules = load(GAME .. "shared/FishingRules.luau"),
 		Remotes = load(GAME .. "shared/Remotes.luau"),
@@ -245,6 +262,10 @@ local function buildWorld(overrides)
 					})
 				end
 				return { spawns = spawns, castTargets = castTargets }
+			end,
+			-- opts.atWater = false: el jugador esta tierra adentro (el servidor debe rechazar el lanzamiento)
+			canFishAt = function(_zone, position, _reach)
+				return opts.atWater ~= false and position ~= nil
 			end,
 		},
 		StudioMemoryStore = load(GAME .. "server/StudioMemoryStore.luau"),
@@ -285,6 +306,16 @@ local function buildWorld(overrides)
 		properties.fire = false
 		local player = env.Players:AddPlayer(userId or USER, name or "Alice", properties)
 		player.CharacterAdded = Mocks.Signal.new({ spawn = env.task.spawn })
+		-- Personaje falso con HumanoidRootPart (el servidor lee su posicion al lanzar). Sin hijos que no sean la raiz.
+		local root = { Name = "HumanoidRootPart", Position = { onPier = true } }
+		function root.IsA(_self, className)
+			return className == "BasePart"
+		end
+		player.Character = {
+			FindFirstChild = function(_self, childName)
+				return if childName == "HumanoidRootPart" then root else nil
+			end,
+		}
 		env.Players.PlayerAdded:Fire(player)
 		env.clock:advance(2) -- carga del perfil + loadPlayer + onLoaded
 		return player
