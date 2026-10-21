@@ -1,6 +1,6 @@
 # 001 — Que la prueba de Node funcione desde Lune en Windows
 
-Estado: PENDIENTE
+Estado: ACEPTADA (resuelta por Claude: `--test-reporter=tap`; Node 24 usa el reportero "spec" por defecto)
 Asignada a: Codex
 Creada por: Claude, 2026-10-21
 

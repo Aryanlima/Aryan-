@@ -44,7 +44,8 @@ local function run(): (boolean, string, boolean)
 	if major < 20 then
 		return false, "se necesita Node 20 o superior (hay " .. string.gsub(version.stdout, "%s+", "") .. ")", true
 	end
-	local args = { "--test" }
+	-- Reportero fijo: desde Node 23 el de por defecto es "spec" ("ℹ fail 0") y no TAP ("# fail 0").
+	local args = { "--test", "--test-reporter=tap" }
 	for _, file in TEST_FILES do
 		table.insert(args, file)
 	end
