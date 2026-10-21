@@ -773,7 +773,6 @@ local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 end
 
 local function setupLighting()
-	Lighting.Technology = Enum.Technology.Future
 	Lighting.ClockTime = 16.3
 	Lighting.Brightness = 2
 	Lighting.ExposureCompensation = 0.1
