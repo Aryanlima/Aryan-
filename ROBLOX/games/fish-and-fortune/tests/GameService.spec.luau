@@ -515,7 +515,7 @@ describe("GameService (arnes de integracion con dobles)", function()
 				expect(string.find(locale:format("en", assert(key, "clave"), args), "[{}]") == nil).toBe(true)
 				expect(#offer.name > 0).toBe(true) -- texto de respaldo en espanol
 			end
-			expect(seen).toBe(11)
+			expect(seen).toBe(13)
 		end
 	)
 

@@ -436,6 +436,16 @@ local entries: { [string]: Entry } = {
 		es = "Desbloquea la pista premium de la Temporada 1: premios fijos, sin azar.",
 		en = "Unlocks the Season 1 premium track: fixed rewards, no randomness.",
 	},
+	["pass.golden_rod.name"] = { es = "Caña Dorada", en = "Golden Rod" },
+	["pass.golden_rod.desc"] = {
+		es = "Tu caña brilla en dorado y suelta chispas. Solo cambia el aspecto; los demás jugadores la ven.",
+		en = "Your rod shines gold and gives off sparkles. Looks only; other players can see it.",
+	},
+	["pass.bubble_trail.name"] = { es = "Estela de Burbujas", en = "Bubble Trail" },
+	["pass.bubble_trail.desc"] = {
+		es = "Deja una estela de burbujas al moverte. Solo cambia el aspecto; los demás jugadores la ven.",
+		en = "Leave a trail of bubbles as you move. Looks only; other players can see it.",
+	},
 
 	----------------------------------------------------------------------------
 	-- Productos de la tienda

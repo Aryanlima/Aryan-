@@ -31,6 +31,7 @@ Catalog.ladder = {
 	standard = 299,
 	strong = 399,
 	major = 499,
+	deluxe = 799,
 	premium = 999,
 	anchor = 1999,
 }
@@ -113,6 +114,19 @@ function Catalog.build(
 				key = "season_pass",
 				id = ids.passes.season_pass,
 				tier = "strong",
+			}),
+			-- Cosmeticos (tarea 002): solo aspecto, sin efecto de juego.
+			golden_rod = withText(text, "pass.golden_rod", {}, {
+				key = "golden_rod",
+				id = ids.passes.golden_rod,
+				tier = "strong",
+				cosmetic = true,
+			}),
+			bubble_trail = withText(text, "pass.bubble_trail", {}, {
+				key = "bubble_trail",
+				id = ids.passes.bubble_trail,
+				tier = "deluxe",
+				cosmetic = true,
 			}),
 		},
 		products = {

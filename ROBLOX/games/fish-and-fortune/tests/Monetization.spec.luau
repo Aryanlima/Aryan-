@@ -29,6 +29,8 @@ local FAKE_IDS = {
 		starter = 4,
 		vip = 5,
 		season_pass = 6,
+		golden_rod = 7,
+		bubble_trail = 8,
 	},
 	products = {
 		lucky_bait_15 = 11,
@@ -213,7 +215,7 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 		expect(byKey.lucky_bait_15.available).toBe(false)
 		expect(byKey.lucky_bait_15.reason).toBe("restricted")
 		expect(byKey.coin_pack_small.available).toBe(true)
-		expect(#offers).toBe(13)
+		expect(#offers).toBe(15)
 	end)
 	describe("v1: suerte de pago APAGADA (FeatureFlags.paidLuckEnabled = false)", function()
 		it("Suerte+ y Cebo de Suerte NO aparecen en la tienda", function()
@@ -226,7 +228,7 @@ describe("Monetizacion de Fish & Fortune (integracion)", function()
 			expect(keys.luck_plus).toBeNil()
 			expect(keys.lucky_bait_15).toBeNil()
 			expect(keys.coin_pack_small).toBe(true)
-			expect(#shop:getOffers(player)).toBe(11) -- 13 menos los 2 apagados
+			expect(#shop:getOffers(player)).toBe(13) -- 15 menos los 2 apagados
 		end)
 
 		it("ningun texto de la tienda menciona suerte comprable", function()

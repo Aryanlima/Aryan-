@@ -18,6 +18,21 @@
     },
     {
       "description": {
+        "en": "Leave a trail of bubbles as you move. Looks only; other players can see it.",
+        "es": "Deja una estela de burbujas al moverte. Solo cambia el aspecto; los demás jugadores la ven."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/bubble_trail.png",
+      "key": "bubble_trail",
+      "kind": "pass",
+      "name": {
+        "en": "Bubble Trail",
+        "es": "Estela de Burbujas"
+      },
+      "price": 799,
+      "tier": "deluxe"
+    },
+    {
+      "description": {
         "en": "Doubles the coins you earn when selling. Stacks with other bonuses, up to a cap.",
         "es": "Duplica las monedas que ganas al vender. Se suma a otros bonus, con un tope."
       },
@@ -30,6 +45,21 @@
       },
       "price": 249,
       "tier": "plus"
+    },
+    {
+      "description": {
+        "en": "Your rod shines gold and gives off sparkles. Looks only; other players can see it.",
+        "es": "Tu caña brilla en dorado y suelta chispas. Solo cambia el aspecto; los demás jugadores la ven."
+      },
+      "icon": "marketing/fish-and-fortune/assets/passes/golden_rod.png",
+      "key": "golden_rod",
+      "kind": "pass",
+      "name": {
+        "en": "Golden Rod",
+        "es": "Caña Dorada"
+      },
+      "price": 399,
+      "tier": "strong"
     },
     {
       "description": {

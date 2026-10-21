@@ -82,5 +82,6 @@ GameService.start({
 	WorldBuilder = require(server:WaitForChild("WorldBuilder")),
 	StudioMemoryStore = require(server:WaitForChild("StudioMemoryStore")),
 	LiveOpsDefaults = require(server:WaitForChild("LiveOpsDefaults")),
+	Cosmetics = require(server:WaitForChild("Cosmetics")),
 	ArtDirector = artDirector,
 })

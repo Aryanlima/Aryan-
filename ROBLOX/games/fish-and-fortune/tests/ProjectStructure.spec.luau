@@ -171,6 +171,7 @@ local EXPECTED = {
 		Schema = "ModuleScript",
 		WorldBuilder = "ModuleScript",
 		StudioMemoryStore = "ModuleScript",
+		Cosmetics = "ModuleScript",
 		LiveOpsDefaults = "ModuleScript",
 		ArtDirector = "ModuleScript",
 	},

@@ -82,7 +82,7 @@ function setup(state, extraEnv = {}) {
 
 const base = { universe: "5555555555", delayMs: 0 };
 
-test("PLAN (sin --apply): muestra los 11 objetos, no usa la red y no necesita clave", async () => {
+test("PLAN (sin --apply): muestra los 13 objetos, no usa la red y no necesita clave", async () => {
 	const ctx = setup(null, { ROBLOX_API_KEY: undefined });
 	ctx.deps.fetch = () => assert.fail("el plan no debe usar la red");
 	const code = await run({ ...base, out: ctx.out }, ctx.deps);
@@ -90,7 +90,7 @@ test("PLAN (sin --apply): muestra los 11 objetos, no usa la red y no necesita cl
 	const text = ctx.lines.join("\n");
 	assert.match(text, /PLAN \(no se crea nada/);
 	assert.match(text, /Auto-Fishing Pass/);
-	assert.equal(STORE.items.length, 11);
+	assert.equal(STORE.items.length, 13);
 	assert.doesNotMatch(text, /Luck\+|Lucky Bait/);
 	assert.equal(fs.existsSync(ctx.out), false);
 });
@@ -102,18 +102,18 @@ test("--apply sin ROBLOX_API_KEY: error 2 con instrucciones (la clave va en una 
 	assert.match(ctx.errs.join("\n"), /ROBLOX_API_KEY.*variable de entorno/s);
 });
 
-test("--apply crea los 11 objetos FUERA DE VENTA, con icono, guarda ids.local.json y la clave nunca se imprime", async () => {
+test("--apply crea los 13 objetos FUERA DE VENTA, con icono, guarda ids.local.json y la clave nunca se imprime", async () => {
 	const server = await startServer();
 	try {
 		const ctx = setup(server);
 		const code = await run({ ...base, apply: true, out: ctx.out }, ctx.deps);
 		assert.equal(code, 0, ctx.errs.join("\n"));
 		const posts = server.requests.filter((r) => r.method === "POST");
-		assert.equal(posts.length, 11);
+		assert.equal(posts.length, 13);
 		assert.ok(server.requests.every((r) => r.key === FAKE_KEY));
 		assert.ok(posts.every((r) => field(r.body, "isForSale") === "false"), "deben crearse fuera de venta");
 		assert.ok(posts.every((r) => /name="imageFile"; filename="[\w]+\.png"/.test(r.body)), "cada objeto sube su icono");
-		assert.equal(server.passes.length, 5);
+		assert.equal(server.passes.length, 7);
 		assert.equal(server.products.length, 6);
 		const names = posts.map((r) => field(r.body, "name"));
 		assert.ok(names.includes("Auto-Fishing Pass") && names.includes("Small Coin Pack"));
@@ -139,7 +139,7 @@ test("ROBLOX_API_KEY_VIA_PROXY=1 (secreto de red de la nube): no necesita la cla
 	try {
 		const ctx = setup(server, { ROBLOX_API_KEY: undefined, ROBLOX_API_KEY_VIA_PROXY: "1" });
 		assert.equal(await run({ ...base, apply: true, out: ctx.out }, ctx.deps), 0, ctx.errs.join("\n"));
-		assert.ok(server.requests.length > 11);
+		assert.ok(server.requests.length > 13);
 		assert.ok(server.requests.every((r) => r.key === undefined));
 	} finally {
 		await server.close();
@@ -157,7 +157,7 @@ test("es IDEMPOTENTE: repetir el comando no crea duplicados", async () => {
 		assert.equal(await run({ ...base, apply: true, out: ctx.out }, ctx2.deps), 0);
 		assert.equal(server.requests.filter((r) => r.method === "POST").length, before);
 		assert.equal(fs.readFileSync(ctx.out, "utf8"), first);
-		assert.match(ctx2.lines.join("\n"), /0 creado\(s\), 11 ya existian/);
+		assert.match(ctx2.lines.join("\n"), /0 creado\(s\), 13 ya existian/);
 	} finally {
 		await server.close();
 	}
@@ -173,7 +173,7 @@ test("--for-sale: crea a la venta y, en objetos que ya existian fuera de venta, 
 		assert.equal(await run({ ...base, apply: true, forSale: true, out: ctx.out }, ctx2.deps), 0);
 		assert.ok(server.passes.every((p) => p.isForSale === true));
 		assert.ok(server.products.every((p) => p.isForSale === true));
-		assert.equal(server.requests.filter((r) => r.method === "PATCH").length, 11);
+		assert.equal(server.requests.filter((r) => r.method === "PATCH").length, 13);
 	} finally {
 		await server.close();
 	}
@@ -253,7 +253,7 @@ test("un ID ya cableado a mano (sin objeto con ese nombre) NO se duplica", async
 		const ctx = setup(server);
 		fs.writeFileSync(ctx.out, JSON.stringify({ passes: { vip: 4444444444 }, products: {} }));
 		assert.equal(await run({ ...base, apply: true, out: ctx.out }, ctx.deps), 0);
-		assert.equal(server.requests.filter((r) => r.method === "POST").length, 10);
+		assert.equal(server.requests.filter((r) => r.method === "POST").length, 12);
 		assert.equal(JSON.parse(fs.readFileSync(ctx.out, "utf8")).passes.vip, 4444444444);
 	} finally {
 		await server.close();

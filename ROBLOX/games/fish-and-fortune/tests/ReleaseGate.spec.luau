@@ -47,7 +47,7 @@ describe("Puerta previa a publicar (FF_RELEASE_CHECK=1)", function()
 
 	run("el servidor real, con los IDs REALES: prompts, recibos y pases van a la clave correcta", function()
 		local checked = IdWiringChecks.checkAll(ProductIds, expect)
-		-- 5 pases + 6 productos habilitados en la v1; si el catalogo crece, este numero crece con el
-		expect(checked).toBe(11)
+		-- 7 pases (2 cosmeticos) + 6 productos habilitados; si el catalogo crece, este numero crece con el
+		expect(checked).toBe(13)
 	end)
 end)

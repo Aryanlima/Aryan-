@@ -91,6 +91,26 @@ const PASSES = {
     <text x="256" y="406" font-size="52" text-anchor="middle" fill="${C.foam}" stroke="${C.navy}" stroke-width="9" paint-order="stroke" stroke-linejoin="round" class="t" data-contrast="${C.foam}" letter-spacing="4">VIP</text>
     ${sparkle(386, 190, 14)}${sparkle(124, 220, 11)}`,
   }),
+  golden_rod: () => iconFrame({
+    uid: 'gr', a: '#6A3FD8', b: '#0A1F44', glow: C.gold,
+    subject: `<g filter="url(#fSh)">
+    <path d="M150 400L366 120" stroke="${C.navy}" stroke-width="40" stroke-linecap="round"/>
+    <path d="M150 400L366 120" stroke="url(#gGold)" stroke-width="24" stroke-linecap="round"/>
+    <path d="M190 350L330 168" stroke="#fff" stroke-opacity=".55" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="196" cy="340" r="34" fill="url(#gGold)" stroke="${C.navy}" stroke-width="7"/><circle cx="196" cy="340" r="11" fill="#A56A06"/>
+    <path d="M366 120Q402 190 380 262" stroke="${C.foam}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </g>
+    ${bobber({ x: 380, y: 282, s: 0.55 })}
+    ${sparkle(300, 118, 16)}${sparkle(132, 260, 13)}${sparkle(404, 380, 12)}${sparkle(250, 214, 10)}`,
+  }),
+  bubble_trail: () => iconFrame({
+    uid: 'bt', a: '#1B6F9E', b: '#0A1F44', glow: C.foam,
+    subject: `<g filter="url(#fSh)">
+    <path d="M120 380Q220 250 300 300T420 150" stroke="#BFE9F4" stroke-opacity=".55" stroke-width="44" fill="none" stroke-linecap="round"/>
+    ${[[130, 372, 30], [190, 318, 24], [250, 286, 34], [312, 296, 22], [356, 248, 28], [398, 188, 38]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#E8F8FF" fill-opacity=".45" stroke="${C.navy}" stroke-width="9" paint-order="stroke"/><circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${C.foam}" stroke-width="5"/><path d="M${x - r * 0.45} ${y - r * 0.2}Q${x - r * 0.35} ${y - r * 0.55} ${x} ${y - r * 0.6}" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}
+    </g>
+    ${sparkle(150, 210, 13)}${sparkle(430, 300, 11)}`,
+  }),
   season_pass: () => iconFrame({
     uid: 'sp', a: '#1FB6B8', b: '#0A1F44', glow: C.coral,
     subject: `<g filter="url(#fShS)"><path d="M196 300L158 430L214 410L236 440L262 320Z" fill="url(#gCoral)" stroke="${C.navy}" stroke-width="5" stroke-linejoin="round"/><path d="M316 300L354 430L298 410L276 440L250 320Z" fill="#E4573A" stroke="${C.navy}" stroke-width="5" stroke-linejoin="round"/></g>
@@ -306,6 +326,8 @@ export const ASSETS = [
   { id: 'double_coins', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Pase 2x Dinero', body: PASSES.double_coins, key: 'passes.double_coins', note: '"x2" + conchas (sin monedas)' },
   { id: 'starter', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Pack de inicio', body: PASSES.starter, key: 'passes.starter', note: 'Caja de aparejos abierta (sin cofre de botin)' },
   { id: 'vip', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Pase VIP', body: PASSES.vip, key: 'passes.vip', note: 'Anzuelo dorado + corona con estrella + cinta VIP' },
+  { id: 'golden_rod', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Cana Dorada', body: PASSES.golden_rod, key: 'passes.golden_rod', note: 'Cana dorada con chispas (cosmetico)' },
+  { id: 'bubble_trail', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Estela de Burbujas', body: PASSES.bubble_trail, key: 'passes.bubble_trail', note: 'Estela de burbujas (cosmetico)' },
   { id: 'season_pass', group: 'pass', dir: 'passes', w: 512, h: 512, name: 'Pase de Temporada 1', body: PASSES.season_pass, key: 'passes.season_pass', note: 'Medalla con ola y estrella, insignia "1"' },
   // Productos
   { id: 'coin_boost_15', group: 'product', dir: 'products', w: 512, h: 512, name: 'Boost de Monedas (15 min)', body: PRODUCTS.coin_boost_15, key: 'products.coin_boost_15', note: 'Cronometro + rayo' },

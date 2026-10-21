@@ -27,7 +27,9 @@ local RunService = game:GetService("RunService")
 
 local GameService = {}
 
-local PASS_KEYS = { "auto_fish", "double_coins", "luck_plus", "starter", "vip", "season_pass" }
+local COSMETIC_PASSES = { golden_rod = true, bubble_trail = true }
+local PASS_KEYS =
+	{ "auto_fish", "double_coins", "luck_plus", "starter", "vip", "season_pass", "golden_rod", "bubble_trail" }
 local DATASTORE_NAME = "FishFortune_PlayerData_v1" -- NO cambiar el nombre una vez publicado (seria un almacen vacio)
 local LIVEOPS_CONFIG_KEY = "FishFortune_LiveOps" -- clave de ConfigService (JSON)
 local LIVEOPS_TOPIC = "FishFortune_LiveOpsUpdated"
@@ -177,6 +179,7 @@ function GameService.start(m: any)
 	end
 
 	local shop: any = nil -- se crea mas abajo (necesita los handlers); `context` lo usa en tiempo de ejecucion
+	local refreshCosmetics: ((player: Player) -> ())? = nil -- se asigna junto a attachRod
 
 	-- Estado transitorio por jugador (no se guarda)
 	local runtimes: { [number]: any } = {}
@@ -397,8 +400,11 @@ function GameService.start(m: any)
 			toast(player, "toast.purchase_received", { item = { key = "product." .. product.key .. ".name" } })
 			markDirty(player)
 		end,
-		onPassChanged = function(player: Player, _pass: any, _owned: boolean)
+		onPassChanged = function(player: Player, pass: any, _owned: boolean)
 			markDirty(player)
+			if COSMETIC_PASSES[pass.key] and refreshCosmetics ~= nil then
+				task.defer(refreshCosmetics, player) -- recien comprado: se ve sin reaparecer
+			end
 		end,
 	})
 	shop:start()
@@ -517,6 +523,15 @@ function GameService.start(m: any)
 	end
 	liveOps:startPolling()
 
+	-- Cosmeticos de pase (solo aspecto). Se aplican al poner la cana y al comprarlos.
+	local function applyCosmetics(player: Player, character: Model)
+		local rod = character:FindFirstChild("FishingRod")
+		if rod ~= nil and shop:ownsPass(player, "golden_rod") then
+			m.Cosmetics.goldenRod(rod)
+		end
+		m.Cosmetics.bubbleTrail(character, shop:ownsPass(player, "bubble_trail"))
+	end
+
 	local function attachRod(player: Player, character: Model)
 		local profile = profileOf(player)
 		local rodId = if profile then profile.data.rod else "driftwood"
@@ -530,6 +545,7 @@ function GameService.start(m: any)
 			return
 		end
 		if art ~= nil and art.attachRod(rodId, hand, character) then
+			applyCosmetics(player, character)
 			return -- cana de arte generado; si no hay (o se rechaza), sigue el respaldo procedural
 		end
 		local part = Instance.new("Part")
@@ -545,6 +561,7 @@ function GameService.start(m: any)
 		weld.Part1 = part
 		weld.Parent = part
 		part.Parent = character
+		applyCosmetics(player, character)
 	end
 
 	local function refreshRod(player: Player)
@@ -553,6 +570,7 @@ function GameService.start(m: any)
 			attachRod(player, character)
 		end
 	end
+	refreshCosmetics = refreshRod
 
 	----------------------------------------------------------------------------
 	-- Handlers de remotos (todos validados por packages/Net)

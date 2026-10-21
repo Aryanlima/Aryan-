@@ -16,7 +16,16 @@ local GAME = HERE .. "../../src/"
 local PACKAGES = HERE .. "../../../../packages/"
 
 local FAKE_IDS = {
-	passes = { auto_fish = 1, double_coins = 2, luck_plus = 3, starter = 4, vip = 5, season_pass = 6 },
+	passes = {
+		auto_fish = 1,
+		double_coins = 2,
+		luck_plus = 3,
+		starter = 4,
+		vip = 5,
+		season_pass = 6,
+		golden_rod = 7,
+		bubble_trail = 8,
+	},
 	products = {
 		lucky_bait_15 = 11,
 		coin_boost_15 = 12,
@@ -240,6 +249,7 @@ local function buildWorld(overrides)
 		},
 		StudioMemoryStore = load(GAME .. "server/StudioMemoryStore.luau"),
 		LiveOpsDefaults = load(GAME .. "server/LiveOpsDefaults.luau"),
+		Cosmetics = load(GAME .. "server/Cosmetics.luau"),
 		ArtDirector = opts.artDirector, -- opcional (nil = sin arte generado, como siempre)
 	}
 	local GameService = load(GAME .. "server/GameService.luau")

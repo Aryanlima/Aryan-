@@ -74,8 +74,8 @@ function capture() {
 
 const validate = (json, opts = {}) => validateIds(json, structure, opts);
 
-test("la estructura leida de ProductIds.luau tiene los 6 pases y 7 productos del catalogo", () => {
-	assert.deepEqual(PASS_KEYS, ["auto_fish", "double_coins", "luck_plus", "starter", "vip", "season_pass"]);
+test("la estructura leida de ProductIds.luau tiene los 8 pases y 7 productos del catalogo", () => {
+	assert.deepEqual(PASS_KEYS, ["auto_fish", "double_coins", "luck_plus", "starter", "vip", "season_pass", "golden_rod", "bubble_trail"]);
 	assert.equal(PRODUCT_KEYS.length, 7);
 	assert.equal(readPaidLuckFlag(REAL_FLAGS), false);
 	for (const key of GATED_KEYS) {
@@ -86,7 +86,7 @@ test("la estructura leida de ProductIds.luau tiene los 6 pases y 7 productos del
 test("IDs buenos: sin errores", () => {
 	const result = validate(goodIds());
 	assert.deepEqual(result.errors, []);
-	assert.equal(result.passes.size, 6);
+	assert.equal(result.passes.size, 8);
 	assert.equal(result.products.size, 7);
 });
 
@@ -234,7 +234,7 @@ test("run --dry-run valida y muestra el resumen pero NO escribe ni corre la puer
 	assert.equal(code, 0);
 	assert.equal(fs.readFileSync(box.target, "utf8"), BASELINE);
 	assert.equal(gateCalled, false);
-	assert.match(cap.out.join("\n"), /11 ID\(s\) cambian/);
+	assert.match(cap.out.join("\n"), /13 ID\(s\) cambian/);
 	assert.match(cap.out.join("\n"), /luck_plus .* 0 +-> 0 +igual +<- apagado a proposito/);
 	assert.match(cap.out.join("\n"), /--dry-run/);
 });
@@ -346,7 +346,7 @@ test("CLI real: --dry-run con IDs buenos sale con 0; opciones desconocidas con 2
 	const box = sandbox(goodIds());
 	let result = spawnSync(process.execPath, [SCRIPT, "--ids", box.ids, "--target", box.target, "--flags", box.flags, "--dry-run"], { encoding: "utf8" });
 	assert.equal(result.status, 0, result.stderr);
-	assert.match(result.stdout, /11 ID\(s\) cambian/);
+	assert.match(result.stdout, /13 ID\(s\) cambian/);
 	result = spawnSync(process.execPath, [SCRIPT, "--no-existe"], { encoding: "utf8" });
 	assert.equal(result.status, 2);
 	assert.match(result.stderr, /opcion desconocida/);

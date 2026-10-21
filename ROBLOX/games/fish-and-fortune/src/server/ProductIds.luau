@@ -33,6 +33,8 @@ return {
 		starter = 0, -- TODO_ID  (Pack de inicio, pago unico)
 		vip = 0, -- TODO_ID  (Pase VIP)
 		season_pass = 0, -- TODO_ID  (Pase de Temporada 1: pista premium)
+		golden_rod = 0, -- TODO_ID  (Cana Dorada, cosmetico)
+		bubble_trail = 0, -- TODO_ID  (Estela de Burbujas, cosmetico)
 	},
 	products = {
 		lucky_bait_15 = 0, -- TODO_ID  (Cebo de Suerte, 15 min : ALTERA PROBABILIDADES)

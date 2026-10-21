@@ -1,6 +1,6 @@
 # 002 — Pases cosméticos v1.1: Caña Dorada y Estela de Burbujas
 
-Estado: PENDIENTE
+Estado: HECHA EN CÓDIGO (647 pruebas OK). Falta: playtest visual y revisión de Codex (sin sesión)
 Asignada a: Claude (toca dinero: no se delega). Codex hace la revisión con `codex-task.sh --review <commit>`.
 Creada por: Claude, 2026-10-21
 

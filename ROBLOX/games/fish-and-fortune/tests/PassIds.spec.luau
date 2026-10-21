@@ -37,6 +37,8 @@ local function syntheticIds()
 			starter = 7000000003,
 			vip = 7000000004,
 			season_pass = 7000000005,
+			golden_rod = 7000000006,
+			bubble_trail = 7000000007,
 		},
 		products = {
 			lucky_bait_15 = 0,
@@ -61,8 +63,8 @@ local function sortedKeys(map)
 end
 
 describe("Cableado de IDs con el codigo real del servidor (IDs sinteticos)", function()
-	it("cada clave habilitada abre el prompt con SU ID (5 pases + 6 productos)", function()
-		expect(IdWiringChecks.checkPrompts(syntheticIds(), expect)).toBe(11)
+	it("cada clave habilitada abre el prompt con SU ID (7 pases + 6 productos)", function()
+		expect(IdWiringChecks.checkPrompts(syntheticIds(), expect)).toBe(13)
 	end)
 
 	it("cada recibo concede SOLO el efecto de su producto, una vez, y se guarda", function()
@@ -70,7 +72,7 @@ describe("Cableado de IDs con el codigo real del servidor (IDs sinteticos)", fun
 	end)
 
 	it("tener un pase (por su ID) activa SOLO ese pase", function()
-		expect(IdWiringChecks.checkPassOwnership(syntheticIds(), expect)).toBe(5)
+		expect(IdWiringChecks.checkPassOwnership(syntheticIds(), expect)).toBe(7)
 	end)
 
 	it(
@@ -79,7 +81,7 @@ describe("Cableado de IDs con el codigo real del servidor (IDs sinteticos)", fun
 			local ids = syntheticIds()
 			ids.passAssetIds = { vip = 9100000104, auto_fish = 9100000101 }
 			expect(IdWiringChecks.checkAliases(ids, expect)).toBe(2)
-			expect(IdWiringChecks.checkPrompts(ids, expect)).toBe(11) -- el prompt sigue usando el ID principal, nunca el alias
+			expect(IdWiringChecks.checkPrompts(ids, expect)).toBe(13) -- el prompt sigue usando el ID principal, nunca el alias
 		end
 	)
 
@@ -325,7 +327,7 @@ describe("store-items.json (lo que hay que crear en Creator Hub)", function()
 	)
 
 	it(
-		"lista exactamente los 5 pases y 6 productos habilitados (sin Suerte+ ni Cebo), con precio entero e icono",
+		"lista exactamente los 7 pases y 6 productos habilitados (sin Suerte+ ni Cebo), con precio entero e icono",
 		function()
 			local keys = {}
 			for _, item in EXPECTED_STORE_ITEMS.items do
@@ -337,7 +339,9 @@ describe("store-items.json (lo que hay que crear en Creator Hub)", function()
 			table.sort(keys)
 			expect(keys).toEqual({
 				"pass:auto_fish",
+				"pass:bubble_trail",
 				"pass:double_coins",
+				"pass:golden_rod",
 				"pass:season_pass",
 				"pass:starter",
 				"pass:vip",
