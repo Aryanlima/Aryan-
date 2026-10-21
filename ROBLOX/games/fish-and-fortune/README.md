@@ -2,7 +2,9 @@
 
 Pesca relajante en lagos compartidos: lanza la caña, recoge en el momento justo, descubre 25 criaturas de 6 rarezas en 3 zonas, véndelas, mejora tu caña y completa el bestiario. Concepto 1 del informe `ROBLOX/research/07`.
 
-**Estado: código completo del MVP, NUNCA ejecutado en Roblox Studio.** Se ha comprobado con tests de lógica pura (Lune), análisis estático (selene, StyLua, luau-lsp con los tipos de Roblox) y `rojo build`. Antes de publicar hay que hacer el playtest de la sección 6 y la revisión humana de todo lo marcado `-- REVIEW(money):`.
+**Estado (2026-10-21): el juego se ejecutó en Roblox Studio y se playtesteó.** Se probó en el archivo local `ff-playtest9.rbxl` (sincronizado con Rojo): arranque, HUD, pesca con espera de picada y zona verde decisiva, venta, compra de caña con monedas, bestiario, temporada, probabilidades y tienda. Las 3 zonas construyen sin errores (verificado con cámara, sin viaje de jugador). Pruebas Lune en verde; lint y formato limpios. Detalle en [`../../docs/playtest-2.md`](../../docs/playtest-2.md).
+
+**Sigue SIN verificar en Studio:** eventos rotativos, códigos, selección de idioma, recompensas offline, pesca automática, compras con IDs reales (13 objetos creados fuera de venta en la experiencia privada, sin comprar nada) y móvil real. Sigue pendiente la revisión humana de todo lo marcado `-- REVIEW(money):`.
 
 Arquitectura, flujos de compra y de datos, decisiones y riesgos: [`../../docs/arquitectura.md`](../../docs/arquitectura.md).
 
