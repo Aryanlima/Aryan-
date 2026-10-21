@@ -24,7 +24,13 @@ function Feedback.start(ctx: any): any
 	local currentBanner: any = nil
 
 	local function toast(text: string)
-		UI.toast(gui, text, 3.5)
+		local notice = UI.toast(gui, text, 3.5)
+		notice.TextTransparency = 1
+		notice.BackgroundTransparency = 1
+		TweenService:Create(notice, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+			TextTransparency = 0,
+			BackgroundTransparency = 0.08,
+		}):Play()
 	end
 
 	local function showCatch(payload: any)
@@ -40,13 +46,17 @@ function Feedback.start(ctx: any): any
 			Name = "CatchCard",
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.new(0.5, 0, 0.12, 0),
-			Size = UDim2.new(0.8, 0, 0, 132),
+			Size = UDim2.new(0.86, 0, 0, 154),
 			BackgroundColor3 = rgb(UI.theme.colors.panel),
 			BorderSizePixel = 0,
 			Parent = gui,
 		}, {
-			UI.create("UICorner", { CornerRadius = UDim.new(0, 16) }),
-			UI.create("UIStroke", { Color = rgb(color), Thickness = 3 }),
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 22) }),
+			UI.create("UIGradient", {
+				Color = ColorSequence.new(rgb(UI.theme.colors.panel), Color3.fromRGB(18, 26, 42)),
+				Rotation = 90,
+			}),
+			UI.create("UIStroke", { Color = rgb(color), Thickness = 4 }),
 			UI.create("UISizeConstraint", { MaxSize = Vector2.new(420, 160) }),
 			UI.create("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -56,8 +66,8 @@ function Feedback.start(ctx: any): any
 			}),
 		})
 		local lines: { { text: string, size: number, color: { number }, order: number } } = {
-			{ text = L("creature." .. payload.id), size = 26, color = color, order = 1 },
-			{ text = L("rarity." .. payload.rarity), size = 18, color = color, order = 2 },
+			{ text = "✦  " .. L("creature." .. payload.id) .. "  ✦", size = 28, color = color, order = 1 },
+			{ text = L("rarity." .. payload.rarity), size = 20, color = color, order = 2 },
 			{
 				text = L("catch.value", { amount = fmt.compact(payload.value) }),
 				size = 18,

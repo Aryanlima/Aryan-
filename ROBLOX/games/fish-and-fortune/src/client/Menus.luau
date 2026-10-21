@@ -15,6 +15,7 @@
 ]]
 
 local Menus = {}
+local TweenService = game:GetService("TweenService")
 
 local function rgb(triple: { number }): Color3
 	return Color3.fromRGB(triple[1], triple[2], triple[3])
@@ -84,7 +85,8 @@ function Menus.start(ctx: any): any
 			LayoutOrder = order,
 			Parent = content,
 		}, {
-			UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 16) }),
+			UI.create("UIStroke", { Color = rgb(UI.theme.colors.water), Thickness = 1.5, Transparency = 0.12 }),
 			UI.create("UIPadding", {
 				PaddingTop = UDim.new(0, 10),
 				PaddingBottom = UDim.new(0, 10),
@@ -112,6 +114,12 @@ function Menus.start(ctx: any): any
 	local function openPanel(name: string, title: string, build: (content: any, state: any) -> ())
 		close()
 		local root, content = UI.panel(gui, { name = name, title = title, onClose = close })
+		local scale = Instance.new("UIScale")
+		scale.Scale = 0.92
+		scale.Parent = root
+		TweenService:Create(scale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+			Scale = 1,
+		}):Play()
 		local function render()
 			clearContent(content)
 			local state = store:get()

@@ -59,6 +59,7 @@ export type Environment = {
 	UDim2: any,
 	UDim: any,
 	Color3: any,
+	ColorSequence: any,
 	Vector2: any,
 	Enum: any,
 	task: any?,
@@ -81,14 +82,18 @@ local UI = {}
 UI.theme = {
 	colors = {
 		background = { 20, 28, 44 },
-		panel = { 30, 42, 64 },
-		row = { 40, 56, 84 },
+		panel = { 30, 42, 68 },
+		row = { 42, 64, 92 },
 		text = { 240, 245, 255 },
 		textMuted = { 170, 185, 210 },
-		accent = { 64, 156, 255 },
+		accent = { 46, 196, 241 },
 		accentText = { 255, 255, 255 },
 		disabled = { 80, 90, 110 },
 		positive = { 90, 200, 140 },
+		water = { 46, 196, 241 },
+		wood = { 201, 138, 75 },
+		gold = { 255, 200, 61 },
+		coral = { 255, 90, 95 },
 		-- colores de rareza (nombres = rarezas del juego)
 		Common = { 190, 200, 210 },
 		Uncommon = { 110, 210, 130 },
@@ -313,6 +318,13 @@ local function corner(radius: number?): any
 	return UI.create("UICorner", { CornerRadius = env().UDim.new(0, radius or UI.theme.corner) })
 end
 
+local function outline(strokeColor: any?, thickness: number?): any
+	return UI.create(
+		"UIStroke",
+		{ Color = strokeColor or color("gold"), Thickness = thickness or 2, Transparency = 0.12 }
+	)
+end
+
 local function padding(amount: number?): any
 	local pad = env().UDim.new(0, amount or UI.theme.padding)
 	return UI.create("UIPadding", {
@@ -391,7 +403,14 @@ function UI.button(options: ButtonOptions): any
 		Active = enabled,
 		LayoutOrder = options.layoutOrder or 0,
 		Parent = options.parent,
-	}, { corner() })
+	}, {
+		corner(16),
+		UI.create("UIGradient", {
+			Color = e.ColorSequence.new(color("water"), color("panel")),
+			Rotation = 90,
+		}),
+		outline(color(if enabled then (options.colorName or "gold") else "textMuted"), 2),
+	})
 	local callback = options.onActivated
 	if callback ~= nil and enabled then
 		button.Activated:Connect(function()
@@ -451,6 +470,7 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 		Visible = true,
 	}, {
 		corner(16),
+		outline(color("gold"), 2),
 		padding(),
 		-- limite en pantallas grandes (tablet / PC)
 		UI.create("UISizeConstraint", { MaxSize = options.maxSize or e.Vector2.new(560, 720) }),
@@ -476,6 +496,7 @@ local function offerRow(offer: OfferView, onBuy: (kind: string, key: string) -> 
 		LayoutOrder = order,
 	}, {
 		corner(),
+		outline(color("water"), 1.5),
 		padding(),
 		listLayout(6),
 		UI.label({ text = offerText(offer, "name"), bold = true, layoutOrder = 1 }),
@@ -628,7 +649,8 @@ function UI.toast(parent: any, text: string, seconds: number?): any
 		TextWrapped = true,
 		Parent = parent,
 	}, {
-		corner(),
+		corner(18),
+		outline(color("gold"), 2),
 		UI.create("UISizeConstraint", { MaxSize = e.Vector2.new(520, 120) }),
 	})
 	local scheduler = e.task

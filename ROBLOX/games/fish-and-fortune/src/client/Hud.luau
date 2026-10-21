@@ -43,7 +43,9 @@ function Hud.start(ctx: any): any
 		BorderSizePixel = 0,
 		Parent = gui,
 	}, {
-		UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
+		UI.create("UICorner", { CornerRadius = UDim.new(0, 18) }),
+		UI.create("UIStroke", { Color = rgb(UI.theme.colors.water), Thickness = 2, Transparency = 0.12 }),
+		UI.create("UISizeConstraint", { MaxSize = Vector2.new(250, 220) }),
 		UI.create("UIPadding", {
 			PaddingTop = UDim.new(0, 8),
 			PaddingBottom = UDim.new(0, 8),
@@ -56,14 +58,14 @@ function Hud.start(ctx: any): any
 		return UI.label({
 			text = "",
 			size = UDim2.new(1, 0, 0, 24),
-			textSize = 18,
+			textSize = if order == 1 then 26 else 18,
 			bold = true,
 			colorName = colorName,
 			layoutOrder = order,
 			parent = stats,
 		})
 	end
-	local coinsLabel = statLabel(1, "Legendary")
+	local coinsLabel = statLabel(1, "gold")
 	local pearlsLabel = statLabel(2, "Rare")
 	local bagLabel = statLabel(3, nil)
 	local zoneLabel = statLabel(4, "textMuted")
@@ -76,7 +78,7 @@ function Hud.start(ctx: any): any
 		size = UDim2.new(0.5, 0, 0, 0),
 		textSize = 16,
 		alignX = Enum.TextXAlignment.Center,
-		colorName = "Legendary",
+		colorName = "gold",
 		bold = true,
 		parent = gui,
 	})
@@ -88,6 +90,7 @@ function Hud.start(ctx: any): any
 	eventsLabel.BackgroundColor3 = rgb(UI.theme.colors.panel)
 	eventsLabel.BackgroundTransparency = 0.15
 	UI.create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = eventsLabel })
+	UI.create("UIStroke", { Color = rgb(UI.theme.colors.gold), Thickness = 2, Parent = eventsLabel })
 	UI.create("UIPadding", {
 		PaddingTop = UDim.new(0, 6),
 		PaddingBottom = UDim.new(0, 6),
@@ -107,6 +110,12 @@ function Hud.start(ctx: any): any
 		BackgroundTransparency = 1,
 		Parent = gui,
 	}, { UI.create("UISizeConstraint", { MaxSize = Vector2.new(560, 80) }) })
+	local actionScale = Instance.new("UIScale")
+	actionScale.Scale = 0.82
+	actionScale.Parent = actionBar
+	TweenService:Create(actionScale, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Scale = 1,
+	}):Play()
 	local actionButton = UI.button({
 		text = L("hud.cast"),
 		size = UDim2.new(0.62, 0, 1, 0),
@@ -129,6 +138,22 @@ function Hud.start(ctx: any): any
 	sellButton.Name = "SellButton"
 	sellButton.Position = UDim2.new(0.64, 0, 0, 0)
 	sellButton.TextSize = 22
+	for _, button in { actionButton, sellButton } do
+		local scale = Instance.new("UIScale")
+		scale.Parent = button
+		button.Activated:Connect(function()
+			TweenService:Create(scale, TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Scale = 0.94,
+			}):Play()
+			task.delay(0.09, function()
+				if button.Parent ~= nil then
+					TweenService:Create(scale, TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+						Scale = 1,
+					}):Play()
+				end
+			end)
+		end)
+	end
 
 	----------------------------------------------------------------------------
 	-- Menus (derecha)
@@ -137,7 +162,7 @@ function Hud.start(ctx: any): any
 		Name = "Menu",
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -8, 0.46, 0),
-		Size = UDim2.new(0, 132, 0.62, 0),
+		Size = UDim2.new(0, 144, 0.62, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 4,
@@ -287,8 +312,8 @@ function Hud.start(ctx: any): any
 		for id, button in menuButtons do
 			button.Text = L(menuKeys[id])
 		end
-		coinsLabel.Text = L("hud.coins", { amount = fmt.compact(state.coins) })
-		pearlsLabel.Text = L("hud.pearls", { amount = fmt.compact(state.pearls) })
+		coinsLabel.Text = "🪙 " .. L("hud.coins", { amount = fmt.compact(state.coins) })
+		pearlsLabel.Text = "💎 " .. L("hud.pearls", { amount = fmt.compact(state.pearls) })
 		bagLabel.Text = L("hud.bag", { used = state.inventoryCount, capacity = state.capacity })
 		local zoneName = L("zone." .. state.zone .. ".name")
 		zoneLabel.Text = if state.isPrivateServer then L("hud.zone_private", { zone = zoneName }) else zoneName
