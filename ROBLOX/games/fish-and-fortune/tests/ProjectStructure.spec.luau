@@ -155,6 +155,7 @@ local EXPECTED = {
 		SoundIds = "ModuleScript",
 		Store = "ModuleScript",
 		Strings = "ModuleScript",
+		UiIcons = "ModuleScript",
 	},
 	["ServerScriptService.ServerPackages"] = {
 		Data = "ModuleScript",

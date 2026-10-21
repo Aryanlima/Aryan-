@@ -70,6 +70,7 @@ end
 
 local translate = locale:translator(currentLanguage)
 UI.setTranslator(translate)
+UI.theme.icons = require(shared:WaitForChild("UiIcons"))
 
 -- Texto de un mensaje { key, args } enviado por el servidor (toast, banner): solo claves y argumentos de la lista blanca.
 local function messageText(message: any): string?

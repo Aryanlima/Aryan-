@@ -63,6 +63,8 @@ export type Environment = {
 	Vector2: any,
 	Enum: any,
 	task: any?,
+	TweenService: any?, -- sin el (pruebas del paquete), UI.motion aplica los valores finales al instante
+	TweenInfo: any?,
 }
 
 export type Translate = (key: string, args: { [string]: any }?) -> string
@@ -79,17 +81,22 @@ local UI = {}
 -- Tema (valores crudos; los Color3 se crean al construir)
 ----------------------------------------------------------------------------
 
+-- Estilo "Muelle de madera" (boceto A, elegido por Aryan el 22-oct): tablas, borde de madera oscura y letra de cartel.
 UI.theme = {
 	colors = {
-		background = { 20, 32, 50 },
-		panel = { 32, 51, 79 },
-		row = { 42, 64, 92 },
-		text = { 247, 249, 252 },
-		textMuted = { 180, 198, 216 },
-		accent = { 25, 169, 214 },
+		background = { 58, 31, 10 },
+		panel = { 201, 138, 75 },
+		row = { 150, 96, 48 },
+		text = { 255, 244, 214 },
+		textMuted = { 252, 231, 190 },
+		accent = { 28, 166, 218 },
 		accentText = { 255, 255, 255 },
-		disabled = { 80, 90, 110 },
-		positive = { 90, 200, 140 },
+		disabled = { 120, 92, 66 },
+		positive = { 63, 191, 106 },
+		woodDark = { 91, 53, 23 },
+		woodGrain = { 185, 122, 61 },
+		ink = { 58, 31, 10 },
+		night = { 30, 42, 68 },
 		water = { 25, 169, 214 },
 		wood = { 201, 138, 75 },
 		gold = { 255, 200, 61 },
@@ -102,6 +109,11 @@ UI.theme = {
 		Legendary = { 255, 190, 70 },
 		Mythic = { 255, 100, 130 },
 	} :: { [string]: { number } },
+	-- Nombres de Enum.Font (se resuelven con el Enum del entorno): display = titulos y botones, body = el resto.
+	fonts = { display = "LuckiestGuy", body = "FredokaOne" },
+	-- Iconos por nombre (Coin, Pearl, Bag, Shop, Rods, Bestiary, Season, Odds, Codes, Settings, Cast, Sell) -> id de imagen.
+	-- El juego los rellena (shared/UiIcons); sin id, UI.icon crea la imagen vacia.
+	icons = {} :: { [string]: string },
 	minTouchHeight = 56, -- px: objetivo tactil minimo recomendado
 	textSize = 18,
 	titleSize = 24,
@@ -282,6 +294,8 @@ local function env(): Environment
 		Enum = Enum,
 		ColorSequence = ColorSequence,
 		task = task,
+		TweenService = game:GetService("TweenService"),
+		TweenInfo = TweenInfo,
 	}
 	currentEnvironment = resolved
 	return resolved
@@ -290,6 +304,12 @@ end
 local function color(name: string): any
 	local triple = UI.theme.colors[name] or UI.theme.colors.text
 	return env().Color3.fromRGB(triple[1], triple[2], triple[3])
+end
+
+local function font(role: string): any
+	local e = env()
+	local name = UI.theme.fonts[role] or UI.theme.fonts.body
+	return (e.Enum.Font :: any)[name]
 end
 
 -- Crea una instancia, asigna propiedades y hijos, y el Parent AL FINAL (mejor rendimiento y sin
@@ -323,7 +343,7 @@ local function outline(strokeColor: any?, thickness: number?): any
 	return UI.create("UIStroke", {
 		Color = strokeColor or color("gold"),
 		Thickness = thickness or 2,
-		Transparency = 0.12,
+		Transparency = 0,
 		ApplyStrokeMode = env().Enum.ApplyStrokeMode.Border, -- Contextual contornearia tambien la letra
 	})
 end
@@ -348,6 +368,165 @@ local function listLayout(gap: number?): any
 end
 
 ----------------------------------------------------------------------------
+-- Movimiento (todo con TweenService; sin bucles por fotograma). `UI.motion.reduced = true` (opcion de movimiento
+-- reducido) aplica los valores finales al instante y omite los efectos decorativos.
+----------------------------------------------------------------------------
+
+local activeTweens: { [any]: any } = setmetatable({}, { __mode = "k" }) :: any
+
+UI.motion = { reduced = false }
+
+local function easing(name: string?): any
+	return (env().Enum.EasingStyle :: any)[name or "Quad"]
+end
+
+-- Interpola `props` en `seconds`; cancela la animacion anterior de esa instancia. Sin TweenService o con movimiento
+-- reducido, asigna los valores al momento.
+function UI.motion.tween(instance: any, props: { [string]: any }, seconds: number, style: string?, direction: string?, repeats: number?, reverses: boolean?)
+	local e = env()
+	local previous = activeTweens[instance]
+	if previous ~= nil then
+		previous:Cancel()
+		activeTweens[instance] = nil
+	end
+	if UI.motion.reduced or e.TweenService == nil or e.TweenInfo == nil then
+		if repeats == nil or repeats == 0 then
+			for key, value in props do
+				instance[key] = value
+			end
+		end
+		return
+	end
+	local info = e.TweenInfo.new(seconds, easing(style), (e.Enum.EasingDirection :: any)[direction or "Out"], repeats or 0, reverses or false)
+	local tween = e.TweenService:Create(instance, info, props)
+	activeTweens[instance] = tween
+	tween:Play()
+end
+
+-- Escala de animacion de un GuiObject (UIScale "MotionScale", se crea una vez).
+local motionScales: { [any]: any } = setmetatable({}, { __mode = "k" }) :: any
+
+function UI.motion.scaleOf(instance: any): any
+	local scale = motionScales[instance]
+	if scale == nil then
+		scale = UI.create("UIScale", { Name = "MotionScale", Scale = 1, Parent = instance })
+		motionScales[instance] = scale
+	end
+	return scale
+end
+
+local function later(seconds: number, callback: () -> ())
+	local scheduler = env().task
+	if scheduler ~= nil then
+		scheduler.delay(seconds, callback)
+	else
+		callback()
+	end
+end
+
+-- Se hunde y rebota (respuesta al pulsar).
+function UI.motion.squash(instance: any)
+	local scale = UI.motion.scaleOf(instance)
+	UI.motion.tween(scale, { Scale = 0.92 }, 0.07)
+	later(0.07, function()
+		UI.motion.tween(scale, { Scale = 1 }, 0.18, "Back")
+	end)
+end
+
+-- Crece y vuelve (algo cambio: monedas, captura nueva).
+function UI.motion.pop(instance: any, peak: number?)
+	local scale = UI.motion.scaleOf(instance)
+	if UI.motion.reduced then
+		return
+	end
+	UI.motion.tween(scale, { Scale = peak or 1.18 }, 0.1, "Back")
+	later(0.1, function()
+		UI.motion.tween(scale, { Scale = 1 }, 0.16)
+	end)
+end
+
+-- Aparece creciendo desde `from` (paneles, tarjetas).
+function UI.motion.appear(instance: any, from: number?, seconds: number?)
+	local scale = UI.motion.scaleOf(instance)
+	if not UI.motion.reduced then
+		scale.Scale = from or 0.85
+	end
+	UI.motion.tween(scale, { Scale = 1 }, seconds or 0.24, "Back")
+end
+
+-- Sacudida horizontal corta (fallo, boton bloqueado, captura enorme).
+function UI.motion.shake(instance: any, pixels: number?)
+	if UI.motion.reduced then
+		return
+	end
+	local e = env()
+	local origin = instance.Position
+	local px = pixels or 6
+	local steps = { px, -px, px * 0.6, -px * 0.6, 0 }
+	for index, dx in steps do
+		later((index - 1) * 0.04, function()
+			instance.Position = e.UDim2.new(origin.X.Scale, origin.X.Offset + dx, origin.Y.Scale, origin.Y.Offset)
+		end)
+	end
+end
+
+-- Desliza desde un desplazamiento (en px) hasta su posicion actual.
+function UI.motion.slideIn(instance: any, dx: number, dy: number, seconds: number?)
+	local e = env()
+	local target = instance.Position
+	if not UI.motion.reduced then
+		instance.Position = e.UDim2.new(target.X.Scale, target.X.Offset + dx, target.Y.Scale, target.Y.Offset + dy)
+	end
+	UI.motion.tween(instance, { Position = target }, seconds or 0.28, "Back")
+end
+
+-- Cuenta del valor `from` al `to` en el texto de `label` (max 12 pasos), con `format` para cada paso.
+function UI.motion.countUp(label: any, from: number, to: number, format: (number) -> string, seconds: number?)
+	if UI.motion.reduced or from == to or env().task == nil then
+		label.Text = format(to)
+		return
+	end
+	local steps = 12
+	local total = seconds or 0.45
+	local token = {}
+	activeTweens[label] = token
+	for i = 1, steps do
+		later(total * i / steps, function()
+			if activeTweens[label] ~= token then
+				return
+			end
+			local t = 1 - (1 - i / steps) ^ 2
+			label.Text = format(if i == steps then to else math.floor(from + (to - from) * t))
+		end)
+	end
+end
+
+----------------------------------------------------------------------------
+-- Iconos
+----------------------------------------------------------------------------
+
+-- Imagen cuadrada del icono `name` (UI.theme.icons). Sin id queda vacia pero conserva el hueco.
+function UI.icon(name: string, size: number, props: { [string]: any }?): any
+	local e = env()
+	local image = UI.create("ImageLabel", {
+		Name = name .. "Icon",
+		Image = UI.theme.icons[name] or "",
+		Size = e.UDim2.fromOffset(size, size),
+		BackgroundTransparency = 1,
+		ScaleType = e.Enum.ScaleType.Fit,
+	})
+	for key, value in props or {} do
+		if key ~= "Parent" then
+			image[key] = value
+		end
+	end
+	if props ~= nil and props.Parent ~= nil then
+		image.Parent = props.Parent
+	end
+	return image
+end
+
+----------------------------------------------------------------------------
 -- Componentes
 ----------------------------------------------------------------------------
 
@@ -361,6 +540,7 @@ export type LabelOptions = {
 	wrap: boolean?,
 	parent: any?,
 	layoutOrder: number?,
+	display: boolean?, -- letra de cartel con contorno de tinta (titulos, numeros grandes)
 }
 
 function UI.label(options: LabelOptions): any
@@ -371,13 +551,21 @@ function UI.label(options: LabelOptions): any
 		BackgroundTransparency = 1,
 		TextColor3 = color(options.colorName or "text"),
 		TextSize = options.textSize or UI.theme.textSize,
-		Font = if options.bold then e.Enum.Font.GothamBold else e.Enum.Font.GothamMedium,
+		Font = font(if options.display then "display" else "body"),
 		TextXAlignment = options.alignX or e.Enum.TextXAlignment.Left,
 		TextWrapped = options.wrap ~= false,
 		AutomaticSize = if options.size == nil then e.Enum.AutomaticSize.Y else e.Enum.AutomaticSize.None,
 		LayoutOrder = options.layoutOrder or 0,
 		Parent = options.parent,
 	})
+	if options.display or options.bold then
+		UI.create("UIStroke", {
+			Color = color("ink"),
+			Thickness = if options.display then 2.5 else 1.5,
+			ApplyStrokeMode = e.Enum.ApplyStrokeMode.Contextual,
+			Parent = label,
+		})
+	end
 	return label
 end
 
@@ -395,39 +583,54 @@ export type ButtonOptions = {
 function UI.button(options: ButtonOptions): any
 	local e = env()
 	local enabled = options.enabled ~= false
+	local fill = if enabled then (options.colorName or "accent") else "disabled"
 	local button = UI.create("TextButton", {
 		Text = options.text,
 		Size = options.size or e.UDim2.new(1, 0, 0, UI.theme.minTouchHeight),
-		BackgroundColor3 = color(if enabled then (options.colorName or "accent") else "disabled"),
-		TextColor3 = color("accentText"),
-		TextStrokeColor3 = color("panel"),
-		TextStrokeTransparency = 0.45,
-		TextSize = UI.theme.textSize,
-		Font = e.Enum.Font.GothamBold,
+		BackgroundColor3 = color(fill),
+		TextColor3 = color(if enabled then "accentText" else "textMuted"),
+		TextStrokeColor3 = color("ink"),
+		TextStrokeTransparency = if enabled then 0 else 0.6,
+		TextSize = UI.theme.textSize + 2,
+		Font = font("display"),
 		AutoButtonColor = enabled,
 		Active = enabled,
 		Selectable = enabled, -- navegable con mando (GuiService)
 		LayoutOrder = options.layoutOrder or 0,
 		Parent = options.parent,
 	}, {
-		corner(12),
+		corner(14),
 		-- Reflejo claro arriba. NO usar UIGradient en un TextButton: tine tambien la letra y la deja del color del fondo.
 		UI.create("Frame", {
 			Name = "Sheen",
-			Position = e.UDim2.new(0, 4, 0, 3),
-			Size = e.UDim2.new(1, -8, 0.42, 0),
-			BackgroundColor3 = color("text"),
-			BackgroundTransparency = 0.84,
+			Position = e.UDim2.new(0, 5, 0, 3),
+			Size = e.UDim2.new(1, -10, 0.38, 0),
+			BackgroundColor3 = color("accentText"),
+			BackgroundTransparency = 0.8,
 			BorderSizePixel = 0,
 			Active = false,
 		}, {
 			corner(12),
 		}),
-		outline(color(if enabled then (options.colorName or "gold") else "textMuted"), 2),
+		-- Sombra interior abajo: aspecto de tabla gruesa (un hijo siempre se dibuja ENCIMA del boton, no detras).
+		UI.create("Frame", {
+			Name = "Edge",
+			AnchorPoint = e.Vector2.new(0, 1),
+			Position = e.UDim2.new(0, 0, 1, 0),
+			Size = e.UDim2.new(1, 0, 0.24, 0),
+			BackgroundColor3 = color("woodDark"),
+			BackgroundTransparency = 0.72,
+			BorderSizePixel = 0,
+			Active = false,
+		}, {
+			corner(14),
+		}),
+		outline(color("woodDark"), 3),
 	})
 	local callback = options.onActivated
 	if callback ~= nil and enabled then
 		button.Activated:Connect(function()
+			UI.motion.squash(button)
 			callback()
 		end)
 	end
@@ -459,11 +662,23 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 	local title = UI.label({
 		text = options.title,
 		size = e.UDim2.new(1, 0, 0, 40),
-		textSize = UI.theme.titleSize,
-		bold = true,
+		textSize = UI.theme.titleSize + 6,
+		display = true,
+		alignX = e.Enum.TextXAlignment.Center,
 	})
 	title.Name = "Title"
-	outline(color("water"), 1.5).Parent = title
+	-- Vetas de las tablas (lineas finas detras del contenido)
+	local planks = UI.create("Frame", { Name = "Planks", Size = e.UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 0 })
+	for i = 1, 9 do
+		UI.create("Frame", {
+			Position = e.UDim2.new(0, -UI.theme.padding, i / 10, 0),
+			Size = e.UDim2.new(1, UI.theme.padding * 2, 0, 3),
+			BackgroundColor3 = color("woodGrain"),
+			BorderSizePixel = 0,
+			ZIndex = 0,
+			Parent = planks,
+		})
+	end
 
 	local closeButton = UI.button({
 		text = options.closeText or tr("ui.close"),
@@ -481,13 +696,14 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 		Position = e.UDim2.fromScale(0.5, 0.5),
 		Size = e.UDim2.fromScale(0.92, 0.86),
 		BackgroundColor3 = color("panel"),
-		BackgroundTransparency = 0.08,
+		BackgroundTransparency = 0,
 		BorderSizePixel = 0,
 		Visible = true,
 	}, {
-		corner(12),
-		outline(color("gold"), 2),
+		corner(22),
+		outline(color("woodDark"), 5),
 		padding(),
+		planks,
 		-- limite en pantallas grandes (tablet / PC)
 		UI.create("UISizeConstraint", { MaxSize = options.maxSize or e.Vector2.new(560, 720) }),
 		title,
@@ -657,21 +873,29 @@ function UI.toast(parent: any, text: string, seconds: number?): any
 		AnchorPoint = e.Vector2.new(0.5, 1),
 		Position = e.UDim2.new(0.5, 0, 1, -130),
 		Size = e.UDim2.new(0.8, 0, 0, 48),
-		BackgroundColor3 = color("panel"),
+		BackgroundColor3 = color("woodDark"),
 		TextColor3 = color("text"),
-		TextSize = UI.theme.textSize,
-		Font = e.Enum.Font.GothamBold,
+		TextStrokeColor3 = color("ink"),
+		TextStrokeTransparency = 0.2,
+		TextSize = UI.theme.textSize + 2,
+		Font = font("body"),
 		Text = text,
 		TextWrapped = true,
 		Parent = parent,
 	}, {
 		corner(18),
-		outline(color("gold"), 2),
+		outline(color("gold"), 3),
 		UI.create("UISizeConstraint", { MaxSize = e.Vector2.new(520, 120) }),
 	})
+	UI.motion.slideIn(toast, 0, 30, 0.22)
+	UI.motion.appear(toast, 0.9, 0.22)
 	local scheduler = e.task
 	if scheduler ~= nil then
-		scheduler.delay(seconds or 3, function()
+		local life = seconds or 3
+		scheduler.delay(math.max(0, life - 0.2), function()
+			UI.motion.tween(toast, { BackgroundTransparency = 1, TextTransparency = 1, TextStrokeTransparency = 1 }, 0.18, "Quad", "In")
+		end)
+		scheduler.delay(life, function()
 			toast:Destroy()
 		end)
 	end
