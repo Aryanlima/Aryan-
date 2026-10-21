@@ -18,10 +18,20 @@ Mundo con Terrain (agua real, orilla de arena, muelle con barandas y farolas, ba
 Ropilot: conectado a Claude y Codex (`claude mcp list`), sin usar todavía.
 
 ## Ropilot (21-oct, noche)
-Su programa (`%APPDATA%opilotinopilot-infra-helper.exe mcp --ropilot-external-mcp`) funciona y expone 27 herramientas: Studio (scripts, capturas, playtest), Blender (modelos, renders para íconos/miniaturas, `ropilot_blender_upload_images` sube PNG a Roblox) y VFX (`ropilot_vfx_capture`). Se probó por stdio con `ROBLOX/tools/ropilot-mcp-probe.mjs` (solo lista y listchildren). **Studio NO estaba conectado a Ropilot** (falta que Aryan inicie sesión en la app Ropilot Studio y active el plugin en Plugins). Claude lo carga como herramienta nativa tras reiniciar. Pendiente: prueba comparativa (ícono y miniatura con Blender de Ropilot vs flujo propio). Ropilot es de terceros: su plugin ejecuta código recibido de ropilot.ai y usa créditos.
+Su programa (`%APPDATA%
+opilotin
+opilot-infra-helper.exe mcp --ropilot-external-mcp`) funciona y expone 27 herramientas: Studio (scripts, capturas, playtest), Blender (modelos, renders para íconos/miniaturas, `ropilot_blender_upload_images` sube PNG a Roblox) y VFX (`ropilot_vfx_capture`). Se probó por stdio con `ROBLOX/tools/ropilot-mcp-probe.mjs` (solo lista y listchildren). **Studio NO estaba conectado a Ropilot** (falta que Aryan inicie sesión en la app Ropilot Studio y active el plugin en Plugins). Claude lo carga como herramienta nativa tras reiniciar. Pendiente: prueba comparativa (ícono y miniatura con Blender de Ropilot vs flujo propio). Ropilot es de terceros: su plugin ejecuta código recibido de ropilot.ai y usa créditos.
 
 ## Estado visual (21-oct, noche)
 Mundo con colinas de Terrain, nubes reales, luz cálida, muelle con farolas, cartel legible, agua azul (28,116,178), HUD compacto, efectos de salpicadura y "!" al picar, audio real. Bug resuelto: `Lighting.Technology` no se puede fijar desde script y cortaba toda la iluminación (poner "Future" a mano en el lugar). Falta: ver la versión final con el agua corregida en Studio, ícono/miniatura finales, sonidos `cast`/`escape`/`button`, probar compras con IDs reales en la privada (Aryan decide).
+
+## Pendiente al 22-oct (leer primero)
+1. **Zonas Río/Costa:** un agente dejó la rama `worktree-agent-af3002e9f12884d6c` (commit 409bd48): río de montaña (rocas, cascada, puente de troncos, niebla) y costa (faro en isla, gaviotas, conchas, palmeras extra). Se creó sobre una base vieja y CHOCA con `WorldBuilder.luau` actual (que ya tiene mar abierto en la Costa y `canFishAt`). No mezclar a ciegas: re-aplicar sus ideas sobre el archivo actual (`git show 409bd48:ROBLOX/games/fish-and-fortune/src/server/WorldBuilder.luau`).
+2. **Ícono y miniatura con Ropilot (Blender 5.2.1 funciona):** scripts base en `ROBLOX/.toolchain/ropilot/icon-base.py` y `render-base.py`; el primer render (`icono.png`) es flojo (cola mal orientada, un solo ojo, colores apagados). Antes de iterar, INVESTIGAR cómo trabaja Ropilot de verdad: sus herramientas traen instrucciones (skills como roblox-tester) y quizá basta un buen prompt; consultar `prompts/list` y `resources/list` del MCP con la sonda. No subir imágenes a Roblox sin permiso de Aryan.
+3. **Equilibrio nuevo (sin playtest largo):** cañas 120/1.500/12.000/80.000, zonas 1.500/15.000, míticos peso 1; mando con botón A; botones `Selectable`. Auditorías de Codex en `ROBLOX/.toolchain/codex/auditoria-1.md` y `-2.md` (resumidas en `docs/playtest-2.md`).
+4. Pendientes de prueba en Studio: eventos, códigos, idiomas, offline, pesca automática, móvil real, mando real, compras con IDs reales (13 objetos fuera de venta; ninguna compra probada).
+5. Costo: tabla "Reparto por costo" en la skill `token-efficient-development` (haiku mecánico, Codex revisión, Ropilot diseño). Claude Code Router NO instalado (pide claves de pago).
+6. El límite de sesión del plan de Aryan cortó a los subagentes: se reinicia a las 3 a. m. (Seúl). Contexto de la conversación larga casi lleno: seguir en un chat nuevo.
 
 ## Decisiones
 - La nube orquesta y escribe en `claude/brave-meitner-esyqy8`; el PC commitea en `pc/aryan-local`; Codex trabaja en `codex/<tarea>`.
