@@ -406,6 +406,7 @@ function UI.button(options: ButtonOptions): any
 		Font = e.Enum.Font.GothamBold,
 		AutoButtonColor = enabled,
 		Active = enabled,
+		Selectable = enabled, -- navegable con mando (GuiService)
 		LayoutOrder = options.layoutOrder or 0,
 		Parent = options.parent,
 	}, {

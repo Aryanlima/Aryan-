@@ -158,29 +158,30 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Enum.Material.Sand
 		)
 	else
-		local center = origin + Vector3.new(0, 0, -70)
+		-- Mar abierto: la orilla sigue en z = -20 (canFishAt) y el agua se extiende hasta el horizonte.
+		local center = origin + Vector3.new(0, 0, -200)
 		callTerrain(
 			"FillBlock",
 			CFrame.new(center + Vector3.new(0, -4, 0)),
-			Vector3.new(196, 8, 112),
+			Vector3.new(560, 8, 372),
 			Enum.Material.Sand
 		)
 		callTerrain(
 			"FillBlock",
 			CFrame.new(center + Vector3.new(0, -4, 0)),
-			Vector3.new(188, 8, 106),
+			Vector3.new(552, 8, 366),
 			Enum.Material.Sand
 		)
 		callTerrain(
 			"FillBlock",
 			CFrame.new(center + Vector3.new(0, -2, 0)),
-			Vector3.new(180, 8, 100),
+			Vector3.new(540, 8, 360),
 			Enum.Material.Air
 		)
 		callTerrain(
 			"FillBlock",
 			CFrame.new(center + Vector3.new(0, -3, 0)),
-			Vector3.new(180, 6, 100),
+			Vector3.new(540, 6, 360),
 			Enum.Material.Water
 		)
 	end

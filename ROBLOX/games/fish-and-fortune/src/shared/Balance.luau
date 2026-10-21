@@ -105,12 +105,12 @@ Balance.zones = {
 	river = {
 		id = "river",
 		order = 2,
-		unlockCost = 2000,
+		unlockCost = 1500,
 	},
 	coast = {
 		id = "coast",
 		order = 3,
-		unlockCost = 30000,
+		unlockCost = 15000,
 	},
 } :: { [string]: Zone }
 
@@ -124,7 +124,7 @@ Balance.creatures = {
 	{ id = "golden_trout", zone = "lake", rarity = "Rare", weight = 45, value = 160 },
 	{ id = "moon_koi", zone = "lake", rarity = "Epic", weight = 18, value = 900 },
 	{ id = "ancient_carp", zone = "lake", rarity = "Legendary", weight = 6, value = 6000 },
-	{ id = "lake_spirit", zone = "lake", rarity = "Mythic", weight = 0.4, value = 60000 },
+	{ id = "lake_spirit", zone = "lake", rarity = "Mythic", weight = 1, value = 60000 },
 	-- Rio Cristal (8)
 	{ id = "chub", zone = "river", rarity = "Common", weight = 350, value = 45 },
 	{ id = "salmon", zone = "river", rarity = "Common", weight = 300, value = 70 },
@@ -139,7 +139,7 @@ Balance.creatures = {
 		weight = 6,
 		value = 30000,
 	},
-	{ id = "river_queen", zone = "river", rarity = "Mythic", weight = 0.4, value = 300000 },
+	{ id = "river_queen", zone = "river", rarity = "Mythic", weight = 1, value = 300000 },
 	-- Costa Dorada (8)
 	{ id = "sand_crab", zone = "coast", rarity = "Common", weight = 350, value = 250 },
 	{ id = "sardine", zone = "coast", rarity = "Common", weight = 300, value = 350 },
@@ -152,7 +152,7 @@ Balance.creatures = {
 		id = "tide_leviathan",
 		zone = "coast",
 		rarity = "Mythic",
-		weight = 0.4,
+		weight = 1,
 		value = 1500000,
 	},
 } :: { Creature }
@@ -184,7 +184,7 @@ Balance.rods = {
 	},
 	fiberglass = {
 		id = "fiberglass",
-		price = 2500,
+		price = 1500,
 		luck = 1,
 		sweetSpot = 0.18,
 		autoInterval = 8,
@@ -193,7 +193,7 @@ Balance.rods = {
 	},
 	carbon = {
 		id = "carbon",
-		price = 30000,
+		price = 12000,
 		luck = 1.8,
 		sweetSpot = 0.2,
 		autoInterval = 7,
@@ -202,7 +202,7 @@ Balance.rods = {
 	},
 	golden = {
 		id = "golden",
-		price = 400000,
+		price = 80000,
 		luck = 2.6,
 		sweetSpot = 0.22,
 		autoInterval = 6,

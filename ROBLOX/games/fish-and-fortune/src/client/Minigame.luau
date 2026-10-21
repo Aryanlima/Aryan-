@@ -276,7 +276,7 @@ function Minigame.start(ctx: any): any
 			action()
 		end
 		return Enum.ContextActionResult.Sink
-	end, false, Enum.KeyCode.Space)
+	end, false, Enum.KeyCode.Space, Enum.KeyCode.ButtonA) -- teclado y mando
 
 	return {
 		action = action,
