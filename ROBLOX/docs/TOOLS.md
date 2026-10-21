@@ -11,6 +11,7 @@ Instalación y detalles: `entorno-y-toolchain.md` y `estado-pc.md`.
 | Rojo / Rokit | 7.7.1 / 1.2.0 | Funciona (`rojo build` verificado) |
 | StyLua / Selene / luau-lsp / Lune | 2.6.0 / 0.32.0 / 1.70.1 / 0.11.0 | Funcionan (`lint.sh`, `test.sh`) |
 | Git / Node / npm / Python | 2.54 / 24.21 / 11.19 / 3.14 | Funcionan |
+| Ropilot (app de escritorio + plugin) | app en `%APPDATA%opilot` | Registrado en Claude (`claude mcp add ropilot`, usa `ropilot-infra-helper.exe mcp --ropilot-external-mcp`) y ya lo estaba en Codex. Conectado en `claude mcp list`. Es de terceros: su plugin ejecuta código recibido de ropilot.ai; pide cuenta/créditos. El paquete npm `ropilot` está abandonado: no usarlo |
 | GitHub CLI `gh` | — | No instalado (no hace falta: push por git) |
 
 ## Skills
