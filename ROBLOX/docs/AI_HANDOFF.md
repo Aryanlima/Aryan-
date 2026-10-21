@@ -9,6 +9,13 @@ Actualizado: 2026-10-21 (2.ª parte), sesión del PC (rama `pc/aryan-local`).
 - Experiencia PRIVADA "FF Pruebas (privado)": Universe 10772154962, Place 98614059053563.
 - Investigación: `research/10-ranking-real-y-cartera.md` (ranking real) y `GDD.md` (dirección de arte y monetización cosmética).
 
+## Mecánica de pesca (commits fb2e8a2 y siguiente)
+Solo se lanza desde el muelle u orilla (`WorldBuilder.canFishAt`, validado en el servidor), hay espera de picada (`bite` 1,5-4 s) y recoger fuera de la zona verde = el pez se escapa (`missed`). 649 pruebas OK. Codex lo revisó: 1 hallazgo válido (recoger antes de la picada, arreglado) y 2 no aplicables (la comprobación del lago es un anillo exacto; `startCast` no se bloquea con una sesión vieja).
+
+## En curso (Codex, ramas `codex/003-mundo-visual`, `codex/004-ui-visual`, `codex/005-audio`)
+Mundo con Terrain, interfaz visual y audio. Al terminar: revisar el diff, correr pruebas, mezclar y ver en Studio. Faltan los IDs de sonido reales (`SoundIds.luau` vacío): buscar con `search_asset` con Studio abierto.
+Ropilot (pedido por Aryan): su plugin ejecuta código recibido de ropilot.ai con `loadstring` dentro de Studio y pide cuenta y créditos; no instalado a la espera de que Aryan decida (el MCP oficial de Studio ya cubre lo mismo).
+
 ## Decisiones
 - La nube orquesta y escribe en `claude/brave-meitner-esyqy8`; el PC commitea en `pc/aryan-local`; Codex trabaja en `codex/<tarea>`.
 - Monetización v1.1: cosméticos y comodidad antes que suerte de pago.
