@@ -43,14 +43,21 @@ describe("GameService (arnes de integracion con dobles)", function()
 		env.clock:assertNoErrors()
 	end)
 
-	it("en un lugar sin publicar (GetDataStore lanza error) arranca con el almacen en memoria", function()
-		local w = buildWorld({ unpublishedStudio = true })
-		expect(w.env.MarketplaceService.ProcessReceipt).toBeTruthy()
-		local usedMemory = false
-		for _, line in w.warnings do
-			usedMemory = usedMemory or string.find(tostring(line), "MEMORIA", 1, true) ~= nil
+	it(
+		"Studio con un lugar sin publicar (GetDataStore lanza): arranca con el almacen en memoria, sin caerse",
+		function()
+			local w = buildWorld({ unpublished = true, mocks = { runService = { isStudio = true } } })
+			local player = w.join()
+			expect(w.api.manager:get(USER):isActive()).toBe(true)
+			expect(w.sentTo("State")[1].player).toBe(player)
+			expect(table.concat(w.warnings, "\n")).toContain("MEMORIA")
+			w.env.clock:assertNoErrors()
 		end
-		expect(usedMemory).toBe(true)
+	)
+
+	it("servidor real (no Studio) sin acceso a DataStore: falla a proposito en vez de usar memoria", function()
+		local ok = pcall(buildWorld, { unpublished = true })
+		expect(ok).toBe(false)
 	end)
 
 	it("al entrar un jugador se carga el perfil y se le envia el estado inicial", function()

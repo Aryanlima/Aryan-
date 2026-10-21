@@ -33,7 +33,12 @@ local KEY = "FishFortune_PlayerData_v1" -- DATASTORE_NAME de GameService
 
 local function buildWorld(overrides)
 	local opts = overrides or {}
-	local env = Mocks.new()
+	local env = Mocks.new(opts.mocks)
+	if opts.unpublished then
+		env.DataStoreService.GetDataStore = function()
+			error("You must publish this place to the web to access DataStore.", 2)
+		end
+	end
 	local world = {
 		env = env,
 		sent = {}, -- { {name=, player=, args={...}} } (servidor -> cliente)
@@ -237,12 +242,6 @@ local function buildWorld(overrides)
 		LiveOpsDefaults = load(GAME .. "server/LiveOpsDefaults.luau"),
 		ArtDirector = opts.artDirector, -- opcional (nil = sin arte generado, como siempre)
 	}
-	if opts.unpublishedStudio then -- lugar sin publicar en Studio: GetDataStore lanza error (playtest-1)
-		env.RunService._isStudio = true
-		env.DataStoreService.GetDataStore = function()
-			error("You must publish this place to the web to access DataStore.")
-		end
-	end
 	local GameService = load(GAME .. "server/GameService.luau")
 	world.api = GameService.start(m)
 	world.m = m

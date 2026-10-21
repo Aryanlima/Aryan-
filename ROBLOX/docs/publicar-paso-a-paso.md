@@ -14,7 +14,7 @@ Quién hace qué: **[NUBE]** sesión de la nube (código, herramientas, pruebas)
 
 | Etapa | Qué pasa | ¿Público? | ¿Cuesta Robux/dinero? | Quién | Puerta para pasar a la siguiente |
 |---|---|---|---|---|---|
-| **0** | Playtest en Studio **sin compras** | No | No | [PC] | `docs/playtest-1.md` sin fallos graves; los FALLA los arregla la nube |
+| **0** | Playtest en Studio **sin compras** | No | No | [PC] | `docs/playtest-1.md` (o `playtest-2.md` tras un arreglo) sin fallos graves; los FALLA los arregla la nube |
 | **1** | Experiencia de **prueba PRIVADA** | **No (solo tú)** | No | [PC] + [ARYAN] | Se comprueba que es **privada** y que el lugar está guardado |
 | **2** | Crear pases y productos (**fuera de venta**) y copiar sus IDs | No | No | [PC] + [ARYAN] (clave) | Los 11 objetos existen y coinciden con `store-items.json` |
 | **3** | Cablear los IDs, comprobar, y probar compras **sin confirmar ninguna** | No | No | [PC] | `wire-ids` verde + verificación de solo lectura + `TargetId` resuelto + commit en `pc/aryan-local` |
@@ -70,7 +70,7 @@ Lo único que se rellena a mano (o lo rellena `create-items.mjs`) es `ROBLOX/gam
 
 **Qué:** el primer recorrido del juego en Studio (tutorial, pesca, venta, bestiario, probabilidades, nada de suerte comprable) **sin comprar nada**. Ya está escrito: [`prompt-pc-playtest-1.md`](prompt-pc-playtest-1.md) → informe `docs/playtest-1.md`. **No se repite aquí.**
 
-**Puerta:** `docs/playtest-1.md` existe y no tiene FALLA en arranque, tienda ni datos; los FALLA los corrige la nube antes de seguir. Tú decides si lo que queda es aceptable.
+**Puerta:** el playtest más reciente (`docs/playtest-2.md` si hubo reintento, si no `playtest-1.md`) existe y no tiene FALLA en arranque, tienda ni datos; los FALLA los corrige la nube antes de seguir. Tú decides si lo que queda es aceptable.
 
 **Cómo deshacer:** nada que deshacer (no se publicó nada; Studio con el almacén de datos en memoria).
 

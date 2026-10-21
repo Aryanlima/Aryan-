@@ -16,6 +16,8 @@ Cuándo usarlo: después de que la sesión del PC haya hecho (o pueda hacer) el 
 ```
 Hola. Soy Aryan. MISIÓN 2 de Fish & Fortune: encadenar las ETAPAS 0 a 3 de ROBLOX/docs/publicar-paso-a-paso.md (léelo entero primero, y también ROBLOX/docs/pc-investigacion/verificacion-pases-y-publicacion.md). Hazlo tú de principio a fin, sin pedirme nada salvo lo que diga "PARAR". Responde en español y simple (no soy programador).
 
+RETOMAR: si ROBLOX/docs/mision-2-informe.md ya existe, léelo primero. NO repitas las filas OK ni crees otra experiencia (la privada ya existe: Universe ID y Place ID en el informe); empieza en la primera fila PENDIENTE o FALLA y actualiza el mismo informe. Haz `git merge origin/claude/brave-meitner-esyqy8` antes (trae el arreglo de pickDataStore con 642 pruebas, el diagnóstico de wire-ids.spec y la resolución del conflicto con tu arreglo: queda el de la nube).
+
 DATOS DE ARYAN (rellenados antes de pegar; en blanco = no sé):
   ROBUX_EN_LA_CUENTA: ________   (si pongo 0 puedes hacer la prueba del diálogo de compra de la Etapa 3.5; si es mayor que 0 o está en blanco, OMÍTELA y anótala NO PROBADO)
   GUARDÉ_ROBLOX_API_KEY: SI / NO  (SI = ya creé la clave y la guardé en la variable de entorno ROBLOX_API_KEY)
@@ -36,9 +38,9 @@ INFORME (obligatorio): crea y mantén ROBLOX/docs/mision-2-informe.md con una ta
 
 ETAPA 0 — Preparación y playtest sin compras
  0.1 git fetch origin; git checkout pc/aryan-local; git merge origin/claude/brave-meitner-esyqy8 (si hay conflictos, conserva la versión de la nube, salvo en tu estado-pc.md y en los archivos que ya existían en pc-investigacion/). Comprueba .gitattributes (LF) y node --version (>= 20). Si falta algo del toolchain: cd ROBLOX && rokit install.
- 0.2 Corre bash ROBLOX/tools/test.sh, bash ROBLOX/tools/lint.sh y bash ROBLOX/tools/format.sh --check. Anota los números REALES (se esperan 536 pruebas o más, 0 fallos). Si falla algo que en la nube pasa, diagnostica y reporta SIN parchear el juego (otro agente de la nube puede estar editando: espera 2 minutos y repite una vez).
- 0.3 Playtest sin compras: si ROBLOX/docs/playtest-1.md ya existe en la rama, léelo y NO lo repitas (cita su resumen en el informe). Si no existe, ejecuta lo de ROBLOX/docs/prompt-pc-playtest-1.md (sin compras) y genera ese informe.
- 0.4 Puerta: si playtest-1.md tiene FALLA en arranque, tienda, datos o el tutorial de 60 s, PARAR y avisarme (la nube arregla y se repite).
+ 0.2 Corre bash ROBLOX/tools/test.sh, bash ROBLOX/tools/lint.sh y bash ROBLOX/tools/format.sh --check. Anota los números REALES (se esperan 642 pruebas o más, 0 fallos). Si tools/wire-ids.spec.luau falla, la salida ahora trae un bloque "[wire-ids.spec] node --test FALLO" (código de salida, so, cwd, comando, stdout y stderr de node): copia ese bloque ENTERO al informe; no lo parchees. Si falla algo que en la nube pasa, diagnostica y reporta SIN parchear el juego (otro agente de la nube puede estar editando: espera 2 minutos y repite una vez).
+ 0.3 Playtest sin compras: si ROBLOX/docs/playtest-1.md ya trae la "Segunda pasada" sin FALLA en arranque, tienda, datos ni tutorial, NO lo repitas (cita su resumen). Si no, repítelo según ROBLOX/docs/prompt-pc-playtest-1.md y añade una nueva sección fechada. En un lugar sin publicar debe salir el aviso "[Data] ... almacen en MEMORIA" y el servidor NO debe caerse; el aviso ContentId rbxassetid://203785492 no es del repo (anótalo, no es FALLA).
+ 0.4 Puerta: si el playtest más reciente tiene FALLA en arranque, tienda, datos o el tutorial de 60 s, PARAR y avisarme (la nube arregla y se repite).
 
 ETAPA 1 — Experiencia de prueba PRIVADA
  1.1 Pide permiso del escritorio y crea la experiencia: en Studio abre un lugar nuevo (Baseplate), File > Publish, ventana "Game details": nombre "FF Pruebas (privado)", género y descripción cortos, Save. Si aparece otra ventana con Invite/Continue o preguntas del cuestionario de madurez, ciérrala sin pulsar nada (es el flujo de hacerla pública).
