@@ -30,11 +30,12 @@ function Hud.start(ctx: any): any
 	local gui: ScreenGui = ctx.gui
 
 	----------------------------------------------------------------------------
-	-- Estadisticas (arriba a la izquierda)
+	-- Estadisticas (izquierda, centradas en vertical: arriba las tapaba la ventana del chat)
 	----------------------------------------------------------------------------
 	local stats = UI.create("Frame", {
 		Name = "Stats",
-		Position = UDim2.new(0, 10, 0, 10),
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 10, 0.42, 0),
 		Size = UDim2.new(0, 230, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = rgb(UI.theme.colors.panel),
@@ -75,13 +76,25 @@ function Hud.start(ctx: any): any
 		size = UDim2.new(0.5, 0, 0, 0),
 		textSize = 16,
 		alignX = Enum.TextXAlignment.Center,
-		colorName = "positive",
+		colorName = "Legendary",
+		bold = true,
 		parent = gui,
 	})
 	eventsLabel.Name = "Events"
 	eventsLabel.AnchorPoint = Vector2.new(0.5, 0)
 	eventsLabel.Position = UDim2.new(0.5, 0, 0, 10)
 	eventsLabel.AutomaticSize = Enum.AutomaticSize.Y
+	-- Pildora oscura: el texto verde sobre el cielo casi no se leia (playtest-1).
+	eventsLabel.BackgroundColor3 = rgb(UI.theme.colors.panel)
+	eventsLabel.BackgroundTransparency = 0.15
+	UI.create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = eventsLabel })
+	UI.create("UIPadding", {
+		PaddingTop = UDim.new(0, 6),
+		PaddingBottom = UDim.new(0, 6),
+		PaddingLeft = UDim.new(0, 12),
+		PaddingRight = UDim.new(0, 12),
+		Parent = eventsLabel,
+	})
 
 	----------------------------------------------------------------------------
 	-- Barra de acciones (abajo)
@@ -248,6 +261,7 @@ function Hud.start(ctx: any): any
 			)
 		end
 		eventsLabel.Text = table.concat(lines, "\n")
+		eventsLabel.Visible = #lines > 0
 	end
 
 	local function refreshAction()

@@ -616,8 +616,9 @@ function UI.toast(parent: any, text: string, seconds: number?): any
 	local e = env()
 	local toast = UI.create("TextLabel", {
 		Name = "Toast",
-		AnchorPoint = e.Vector2.new(0.5, 0),
-		Position = e.UDim2.new(0.5, 0, 0, 24),
+		-- Abajo, encima de la barra de acciones: arriba tapaba el titulo de los paneles (playtest-1).
+		AnchorPoint = e.Vector2.new(0.5, 1),
+		Position = e.UDim2.new(0.5, 0, 1, -130),
 		Size = e.UDim2.new(0.8, 0, 0, 48),
 		BackgroundColor3 = color("panel"),
 		TextColor3 = color("text"),
