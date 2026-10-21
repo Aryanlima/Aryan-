@@ -90,7 +90,12 @@ function Hud.start(ctx: any): any
 	eventsLabel.BackgroundColor3 = rgb(UI.theme.colors.panel)
 	eventsLabel.BackgroundTransparency = 0.15
 	UI.create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = eventsLabel })
-	UI.create("UIStroke", { Color = rgb(UI.theme.colors.gold), Thickness = 2, Parent = eventsLabel })
+	UI.create("UIStroke", {
+		Color = rgb(UI.theme.colors.gold),
+		Thickness = 2,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Parent = eventsLabel,
+	})
 	UI.create("UIPadding", {
 		PaddingTop = UDim.new(0, 6),
 		PaddingBottom = UDim.new(0, 6),
@@ -312,7 +317,7 @@ function Hud.start(ctx: any): any
 		for id, button in menuButtons do
 			button.Text = L(menuKeys[id])
 		end
-		coinsLabel.Text = "🪙 " .. L("hud.coins", { amount = fmt.compact(state.coins) })
+		coinsLabel.Text = L("hud.coins", { amount = fmt.compact(state.coins) })
 		pearlsLabel.Text = "💎 " .. L("hud.pearls", { amount = fmt.compact(state.pearls) })
 		bagLabel.Text = L("hud.bag", { used = state.inventoryCount, capacity = state.capacity })
 		local zoneName = L("zone." .. state.zone .. ".name")

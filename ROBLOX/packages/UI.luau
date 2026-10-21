@@ -320,10 +320,12 @@ local function corner(radius: number?): any
 end
 
 local function outline(strokeColor: any?, thickness: number?): any
-	return UI.create(
-		"UIStroke",
-		{ Color = strokeColor or color("gold"), Thickness = thickness or 2, Transparency = 0.12 }
-	)
+	return UI.create("UIStroke", {
+		Color = strokeColor or color("gold"),
+		Thickness = thickness or 2,
+		Transparency = 0.12,
+		ApplyStrokeMode = env().Enum.ApplyStrokeMode.Border, -- Contextual contornearia tambien la letra
+	})
 end
 
 local function padding(amount: number?): any
@@ -398,6 +400,8 @@ function UI.button(options: ButtonOptions): any
 		Size = options.size or e.UDim2.new(1, 0, 0, UI.theme.minTouchHeight),
 		BackgroundColor3 = color(if enabled then (options.colorName or "accent") else "disabled"),
 		TextColor3 = color("accentText"),
+		TextStrokeColor3 = color("panel"),
+		TextStrokeTransparency = 0.45,
 		TextSize = UI.theme.textSize,
 		Font = e.Enum.Font.GothamBold,
 		AutoButtonColor = enabled,
@@ -406,9 +410,17 @@ function UI.button(options: ButtonOptions): any
 		Parent = options.parent,
 	}, {
 		corner(16),
-		UI.create("UIGradient", {
-			Color = e.ColorSequence.new(color("water"), color("panel")),
-			Rotation = 90,
+		-- Reflejo claro arriba. NO usar UIGradient en un TextButton: tine tambien la letra y la deja del color del fondo.
+		UI.create("Frame", {
+			Name = "Sheen",
+			Position = e.UDim2.new(0, 4, 0, 3),
+			Size = e.UDim2.new(1, -8, 0.42, 0),
+			BackgroundColor3 = color("text"),
+			BackgroundTransparency = 0.84,
+			BorderSizePixel = 0,
+			Active = false,
+		}, {
+			corner(12),
 		}),
 		outline(color(if enabled then (options.colorName or "gold") else "textMuted"), 2),
 	})

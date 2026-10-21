@@ -116,46 +116,63 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			method(terrain, ...)
 		end
 	end
+	-- Orden: orilla de arena y fondo de barro (sin sobresalir del suelo, y = 0), se VACIA con Air (el agua no
+	-- reemplaza tierra solida) y se llena de agua a ras de suelo. El muelle (cubierta a y = 1.2) queda por encima.
 	if style.waterShape == "disc" then
-		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 65, Enum.Material.Sand)
-		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 60, Enum.Material.Mud)
-		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 55, Enum.Material.Water)
+		local center = origin + Vector3.new(0, 0, -45)
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 65, Enum.Material.Sand)
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 58, Enum.Material.Mud)
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -2, 0)), 8, 55, Enum.Material.Air)
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -3, 0)), 6, 55, Enum.Material.Water)
+		-- tierra firme bajo la entrada del muelle (si no, el muelle empieza dentro del agua)
+		callTerrain("FillBlock", CFrame.new(origin + Vector3.new(0, -4, 4)), Vector3.new(14, 8, 16), Enum.Material.Sand)
 	elseif style.waterShape == "river" then
+		local center = origin + Vector3.new(0, 0, -40)
 		callTerrain(
 			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -40)),
+			CFrame.new(center + Vector3.new(0, -4, 0)),
 			Vector3.new(78, 8, 188),
 			Enum.Material.Sand
 		)
+		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -4, 0)), Vector3.new(68, 8, 184), Enum.Material.Mud)
+		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -2, 0)), Vector3.new(60, 8, 170), Enum.Material.Air)
 		callTerrain(
 			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -40)),
-			Vector3.new(68, 8, 184),
-			Enum.Material.Mud
-		)
-		callTerrain(
-			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -40)),
-			Vector3.new(60, 8, 170),
+			CFrame.new(center + Vector3.new(0, -3, 0)),
+			Vector3.new(60, 6, 170),
 			Enum.Material.Water
 		)
-	else
+		-- calzada de tierra por el centro del rio hasta el muelle (el aparicion esta dentro del rio)
 		callTerrain(
 			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			CFrame.new(origin + Vector3.new(0, -4, 8.5)),
+			Vector3.new(14, 8, 77),
+			Enum.Material.Sand
+		)
+	else
+		local center = origin + Vector3.new(0, 0, -70)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(center + Vector3.new(0, -4, 0)),
 			Vector3.new(196, 8, 112),
 			Enum.Material.Sand
 		)
 		callTerrain(
 			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			CFrame.new(center + Vector3.new(0, -4, 0)),
 			Vector3.new(188, 8, 106),
 			Enum.Material.Mud
 		)
 		callTerrain(
 			"FillBlock",
-			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			CFrame.new(center + Vector3.new(0, -2, 0)),
 			Vector3.new(180, 8, 100),
+			Enum.Material.Air
+		)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(center + Vector3.new(0, -3, 0)),
+			Vector3.new(180, 6, 100),
 			Enum.Material.Water
 		)
 	end
@@ -640,8 +657,8 @@ local function setupLighting()
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(46, 196, 241)
-	terrain.WaterTransparency = 0.22
+	terrain.WaterColor = Color3.fromRGB(32, 132, 196) -- azul profundo: el cian puro se veia plano y electrico
+	terrain.WaterTransparency = 0.3
 	terrain.WaterWaveSize = 0.12
 	terrain.WaterWaveSpeed = 9
 	terrain.WaterReflectance = 0.18
