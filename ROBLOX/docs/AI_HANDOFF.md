@@ -14,8 +14,8 @@ Actualizado: 2026-10-21 (2.ª parte), sesión del PC (rama `pc/aryan-local`).
 - Monetización v1.1: cosméticos y comodidad antes que suerte de pago.
 
 ## Pendiente
-1. Aryan: `codex login`; la clave `ROBLOX_API_KEY` limitada a Universe 10772154962, para la etapa 2 de la misión 2 (11 pases y productos); el W-9 antes del 31-oct.
-2. Tarea 002 hecha en código: Caña Dorada (399) y Estela de Burbujas (799, escalón nuevo `deluxe`), con `server/Cosmetics.luau` aplicado por el servidor, íconos en `marketing/.../passes/`, `store-items.json` con **13 objetos** (antes 11) y `tests/Cosmetics.spec.luau`. Falta: verla en Studio y `codex-task.sh --review` cuando Codex tenga sesión. La misión 2 ahora crea 13 objetos.
+1. Aryan: la clave `ROBLOX_API_KEY` limitada a Universe 10772154962, para la etapa 2 de la misión 2 (11 pases y productos); el W-9 antes del 31-oct.
+2. Tarea 002 hecha en código: Caña Dorada (399) y Estela de Burbujas (799, escalón nuevo `deluxe`), con `server/Cosmetics.luau` aplicado por el servidor, íconos en `marketing/.../passes/`, `store-items.json` con **13 objetos** (antes 11) y `tests/Cosmetics.spec.luau`. Codex la revisó (`--review 80430f1`): 1 hallazgo bajo (el Trail no tenía burbujas) → arreglado con un ParticleEmitter. Pendiente: una textura de burbuja propia (subir la imagen) y verla en Studio. La misión 2 ahora crea 13 objetos.
 - `render-assets.mjs` necesita ImageMagick (winget falla en este PC); los PNG se optimizaron con PIL (RGB y ≤200 KB).
 3. Ícono y miniatura según GDD §4 (necesita una herramienta de imagen o generarlos en Studio).
 4. Playtest final en Studio (UI nueva y cosméticos), cuando Aryan lo pida.

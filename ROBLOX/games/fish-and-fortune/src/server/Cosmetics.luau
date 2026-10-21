@@ -50,7 +50,14 @@ function Cosmetics.bubbleTrail(character: Model, enabled: boolean)
 	if root == nil or not root:IsA("BasePart") then
 		return
 	end
-	for _, name in { Cosmetics.TRAIL_NAME, Cosmetics.TRAIL_NAME .. "Top", Cosmetics.TRAIL_NAME .. "Bottom" } do
+	for _, name in
+		{
+			Cosmetics.TRAIL_NAME,
+			Cosmetics.TRAIL_NAME .. "Top",
+			Cosmetics.TRAIL_NAME .. "Bottom",
+			Cosmetics.TRAIL_NAME .. "Bubbles",
+		}
+	do
 		local old = root:FindFirstChild(name)
 		if old ~= nil then
 			old:Destroy()
@@ -77,6 +84,20 @@ function Cosmetics.bubbleTrail(character: Model, enabled: boolean)
 	trail.Color = ColorSequence.new(Color3.fromRGB(46, 196, 241), Color3.fromRGB(255, 255, 255))
 	trail.Transparency = NumberSequence.new(0.3, 1)
 	trail.Parent = root
+	-- Burbujas que suben (revision de Codex: el Trail solo es una cinta). Textura por defecto del motor;
+	-- PENDIENTE: subir una textura de burbuja propia y ponerla en `Texture` (no se inventan IDs de assets).
+	local bubbles = Instance.new("ParticleEmitter")
+	bubbles.Name = Cosmetics.TRAIL_NAME .. "Bubbles"
+	bubbles.Color = ColorSequence.new(Color3.fromRGB(190, 236, 255))
+	bubbles.LightEmission = 0.4
+	bubbles.Rate = 8
+	bubbles.Lifetime = NumberRange.new(0.8, 1.4)
+	bubbles.Speed = NumberRange.new(0.5, 1.5)
+	bubbles.Acceleration = Vector3.new(0, 3, 0)
+	bubbles.SpreadAngle = Vector2.new(25, 25)
+	bubbles.Size = NumberSequence.new(0.25, 0.4)
+	bubbles.Transparency = NumberSequence.new(0.2, 1)
+	bubbles.Parent = bottom
 end
 
 return Cosmetics

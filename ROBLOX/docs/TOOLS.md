@@ -5,7 +5,7 @@ Instalación y detalles: `entorno-y-toolchain.md` y `estado-pc.md`.
 | Herramienta | Versión | Estado |
 |---|---|---|
 | Claude Code | 2.1.304 | Funciona |
-| OpenAI Codex CLI | 0.163.0 (`npm i -g @openai/codex`, paquete oficial) | Instalado; **falta `codex login`** (Aryan) |
+| OpenAI Codex CLI | 0.163.0 (`npm i -g @openai/codex`, paquete oficial) | Funciona con la cuenta de ChatGPT de Aryan. En `~/.codex/config.toml`: carpeta de confianza y `[windows] sandbox = "unelevated"` (sin esto rechaza todo comando con "blocked by policy"). Git: `safe.directory` del repo y de los worktrees de Codex |
 | Roblox Studio | instalado en Program Files | Funciona; playtest por MCP verificado |
 | MCP de Studio (`Roblox_Studio`) | integrado en Studio | Conectado (`claude mcp list`) |
 | Rojo / Rokit | 7.7.1 / 1.2.0 | Funciona (`rojo build` verificado) |

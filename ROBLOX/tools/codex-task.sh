@@ -8,7 +8,9 @@ if ! codex login status >/dev/null 2>&1; then echo "Codex sin sesión: ejecuta '
 if [ "${1:-}" = "--review" ]; then
 	sha="${2:?falta el commit}"; mkdir -p "$(git rev-parse --show-toplevel)/ROBLOX/.toolchain/codex"
 	f="$(git rev-parse --show-toplevel)/ROBLOX/.toolchain/codex/review-$sha.md"
-	codex review --commit "$sha" </dev/null > "$f" 2>&1; echo "Revisión: $f"; exit 0
+	# En Windows el sandbox de solo lectura de Codex bloquea `git`: se le pasa el diff por stdin y no ejecuta nada.
+	git show --stat --patch "$sha" -- . ':(exclude)*.png' | codex exec -s read-only --skip-git-repo-check -o "$f" 		"Revisa este commit de un juego de Roblox (Luau --!strict, servidor autoritativo). Lee AGENTS.md si lo necesitas. Busca SOLO problemas reales: errores de lógica, exploits o confianza en el cliente, pérdida de datos o de compras, regresiones y fallos de rendimiento. Para cada hallazgo: archivo:línea, gravedad (alta/media/baja), por qué falla y el arreglo propuesto. Si no hay problemas, dilo. Responde en español, máximo 25 líneas." >/dev/null 2>&1
+	echo "Revisión: $f"; exit 0
 fi
 task="${1:?falta la ruta de la tarea}"
 name="$(basename "$task" .md)"
@@ -17,6 +19,8 @@ wt="$root/../$(basename "$root")-codex-$name"
 out="$root/ROBLOX/.toolchain/codex"
 mkdir -p "$out"
 [ -d "$wt" ] || git -C "$root" worktree add -q -b "codex/$name" "$wt" HEAD
+# El sandbox de Windows de Codex corre con otro token: Git exige marcar la carpeta como segura.
+git config --global --get-all safe.directory | grep -qxF "$(cd "$wt" && pwd -W)" || git config --global --add safe.directory "$(cd "$wt" && pwd -W)"
 codex exec -C "$wt" -s workspace-write -o "$out/$name.md" "$(cat "$root/$task")" </dev/null
 echo "Informe de Codex: $out/$name.md"
 git -C "$wt" status --short
