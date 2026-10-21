@@ -41,6 +41,7 @@ local Menus = require(client:WaitForChild("Menus"))
 local Minigame = require(client:WaitForChild("Minigame"))
 local Hud = require(client:WaitForChild("Hud"))
 local Audio = require(client:WaitForChild("Audio"))
+Audio.init(require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SoundIds")))
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "FishFortune"

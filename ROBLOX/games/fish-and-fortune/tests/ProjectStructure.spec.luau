@@ -42,17 +42,6 @@ local HERE = (debug.info(1, "s") :: string):gsub("[^/\\]+$", "")
 local PROJECT_FILE = HERE .. "../default.project.json"
 local SRC_DIR = HERE .. "../src/"
 
-describe("SoundIds", function()
-	it("los IDs definidos usan el formato rbxassetid://<número>", function()
-		local soundIds = fs.readFile(SRC_DIR .. "shared/SoundIds.luau")
-		for value in string.gmatch(soundIds, '\n%s*[%w_]+%s*=%s*"([^"]*)"') do
-			if value ~= "" then
-				expect(string.match(value, "^rbxassetid://%d+$") ~= nil).toBe(true)
-			end
-		end
-	end)
-end)
-
 ----------------------------------------------------------------------------
 -- Construccion del lugar con rojo (tests/support/BuiltPlace.luau)
 ----------------------------------------------------------------------------
@@ -163,6 +152,7 @@ local EXPECTED = {
 		FeatureFlags = "ModuleScript",
 		FishingRules = "ModuleScript",
 		Remotes = "ModuleScript",
+		SoundIds = "ModuleScript",
 		Store = "ModuleScript",
 		Strings = "ModuleScript",
 	},
@@ -928,5 +918,16 @@ describe("(f) Contrato del mundo (WorldBuilder sobre un DataModel real de Lune)"
 			end
 		end
 		expect(count).toBe(1)
+	end)
+end)
+
+describe("SoundIds", function()
+	it("los IDs definidos usan el formato rbxassetid://<número>", function()
+		local soundIds = fs.readFile(SRC_DIR .. "shared/SoundIds.luau")
+		for value in string.gmatch(soundIds, '\n%s*[%w_]+%s*=%s*"([^"]*)"') do
+			if value ~= "" then
+				expect(string.match(value, "^rbxassetid://%d+$") ~= nil).toBe(true)
+			end
+		end
 	end)
 end)

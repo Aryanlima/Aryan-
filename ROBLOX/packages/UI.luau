@@ -280,6 +280,7 @@ local function env(): Environment
 		Color3 = Color3,
 		Vector2 = Vector2,
 		Enum = Enum,
+		ColorSequence = ColorSequence,
 		task = task,
 	}
 	currentEnvironment = resolved

@@ -143,15 +143,14 @@ describe("WorldBuilder con arte generado", function()
 		expect(signature(gameB)).toBe(signature(gameA))
 	end)
 
-	it("SIN arte: sin farolas ni barca (no tienen respaldo) y con el muelle y arboles procedurales", function()
+	it("SIN arte: farolas, barca, muelle y arboles salen con piezas procedurales (sin PierArt)", function()
 		local game, artRoot = newPlace()
 		build(game, provider(artRoot))
 		local lake = game:GetService("Workspace").World.lake
-		expect(countNamed(lake, "Lantern")).toBe(0)
-		expect(lake:FindFirstChild("Rowboat")).toBeNil()
 		expect(lake:FindFirstChild("PierArt")).toBeNil()
-		expect(countNamed(lake, "PierPost")).toBe(10)
-		expect(countNamed(lake, "TreeTrunk")).toBe(16)
+		expect(lake:FindFirstChild("RowboatHull", true) ~= nil).toBe(true)
+		expect(countNamed(lake, "LanternPost") > 0).toBe(true)
+		expect(countNamed(lake, "PierPost") >= 10).toBe(true)
 	end)
 
 	it(

@@ -314,7 +314,20 @@ local function buildClient(locale: string, options: { withoutRemotes: boolean? }
 			return service
 		end,
 	}
-	for _, name in { "Enum", "Vector3", "Vector2", "Color3", "CFrame", "UDim2", "UDim" } do
+	for _, name in
+		{
+			"Enum",
+			"Vector3",
+			"Vector2",
+			"Color3",
+			"CFrame",
+			"UDim2",
+			"UDim",
+			"ColorSequence",
+			"NumberSequence",
+			"NumberRange",
+		}
+	do
 		base[name] = roblox[name]
 	end
 	base.Instance = { new = newFake }

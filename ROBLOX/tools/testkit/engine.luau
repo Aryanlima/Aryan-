@@ -17,7 +17,21 @@ local fs = require("@lune/fs")
 local luau = require("@lune/luau")
 local roblox = require("@lune/roblox") :: any
 
-local DATATYPES = { "Instance", "Enum", "Vector3", "Vector2", "Color3", "CFrame", "UDim", "UDim2", "Rect", "Font" }
+local DATATYPES = {
+	"Instance",
+	"Enum",
+	"Vector3",
+	"Vector2",
+	"Color3",
+	"CFrame",
+	"UDim",
+	"UDim2",
+	"Rect",
+	"Font",
+	"ColorSequence",
+	"NumberSequence",
+	"NumberRange",
+}
 
 local Engine = {}
 

@@ -1,17 +1,17 @@
 --!strict
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundIds = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("SoundIds"))
+local SoundIds: { [string]: string } = {} -- los pasa Main con Audio.init (solo Main requiere modulos por instancia)
 
 local hasSoundService, soundService = pcall(function(): SoundService
 	return game:GetService("SoundService")
 end)
 if not hasSoundService then
-	return { play = function(_key: string) end }
+	return { play = function(_key: string) end, init = function(_ids: { [string]: string }) end }
 end
 
 local groups: { [string]: SoundGroup } = {}
-for name, volume in { Music = 0.12, Ambience = 0.2, SFX = 0.65 } do
+local GROUP_VOLUMES: { [string]: number } = { Music = 0.12, Ambience = 0.2, SFX = 0.65 }
+for name, volume in GROUP_VOLUMES do
 	local group = Instance.new("SoundGroup")
 	group.Name = name
 	group.Volume = volume
@@ -34,11 +34,14 @@ local function startLoop(key: string, groupName: string, volume: number)
 	sound:Play()
 end
 
-startLoop("music", "Music", 1)
-startLoop("ambience_nature", "Ambience", 0.7)
-startLoop("ambience_crowd", "Ambience", 0.25)
-
 local Audio = {}
+
+function Audio.init(ids: { [string]: string })
+	SoundIds = ids
+	startLoop("music", "Music", 1)
+	startLoop("ambience_nature", "Ambience", 0.7)
+	startLoop("ambience_crowd", "Ambience", 0.25)
+end
 
 function Audio.play(key: string)
 	local soundId = SoundIds[key]

@@ -554,7 +554,7 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 			})
 		end
 	end
-	for index = 1, 10 do
+	for _ = 1, 10 do
 		local x = rng:NextNumber(-85, 85)
 		local z = rng:NextNumber(14, 88)
 		local size = rng:NextNumber(2, 5)
