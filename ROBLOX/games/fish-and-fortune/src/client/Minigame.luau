@@ -93,6 +93,77 @@ function Minigame.start(ctx: any): any
 		end
 	end
 
+	-- Salpicadura con particulas y onda expansiva. Solo vista: si algo falla (p. ej. el entorno de pruebas) no pasa nada.
+	local function splashAt(position: Vector3, count: number)
+		pcall(function()
+			local holder = Instance.new("Part")
+			holder.Anchored = true
+			holder.CanCollide = false
+			holder.CanQuery = false
+			holder.Transparency = 1
+			holder.Size = Vector3.new(0.2, 0.2, 0.2)
+			holder.Position = position
+			holder.Parent = Workspace
+			local drops = Instance.new("ParticleEmitter")
+			drops.Color = ColorSequence.new(Color3.fromRGB(220, 244, 255))
+			drops.Size = NumberSequence.new(0.5, 0.1)
+			drops.Lifetime = NumberRange.new(0.5, 0.9)
+			drops.Speed = NumberRange.new(10, 18)
+			drops.SpreadAngle = Vector2.new(35, 35)
+			drops.Acceleration = Vector3.new(0, -40, 0)
+			drops.Rate = 0
+			drops.Parent = holder
+			drops:Emit(count)
+			local ring = Instance.new("Part")
+			ring.Shape = Enum.PartType.Cylinder
+			ring.Anchored = true
+			ring.CanCollide = false
+			ring.CanQuery = false
+			ring.Material = Enum.Material.Neon
+			ring.Color = Color3.fromRGB(230, 248, 255)
+			ring.Transparency = 0.35
+			ring.Size = Vector3.new(0.1, 1, 1)
+			ring.CFrame = CFrame.new(position) * CFrame.Angles(0, 0, math.rad(90))
+			ring.Parent = Workspace
+			TweenService:Create(ring, TweenInfo.new(0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = Vector3.new(0.1, 9, 9),
+				Transparency = 1,
+			}):Play()
+			task.delay(1.2, function()
+				holder:Destroy()
+				ring:Destroy()
+			end)
+		end)
+	end
+
+	-- "!" sobre el corcho cuando pica el pez.
+	local function biteAlert()
+		local current = bobber
+		if current == nil then
+			return
+		end
+		pcall(function()
+			splashAt(current.Position, 28)
+			local board = Instance.new("BillboardGui")
+			board.Size = UDim2.fromOffset(60, 60)
+			board.StudsOffset = Vector3.new(0, 3, 0)
+			board.AlwaysOnTop = true
+			local mark = Instance.new("TextLabel")
+			mark.Size = UDim2.fromScale(1, 1)
+			mark.BackgroundTransparency = 1
+			mark.Text = "!"
+			mark.TextScaled = true
+			mark.Font = Enum.Font.GothamBlack
+			mark.TextColor3 = Color3.fromRGB(255, 200, 61)
+			mark.TextStrokeTransparency = 0
+			mark.Parent = board
+			board.Parent = current
+			task.delay(1.4, function()
+				board:Destroy()
+			end)
+		end)
+	end
+
 	local function placeBobber(zoneId: string)
 		removeBobber()
 		local world = Workspace:FindFirstChild("World")
@@ -112,6 +183,7 @@ function Minigame.start(ctx: any): any
 		part.CanQuery = false
 		part.Position = target.Position + Vector3.new(0, 0.6, 0)
 		part.Parent = Workspace
+		splashAt(part.Position, 14)
 		TweenService:Create(
 			part,
 			TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true),
@@ -171,6 +243,7 @@ function Minigame.start(ctx: any): any
 			end
 			if not overlay.Visible then
 				overlay.Visible = true
+				biteAlert()
 			end
 			marker.Position = UDim2.new(rules:markerPosition(elapsed), 0, 0.5, 0)
 			if elapsed > balance.minigame.durationSeconds + balance.minigame.graceSeconds - 0.2 then
