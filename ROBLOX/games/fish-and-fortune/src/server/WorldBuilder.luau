@@ -107,6 +107,7 @@ local function applyVariant(part: Part, art: ArtLike?, materialId: string)
 	end
 end
 
+-- El fondo del lago es de arena clara (no barro): asi el agua se ve turquesa y no turbia.
 local function buildWater(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
 	local terrain: any = Workspace.Terrain
@@ -123,7 +124,7 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 	if style.waterShape == "disc" then
 		local center = origin + Vector3.new(0, 0, -45)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 65, Enum.Material.Sand)
-		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 58, Enum.Material.Mud)
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 58, Enum.Material.Sand)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -2, 0)), 8, 55, Enum.Material.Air)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -3, 0)), 6, 55, Enum.Material.Water)
 		-- tierra firme bajo la entrada del muelle (si no, el muelle empieza dentro del agua)
@@ -136,7 +137,12 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Vector3.new(78, 8, 188),
 			Enum.Material.Sand
 		)
-		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -4, 0)), Vector3.new(68, 8, 184), Enum.Material.Mud)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(center + Vector3.new(0, -4, 0)),
+			Vector3.new(68, 8, 184),
+			Enum.Material.Sand
+		)
 		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -2, 0)), Vector3.new(60, 8, 170), Enum.Material.Air)
 		callTerrain(
 			"FillBlock",
@@ -163,7 +169,7 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			"FillBlock",
 			CFrame.new(center + Vector3.new(0, -4, 0)),
 			Vector3.new(188, 8, 106),
-			Enum.Material.Mud
+			Enum.Material.Sand
 		)
 		callTerrain(
 			"FillBlock",
@@ -633,38 +639,34 @@ end
 -- Siluetas frías al horizonte y nubes de bajo coste para ampliar visualmente cada zona.
 local function buildHorizon(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
-	local distant = Color3.fromRGB(128, 158, 174)
+	local terrain: any = Workspace.Terrain
+	-- Colinas lejanas de Terrain (pasto con cima de roca), parcialmente enterradas: se ven como relieve real.
 	for index = 1, 7 do
 		local side = if index % 2 == 0 then 1 else -1
 		local x = side * (95 + (index % 3) * 22)
 		local z = -112 - index * 10
-		local hill = detail(
-			newPart(
-				folder,
-				"DistantHill",
-				Vector3.new(52 + (index % 3) * 18, 34 + (index % 4) * 8, 48),
-				origin + Vector3.new(x, 9, z),
-				distant:Lerp(Color3.fromRGB(160, 180, 188), index / 10),
-				Enum.Material.Slate
-			)
-		)
-		hill.Shape = Enum.PartType.Ball
-		hill.Transparency = 0.08
+		local radius = 26 + (index % 3) * 8
+		pcall(function()
+			terrain:FillBall(origin + Vector3.new(x, -6, z), radius, Enum.Material.Grass)
+			terrain:FillBall(origin + Vector3.new(x, -6 + radius * 0.62, z), radius * 0.5, Enum.Material.Rock)
+		end)
 	end
-	for index = 1, 5 do
-		local cloud = detail(
-			newPart(
-				folder,
-				"DistantCloud",
-				Vector3.new(26, 5, 12),
-				origin + Vector3.new(-105 + index * 43, 48 + (index % 2) * 8, -150 - (index % 3) * 15),
-				Color3.fromRGB(245, 232, 213),
-				Enum.Material.SmoothPlastic
-			)
-		)
-		cloud.Shape = Enum.PartType.Ball
-		cloud.Transparency = 0.28
-	end
+	local _ = folder
+end
+
+-- Nubes reales de Terrain (una sola vez, compartidas por las zonas).
+local function buildClouds()
+	pcall(function()
+		local terrain: any = Workspace.Terrain
+		if terrain:FindFirstChildOfClass("Clouds") ~= nil then
+			return
+		end
+		local clouds = Instance.new("Clouds")
+		clouds.Cover = 0.55
+		clouds.Density = 0.6
+		clouds.Color = Color3.fromRGB(255, 245, 232)
+		clouds.Parent = terrain
+	end)
 end
 
 local function buildWildlife(folder: Folder, style: ZoneStyle)
@@ -782,7 +784,7 @@ local function setupLighting()
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
 	terrain.WaterColor = Color3.fromRGB(25, 169, 214)
-	terrain.WaterTransparency = 0.22
+	terrain.WaterTransparency = 0.35
 	terrain.WaterWaveSize = 0.16
 	terrain.WaterWaveSpeed = 7
 	terrain.WaterReflectance = 0.12
@@ -962,6 +964,7 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 	spawnLocation.Duration = 0
 	spawnLocation.Parent = Workspace
 
+	buildClouds()
 	setupLighting()
 	return info
 end
