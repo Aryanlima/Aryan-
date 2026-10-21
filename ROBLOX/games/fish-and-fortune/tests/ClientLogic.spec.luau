@@ -27,6 +27,14 @@ local function state(overrides)
 	return s
 end
 
+describe("ClientLogic.layout (zonas del chat y de los avisos)", function()
+	it("las estadisticas bajan de la zona del chat y los avisos quedan sobre la guia y la barra de acciones", function()
+		expect(ClientLogic.layout.statsTopScale > 0).toBe(true)
+		expect(ClientLogic.layout.statsTopOffset > 0).toBe(true)
+		expect(ClientLogic.layout.toastBottomOffset <= -(96 + 40 + 8)).toBe(true) -- hint: 96 px del borde + 40 px de alto
+	end)
+end)
+
 describe("ClientLogic.ftueHint (primeros 60 s guiados)", function()
 	it("sin estado no hay pista", function()
 		expect(ClientLogic.ftueHint(nil, Balance, false)).toBeNil()

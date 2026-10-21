@@ -9,6 +9,9 @@ export type Hint = { id: string, key: string, target: string } -- key: clave de 
 
 local ClientLogic = {}
 
+-- Maquetacion: el chat de Roblox ocupa arriba a la izquierda (las estadisticas bajan de esa zona) y los avisos van encima de la guia y la barra de acciones.
+ClientLogic.layout = { statsTopScale = 0.27, statsTopOffset = 8, toastBottomOffset = -144 }
+
 --[[
 	Guia de los primeros 60 s (ROBLOX/research/07 4.1). Devuelve la sugerencia actual o nil.
 	  * 0-5 s:   objetivo visible (Lanzar), cero menus previos

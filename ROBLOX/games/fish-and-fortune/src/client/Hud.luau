@@ -34,7 +34,7 @@ function Hud.start(ctx: any): any
 	----------------------------------------------------------------------------
 	local stats = UI.create("Frame", {
 		Name = "Stats",
-		Position = UDim2.new(0, 10, 0, 10),
+		Position = UDim2.new(0, 10, ClientLogic.layout.statsTopScale, ClientLogic.layout.statsTopOffset),
 		Size = UDim2.new(0, 230, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = rgb(UI.theme.colors.panel),
@@ -82,6 +82,12 @@ function Hud.start(ctx: any): any
 	eventsLabel.AnchorPoint = Vector2.new(0.5, 0)
 	eventsLabel.Position = UDim2.new(0.5, 0, 0, 10)
 	eventsLabel.AutomaticSize = Enum.AutomaticSize.Y
+	eventsLabel.BackgroundTransparency = 0.15
+	eventsLabel.BackgroundColor3 = rgb(UI.theme.colors.panel)
+	eventsLabel.Visible = false
+	UI.create("UICorner", { CornerRadius = UDim.new(0, 10), Parent = eventsLabel })
+	UI.create("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4), Parent = eventsLabel })
+	UI.create("UISizeConstraint", { MaxSize = Vector2.new(520, 1000), Parent = eventsLabel })
 
 	----------------------------------------------------------------------------
 	-- Barra de acciones (abajo)
@@ -248,6 +254,7 @@ function Hud.start(ctx: any): any
 			)
 		end
 		eventsLabel.Text = table.concat(lines, "\n")
+		eventsLabel.Visible = #lines > 0
 	end
 
 	local function refreshAction()

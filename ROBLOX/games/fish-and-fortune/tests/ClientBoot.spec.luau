@@ -22,6 +22,7 @@ local testkit = require("@testkit")
 local Mocks = require("@testkit/mocks")
 -- Todos los `require` ANTES del primer `describe` (ver tests/support/BuiltPlace.luau).
 local BuiltPlace = require("./support/BuiltPlace")
+local ClientLogic = require("../src/shared/ClientLogic")
 local Remotes = require("../src/shared/Remotes")
 local ServerHarness = require("./support/ServerHarness")
 
@@ -544,6 +545,23 @@ for _, locale in { "es-es", "en-us" } do
 					client.assertHealthy()
 				end
 			)
+
+			it("deja libre la zona del chat y pone los avisos sobre la barra de acciones", function()
+				local client = buildClient(locale)
+				client.server("State", payloads.state)
+				local function named(name)
+					return client.find(function(node)
+						return node.Name == name
+					end)[1]
+				end
+				expect(named("Stats").Position.Y.Scale).toBeCloseTo(ClientLogic.layout.statsTopScale, 4)
+				expect(named("Events").Visible).toBe(#payloads.state.events > 0)
+				client.server("Toast", payloads.toasts[1])
+				local toast = named("Toast")
+				expect(toast.AnchorPoint.Y).toBe(1)
+				expect(toast.Position.Y.Offset).toBe(ClientLogic.layout.toastBottomOffset)
+				client.assertHealthy()
+			end)
 
 			it(
 				"abre y cierra cada menu (tienda, canas, bestiario, temporada, probabilidades, codigos) sin errores",

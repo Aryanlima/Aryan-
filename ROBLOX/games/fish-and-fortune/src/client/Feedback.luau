@@ -24,7 +24,9 @@ function Feedback.start(ctx: any): any
 	local currentBanner: any = nil
 
 	local function toast(text: string)
-		UI.toast(gui, text, 3.5)
+		local label = UI.toast(gui, text, 3.5)
+		label.AnchorPoint = Vector2.new(0.5, 1)
+		label.Position = UDim2.new(0.5, 0, 1, ctx.ClientLogic.layout.toastBottomOffset)
 	end
 
 	local function showCatch(payload: any)
