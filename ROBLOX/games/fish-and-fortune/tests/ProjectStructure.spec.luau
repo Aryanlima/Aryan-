@@ -42,6 +42,17 @@ local HERE = (debug.info(1, "s") :: string):gsub("[^/\\]+$", "")
 local PROJECT_FILE = HERE .. "../default.project.json"
 local SRC_DIR = HERE .. "../src/"
 
+describe("SoundIds", function()
+	it("los IDs definidos usan el formato rbxassetid://<número>", function()
+		local soundIds = fs.readFile(SRC_DIR .. "shared/SoundIds.luau")
+		for value in string.gmatch(soundIds, '\n%s*[%w_]+%s*=%s*"([^"]*)"') do
+			if value ~= "" then
+				expect(string.match(value, "^rbxassetid://%d+$") ~= nil).toBe(true)
+			end
+		end
+	end)
+end)
+
 ----------------------------------------------------------------------------
 -- Construccion del lugar con rojo (tests/support/BuiltPlace.luau)
 ----------------------------------------------------------------------------
@@ -183,6 +194,7 @@ local EXPECTED = {
 	},
 	["StarterPlayer.StarterPlayerScripts.Client"] = {
 		Main = "LocalScript",
+		Audio = "ModuleScript",
 		Feedback = "ModuleScript",
 		Hud = "ModuleScript",
 		Menus = "ModuleScript",
