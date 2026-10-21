@@ -426,14 +426,14 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 		newPart(
 			folder,
 			"Sign",
-			Vector3.new(12, 6, 0.6),
-			style.origin + Vector3.new(14, 5, 8),
+			Vector3.new(8, 3.2, 0.6),
+			style.origin + Vector3.new(12, 4, 8),
 			Color3.fromRGB(60, 45, 35),
 			Enum.Material.Wood
 		)
 	)
 	local gui = Instance.new("SurfaceGui")
-	gui.Face = Enum.NormalId.Front
+	gui.Face = Enum.NormalId.Back -- el jugador llega desde +Z: la cara visible es la de atras
 	gui.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
 	gui.PixelsPerStud = 40
 	local label = Instance.new("TextLabel")
@@ -451,14 +451,14 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 		newPart(
 			folder,
 			"FishHereSign",
-			Vector3.new(7, 2, 0.7),
-			style.origin + Vector3.new(14, 9.3, 8),
+			Vector3.new(6, 1.6, 0.7),
+			style.origin + Vector3.new(12, 6.4, 8),
 			Color3.fromRGB(255, 90, 95),
 			Enum.Material.SmoothPlastic
 		)
 	)
 	local arrowGui = Instance.new("SurfaceGui")
-	arrowGui.Face = Enum.NormalId.Front
+	arrowGui.Face = Enum.NormalId.Back
 	arrowGui.PixelsPerStud = 32
 	local arrowLabel = Instance.new("TextButton")
 	arrowLabel.Size = UDim2.fromScale(1, 1)
@@ -474,8 +474,8 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 		newPart(
 			folder,
 			"SignLegs",
-			Vector3.new(1, 5, 1),
-			style.origin + Vector3.new(14, 2.5, 7.6),
+			Vector3.new(1, 4, 1),
+			style.origin + Vector3.new(12, 2, 7.6),
 			Color3.fromRGB(60, 45, 35),
 			Enum.Material.Wood
 		)

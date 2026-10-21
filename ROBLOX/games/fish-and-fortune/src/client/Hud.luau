@@ -303,7 +303,8 @@ function Hud.start(ctx: any): any
 		if state ~= nil then
 			local hint = ClientLogic.ftueHint(state, balance, minigame.isCasting())
 			if hint ~= nil then
-				hintLabel.Text = L(hint.key)
+				local waiting = hint.id == "reel" and not minigame.isBiting()
+				hintLabel.Text = L(if waiting then "hint.wait_bite" else hint.key)
 				hintLabel.Visible = true
 				hintStroke.Parent = hintTargets[hint.target]
 			else

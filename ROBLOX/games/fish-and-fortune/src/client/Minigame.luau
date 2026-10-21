@@ -207,6 +207,9 @@ function Minigame.start(ctx: any): any
 
 	return {
 		action = action,
+		isBiting = function(): boolean
+			return casting and os.clock() >= startedClock
+		end,
 		isCasting = function(): boolean
 			return casting
 		end,
