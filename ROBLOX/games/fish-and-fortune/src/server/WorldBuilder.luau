@@ -621,6 +621,272 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	end
 end
 
+-- Detalle visual barato: sin colision, consulta ni sombra.
+local function deco(
+	parent: Instance,
+	name: string,
+	size: Vector3,
+	position: Vector3,
+	color: Color3,
+	material: Enum.Material?,
+	shape: Enum.PartType?
+): Part
+	local part = detail(newPart(parent, name, size, position, color, material))
+	part.CanQuery = false
+	if shape then
+		part.Shape = shape
+	end
+	return part
+end
+
+-- Roca grande de Terrain (gratis en Parts); si Terrain no existe (pruebas) cae a una esfera.
+local function rockBall(
+	parent: Instance,
+	name: string,
+	center: Vector3,
+	radius: number,
+	color: Color3,
+	material: Enum.Material
+)
+	local terrain: any = Workspace.Terrain
+	local ok = pcall(function()
+		terrain:FillBall(center, radius, material)
+	end)
+	if not ok then
+		deco(parent, name, Vector3.one * radius * 2, center, color, material, Enum.PartType.Ball)
+	end
+end
+
+local WHITE = Color3.fromRGB(240, 248, 250)
+local THEME_WOOD = Color3.fromRGB(104, 76, 52)
+
+-- Rio de montana: rocas en orillas y agua, pinos azul-verdosos, cascada al fondo (el agua acaba en z = -125), niebla y puente.
+local function buildRiverTheme(folder: Folder, style: ZoneStyle)
+	local o = style.origin
+	local rng = Random.new(style.seed + 500)
+	local rockColor = Color3.fromRGB(96, 108, 118)
+	for i = 1, 12 do -- orillas (|x| > 33, fuera del agua)
+		local r = rng:NextNumber(2.5, 5)
+		local x = (if i % 2 == 0 then 1 else -1) * rng:NextNumber(35, 44)
+		rockBall(
+			folder,
+			"Boulder" .. i,
+			o + Vector3.new(x, r * 0.3, rng:NextNumber(-115, 30)),
+			r,
+			rockColor,
+			Enum.Material.Slate
+		)
+	end
+	for i = 1, 6 do -- en el agua, lejos del muelle y del carril de pesca central (|x| >= 13)
+		local r = rng:NextNumber(1.8, 3)
+		local x = (if i % 2 == 0 then 1 else -1) * rng:NextNumber(13, 26)
+		local pos = o + Vector3.new(x, 0.2, rng:NextNumber(-118, -60))
+		rockBall(folder, "WaterRock" .. i, pos, r, rockColor, Enum.Material.Rock)
+		local foam =
+			deco(folder, "Foam" .. i, Vector3.new(0.2, r * 2.8, r * 2.8), pos, WHITE, nil, Enum.PartType.Cylinder)
+		foam.CFrame = CFrame.new(pos.X, 0.15, pos.Z) * CFrame.Angles(0, 0, math.rad(90))
+		foam.Transparency = 0.4
+	end
+	for i = 1, 16 do -- pinos extra en dos tonos, en tierra (nunca en el agua ni en la calzada)
+		local x, z
+		if i % 2 == 0 then
+			x, z = rng:NextNumber(-90, 90), rng:NextNumber(52, 95)
+		else
+			x, z = (if i % 4 == 1 then 1 else -1) * rng:NextNumber(38, 92), rng:NextNumber(-95, 40)
+		end
+		local h = rng:NextNumber(8, 14)
+		deco(
+			folder,
+			"Conifer" .. i,
+			Vector3.new(1.6, h, 1.6),
+			o + Vector3.new(x, h / 2, z),
+			Color3.fromRGB(96, 74, 56),
+			Enum.Material.Wood
+		)
+		deco(
+			folder,
+			"ConiferCrown" .. i,
+			Vector3.new(7, h * 1.1, 7),
+			o + Vector3.new(x, h + 2, z),
+			if i % 3 == 0 then Color3.fromRGB(32, 98, 92) else Color3.fromRGB(44, 118, 110),
+			Enum.Material.Grass,
+			Enum.PartType.Ball
+		)
+	end
+	-- cascada: risco de roca, lamina de agua, estrias de espuma y remolino al pie
+	local cliff =
+		deco(folder, "FallsCliff", Vector3.new(90, 22, 10), o + Vector3.new(0, 9, -132), rockColor, Enum.Material.Slate)
+	cliff.CanCollide = true
+	local sheet = deco(
+		folder,
+		"FallsWater",
+		Vector3.new(22, 16, 1.5),
+		o + Vector3.new(0, 9, -126.4),
+		style.waterColor,
+		Enum.Material.Glass
+	)
+	sheet.Transparency = 0.25
+	for i, x in { -6, 0, 7 } do
+		deco(folder, "FallsFoam" .. i, Vector3.new(1.8, 15, 0.4), o + Vector3.new(x, 9, -125.5), WHITE).Transparency =
+			0.3
+	end
+	deco(folder, "FallsPlunge", Vector3.new(26, 0.2, 8), o + Vector3.new(0, 0.2, -121), WHITE).Transparency = 0.35
+	for i, x in { -14, 4, 16 } do -- niebla suave
+		deco(folder, "Mist" .. i, Vector3.new(40, 7, 18), o + Vector3.new(x, 4, -112 + i * 5), WHITE).Transparency = 0.9
+	end
+	-- puente de troncos en z = -95 (cubierta baja y pisable, barandas sin colision)
+	for i = 0, 5 do
+		local log = deco(
+			folder,
+			"BridgeLog" .. i,
+			Vector3.new(76, 1.6, 1.6),
+			o + Vector3.new(0, 1, -95 + (i - 2.5) * 1.7),
+			THEME_WOOD,
+			Enum.Material.Wood,
+			Enum.PartType.Cylinder
+		)
+		log.CanCollide = true
+	end
+	for _, side in { -1, 1 } do
+		local railAt = o + Vector3.new(0, 3.6, -95 + side * 5.2)
+		deco(
+			folder,
+			"BridgeRail",
+			Vector3.new(76, 0.8, 0.8),
+			railAt,
+			THEME_WOOD,
+			Enum.Material.Wood,
+			Enum.PartType.Cylinder
+		)
+		for _, x in { -34, -17, 0, 17, 34 } do
+			deco(
+				folder,
+				"BridgePost",
+				Vector3.new(0.9, 7, 0.9),
+				o + Vector3.new(x, 1, -95 + side * 5.2),
+				THEME_WOOD,
+				Enum.Material.Wood
+			)
+		end
+	end
+end
+
+-- Palmera extra: tronco inclinado y 4 hojas caidas.
+local function buildPalm(folder: Folder, index: number, base: Vector3, height: number, leaf: Color3)
+	local lean = math.sin(index * 2.3) * 0.14
+	local trunk = deco(
+		folder,
+		"PalmTrunk" .. index,
+		Vector3.new(1.3, height, 1.3),
+		base,
+		Color3.fromRGB(150, 118, 80),
+		Enum.Material.Wood
+	)
+	trunk.CFrame = CFrame.new(base) * CFrame.Angles(0, 0, lean) * CFrame.new(0, height / 2, 0)
+	local top = base + Vector3.new(-math.sin(lean) * height, math.cos(lean) * height, 0)
+	for frond = 0, 3 do
+		local part = deco(folder, "PalmLeaf" .. index, Vector3.new(9, 0.3, 2.6), top, leaf, Enum.Material.Grass)
+		part.CFrame = CFrame.new(top)
+			* CFrame.Angles(0, frond * math.pi / 2 + index, 0)
+			* CFrame.Angles(0, 0, -0.4)
+			* CFrame.new(4.2, 0, 0)
+	end
+end
+
+-- Costa: palmeras altas, conchas, estrellas de mar, rocas de playa, faro en una isla del mar abierto y gaviotas.
+local function buildCoastTheme(folder: Folder, style: ZoneStyle)
+	local o = style.origin
+	local rng = Random.new(style.seed + 500)
+	local function beachX(range: number): number -- evita la entrada del muelle (|x| < 9)
+		local x = rng:NextNumber(-range, range)
+		return if math.abs(x) < 9 then x + 18 else x
+	end
+	for i = 1, 8 do
+		buildPalm(
+			folder,
+			i,
+			o + Vector3.new(beachX(88), 0, rng:NextNumber(22, 85)),
+			rng:NextNumber(15, 22),
+			style.treeColor
+		)
+	end
+	for i = 1, 20 do
+		deco(
+			folder,
+			"Shell" .. i,
+			Vector3.new(0.9, 0.5, 0.9),
+			o + Vector3.new(beachX(85), 0.25, rng:NextNumber(-12, 36)),
+			if i % 2 == 0 then Color3.fromRGB(250, 238, 222) else Color3.fromRGB(240, 190, 180),
+			nil,
+			Enum.PartType.Ball
+		)
+	end
+	for i = 1, 6 do
+		local at = o + Vector3.new(beachX(80), 0.12, rng:NextNumber(-12, 34))
+		for arm = 0, 2 do
+			local bar = deco(folder, "Starfish" .. i, Vector3.new(2.4, 0.2, 0.6), at, Color3.fromRGB(235, 120, 70))
+			bar.CFrame = CFrame.new(at) * CFrame.Angles(0, arm * math.pi / 3, 0)
+		end
+	end
+	for i = 1, 6 do -- rocas de playa lejos del muelle y de la linea de pesca (z = -20)
+		local r = rng:NextNumber(1.6, 3)
+		local x = (if i % 2 == 0 then 1 else -1) * rng:NextNumber(20, 85)
+		rockBall(
+			folder,
+			"BeachRock" .. i,
+			o + Vector3.new(x, r * 0.3, rng:NextNumber(-4, 30)),
+			r,
+			Color3.fromRGB(165, 156, 142),
+			Enum.Material.Rock
+		)
+	end
+	-- faro en una isla del mar abierto (88 studs de la orilla, fuera del carril de pesca); el fondo marino esta en y = -6
+	local base = o + Vector3.new(52, 0, -108)
+	local island = deco(
+		folder,
+		"LighthouseIsland",
+		Vector3.new(8, 24, 24),
+		base + Vector3.new(0, -2, 0),
+		style.groundColor,
+		Enum.Material.Sand,
+		Enum.PartType.Cylinder
+	)
+	island.CFrame = CFrame.new(base + Vector3.new(0, -2, 0)) * CFrame.Angles(0, 0, math.rad(90))
+	island.CanCollide = true
+	local function tower(name: string, size: Vector3, y: number, color: Color3, material: Enum.Material)
+		local part = deco(folder, name, size, base + Vector3.new(0, y, 0), color, material, Enum.PartType.Cylinder)
+		part.CFrame = CFrame.new(base + Vector3.new(0, y, 0)) * CFrame.Angles(0, 0, math.rad(90))
+	end
+	for i = 0, 3 do
+		local d = 4.6 - i * 0.3
+		local color = if i % 2 == 0 then Color3.fromRGB(235, 70, 60) else Color3.fromRGB(245, 245, 240)
+		tower("LighthouseBody" .. i, Vector3.new(5, d, d), 4.5 + i * 5, color, Enum.Material.SmoothPlastic)
+	end
+	tower("LighthouseLamp", Vector3.new(2.6, 3.2, 3.2), 24.1, Color3.fromRGB(255, 235, 150), Enum.Material.Neon)
+	tower("LighthouseRoof", Vector3.new(1.6, 4.6, 4.6), 26.1, Color3.fromRGB(90, 40, 40), Enum.Material.SmoothPlastic)
+	for i = 1, 4 do
+		local r = rng:NextNumber(2, 3.6)
+		local a = i * 1.6
+		local at = base + Vector3.new(math.cos(a) * 11, r * 0.3, math.sin(a) * 11)
+		rockBall(folder, "IslandRock" .. i, at, r, Color3.fromRGB(150, 145, 140), Enum.Material.Rock)
+	end
+	-- 3 gaviotas lejanas que van y vienen con un Tween infinito (en pcall: sin TweenService real no pasa nada)
+	for i = 1, 3 do
+		local gull = deco(
+			folder,
+			"Gull" .. i,
+			Vector3.new(3, 0.3, 1.1),
+			o + Vector3.new(-50 + i * 30, 34 + i * 4, -70 - i * 8),
+			WHITE
+		)
+		pcall(function()
+			local info = TweenInfo.new(14 + i * 3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+			local goal = gull.CFrame * CFrame.new(70 - i * 20, 6, 10) * CFrame.Angles(0, math.rad(20 * i), 0)
+			TweenService:Create(gull, info, { CFrame = goal }):Play()
+		end)
+	end
+end
+
 -- Siluetas frías al horizonte y nubes de bajo coste para ampliar visualmente cada zona.
 local function buildHorizon(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
@@ -752,6 +1018,11 @@ local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	buildHorizon(folder, style)
 	buildSign(folder, style)
 	buildDecor(folder, style, art)
+	if style.id == "river" then
+		buildRiverTheme(folder, style)
+	elseif style.id == "coast" then
+		buildCoastTheme(folder, style)
+	end
 	buildArtOnlyProps(folder, style, art)
 	buildWildlife(folder, style)
 	folder.Parent = world
@@ -900,11 +1171,11 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			name = "",
 			nameKey = "",
 			origin = Vector3.new(400, 0, 0),
-			groundColor = Color3.fromRGB(120, 160, 110),
+			groundColor = Color3.fromRGB(88, 126, 108),
 			groundMaterial = Enum.Material.Grass,
 			waterColor = Color3.fromRGB(90, 200, 215),
 			waterShape = "river",
-			treeColor = Color3.fromRGB(50, 120, 90),
+			treeColor = Color3.fromRGB(36, 104, 98),
 			treeArt = "pine_tree",
 			seed = 22,
 		},
@@ -913,11 +1184,11 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			name = "",
 			nameKey = "",
 			origin = Vector3.new(800, 0, 0),
-			groundColor = Color3.fromRGB(232, 210, 150),
+			groundColor = Color3.fromRGB(248, 234, 190),
 			groundMaterial = Enum.Material.Sand,
 			waterColor = Color3.fromRGB(40, 130, 200),
 			waterShape = "sea",
-			treeColor = Color3.fromRGB(95, 170, 80),
+			treeColor = Color3.fromRGB(120, 190, 70),
 			treeArt = "palm_tree",
 			seed = 33,
 		},
