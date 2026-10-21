@@ -17,6 +17,12 @@ Mundo con Terrain (agua real, orilla de arena, muelle con barandas y farolas, ba
 **Pendiente visual (el dueño dijo que aún "parece malo"):** cartel de zona enorme y feo (tablero rosa + base oscura); agua demasiado plana, sin espuma ni reflejos; sin partículas al pescar ni cámara que siga el corcho; el texto de ayuda de abajo sigue diciendo "Press REEL IN…" mientras se espera la picada; el chat de Studio tapa el HUD; íconos y miniatura finales; **audio: puestos y verificados en Studio (música, lago, gente jugando, salpicadura, monedas, fanfarria; cargan y suenan). Pendientes: `cast`, `escape`, `button` en `SoundIds.luau`; `bite` y `catch` son provisionales y sin oír.** Hacer comparación Ropilot vs flujo propio con el mismo encargo (el MCP de Ropilot se carga al reiniciar Claude).
 Ropilot: conectado a Claude y Codex (`claude mcp list`), sin usar todavía.
 
+## Ropilot (21-oct, noche)
+Su programa (`%APPDATA%opilotinopilot-infra-helper.exe mcp --ropilot-external-mcp`) funciona y expone 27 herramientas: Studio (scripts, capturas, playtest), Blender (modelos, renders para íconos/miniaturas, `ropilot_blender_upload_images` sube PNG a Roblox) y VFX (`ropilot_vfx_capture`). Se probó por stdio con `ROBLOX/tools/ropilot-mcp-probe.mjs` (solo lista y listchildren). **Studio NO estaba conectado a Ropilot** (falta que Aryan inicie sesión en la app Ropilot Studio y active el plugin en Plugins). Claude lo carga como herramienta nativa tras reiniciar. Pendiente: prueba comparativa (ícono y miniatura con Blender de Ropilot vs flujo propio). Ropilot es de terceros: su plugin ejecuta código recibido de ropilot.ai y usa créditos.
+
+## Estado visual (21-oct, noche)
+Mundo con colinas de Terrain, nubes reales, luz cálida, muelle con farolas, cartel legible, agua azul (28,116,178), HUD compacto, efectos de salpicadura y "!" al picar, audio real. Bug resuelto: `Lighting.Technology` no se puede fijar desde script y cortaba toda la iluminación (poner "Future" a mano en el lugar). Falta: ver la versión final con el agua corregida en Studio, ícono/miniatura finales, sonidos `cast`/`escape`/`button`, probar compras con IDs reales en la privada (Aryan decide).
+
 ## Decisiones
 - La nube orquesta y escribe en `claude/brave-meitner-esyqy8`; el PC commitea en `pc/aryan-local`; Codex trabaja en `codex/<tarea>`.
 - Monetización v1.1: cosméticos y comodidad antes que suerte de pago.
