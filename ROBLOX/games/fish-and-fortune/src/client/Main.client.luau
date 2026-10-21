@@ -40,6 +40,7 @@ local Feedback = require(client:WaitForChild("Feedback"))
 local Menus = require(client:WaitForChild("Menus"))
 local Minigame = require(client:WaitForChild("Minigame"))
 local Hud = require(client:WaitForChild("Hud"))
+local Audio = require(client:WaitForChild("Audio"))
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "FishFortune"
@@ -159,25 +160,47 @@ net:onEvent("State", function(state: any)
 	ctx.store:set(state)
 end)
 net:onEvent("Toast", function(message: any)
+	if type(message) == "table" then
+		if message.key == "toast.sold" then
+			Audio.play("sell")
+		elseif message.key == "toast.rod_bought" then
+			Audio.play("buy")
+		end
+	end
 	local text = messageText(message)
 	if text ~= nil then
 		ctx.feedback.toast(text)
 	end
 end)
 net:onEvent("Catch", function(payload: any)
+	Audio.play("catch")
 	ctx.minigame.onCatch(payload)
 	ctx.feedback.showCatch(payload)
 end)
 net:onEvent("Banner", function(message: any)
 	local text = messageText(message)
 	if text ~= nil then
+		if
+			type(message) == "table"
+			and type(message.key) == "string"
+			and string.find(message.key, "banner.mythic", 1, true) == 1
+		then
+			Audio.play("rare")
+		end
 		ctx.feedback.showBanner(text)
 	end
 end)
 net:onEvent("CastStarted", function(payload: any)
+	Audio.play("splash")
+	if type(payload) == "table" and type(payload.bite) == "number" and payload.bite >= 0 then
+		task.delay(payload.bite, function()
+			Audio.play("bite")
+		end)
+	end
 	ctx.minigame.onCastStarted(payload)
 end)
 net:onEvent("CastFailed", function(reason: string)
+	Audio.play("escape")
 	ctx.minigame.onCastFailed(reason)
 	local key = ClientLogic.failureKey(reason)
 	if key ~= nil then
