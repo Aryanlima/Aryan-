@@ -1,0 +1,22 @@
+{
+  "universeId": 10772154962,
+  "passes": {
+    "auto_fish": 2044814436,
+    "double_coins": 2044700392,
+    "luck_plus": 0,
+    "starter": 2044472407,
+    "vip": 2044946389,
+    "season_pass": 2045408395,
+    "golden_rod": 2045144398,
+    "bubble_trail": 2044262410
+  },
+  "products": {
+    "lucky_bait_15": 0,
+    "coin_boost_15": 3720534632,
+    "coin_pack_small": 3720534679,
+    "coin_pack_medium": 3720534661,
+    "coin_pack_large": 3720534646,
+    "pearl_pack": 3720534699,
+    "slot_pack": 3720534714
+  }
+}

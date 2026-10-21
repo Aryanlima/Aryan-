@@ -27,23 +27,23 @@
 
 return {
 	passes = {
-		auto_fish = 0, -- TODO_ID  (Pase Auto-Pesca)
-		double_coins = 0, -- TODO_ID  (Pase 2x Dinero)
+		auto_fish = 2044814436, -- (Pase Auto-Pesca)
+		double_coins = 2044700392, -- (Pase 2x Dinero)
 		luck_plus = 0, -- TODO_ID  (Pase Suerte+ : ALTERA PROBABILIDADES)
-		starter = 0, -- TODO_ID  (Pack de inicio, pago unico)
-		vip = 0, -- TODO_ID  (Pase VIP)
-		season_pass = 0, -- TODO_ID  (Pase de Temporada 1: pista premium)
-		golden_rod = 0, -- TODO_ID  (Cana Dorada, cosmetico)
-		bubble_trail = 0, -- TODO_ID  (Estela de Burbujas, cosmetico)
+		starter = 2044472407, -- (Pack de inicio, pago unico)
+		vip = 2044946389, -- (Pase VIP)
+		season_pass = 2045408395, -- (Pase de Temporada 1: pista premium)
+		golden_rod = 2045144398, -- (Cana Dorada, cosmetico)
+		bubble_trail = 2044262410, -- (Estela de Burbujas, cosmetico)
 	},
 	products = {
 		lucky_bait_15 = 0, -- TODO_ID  (Cebo de Suerte, 15 min : ALTERA PROBABILIDADES)
-		coin_boost_15 = 0, -- TODO_ID  (Boost de Monedas x2, 15 min)
-		coin_pack_small = 0, -- TODO_ID  (Pack de monedas pequeno)
-		coin_pack_medium = 0, -- TODO_ID  (Pack de monedas mediano)
-		coin_pack_large = 0, -- TODO_ID  (Pack de monedas grande)
-		pearl_pack = 0, -- TODO_ID  (Pack de perlas)
-		slot_pack = 0, -- TODO_ID  (+10 espacios de inventario)
+		coin_boost_15 = 3720534632, -- (Boost de Monedas x2, 15 min)
+		coin_pack_small = 3720534679, -- (Pack de monedas pequeno)
+		coin_pack_medium = 3720534661, -- (Pack de monedas mediano)
+		coin_pack_large = 3720534646, -- (Pack de monedas grande)
+		pearl_pack = 3720534699, -- (Pack de perlas)
+		slot_pack = 3720534714, -- (+10 espacios de inventario)
 	},
 	passAssetIds = {},
 } :: { passes: { [string]: number }, products: { [string]: number }, passAssetIds: { [string]: number } }
