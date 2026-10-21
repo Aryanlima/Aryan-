@@ -10,11 +10,10 @@
 
 	Si un mapa nuevo respeta ese contrato (y el servidor lee `build()`), nada mas cambia.
 
-	ARTE GENERADO (opcional): `build(zonas, art)` recibe el proveedor de arte (packages/Art). Para cada pieza que tiene perfil
-	(muelle, farolas, barca, arboles) pide el modelo generado; si no existe o no es valido usa el generador procedural de
-	siempre como RESPALDO (farolas y barca no tienen respaldo: sin arte no aparecen). Los materiales generados
-	(MaterialVariant) se aplican al suelo y al muelle procedural. El arte es solo visual: lo que se pisa (la cubierta del
-	muelle) sigue siendo una parte propia e invisible. Sin `art` el resultado es identico al de siempre.
+	ARTE GENERADO (opcional): `build(zonas, art)` recibe el proveedor de arte (packages/Art). Muelle, farolas, barca y
+	arboles aceptan modelos generados y conservan respaldo procedural. MaterialVariants opcionales se aplican al muelle
+	y a un portador invisible para el suelo; el terreno visible siempre usa Terrain. La cubierta del muelle mantiene su
+	colision y altura propias. Sin `art`, todos los elementos se construyen proceduralmente.
 ]]
 
 local Lighting = game:GetService("Lighting")
@@ -88,6 +87,12 @@ local function invisible(part: Part): Part
 	return part
 end
 
+local function detail(part: Part): Part
+	part.CanCollide = false
+	part.CastShadow = false
+	return part
+end
+
 -- Aplica el MaterialVariant generado (si existe) a una parte procedural.
 local function applyVariant(part: Part, art: ArtLike?, materialId: string)
 	if art == nil then
@@ -102,43 +107,62 @@ end
 
 local function buildWater(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
-	local water: Part
+	local terrain: any = Workspace.Terrain
+	local function callTerrain(methodName: string, ...: any)
+		local ok, method = pcall(function()
+			return terrain[methodName]
+		end)
+		if ok and type(method) == "function" then
+			method(terrain, ...)
+		end
+	end
 	if style.waterShape == "disc" then
-		water = newPart(
-			folder,
-			"Water",
-			Vector3.new(1, 110, 110),
-			origin + Vector3.new(0, 0.1, -45),
-			style.waterColor,
-			Enum.Material.Glass
-		)
-		water.Shape = Enum.PartType.Cylinder
-		water.CFrame = CFrame.new(origin + Vector3.new(0, 0.1, -45)) * CFrame.Angles(0, 0, math.rad(90))
+		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 65, Enum.Material.Sand)
+		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 60, Enum.Material.Mud)
+		callTerrain("FillCylinder", CFrame.new(origin + Vector3.new(0, -2, -45)), 8, 55, Enum.Material.Water)
 	elseif style.waterShape == "river" then
-		water = newPart(
-			folder,
-			"Water",
-			Vector3.new(60, 1, 170),
-			origin + Vector3.new(0, 0.1, -40),
-			style.waterColor,
-			Enum.Material.Glass
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -40)),
+			Vector3.new(78, 8, 188),
+			Enum.Material.Sand
+		)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -40)),
+			Vector3.new(68, 8, 184),
+			Enum.Material.Mud
+		)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -40)),
+			Vector3.new(60, 8, 170),
+			Enum.Material.Water
 		)
 	else
-		water = newPart(
-			folder,
-			"Water",
-			Vector3.new(180, 1, 100),
-			origin + Vector3.new(0, 0.1, -70),
-			style.waterColor,
-			Enum.Material.Glass
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			Vector3.new(196, 8, 112),
+			Enum.Material.Sand
+		)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			Vector3.new(188, 8, 106),
+			Enum.Material.Mud
+		)
+		callTerrain(
+			"FillBlock",
+			CFrame.new(origin + Vector3.new(0, -2, -70)),
+			Vector3.new(180, 8, 100),
+			Enum.Material.Water
 		)
 	end
-	water.Transparency = 0.35
-	water.CanCollide = false -- se puede caminar por debajo del muelle sin "flotar"
-	water.CanQuery = false
+	local _ = folder
 end
 
-local PIER_WOOD = Color3.fromRGB(150, 110, 70)
+local PIER_WOOD = Color3.fromRGB(201, 138, 75)
 
 -- Muelle procedural de siempre (respaldo del arte "pier"): cubierta + postes.
 local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
@@ -155,22 +179,65 @@ local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLik
 	applyVariant(deck, art, "pier_wood")
 	for index = 0, 4 do
 		local z = -36 + index * 9
-		newPart(
-			folder,
-			"PierPost",
-			Vector3.new(1.2, 5, 1.2),
-			origin + Vector3.new(-3.6, 0.5, z),
-			darkWood,
-			Enum.Material.Wood
+		detail(
+			newPart(
+				folder,
+				"PierPost",
+				Vector3.new(1.2, 5, 1.2),
+				origin + Vector3.new(-3.6, 0.5, z),
+				darkWood,
+				Enum.Material.Wood
+			)
 		)
-		newPart(
-			folder,
-			"PierPost",
-			Vector3.new(1.2, 5, 1.2),
-			origin + Vector3.new(3.6, 0.5, z),
-			darkWood,
-			Enum.Material.Wood
+		detail(
+			newPart(
+				folder,
+				"PierPost",
+				Vector3.new(1.2, 5, 1.2),
+				origin + Vector3.new(3.6, 0.5, z),
+				darkWood,
+				Enum.Material.Wood
+			)
 		)
+	end
+	for index = 0, 8 do
+		detail(
+			newPart(
+				folder,
+				"DeckPlank",
+				Vector3.new(7.7, 0.12, 4.8),
+				origin + Vector3.new(0, 1.76, -39 + index * 5.2),
+				Color3.fromRGB(201 + (index % 2) * 8, 138 + (index % 2) * 5, 75),
+				Enum.Material.WoodPlanks
+			)
+		)
+	end
+	for _, side in { -1, 1 } do
+		for index = 0, 3 do
+			local z = -35 + index * 11
+			local railPost = detail(
+				newPart(
+					folder,
+					"PierRailPost",
+					Vector3.new(0.55, 3.2, 0.55),
+					origin + Vector3.new(side * 3.55, 3.2, z),
+					darkWood,
+					Enum.Material.Wood
+				)
+			)
+			railPost.CanCollide = true
+		end
+		local rail = detail(
+			newPart(
+				folder,
+				"PierRail",
+				Vector3.new(0.45, 0.45, 34),
+				origin + Vector3.new(side * 3.55, 4.55, -18.5),
+				PIER_WOOD,
+				Enum.Material.WoodPlanks
+			)
+		)
+		rail.CanCollide = true
 	end
 end
 
@@ -212,35 +279,141 @@ local function buildPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	target.Name = "CastTarget"
 end
 
--- Farolas y barca: SOLO existen con arte generado (no hay respaldo: sin arte el mundo es el de siempre).
-local function buildArtOnlyProps(folder: Folder, style: ZoneStyle, art: ArtLike)
+-- El arte puede sustituir las farolas y la barca; si falta se construyen piezas locales.
+local function buildArtOnlyProps(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local origin = style.origin
 	local index = 0
 	for _, z in { -34, -20, -6 } do
 		for _, side in { -1, 1 } do
 			index += 1
-			art:place("props", "lantern", {
-				parent = folder,
-				cframe = CFrame.new(origin + Vector3.new(side * 3.5, 1.7, z)),
-				name = "Lantern" .. index,
-			})
+			local function fallback(parent: Instance, cf: CFrame): Instance?
+				local pole = detail(
+					newPart(
+						parent,
+						"LanternPost",
+						Vector3.new(0.35, 3.4, 0.35),
+						cf.Position + Vector3.new(0, 1.7, 0),
+						Color3.fromRGB(77, 55, 42),
+						Enum.Material.Wood
+					)
+				)
+				local bulb = detail(
+					newPart(
+						parent,
+						"LanternBulb",
+						Vector3.new(1.1, 1.1, 1.1),
+						cf.Position + Vector3.new(0, 3.65, 0),
+						Color3.fromRGB(255, 200, 61),
+						Enum.Material.Glass
+					)
+				)
+				bulb.Shape = Enum.PartType.Ball
+				local light = Instance.new("PointLight")
+				light.Color = Color3.fromRGB(255, 194, 103)
+				light.Brightness = 1.2
+				light.Range = 18
+				light.Parent = bulb
+				return pole
+			end
+			if art ~= nil then
+				art:place("props", "lantern", {
+					parent = folder,
+					cframe = CFrame.new(origin + Vector3.new(side * 3.5, 1.7, z)),
+					name = "Lantern" .. index,
+					fallback = fallback,
+				})
+			else
+				fallback(folder, CFrame.new(origin + Vector3.new(side * 3.5, 1.7, z)))
+			end
 		end
 	end
-	art:place("props", "rowboat", {
-		parent = folder,
-		cframe = CFrame.new(origin + Vector3.new(-9, 0.15, -30)) * CFrame.Angles(0, math.rad(20), 0),
-		name = "Rowboat",
-	})
+	local function boatFallback(parent: Instance, cf: CFrame): Instance?
+		local hull = detail(
+			newPart(
+				parent,
+				"RowboatHull",
+				Vector3.new(4.5, 1, 9),
+				cf.Position,
+				Color3.fromRGB(139, 82, 45),
+				Enum.Material.WoodPlanks
+			)
+		)
+		for _, side in { -1, 1 } do
+			detail(
+				newPart(
+					parent,
+					"BoatGunwale",
+					Vector3.new(0.35, 1.3, 9),
+					cf.Position + Vector3.new(side * 2.1, 0.7, 0),
+					Color3.fromRGB(201, 138, 75),
+					Enum.Material.WoodPlanks
+				)
+			)
+		end
+		return hull
+	end
+	local boatCFrame = CFrame.new(origin + Vector3.new(-10, -0.4, -30)) * CFrame.Angles(0, math.rad(20), 0)
+	if art ~= nil then
+		art:place("props", "rowboat", {
+			parent = folder,
+			cframe = boatCFrame,
+			name = "Rowboat",
+			fallback = boatFallback,
+		})
+	else
+		boatFallback(folder, boatCFrame)
+	end
+	local rope = detail(
+		newPart(
+			folder,
+			"MooringRope",
+			Vector3.new(0.16, 0.16, 8),
+			origin + Vector3.new(-6, 0.5, -30),
+			Color3.fromRGB(105, 81, 58),
+			Enum.Material.Fabric
+		)
+	)
+	rope.CFrame = CFrame.new(rope.Position) * CFrame.Angles(0, math.rad(90), math.rad(12))
+	local cargoX = if style.waterShape == "river" then 34 else 14
+	for crateIndex = 1, 3 do
+		local crate = detail(
+			newPart(
+				folder,
+				"FishCrate",
+				Vector3.new(2.4, 2, 2.4),
+				origin + Vector3.new(cargoX + (crateIndex % 2) * 2.5, 1, 5 + crateIndex * 2.5),
+				Color3.fromRGB(158, 105, 61),
+				Enum.Material.WoodPlanks
+			)
+		)
+		crate.CFrame = CFrame.new(crate.Position) * CFrame.Angles(0, math.rad(crateIndex * 9), 0)
+	end
+	for barrelIndex = 1, 2 do
+		local barrel = detail(
+			newPart(
+				folder,
+				"Barrel",
+				Vector3.new(1.8, 2.4, 1.8),
+				origin + Vector3.new(cargoX + 2, 1.2, 8 + barrelIndex * 3),
+				Color3.fromRGB(128, 83, 49),
+				Enum.Material.Wood
+			)
+		)
+		barrel.Shape = Enum.PartType.Cylinder
+		barrel.CFrame = CFrame.new(barrel.Position) * CFrame.Angles(0, 0, math.rad(90))
+	end
 end
 
 local function buildSign(folder: Folder, style: ZoneStyle)
-	local post = newPart(
-		folder,
-		"Sign",
-		Vector3.new(12, 6, 0.6),
-		style.origin + Vector3.new(14, 5, 8),
-		Color3.fromRGB(60, 45, 35),
-		Enum.Material.Wood
+	local post = detail(
+		newPart(
+			folder,
+			"Sign",
+			Vector3.new(12, 6, 0.6),
+			style.origin + Vector3.new(14, 5, 8),
+			Color3.fromRGB(60, 45, 35),
+			Enum.Material.Wood
+		)
 	)
 	local gui = Instance.new("SurfaceGui")
 	gui.Face = Enum.NormalId.Front
@@ -257,13 +430,38 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 	label.TextScaled = true
 	label.Parent = gui
 	gui.Parent = post
-	newPart(
-		folder,
-		"SignLegs",
-		Vector3.new(1, 5, 1),
-		style.origin + Vector3.new(14, 2.5, 7.6),
-		Color3.fromRGB(60, 45, 35),
-		Enum.Material.Wood
+	local arrow = detail(
+		newPart(
+			folder,
+			"FishHereSign",
+			Vector3.new(7, 2, 0.7),
+			style.origin + Vector3.new(14, 9.3, 8),
+			Color3.fromRGB(255, 90, 95),
+			Enum.Material.SmoothPlastic
+		)
+	)
+	local arrowGui = Instance.new("SurfaceGui")
+	arrowGui.Face = Enum.NormalId.Front
+	arrowGui.PixelsPerStud = 32
+	local arrowLabel = Instance.new("TextButton")
+	arrowLabel.Size = UDim2.fromScale(1, 1)
+	arrowLabel.BackgroundTransparency = 1
+	arrowLabel.Active = false
+	arrowLabel.Text = "← Fish here!"
+	arrowLabel.TextColor3 = Color3.new(1, 1, 1)
+	arrowLabel.Font = Enum.Font.GothamBlack
+	arrowLabel.TextScaled = true
+	arrowLabel.Parent = arrowGui
+	arrowGui.Parent = arrow
+	detail(
+		newPart(
+			folder,
+			"SignLegs",
+			Vector3.new(1, 5, 1),
+			style.origin + Vector3.new(14, 2.5, 7.6),
+			Color3.fromRGB(60, 45, 35),
+			Enum.Material.Wood
+		)
 	)
 end
 
@@ -280,23 +478,66 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 		end
 		local height = rng:NextNumber(7, 11)
 		local function proceduralTree(): Instance?
-			newPart(
-				folder,
-				"TreeTrunk" .. index,
-				Vector3.new(2, height, 2),
-				origin + Vector3.new(x, height / 2, z),
-				Color3.fromRGB(110, 78, 50),
-				Enum.Material.Wood
+			local trunk = detail(
+				newPart(
+					folder,
+					"TreeTrunk" .. index,
+					Vector3.new(2, height, 2),
+					origin + Vector3.new(x, height / 2, z),
+					Color3.fromRGB(110, 78, 50),
+					Enum.Material.Wood
+				)
 			)
-			local crown = newPart(
-				folder,
-				"TreeCrown" .. index,
-				Vector3.new(9, 9, 9),
-				origin + Vector3.new(x, height + 3, z),
-				style.treeColor,
-				Enum.Material.Grass
+			trunk.CanCollide = false
+			if style.treeArt == "palm_tree" then
+				for frond = 1, 6 do
+					local angle = math.rad((frond - 1) * 60)
+					local leaf = detail(
+						newPart(
+							folder,
+							"PalmFrond",
+							Vector3.new(1.1, 0.5, 7),
+							origin + Vector3.new(x + math.cos(angle) * 2.2, height + 1, z + math.sin(angle) * 2.2),
+							Color3.fromRGB(42 + frond * 3, 132 + frond * 4, 78),
+							Enum.Material.Grass
+						)
+					)
+					leaf.CFrame = CFrame.new(leaf.Position) * CFrame.Angles(math.rad(-20), -angle, math.rad(12))
+				end
+				return trunk
+			end
+			local crown = detail(
+				newPart(
+					folder,
+					"TreeCrown" .. index,
+					Vector3.new(9, 9, 9),
+					origin + Vector3.new(x, height + 3, z),
+					style.treeColor,
+					Enum.Material.Grass
+				)
 			)
 			crown.Shape = Enum.PartType.Ball
+			for cluster = 1, 3 do
+				local canopyColor = if cluster == 1
+					then style.treeColor
+					else Color3.fromRGB(70 + cluster * 15, 126 + cluster * 8, 62 + cluster * 6)
+				local canopy = detail(
+					newPart(
+						folder,
+						"TreeCanopy" .. index,
+						Vector3.new(6.4, 6.4, 6.4),
+						origin
+							+ Vector3.new(
+								x + (cluster - 2) * 2.5,
+								height + 2 + (cluster % 2) * 1.3,
+								z + (cluster % 2) * 1.8
+							),
+						canopyColor,
+						Enum.Material.Grass
+					)
+				)
+				canopy.Shape = Enum.PartType.Ball
+			end
 			return crown
 		end
 		if art == nil then
@@ -317,37 +558,76 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 		local x = rng:NextNumber(-85, 85)
 		local z = rng:NextNumber(14, 88)
 		local size = rng:NextNumber(2, 5)
-		local rock = newPart(
-			folder,
-			"Rock" .. index,
-			Vector3.new(size * 1.4, size, size * 1.2),
-			origin + Vector3.new(x, size / 2 - 0.3, z),
-			Color3.fromRGB(125, 130, 135),
-			Enum.Material.Slate
+		local terrain: any = Workspace.Terrain
+		local hasFillBall, fillBall = pcall(function()
+			return terrain.FillBall
+		end)
+		if hasFillBall and type(fillBall) == "function" then
+			fillBall(terrain, origin + Vector3.new(x, size / 2 - 0.3, z), size, Enum.Material.Rock)
+		end
+	end
+	for index = 1, 12 do
+		local x, z = rng:NextNumber(-86, 86), rng:NextNumber(18, 90)
+		local bush = detail(
+			newPart(
+				folder,
+				"Bush" .. index,
+				Vector3.new(3.4, 2.8, 3.4),
+				origin + Vector3.new(x, 1.2, z),
+				Color3.fromRGB(46, 113 + (index % 3) * 12, 67),
+				Enum.Material.Grass
+			)
 		)
-		rock.Shape = Enum.PartType.Ball
+		bush.Shape = Enum.PartType.Ball
+		for bloom = 1, 2 do
+			local flower = detail(
+				newPart(
+					folder,
+					"Flower" .. index,
+					Vector3.new(0.45, 0.45, 0.45),
+					origin + Vector3.new(x + bloom * 0.6, 2.2, z + 0.4),
+					if bloom == 1 then Color3.fromRGB(255, 90, 95) else Color3.fromRGB(255, 200, 61),
+					Enum.Material.Neon
+				)
+			)
+			flower.Shape = Enum.PartType.Ball
+		end
 	end
 end
 
 local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	local folder = Instance.new("Folder")
 	folder.Name = style.id
-	local ground = newPart(
+	local groundMaterialCarrier = newPart(
 		folder,
 		"Ground",
-		Vector3.new(200, 4, 200),
-		style.origin + Vector3.new(0, -2, 0),
+		Vector3.new(200, 1, 200),
+		style.origin + Vector3.new(0, -1, 0),
 		style.groundColor,
 		style.groundMaterial
 	)
-	applyVariant(ground, art, "ground_" .. style.id)
+	groundMaterialCarrier.Transparency = 1
+	groundMaterialCarrier.CanCollide = false
+	groundMaterialCarrier.CanQuery = false
+	groundMaterialCarrier.CanTouch = false
+	applyVariant(groundMaterialCarrier, art, "ground_" .. style.id)
+	local terrain: any = Workspace.Terrain
+	local hasFillBlock, fillBlock = pcall(function()
+		return terrain.FillBlock
+	end)
+	if hasFillBlock and type(fillBlock) == "function" then
+		fillBlock(
+			terrain,
+			CFrame.new(style.origin + Vector3.new(0, -4, 0)),
+			Vector3.new(200, 8, 200),
+			style.groundMaterial
+		)
+	end
 	buildWater(folder, style)
 	buildPier(folder, style, art)
 	buildSign(folder, style)
 	buildDecor(folder, style, art)
-	if art ~= nil then
-		buildArtOnlyProps(folder, style, art)
-	end
+	buildArtOnlyProps(folder, style, art)
 	folder.Parent = world
 end
 
@@ -359,8 +639,29 @@ local function setupLighting()
 	Lighting.ColorShift_Top = Color3.fromRGB(255, 240, 215)
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
+	local terrain = Workspace.Terrain
+	terrain.WaterColor = Color3.fromRGB(46, 196, 241)
+	terrain.WaterTransparency = 0.22
+	terrain.WaterWaveSize = 0.12
+	terrain.WaterWaveSpeed = 9
+	terrain.WaterReflectance = 0.18
+	local previousSky = Lighting:FindFirstChild("FishFortuneSky")
+	if previousSky then
+		previousSky:Destroy()
+	end
+	local sky = Instance.new("Sky")
+	sky.Name = "FishFortuneSky"
+	sky.CelestialBodiesShown = true
+	sky.StarCount = 0
+	sky.SunAngularSize = 14
+	sky.Parent = Lighting
 
+	local previousAtmosphere = Lighting:FindFirstChild("FishFortuneAtmosphere")
+	if previousAtmosphere then
+		previousAtmosphere:Destroy()
+	end
 	local atmosphere = Instance.new("Atmosphere")
+	atmosphere.Name = "FishFortuneAtmosphere"
 	atmosphere.Density = 0.28
 	atmosphere.Offset = 0.25
 	atmosphere.Color = Color3.fromRGB(200, 215, 235)
@@ -369,13 +670,23 @@ local function setupLighting()
 	atmosphere.Haze = 0.6
 	atmosphere.Parent = Lighting
 
+	local previousCorrection = Lighting:FindFirstChild("FishFortuneColorCorrection")
+	if previousCorrection then
+		previousCorrection:Destroy()
+	end
 	local correction = Instance.new("ColorCorrectionEffect")
+	correction.Name = "FishFortuneColorCorrection"
 	correction.Saturation = 0.15
 	correction.Contrast = 0.05
 	correction.TintColor = Color3.fromRGB(255, 248, 238)
 	correction.Parent = Lighting
 
+	local previousBloom = Lighting:FindFirstChild("FishFortuneBloom")
+	if previousBloom then
+		previousBloom:Destroy()
+	end
 	local bloom = Instance.new("BloomEffect")
+	bloom.Name = "FishFortuneBloom"
 	bloom.Intensity = 0.25
 	bloom.Size = 24
 	bloom.Threshold = 1.6
