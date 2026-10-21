@@ -17,6 +17,8 @@
 ]]
 
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
 local Workspace = game:GetService("Workspace")
 
 export type WorldInfo = {
@@ -176,14 +178,30 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Enum.Material.Water
 		)
 	end
+	-- Bandas de color muy tenues junto a la orilla: superficie puramente visual, sin colision.
+	local shallowColor = Color3.fromRGB(140, 235, 255)
+	for index = 1, 3 do
+		local band = detail(
+			newPart(
+				folder,
+				"ShallowWaterBand",
+				Vector3.new(34, 0.12, 3),
+				origin + Vector3.new((index - 2) * 29, 0.04, -8 - index * 7),
+				shallowColor,
+				Enum.Material.Glass
+			)
+		)
+		band.Transparency = 0.58
+		band.Reflectance = 0.05
+	end
 	local _ = folder
 end
 
-local PIER_WOOD = Color3.fromRGB(201, 138, 75)
+local PIER_WOOD = Color3.fromRGB(128, 80, 47)
 
 -- Muelle procedural de siempre (respaldo del arte "pier"): cubierta + postes.
 local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
-	local darkWood = Color3.fromRGB(110, 80, 50)
+	local darkWood = Color3.fromRGB(76, 52, 39)
 	local origin = style.origin
 	local deck = newPart(
 		folder,
@@ -224,7 +242,7 @@ local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLik
 				"DeckPlank",
 				Vector3.new(7.7, 0.12, 4.8),
 				origin + Vector3.new(0, 1.76, -39 + index * 5.2),
-				Color3.fromRGB(201 + (index % 2) * 8, 138 + (index % 2) * 5, 75),
+				Color3.fromRGB(128 + (index % 2) * 8, 80 + (index % 2) * 5, 47),
 				Enum.Material.WoodPlanks
 			)
 		)
@@ -612,6 +630,100 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	end
 end
 
+-- Siluetas frías al horizonte y nubes de bajo coste para ampliar visualmente cada zona.
+local function buildHorizon(folder: Folder, style: ZoneStyle)
+	local origin = style.origin
+	local distant = Color3.fromRGB(128, 158, 174)
+	for index = 1, 7 do
+		local side = if index % 2 == 0 then 1 else -1
+		local x = side * (95 + (index % 3) * 22)
+		local z = -112 - index * 10
+		local hill = detail(
+			newPart(
+				folder,
+				"DistantHill",
+				Vector3.new(52 + (index % 3) * 18, 34 + (index % 4) * 8, 48),
+				origin + Vector3.new(x, 9, z),
+				distant:Lerp(Color3.fromRGB(160, 180, 188), index / 10),
+				Enum.Material.Slate
+			)
+		)
+		hill.Shape = Enum.PartType.Ball
+		hill.Transparency = 0.08
+	end
+	for index = 1, 5 do
+		local cloud = detail(
+			newPart(
+				folder,
+				"DistantCloud",
+				Vector3.new(26, 5, 12),
+				origin + Vector3.new(-105 + index * 43, 48 + (index % 2) * 8, -150 - (index % 3) * 15),
+				Color3.fromRGB(245, 232, 213),
+				Enum.Material.SmoothPlastic
+			)
+		)
+		cloud.Shape = Enum.PartType.Ball
+		cloud.Transparency = 0.28
+	end
+end
+
+local function buildWildlife(folder: Folder, style: ZoneStyle)
+	local origin = style.origin
+	-- Solo un pez efímero a la vez por zona; Tween y Debris limitan trabajo y vida de las piezas.
+	task.spawn(function()
+		while folder.Parent ~= nil do
+			task.wait(4.5)
+			if folder.Parent == nil then
+				break
+			end
+			local fish = detail(
+				newPart(
+					folder,
+					"JumpingFish",
+					Vector3.new(1.8, 0.65, 0.55),
+					origin + Vector3.new(math.random(-12, 12), 1, -48 - math.random(0, 18)),
+					Color3.fromRGB(255, 196, 97),
+					Enum.Material.SmoothPlastic
+				)
+			)
+			fish.CanQuery = false
+			local start = fish.CFrame
+			fish.CFrame = start * CFrame.Angles(0, 0, math.rad(-18))
+			local tween = TweenService:Create(
+				fish,
+				TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+				{ CFrame = start + Vector3.new(0, 5, 0) }
+			)
+			tween:Play()
+			Debris:AddItem(fish, 1.8)
+		end
+	end)
+	-- Partículas breves en dos puntos altos sugieren pájaros/libélulas sin emisores activos permanentes.
+	for index = 1, 2 do
+		local perch = detail(
+			newPart(
+				folder,
+				"DistantWildlife",
+				Vector3.new(0.3, 0.3, 0.3),
+				origin + Vector3.new(-42 + index * 78, 15, -35),
+				Color3.fromRGB(255, 226, 157),
+				Enum.Material.SmoothPlastic
+			)
+		)
+		perch.Transparency = 1
+		local emitter = Instance.new("ParticleEmitter")
+		emitter.Name = "FireflyGlints"
+		emitter.Color = ColorSequence.new(Color3.fromRGB(255, 215, 130))
+		emitter.LightEmission = 0.35
+		emitter.Rate = 0.7
+		emitter.Lifetime = NumberRange.new(1.5, 2.5)
+		emitter.Speed = NumberRange.new(0.5, 1.2)
+		emitter.SpreadAngle = Vector2.new(35, 35)
+		emitter.Size = NumberSequence.new(0.14)
+		emitter.Parent = perch
+	end
+end
+
 local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	local folder = Instance.new("Folder")
 	folder.Name = style.id
@@ -642,26 +754,30 @@ local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	end
 	buildWater(folder, style)
 	buildPier(folder, style, art)
+	buildHorizon(folder, style)
 	buildSign(folder, style)
 	buildDecor(folder, style, art)
 	buildArtOnlyProps(folder, style, art)
+	buildWildlife(folder, style)
 	folder.Parent = world
 end
 
 local function setupLighting()
-	Lighting.ClockTime = 14.5
-	Lighting.Brightness = 2.4
-	Lighting.Ambient = Color3.fromRGB(110, 120, 140)
-	Lighting.OutdoorAmbient = Color3.fromRGB(140, 150, 170)
+	Lighting.Technology = Enum.Technology.Future
+	Lighting.ClockTime = 16.3
+	Lighting.Brightness = 2
+	Lighting.ExposureCompensation = 0.1
+	Lighting.Ambient = Color3.fromRGB(123, 145, 166)
+	Lighting.OutdoorAmbient = Color3.fromRGB(169, 196, 211)
 	Lighting.ColorShift_Top = Color3.fromRGB(255, 240, 215)
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(32, 132, 196) -- azul profundo: el cian puro se veia plano y electrico
-	terrain.WaterTransparency = 0.3
-	terrain.WaterWaveSize = 0.12
-	terrain.WaterWaveSpeed = 9
-	terrain.WaterReflectance = 0.18
+	terrain.WaterColor = Color3.fromRGB(25, 169, 214)
+	terrain.WaterTransparency = 0.22
+	terrain.WaterWaveSize = 0.16
+	terrain.WaterWaveSpeed = 7
+	terrain.WaterReflectance = 0.12
 	local previousSky = Lighting:FindFirstChild("FishFortuneSky")
 	if previousSky then
 		previousSky:Destroy()
@@ -679,12 +795,12 @@ local function setupLighting()
 	end
 	local atmosphere = Instance.new("Atmosphere")
 	atmosphere.Name = "FishFortuneAtmosphere"
-	atmosphere.Density = 0.28
-	atmosphere.Offset = 0.25
-	atmosphere.Color = Color3.fromRGB(200, 215, 235)
-	atmosphere.Decay = Color3.fromRGB(255, 225, 190)
-	atmosphere.Glare = 0.2
-	atmosphere.Haze = 0.6
+	atmosphere.Density = 0.25
+	atmosphere.Offset = 0.1
+	atmosphere.Color = Color3.fromRGB(197, 232, 243)
+	atmosphere.Decay = Color3.fromRGB(242, 201, 149)
+	atmosphere.Glare = 0.15
+	atmosphere.Haze = 1.2
 	atmosphere.Parent = Lighting
 
 	local previousCorrection = Lighting:FindFirstChild("FishFortuneColorCorrection")
@@ -693,9 +809,9 @@ local function setupLighting()
 	end
 	local correction = Instance.new("ColorCorrectionEffect")
 	correction.Name = "FishFortuneColorCorrection"
-	correction.Saturation = 0.15
-	correction.Contrast = 0.05
-	correction.TintColor = Color3.fromRGB(255, 248, 238)
+	correction.Saturation = 0.08
+	correction.Contrast = 0.04
+	correction.TintColor = Color3.fromRGB(255, 239, 215)
 	correction.Parent = Lighting
 
 	local previousBloom = Lighting:FindFirstChild("FishFortuneBloom")
@@ -704,10 +820,28 @@ local function setupLighting()
 	end
 	local bloom = Instance.new("BloomEffect")
 	bloom.Name = "FishFortuneBloom"
-	bloom.Intensity = 0.25
+	bloom.Intensity = 0.18
 	bloom.Size = 24
-	bloom.Threshold = 1.6
+	bloom.Threshold = 1.4
 	bloom.Parent = Lighting
+	for _, effectName in { "FishFortuneSunRays", "FishFortuneDepthOfField" } do
+		local oldEffect = Lighting:FindFirstChild(effectName)
+		if oldEffect then
+			oldEffect:Destroy()
+		end
+	end
+	local sunRays = Instance.new("SunRaysEffect")
+	sunRays.Name = "FishFortuneSunRays"
+	sunRays.Intensity = 0.035
+	sunRays.Spread = 0.72
+	sunRays.Parent = Lighting
+	local depthOfField = Instance.new("DepthOfFieldEffect")
+	depthOfField.Name = "FishFortuneDepthOfField"
+	depthOfField.FarIntensity = 0.08
+	depthOfField.NearIntensity = 0.04
+	depthOfField.FocusDistance = 55
+	depthOfField.InFocusRadius = 45
+	depthOfField.Parent = Lighting
 end
 
 --[[
