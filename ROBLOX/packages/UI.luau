@@ -81,16 +81,16 @@ local UI = {}
 
 UI.theme = {
 	colors = {
-		background = { 20, 28, 44 },
-		panel = { 30, 42, 68 },
+		background = { 20, 32, 50 },
+		panel = { 32, 51, 79 },
 		row = { 42, 64, 92 },
-		text = { 240, 245, 255 },
-		textMuted = { 170, 185, 210 },
-		accent = { 46, 196, 241 },
+		text = { 247, 249, 252 },
+		textMuted = { 180, 198, 216 },
+		accent = { 25, 169, 214 },
 		accentText = { 255, 255, 255 },
 		disabled = { 80, 90, 110 },
 		positive = { 90, 200, 140 },
-		water = { 46, 196, 241 },
+		water = { 25, 169, 214 },
 		wood = { 201, 138, 75 },
 		gold = { 255, 200, 61 },
 		coral = { 255, 90, 95 },
@@ -371,7 +371,7 @@ function UI.label(options: LabelOptions): any
 		BackgroundTransparency = 1,
 		TextColor3 = color(options.colorName or "text"),
 		TextSize = options.textSize or UI.theme.textSize,
-		Font = if options.bold then e.Enum.Font.GothamBold else e.Enum.Font.Gotham,
+		Font = if options.bold then e.Enum.Font.GothamBold else e.Enum.Font.GothamMedium,
 		TextXAlignment = options.alignX or e.Enum.TextXAlignment.Left,
 		TextWrapped = options.wrap ~= false,
 		AutomaticSize = if options.size == nil then e.Enum.AutomaticSize.Y else e.Enum.AutomaticSize.None,
@@ -409,7 +409,7 @@ function UI.button(options: ButtonOptions): any
 		LayoutOrder = options.layoutOrder or 0,
 		Parent = options.parent,
 	}, {
-		corner(16),
+		corner(12),
 		-- Reflejo claro arriba. NO usar UIGradient en un TextButton: tine tambien la letra y la deja del color del fondo.
 		UI.create("Frame", {
 			Name = "Sheen",
@@ -462,6 +462,7 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 		bold = true,
 	})
 	title.Name = "Title"
+	outline(color("water"), 1.5).Parent = title
 
 	local closeButton = UI.button({
 		text = options.closeText or tr("ui.close"),
@@ -479,10 +480,11 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 		Position = e.UDim2.fromScale(0.5, 0.5),
 		Size = e.UDim2.fromScale(0.92, 0.86),
 		BackgroundColor3 = color("panel"),
+		BackgroundTransparency = 0.08,
 		BorderSizePixel = 0,
 		Visible = true,
 	}, {
-		corner(16),
+		corner(12),
 		outline(color("gold"), 2),
 		padding(),
 		-- limite en pantallas grandes (tablet / PC)

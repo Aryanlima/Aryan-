@@ -22,6 +22,38 @@ function Feedback.start(ctx: any): any
 	local fmt = ctx.fmt
 	local currentCard: any = nil
 	local currentBanner: any = nil
+	local activeParticles = 0
+
+	local function sparkle(parent: any)
+		local count = math.min(12, 20 - activeParticles)
+		for index = 1, count do
+			activeParticles += 1
+			local origin = parent.AbsolutePosition + parent.AbsoluteSize / 2
+			local particle = UI.create("Frame", {
+				Name = "CatchSparkle",
+				AnchorPoint = Vector2.new(0.5, 0.5),
+				Position = UDim2.fromOffset(origin.X + math.random(-120, 120), origin.Y + math.random(-18, 18)),
+				Size = UDim2.fromOffset(math.random(5, 9), math.random(5, 9)),
+				BackgroundColor3 = rgb(UI.theme.colors.gold),
+				BackgroundTransparency = 0.1,
+				BorderSizePixel = 0,
+				ZIndex = 5,
+				Parent = gui,
+			}, { UI.create("UICorner", { CornerRadius = UDim.new(1, 0) }) })
+			local drift = (index % 2 == 0) and 1 or -1
+			TweenService:Create(particle, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Position = particle.Position + UDim2.fromOffset(drift * math.random(12, 28), -math.random(10, 24)),
+				BackgroundTransparency = 1,
+				Size = UDim2.fromOffset(2, 2),
+			}):Play()
+			task.delay(0.36, function()
+				if particle.Parent ~= nil then
+					particle:Destroy()
+				end
+				activeParticles = math.max(0, activeParticles - 1)
+			end)
+		end
+	end
 
 	local function toast(text: string)
 		local notice = UI.toast(gui, text, 3.5)
@@ -51,12 +83,16 @@ function Feedback.start(ctx: any): any
 			BorderSizePixel = 0,
 			Parent = gui,
 		}, {
-			UI.create("UICorner", { CornerRadius = UDim.new(0, 22) }),
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
 			UI.create("UIGradient", {
 				Color = ColorSequence.new(rgb(UI.theme.colors.panel), Color3.fromRGB(18, 26, 42)),
 				Rotation = 90,
 			}),
-			UI.create("UIStroke", { Color = rgb(color), Thickness = 4 }),
+			UI.create("UIStroke", {
+				Color = rgb(color),
+				Thickness = 2,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			}),
 			UI.create("UISizeConstraint", { MaxSize = Vector2.new(420, 160) }),
 			UI.create("UIListLayout", {
 				SortOrder = Enum.SortOrder.LayoutOrder,
@@ -99,6 +135,18 @@ function Feedback.start(ctx: any): any
 				rgb(line.color)
 		end
 		currentCard = card
+		if
+			payload.rarity == "Rare"
+			or payload.rarity == "Epic"
+			or payload.rarity == "Legendary"
+			or payload.rarity == "Mythic"
+		then
+			card.BackgroundColor3 = rgb(UI.theme.colors.gold)
+			TweenService:Create(card, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				BackgroundColor3 = rgb(UI.theme.colors.panel),
+			}):Play()
+			sparkle(card)
+		end
 		card.Position = UDim2.new(0.5, 0, 0, -160)
 		TweenService:Create(card, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
 			Position = UDim2.new(0.5, 0, 0.12, 0),
@@ -128,8 +176,12 @@ function Feedback.start(ctx: any): any
 			Text = text,
 			Parent = gui,
 		}, {
-			UI.create("UICorner", { CornerRadius = UDim.new(0, 14) }),
-			UI.create("UIStroke", { Color = rgb(UI.theme.colors.Mythic), Thickness = 2 }),
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
+			UI.create("UIStroke", {
+				Color = rgb(UI.theme.colors.Mythic),
+				Thickness = 2,
+				ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			}),
 			UI.create("UISizeConstraint", { MaxSize = Vector2.new(640, 90) }),
 		})
 		currentBanner = banner

@@ -35,7 +35,7 @@ function Hud.start(ctx: any): any
 	local stats = UI.create("Frame", {
 		Name = "Stats",
 		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 10, 0.42, 0),
+		Position = UDim2.new(0, 10, 0.5, 0),
 		Size = UDim2.new(0, 230, 0, 0),
 		AutomaticSize = Enum.AutomaticSize.Y,
 		BackgroundColor3 = rgb(UI.theme.colors.panel),
@@ -43,9 +43,9 @@ function Hud.start(ctx: any): any
 		BorderSizePixel = 0,
 		Parent = gui,
 	}, {
-		UI.create("UICorner", { CornerRadius = UDim.new(0, 18) }),
+		UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
 		UI.create("UIStroke", { Color = rgb(UI.theme.colors.water), Thickness = 2, Transparency = 0.12 }),
-		UI.create("UISizeConstraint", { MaxSize = Vector2.new(250, 220) }),
+		UI.create("UISizeConstraint", { MaxSize = Vector2.new(250, 128) }),
 		UI.create("UIPadding", {
 			PaddingTop = UDim.new(0, 8),
 			PaddingBottom = UDim.new(0, 8),
@@ -75,8 +75,8 @@ function Hud.start(ctx: any): any
 	----------------------------------------------------------------------------
 	local eventsLabel = UI.label({
 		text = "",
-		size = UDim2.new(0.5, 0, 0, 0),
-		textSize = 16,
+		size = UDim2.new(0.9, 0, 0, 44),
+		textSize = 14,
 		alignX = Enum.TextXAlignment.Center,
 		colorName = "gold",
 		bold = true,
@@ -96,6 +96,7 @@ function Hud.start(ctx: any): any
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Parent = eventsLabel,
 	})
+	UI.create("UISizeConstraint", { MaxSize = Vector2.new(540, 44), Parent = eventsLabel })
 	UI.create("UIPadding", {
 		PaddingTop = UDim.new(0, 6),
 		PaddingBottom = UDim.new(0, 6),
@@ -167,7 +168,7 @@ function Hud.start(ctx: any): any
 		Name = "Menu",
 		AnchorPoint = Vector2.new(1, 0.5),
 		Position = UDim2.new(1, -8, 0.46, 0),
-		Size = UDim2.new(0, 144, 0.62, 0),
+		Size = UDim2.new(0, 160, 0.62, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 4,
@@ -190,7 +191,7 @@ function Hud.start(ctx: any): any
 			end,
 			parent = menuColumn,
 		})
-		button.TextSize = 16
+		button.TextSize = 18
 		menuButtons[id] = button
 	end
 	menuButton(1, "shop", "menu.shop")
@@ -213,7 +214,7 @@ function Hud.start(ctx: any): any
 		end,
 		parent = menuColumn,
 	})
-	autoButton.TextSize = 16
+	autoButton.TextSize = 18
 	autoButton.Visible = false
 
 	----------------------------------------------------------------------------
@@ -297,6 +298,7 @@ function Hud.start(ctx: any): any
 	local function refreshAction()
 		local state = store:get()
 		actionButton.Text = if minigame.isCasting() then L("hud.reel") else L("hud.cast")
+		sellButton.Visible = not minigame.isCasting()
 		actionButton.BackgroundColor3 = if minigame.isCasting()
 			then rgb(UI.theme.colors.positive)
 			else rgb(UI.theme.colors.accent)
@@ -319,7 +321,7 @@ function Hud.start(ctx: any): any
 			button.Text = L(menuKeys[id])
 		end
 		coinsLabel.Text = L("hud.coins", { amount = fmt.compact(state.coins) })
-		pearlsLabel.Text = "💎 " .. L("hud.pearls", { amount = fmt.compact(state.pearls) })
+		pearlsLabel.Text = L("hud.pearls", { amount = fmt.compact(state.pearls) })
 		bagLabel.Text = L("hud.bag", { used = state.inventoryCount, capacity = state.capacity })
 		local zoneName = L("zone." .. state.zone .. ".name")
 		zoneLabel.Text = if state.isPrivateServer then L("hud.zone_private", { zone = zoneName }) else zoneName
