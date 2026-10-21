@@ -25,6 +25,9 @@ function Feedback.start(ctx: any): any
 	local activeParticles = 0
 
 	local function sparkle(parent: any)
+		if parent.AbsoluteSize == nil or parent.AbsolutePosition == nil then
+			return -- sin medidas de pantalla (pruebas): sin destellos
+		end
 		local count = math.min(12, 20 - activeParticles)
 		for index = 1, count do
 			activeParticles += 1

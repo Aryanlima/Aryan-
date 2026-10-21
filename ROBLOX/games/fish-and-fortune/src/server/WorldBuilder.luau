@@ -670,10 +670,18 @@ end
 local function buildWildlife(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
 	-- Solo un pez efímero a la vez por zona; Tween y Debris limitan trabajo y vida de las piezas.
-	task.spawn(function()
-		while folder.Parent ~= nil do
-			task.wait(4.5)
-			if folder.Parent == nil then
+	local scheduler: any = task
+	if scheduler == nil then
+		return -- entornos sin planificador (pruebas): sin animacion
+	end
+	local function alive(): boolean
+		local parent: Instance? = folder.Parent
+		return parent ~= nil
+	end
+	scheduler.spawn(function()
+		while alive() do
+			scheduler.wait(4.5)
+			if not alive() then
 				break
 			end
 			local fish = detail(
