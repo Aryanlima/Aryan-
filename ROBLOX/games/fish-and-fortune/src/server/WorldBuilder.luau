@@ -184,22 +184,6 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Enum.Material.Water
 		)
 	end
-	-- Bandas de color muy tenues junto a la orilla: superficie puramente visual, sin colision.
-	local shallowColor = Color3.fromRGB(140, 235, 255)
-	for index = 1, 3 do
-		local band = detail(
-			newPart(
-				folder,
-				"ShallowWaterBand",
-				Vector3.new(34, 0.12, 3),
-				origin + Vector3.new((index - 2) * 29, 0.04, -8 - index * 7),
-				shallowColor,
-				Enum.Material.Glass
-			)
-		)
-		band.Transparency = 0.58
-		band.Reflectance = 0.05
-	end
 	local _ = folder
 end
 
@@ -782,8 +766,8 @@ local function setupLighting()
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(25, 169, 214)
-	terrain.WaterTransparency = 0.35
+	terrain.WaterColor = Color3.fromRGB(28, 116, 178)
+	terrain.WaterTransparency = 0.4
 	terrain.WaterWaveSize = 0.16
 	terrain.WaterWaveSpeed = 7
 	terrain.WaterReflectance = 0.12
