@@ -85,7 +85,7 @@ function Menus.start(ctx: any): any
 			LayoutOrder = order,
 			Parent = content,
 		}, {
-			UI.create("UICorner", { CornerRadius = UDim.new(0, 16) }),
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
 			UI.create("UIStroke", { Color = rgb(UI.theme.colors.water), Thickness = 1.5, Transparency = 0.12 }),
 			UI.create("UIPadding", {
 				PaddingTop = UDim.new(0, 10),
