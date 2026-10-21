@@ -153,6 +153,7 @@ describe("UI (construccion con entorno simulado)", function()
 			UDim2 = roblox.UDim2,
 			UDim = roblox.UDim,
 			Color3 = roblox.Color3,
+			ColorSequence = roblox.ColorSequence,
 			Vector2 = roblox.Vector2,
 			Enum = roblox.Enum,
 			task = clock.task,
