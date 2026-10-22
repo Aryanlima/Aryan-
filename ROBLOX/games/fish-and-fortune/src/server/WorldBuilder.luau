@@ -1426,25 +1426,27 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			0.35
 	end
 	-- caseta de cebo en la orilla (puerta hacia el lago), techo a dos aguas
-	local hx, hz = -20, 16
-	local hutWall = Color3.fromRGB(140, 100, 66)
-	local planks = Enum.Material.WoodPlanks
-	pt("BaitFloor", Vector3.new(8, 0.4, 6), Vector3.new(hx, 0.2, hz), wood, planks).CanCollide = true
-	pt("BaitBack", Vector3.new(8, 5, 0.4), Vector3.new(hx, 2.9, hz + 2.8), hutWall, planks).CanCollide = true
-	pt("BaitLintel", Vector3.new(2.4, 1.6, 0.4), Vector3.new(hx, 4.6, hz - 2.8), hutWall, planks).CanCollide = true
-	for i, side in { -1, 1 } do
-		pt("BaitSide" .. i, Vector3.new(0.4, 5, 6), Vector3.new(hx + side * 3.8, 2.9, hz), hutWall, planks).CanCollide =
-			true
-		pt("BaitFront" .. i, Vector3.new(2.8, 5, 0.4), Vector3.new(hx + side * 2.6, 2.9, hz - 2.8), hutWall, planks).CanCollide =
-			true
-		local roof = pt(
-			"BaitRoof" .. i,
-			Vector3.new(5.6, 0.4, 7.4),
-			Vector3.new(hx + side * 2.3, 6.3, hz),
-			Color3.fromRGB(112, 62, 48),
-			Enum.Material.Wood
-		)
-		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(28))
+	local hx, hz = -42, 8
+	if not kitProp("Hut", "BaitHut", Vector3.new(hx, 0, hz), 1.1, math.pi) then
+		local hutWall = Color3.fromRGB(140, 100, 66)
+		local planks = Enum.Material.WoodPlanks
+		pt("BaitFloor", Vector3.new(8, 0.4, 6), Vector3.new(hx, 0.2, hz), wood, planks).CanCollide = true
+		pt("BaitBack", Vector3.new(8, 5, 0.4), Vector3.new(hx, 2.9, hz + 2.8), hutWall, planks).CanCollide = true
+		pt("BaitLintel", Vector3.new(2.4, 1.6, 0.4), Vector3.new(hx, 4.6, hz - 2.8), hutWall, planks).CanCollide = true
+		for i, side in { -1, 1 } do
+			pt("BaitSide" .. i, Vector3.new(0.4, 5, 6), Vector3.new(hx + side * 3.8, 2.9, hz), hutWall, planks).CanCollide =
+				true
+			pt("BaitFront" .. i, Vector3.new(2.8, 5, 0.4), Vector3.new(hx + side * 2.6, 2.9, hz - 2.8), hutWall, planks).CanCollide =
+				true
+			local roof = pt(
+				"BaitRoof" .. i,
+				Vector3.new(5.6, 0.4, 7.4),
+				Vector3.new(hx + side * 2.3, 6.3, hz),
+				Color3.fromRGB(112, 62, 48),
+				Enum.Material.Wood
+			)
+			roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(28))
+		end
 	end
 	-- aguas someras: discos finos y translucidos apilados (radio decreciente) que siguen la orilla circular sin aristas;
 	-- el borde acumula opacidad (turquesa claro) y el centro queda profundo. Solo decoran (sin colision ni consulta).
