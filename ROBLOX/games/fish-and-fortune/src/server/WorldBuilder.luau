@@ -1159,7 +1159,7 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 		end
 	end
 	-- palmeras en racimos cerca de los bordes de la playa (buildPalm usa deco: sin sombra)
-	for i, spec in { { -56, 24 }, { -50, 30 }, { -60, 33 }, { 52, 26 }, { 58, 32 }, { 47, 34 } } do
+	for i, spec in { { -66, 62 }, { -58, 70 }, { -72, 74 }, { 62, 64 }, { 70, 72 }, { 56, 78 } } do
 		buildPalm(folder, 20 + i, o + Vector3.new(spec[1], 0, spec[2]), rng:NextNumber(14, 19), style.treeColor)
 	end
 	-- 2 cangrejos que van de lado a lado (Tween en bucle, en pcall)
