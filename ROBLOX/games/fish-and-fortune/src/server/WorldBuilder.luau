@@ -321,30 +321,35 @@ local function buildProceduralPier(folder: Folder, style: ZoneStyle, art: ArtLik
 	end
 end
 
+-- Muelle suave de Ropilot por encima: 4 tramos; la cubierta "Pier" sigue (invisible) para caminar y pescar.
+local function softPier(folder: Folder, style: ZoneStyle)
+	if folder:FindFirstChild("PierArt") ~= nil then
+		return
+	end
+	local placedAny = false
+	for index, z in { -34.5, -23.1, -11.7, -0.3 } do
+		placedAny = kitPlace(folder, style, "Pier", "PierSoft" .. index, Vector3.new(0, -1.25, z), 1, 0) or placedAny
+	end
+	if placedAny then
+		for _, child in folder:GetChildren() do
+			if
+				child.Name == "PierPost"
+				or child.Name == "DeckPlank"
+				or child.Name == "PierRailPost"
+				or child.Name == "PierRail"
+			then
+				child:Destroy()
+			elseif child.Name == "Pier" and child:IsA("BasePart") then
+				child.Transparency = 1
+			end
+		end
+	end
+end
+
 local function buildPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local origin = style.origin
 	if art == nil then
 		buildProceduralPier(folder, style, nil)
-		-- Muelle suave de Ropilot por encima: 4 tramos; la cubierta "Pier" sigue (invisible) para caminar y pescar.
-		local placedAny = false
-		for index, z in { -34.5, -23.1, -11.7, -0.3 } do
-			placedAny = kitPlace(folder, style, "Pier", "PierSoft" .. index, Vector3.new(0, -1.25, z), 1, 0)
-				or placedAny
-		end
-		if placedAny then
-			for _, child in folder:GetChildren() do
-				if
-					child.Name == "PierPost"
-					or child.Name == "DeckPlank"
-					or child.Name == "PierRailPost"
-					or child.Name == "PierRail"
-				then
-					child:Destroy()
-				elseif child.Name == "Pier" and child:IsA("BasePart") then
-					child.Transparency = 1
-				end
-			end
-		end
 	else
 		-- La base del modelo queda donde acaban los postes (y = -2) y centrado en la cubierta; si no hay arte valido, el respaldo.
 		local result = art:place("props", "pier", {
@@ -377,6 +382,7 @@ local function buildPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
 		newPart(folder, "CastTarget", Vector3.new(1, 1, 1), origin + Vector3.new(0, 0.9, -52), PIER_WOOD, nil)
 	)
 	target.Name = "CastTarget"
+	softPier(folder, style)
 end
 
 -- El arte puede sustituir las farolas y la barca; si falta se construyen piezas locales.
