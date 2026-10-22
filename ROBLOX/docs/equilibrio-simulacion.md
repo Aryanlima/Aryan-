@@ -47,3 +47,7 @@ Despues de cambiar: repetir la simulacion y, sobre todo, medir con jugadores rea
 Precios: fibra 6.000, carbono 90.000, dorada 800.000 (requiere 18 especies); rio 8.000, costa 150.000. Repetida la simulacion (20 semillas, 60 min):
 casual: carbono ~38 min (12 de 20 semillas), dorada ~55 min (2 de 20); activo: todo comprado hacia los 16 min; idle: carbono ~32 min.
 **Sigue abierto:** el activo gana ~35 veces mas que el casual (16 M/h contra 0,46 M/h) y se queda sin que comprar a los ~16 min: faltan sumideros (cosmeticos, prestigio) y limitar la ventaja del activo. No se tocaron los valores de la costa ni `baseSlots`.
+
+## Decision sobre sumideros de monedas (22-oct)
+- NO crear suerte/carnada/azar comprable con monedas: el juego vende `coin_pack_small` (monedas por Robux), asi que seria suerte pagada de forma indirecta (ver `docs/revision-lanzamiento.md` y `research/03`).
+- Sumideros seguros (sin suerte): cosmeticos de cana por monedas (200 k - 5 M), mas espacios de mochila con precio creciente, titulos/marcos del bestiario. Pendiente: añadirlos con un remoto nuevo (ojo: ProjectStructure/GameService.spec cuentan los 16 remotos de entrada) o reutilizando uno existente.
