@@ -1665,6 +1665,118 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	end)
 end
 
+-- Relieve de Terrain (voxeles, sin Parts): bahias y isla, colinas, acantilados, terrazas y una cordillera con arco y cascada al fondo.
+local function buildRelief(folder: Folder, style: ZoneStyle)
+	local o = style.origin
+	local terrain: any = Workspace.Terrain
+	local rng = Random.new(style.seed + 900)
+	local function fill(method: string, ...: any)
+		local ok, fn = pcall(function()
+			return terrain[method]
+		end)
+		if ok and type(fn) == "function" then
+			pcall(fn, terrain, ...)
+		end
+	end
+	local function at(x: number, y: number, z: number): Vector3
+		return o + Vector3.new(x, y, z)
+	end
+	local ROCK, GRASS, SAND, AIR = Enum.Material.Rock, Enum.Material.Grass, Enum.Material.Sand, Enum.Material.Air
+	if style.waterShape == "disc" then -- dos bahias anchas con playa de arena y una isla con palmeras
+		for _, side in { -1, 1 } do
+			fill("FillCylinder", CFrame.new(at(side * 62, -4, -72)), 8, 36, SAND)
+			fill("FillCylinder", CFrame.new(at(side * 62, -2, -72)), 8, 28, AIR)
+			fill("FillCylinder", CFrame.new(at(side * 62, -3, -72)), 6, 28, Enum.Material.Water)
+		end
+		fill("FillBall", at(-20, -6, -62), 9, SAND)
+		fill("FillBall", at(-20, -3, -62), 6, GRASS)
+		buildPalm(folder, 90, at(-22, 3.5, -62), 12, style.treeColor)
+		buildPalm(folder, 91, at(-17, 3.5, -64), 9, style.treeColor)
+	end
+	for _ = 1, 9 do -- colinas suaves detras de la zona de aparicion (cima de 2 a 4.5 studs)
+		local r = rng:NextNumber(11, 17)
+		local side = if rng:NextNumber() < 0.5 then -1 else 1
+		fill(
+			"FillBall",
+			at(side * rng:NextNumber(26, 92), rng:NextNumber(2, 4.5) - r, rng:NextNumber(42, 92)),
+			r,
+			GRASS
+		)
+	end
+	for _ = 1, 6 do -- lomas grandes en los flancos con cima de roca
+		local r = rng:NextNumber(18, 26)
+		local top = rng:NextNumber(10, 20)
+		local x = (if rng:NextNumber() < 0.5 then -1 else 1) * rng:NextNumber(105, 135)
+		local z = rng:NextNumber(-60, 60)
+		fill("FillBall", at(x, top - r, z), r, GRASS)
+		fill("FillBall", at(x, top - r * 0.3, z), r * 0.5, ROCK)
+	end
+	for _, spec in { { -94, 30 }, { 96, 58 }, { -62, 100 } } :: { { number } } do -- acantilados: roca por los lados y pasto arriba
+		local h = rng:NextNumber(30, 46)
+		fill("FillBlock", CFrame.new(at(spec[1], h / 2 - 4, spec[2])), Vector3.new(22, h, 26), ROCK)
+		fill("FillBlock", CFrame.new(at(spec[1], h - 3.5, spec[2])), Vector3.new(24, 3, 28), GRASS)
+	end
+	for step = 1, 4 do -- terrazas de pasto (2 studs por escalon) que bajan hacia el muelle
+		local h = step * 2
+		fill("FillBlock", CFrame.new(at(0, (h - 4) / 2, 70 + step * 8)), Vector3.new(120, h + 4, 8), GRASS)
+	end
+	-- cordillera al fondo (el jugador mira hacia -z): altura distinta por zona, arco natural y cascada
+	local z0 = o.Z + (if style.id == "coast" then -330 elseif style.id == "river" then -175 else -170)
+	local peak = if style.id == "river" then 105 elseif style.id == "coast" then 70 else 85
+	fill("FillBlock", CFrame.new(o.X, 12, z0), Vector3.new(150, 36, 44), ROCK)
+	for k = -3, 3 do
+		local r = 28 + rng:NextNumber(0, 8)
+		local top = peak * (1 - 0.17 * math.abs(k)) + rng:NextNumber(-4, 4)
+		fill("FillBall", Vector3.new(o.X + k * 26, top - r, z0), r, ROCK)
+		if top > 55 then
+			fill("FillBall", Vector3.new(o.X + k * 26, top - r * 0.2, z0), r * 0.38, Enum.Material.Glacier)
+		end
+	end
+	for _, side in { -1, 1 } do -- falda de pasto al pie
+		fill("FillBall", Vector3.new(o.X + side * 55, -8, z0 + 26), 18, GRASS)
+		fill("FillBall", Vector3.new(o.X + side * 95, -8, z0 + 22), 16, GRASS)
+	end
+	-- contrafuerte plano con la cascada (x = +46), antes que el arco
+	local fallH = peak * 0.85
+	fill("FillBlock", CFrame.new(o.X + 46, fallH / 2 - 6, z0 + 14), Vector3.new(30, fallH + 6, 26), ROCK)
+	-- arco: pasillo recto de 32 de ancho y medio punto encima
+	fill("FillBlock", CFrame.new(o.X, 16, z0), Vector3.new(32, 30, 90), AIR)
+	fill("FillCylinder", CFrame.new(o.X, 31, z0) * CFrame.Angles(math.pi / 2, 0, 0), 90, 16, AIR)
+	fill("FillBlock", CFrame.new(o.X, 0.5, z0), Vector3.new(32, 3, 90), ROCK)
+	local faceZ = z0 + 27.8
+	local mid = 3 + (fallH - 6) / 2
+	deco(
+		folder,
+		"MountainFalls",
+		Vector3.new(7, fallH - 6, 1.2),
+		Vector3.new(o.X + 46, mid, faceZ),
+		Color3.fromRGB(140, 235, 255),
+		Enum.Material.Neon
+	).Transparency =
+		0.4
+	for i, dx in { -2, 0.5, 2.3 } do
+		deco(
+			folder,
+			"MountainFallsFoam" .. i,
+			Vector3.new(0.7, fallH - 10, 0.4),
+			Vector3.new(o.X + 46 + dx, mid, faceZ + 0.7),
+			WHITE
+		).Transparency =
+			0.3
+	end
+	local plunge = deco(
+		folder,
+		"MountainFallsPlunge",
+		Vector3.new(0.4, 16, 16),
+		Vector3.new(o.X + 46, 1, faceZ + 5),
+		WHITE,
+		Enum.Material.SmoothPlastic,
+		Enum.PartType.Cylinder
+	)
+	plunge.CFrame = CFrame.new(plunge.Position) * CFrame.Angles(0, 0, math.rad(90))
+	plunge.Transparency = 0.4
+end
+
 -- Siluetas frías al horizonte y nubes de bajo coste para ampliar visualmente cada zona.
 local function buildHorizon(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
@@ -1794,6 +1906,7 @@ local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 	buildWater(folder, style)
 	buildPier(folder, style, art)
 	buildHorizon(folder, style)
+	buildRelief(folder, style)
 	buildSign(folder, style)
 	buildDecor(folder, style, art)
 	if style.id == "river" then
@@ -1818,11 +1931,28 @@ local function setupLighting()
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(30, 178, 218) -- turquesa vivo
-	terrain.WaterTransparency = 0.45
-	terrain.WaterWaveSize = 0.16
-	terrain.WaterWaveSpeed = 7
-	terrain.WaterReflectance = 0.12
+	terrain.WaterColor = Color3.fromRGB(20, 205, 215) -- turquesa rico
+	terrain.WaterTransparency = 0.35
+	terrain.WaterWaveSize = 0.3
+	terrain.WaterWaveSpeed = 8
+	terrain.WaterReflectance = 0.25
+	-- colores de material muy saturados: todo el mundo se lee estilizado, no realista
+	local materialColors: { [Enum.Material]: Color3 } = {
+		[Enum.Material.Grass] = Color3.fromRGB(110, 215, 60),
+		[Enum.Material.LeafyGrass] = Color3.fromRGB(80, 200, 70),
+		[Enum.Material.Sand] = Color3.fromRGB(255, 205, 95),
+		[Enum.Material.Rock] = Color3.fromRGB(100, 110, 200),
+		[Enum.Material.Mud] = Color3.fromRGB(160, 95, 70),
+		[Enum.Material.Ground] = Color3.fromRGB(190, 130, 70),
+		[Enum.Material.Slate] = Color3.fromRGB(85, 105, 185),
+		[Enum.Material.Basalt] = Color3.fromRGB(80, 65, 135),
+		[Enum.Material.Glacier] = Color3.fromRGB(215, 245, 255),
+	}
+	for material, color in materialColors do
+		pcall(function()
+			(terrain :: any):SetMaterialColor(material, color)
+		end)
+	end
 	local previousSky = Lighting:FindFirstChild("FishFortuneSky")
 	if previousSky then
 		previousSky:Destroy()
