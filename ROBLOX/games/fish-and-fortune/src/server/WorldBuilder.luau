@@ -127,6 +127,8 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -4, 0)), 8, 58, Enum.Material.Sand)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -2, 0)), 8, 55, Enum.Material.Air)
 		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -3, 0)), 6, 55, Enum.Material.Water)
+		-- lecho solido bajo el agua: sin el, el jugador atraviesa el fondo y cae al vacio
+		callTerrain("FillCylinder", CFrame.new(center + Vector3.new(0, -9, 0)), 8, 62, Enum.Material.Sand)
 		-- tierra firme bajo la entrada del muelle (si no, el muelle empieza dentro del agua)
 		callTerrain("FillBlock", CFrame.new(origin + Vector3.new(0, -4, 4)), Vector3.new(14, 8, 16), Enum.Material.Sand)
 	elseif style.waterShape == "river" then
@@ -150,6 +152,7 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Vector3.new(60, 6, 170),
 			Enum.Material.Water
 		)
+		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -9, 0)), Vector3.new(66, 8, 180), Enum.Material.Sand) -- lecho solido
 		-- calzada de tierra por el centro del rio hasta el muelle (el aparicion esta dentro del rio)
 		callTerrain(
 			"FillBlock",
@@ -184,6 +187,7 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Vector3.new(540, 6, 360),
 			Enum.Material.Water
 		)
+		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -9, 0)), Vector3.new(560, 8, 380), Enum.Material.Sand) -- lecho solido
 	end
 	local _ = folder
 end
@@ -1687,6 +1691,7 @@ local function buildRelief(folder: Folder, style: ZoneStyle)
 			fill("FillCylinder", CFrame.new(at(side * 62, -4, -72)), 8, 36, SAND)
 			fill("FillCylinder", CFrame.new(at(side * 62, -2, -72)), 8, 28, AIR)
 			fill("FillCylinder", CFrame.new(at(side * 62, -3, -72)), 6, 28, Enum.Material.Water)
+			fill("FillCylinder", CFrame.new(at(side * 62, -9, -72)), 8, 34, SAND) -- lecho solido
 		end
 		fill("FillBall", at(-20, -6, -62), 9, SAND)
 		fill("FillBall", at(-20, -3, -62), 6, GRASS)
