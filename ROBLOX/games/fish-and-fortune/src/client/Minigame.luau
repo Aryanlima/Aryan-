@@ -151,7 +151,7 @@ function Minigame.start(ctx: any): any
 		})
 		label.Name = "MinigameResult"
 		label.AnchorPoint = Vector2.new(0.5, 0.5)
-		label.Position = UDim2.new(0.5, 0, 0.3, 0)
+		label.Position = UDim2.new(0.5, 0, 0.64, 0)
 		label.TextColor3 = rgb(UI.theme.colors[colorName])
 		label.ZIndex = 6
 		resultLabel = label

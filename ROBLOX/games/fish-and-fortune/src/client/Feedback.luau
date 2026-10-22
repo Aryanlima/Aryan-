@@ -147,11 +147,12 @@ function Feedback.start(ctx: any): any
 			AnchorPoint = Vector2.new(0.5, 0),
 			Position = UDim2.new(0.5, 0, 0, -190),
 			Size = UDim2.new(0.86, 0, 0, 160),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
 			BorderSizePixel = 0,
 			Parent = gui,
 		}, {
-			UI.create("UISizeConstraint", { MaxSize = Vector2.new(420, 164) }),
+			UI.create("UISizeConstraint", { MaxSize = Vector2.new(420, 400) }),
 		})
 		if tier >= 2 then
 			local ring = UI.create("Frame", {
@@ -176,7 +177,8 @@ function Feedback.start(ctx: any): any
 		end
 		local body = UI.create("Frame", {
 			Name = "CatchBody",
-			Size = UDim2.fromScale(1, 1),
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundColor3 = rgb(UI.theme.colors.woodGrain),
 			BorderSizePixel = 0,
 			ZIndex = 2,
@@ -194,6 +196,7 @@ function Feedback.start(ctx: any): any
 				VerticalAlignment = Enum.VerticalAlignment.Center,
 				Padding = UDim.new(0, 2),
 			}),
+			UI.create("UIPadding", { PaddingTop = UDim.new(0, 12), PaddingBottom = UDim.new(0, 12) }),
 		})
 		local lines: { { text: string, size: number, color: { number }, order: number, display: boolean } } = {
 			{ text = L("creature." .. payload.id), size = 30, color = color, order = 1, display = true },

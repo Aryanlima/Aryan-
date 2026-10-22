@@ -212,7 +212,7 @@ function Hud.start(ctx: any): any
 		UI.create("UIPadding", { PaddingLeft = UDim.new(0, 72), Parent = button })
 		UI.icon(iconName, 52, {
 			AnchorPoint = Vector2.new(0, 0.5),
-			Position = UDim2.new(0, 10, 0.5, -2),
+			Position = UDim2.new(0, -62, 0.5, -2), -- el UIPadding de arriba desplaza a los hijos: -72 + 10
 			Parent = button,
 		})
 		return button
