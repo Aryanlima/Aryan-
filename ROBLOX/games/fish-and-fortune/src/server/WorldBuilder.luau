@@ -224,8 +224,12 @@ local function kitPlace(
 	local placed = pcall(function()
 		clone:ScaleTo(scale)
 		local box, size = clone:GetBoundingBox()
-		local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
-		clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
+		local pivot = clone:GetPivot().Position
+		local rotation = CFrame.Angles(0, yaw, 0)
+		-- el pivote de las piezas del kit no esta en su centro: se coloca el CENTRO de la caja (base apoyada en rel)
+		local offset = Vector3.new(box.Position.X - pivot.X, 0, box.Position.Z - pivot.Z)
+		local target = style.origin + rel + Vector3.new(0, pivot.Y - (box.Position.Y - size.Y / 2), 0)
+		clone:PivotTo(CFrame.new(target - rotation:VectorToWorldSpace(offset)) * rotation)
 		for _, part in clone:GetDescendants() do
 			if part:IsA("BasePart") then
 				part.Anchored = true
