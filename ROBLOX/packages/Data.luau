@@ -43,7 +43,7 @@ export type RetryConfig = {
 }
 
 export type LockConfig = {
-	staleSeconds: number?, -- sin latido durante este tiempo => servidor caido (por defecto 600)
+	staleSeconds: number?, -- sin latido durante este tiempo => servidor caido (por defecto 300: el autoguardado renueva el latido cada 120 s)
 	waitSeconds: number?, -- cuanto esperar a que otro servidor suelte el bloqueo (por defecto 30)
 	pollSeconds: number?, -- intervalo de sondeo mientras se espera (por defecto 3)
 }
@@ -493,7 +493,7 @@ type ClaimOutcome = { kind: string, record: any?, lockedBy: string? }
 function Manager._claimOnce(self: Manager, key: string, userId: number): (boolean, any)
 	local jobId = self.jobId
 	local schema = self.schema
-	local staleSeconds = if self.cfg.lock and self.cfg.lock.staleSeconds then self.cfg.lock.staleSeconds else 600
+	local staleSeconds = if self.cfg.lock and self.cfg.lock.staleSeconds then self.cfg.lock.staleSeconds else 300
 	local outcome: ClaimOutcome = { kind = "unset", record = nil, lockedBy = nil }
 
 	local function transform(old: any): any

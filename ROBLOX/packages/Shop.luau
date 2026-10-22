@@ -88,7 +88,7 @@ export type Config = {
 	log: ((message: string) -> ())?,
 	random: (() -> number)?,
 	profileWaitSeconds: number?, -- por defecto 90 (>= espera del bloqueo de sesion de Data + reintentos de carga)
-	purchaseHistorySize: number?, -- por defecto 500
+	purchaseHistorySize: number?, -- por defecto 2000
 	promptCooldownSeconds: number?, -- por defecto 3
 	onPurchaseGranted: ((player: any, product: ProductDef, receipt: Receipt) -> ...any)?, -- DESPUES de persistir
 	onPassChanged: ((player: any, pass: PassDef, owned: boolean) -> ...any)?,
@@ -440,7 +440,7 @@ end
 ----------------------------------------------------------------------------
 
 function ShopImpl._trimHistory(self: Shop, purchases: { [string]: number })
-	local limit = self.cfg.purchaseHistorySize or 500
+	local limit = self.cfg.purchaseHistorySize or 2000
 	local count = 0
 	for _ in purchases do
 		count += 1
