@@ -107,3 +107,17 @@ packages/Data.luau:29 | packages/Economy.luau:17 | packages/Shop.luau:20, 36, 26
 3. Bloqueo de sesion de 600 s tras un crash: Data.luau:496 (DATA-01).
 4. Minijuego enganable (ventana 2,85 s > periodo 1,5 s): FR:176-208 (MINI-01).
 5. Historial de recibos limitado a 500: Shop.luau:441-460.
+
+## Estado al 22-oct (después de la auditoría)
+| Punto | Estado | Evidencia |
+|---|---|---|
+| Studio escribe en el DataStore real (riesgo 1) | HECHO | `GameService.luau` pickDataStore: en Studio siempre memoria salvo `ReplicatedStorage:SetAttribute("UseRealDataStore", true)`; GameService.spec 42/42 |
+| Minijuego engañable MINI-01 (riesgo 4) | HECHO (tolerancia provisional) | `FishingRules.evaluateReel` usa el reloj del servidor con 0,35 s de tolerancia de red; ajustar con pings reales |
+| Bloqueo de sesión 600 s DATA-01 (riesgo 3) | HECHO | `Data.luau` staleSeconds 300 (autoguardado renueva cada 120 s) |
+| Historial de recibos 500 (riesgo 5) | HECHO | `Shop.luau` purchaseHistorySize 2000 |
+| Ciclo pescar -> mochila -> vender | VERIFICADO en Studio | captura real (bagre, perfect), mochila 0->1, venta 600->910 monedas |
+| Sonidos del bucle | VERIFICADO que cargan (12/12 Success); NO escuchados | PreloadAsync en Studio |
+| Pase real (TargetId vs assetId) (riesgo 2) | BLOQUEADO | requiere un pase a la venta en la experiencia privada |
+| Persistencia contra DataStore real | BLOQUEADO | requiere experiencia de prueba separada con acceso a la API |
+| Móvil/mando reales | BLOQUEADO | solo revisado en código y en el escritorio de Studio |
+| Equilibrio | EN CURSO | `docs/equilibrio-simulacion.md` (simulado, no medido) |
