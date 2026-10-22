@@ -15,7 +15,6 @@
 ]]
 
 local Menus = {}
-local TweenService = game:GetService("TweenService")
 
 local function rgb(triple: { number }): Color3
 	return Color3.fromRGB(triple[1], triple[2], triple[3])
@@ -38,15 +37,43 @@ function Menus.start(ctx: any): any
 	local shopHandle: any = nil
 	local selectedOddsZone: string? = nil
 
-	local function close()
+	-- Estado de filas de la apertura actual: "hecho" previo (para el destello verde al comprar/reclamar) y escalonado.
+	local rowDone: { [string]: boolean } = {}
+	local animateRows = false
+	local rowIndex = 0
+
+	-- Cierra el panel actual: encoge y desvanece (0.14 s) y se destruye con task.delay. Se renombra para que no cuente como
+	-- "...Panel" mientras se va. `instant` (redibujos) lo destruye al momento.
+	local function close(instant: boolean?)
 		local open = current
 		if open ~= nil then
 			if open.unsubscribe then
 				open.unsubscribe()
 			end
-			open.root:Destroy()
+			local root = open.root
+			local veil = gui:FindFirstChild("Veil")
 			current = nil
 			shopHandle = nil
+			if instant == true or UI.motion.reduced then
+				root:Destroy()
+				if veil ~= nil then
+					veil:Destroy()
+				end
+				return
+			end
+			root.Name = "Closing"
+			UI.motion.tween(UI.motion.scaleOf(root), { Scale = 0.92 }, 0.14, "Quad", "In")
+			UI.motion.tween(root, { BackgroundTransparency = 1 }, 0.14, "Quad", "In")
+			if veil ~= nil then
+				veil.Name = "VeilOut"
+				UI.motion.tween(veil, { BackgroundTransparency = 1 }, 0.14, "Quad", "In")
+			end
+			task.delay(0.16, function()
+				root:Destroy()
+				if veil ~= nil then
+					veil:Destroy()
+				end
+			end)
 		end
 	end
 
@@ -61,72 +88,136 @@ function Menus.start(ctx: any): any
 	local function addHeader(content: any, order: number, text: string)
 		UI.label({
 			text = text,
-			textSize = 20,
-			bold = true,
+			textSize = 22,
+			display = true,
 			layoutOrder = order,
 			parent = content,
-			colorName = "accent",
+			colorName = "gold",
 		})
 	end
 
+	type RowOptions = { key: string, icon: string?, done: boolean?, accent: string?, titleColor: string? }
+
+	-- Fila de madera oscura: icono, nombre (letra de cartel), descripcion y botones verdes (apagados = gris).
 	local function addRow(
 		content: any,
 		order: number,
 		title: string,
 		subtitle: string?,
 		buttons: { ButtonSpec },
-		colorName: string?
+		opts: RowOptions
 	)
+		local done = opts.done == true
+		local stroke = UI.create("UIStroke", {
+			Color = rgb(if done then UI.theme.colors.positive else UI.theme.colors.woodDark),
+			Thickness = if done then 2 else 3,
+		})
 		local row = UI.create("Frame", {
+			Name = "Row_" .. opts.key,
 			Size = UDim2.new(1, 0, 0, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundColor3 = rgb(UI.theme.colors.row),
 			BorderSizePixel = 0,
 			LayoutOrder = order,
-			Parent = content,
 		}, {
 			UI.create("UICorner", { CornerRadius = UDim.new(0, 12) }),
-			UI.create("UIStroke", { Color = rgb(UI.theme.colors.water), Thickness = 1.5, Transparency = 0.12 }),
+			stroke,
 			UI.create("UIPadding", {
 				PaddingTop = UDim.new(0, 10),
 				PaddingBottom = UDim.new(0, 10),
-				PaddingLeft = UDim.new(0, 10),
+				PaddingLeft = UDim.new(0, if opts.accent then 20 else 10),
 				PaddingRight = UDim.new(0, 10),
 			}),
-			UI.create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 6) }),
+			UI.create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 8) }),
 		})
-		UI.label({ text = title, bold = true, layoutOrder = 1, parent = row, colorName = colorName })
+		if opts.accent ~= nil then
+			UI.create("Frame", {
+				Name = "Accent",
+				Position = UDim2.new(0, -10, 0, -2),
+				Size = UDim2.new(0, 6, 1, 4),
+				BackgroundColor3 = rgb(UI.theme.colors[opts.accent]),
+				BorderSizePixel = 0,
+				Parent = row,
+			}, { UI.create("UICorner", { CornerRadius = UDim.new(0, 3) }) })
+		end
+		local textParent: any = row
+		if opts.icon ~= nil then
+			local head = UI.create("Frame", {
+				Size = UDim2.new(1, 0, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = 1,
+				Parent = row,
+			}, {
+				UI.create("UIListLayout", {
+					FillDirection = Enum.FillDirection.Horizontal,
+					SortOrder = Enum.SortOrder.LayoutOrder,
+					Padding = UDim.new(0, 10),
+				}),
+			})
+			UI.icon(opts.icon, 56, { LayoutOrder = 1, Parent = head })
+			textParent = UI.create("Frame", {
+				Size = UDim2.new(1, -66, 0, 0),
+				AutomaticSize = Enum.AutomaticSize.Y,
+				BackgroundTransparency = 1,
+				LayoutOrder = 2,
+				Parent = head,
+			}, { UI.create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 2) }) })
+		end
+		UI.label({
+			text = title,
+			display = true,
+			textSize = 22,
+			layoutOrder = 1,
+			parent = textParent,
+			colorName = opts.titleColor,
+		})
 		if subtitle ~= nil then
-			UI.label({ text = subtitle, colorName = "textMuted", layoutOrder = 2, parent = row })
+			UI.label({ text = subtitle, colorName = "textMuted", textSize = 16, layoutOrder = 2, parent = textParent })
 		end
 		for index, spec in buttons do
 			UI.button({
 				text = spec.text,
 				enabled = spec.enabled,
+				colorName = "positive",
 				onActivated = spec.onClick,
 				layoutOrder = 2 + index,
 				parent = row,
 			})
 		end
+		-- Se acaba de volver "hecho" (comprada, equipada, reclamada): destello verde del borde + pop.
+		if done and rowDone[opts.key] == false then
+			stroke.Thickness = 5
+			UI.motion.tween(stroke, { Thickness = 2 }, 0.45)
+			UI.motion.pop(row, 1.05)
+		end
+		rowDone[opts.key] = done
+		-- Aparicion escalonada solo la primera vez (max 8 filas, 30 ms); los redibujos por State no animan.
+		if animateRows and rowIndex < 8 and not UI.motion.reduced then
+			rowIndex += 1
+			local scale = UI.motion.scaleOf(row)
+			scale.Scale = 0.9
+			task.delay((rowIndex - 1) * 0.03, function()
+				UI.motion.tween(scale, { Scale = 1 }, 0.18)
+			end)
+		end
 	end
 
-	-- Abre un panel que se redibuja con cada estado nuevo del servidor.
-	local function openPanel(name: string, title: string, build: (content: any, state: any) -> ())
-		close()
-		local root, content = UI.panel(gui, { name = name, title = title, onClose = close })
-		local scale = Instance.new("UIScale")
-		scale.Scale = 0.92
-		scale.Parent = root
-		TweenService:Create(scale, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-			Scale = 1,
-		}):Play()
+	-- Abre un panel que se redibuja con cada estado nuevo del servidor (la aparicion la hace UI.panel).
+	local function openPanel(name: string, title: string, icon: string, build: (content: any, state: any) -> ())
+		close(true)
+		table.clear(rowDone)
+		local root, content = UI.panel(gui, { name = name, title = title, icon = icon, onClose = close })
 		local function render()
 			clearContent(content)
 			local state = store:get()
 			if state ~= nil then
+				rowIndex = 0
 				build(content, state)
 			end
+			animateRows = false
 		end
+		animateRows = true
 		render()
 		current = { name = name, root = root, unsubscribe = store:subscribe(render) }
 	end
@@ -135,7 +226,7 @@ function Menus.start(ctx: any): any
 	-- Canas y zonas
 	----------------------------------------------------------------------------
 	local function openRods()
-		openPanel("RodsPanel", L("rods.title"), function(content: any, state: any)
+		openPanel("RodsPanel", L("rods.title"), "Rods", function(content: any, state: any)
 			local order = 0
 			local function nextOrder(): number
 				order += 1
@@ -170,7 +261,14 @@ function Menus.start(ctx: any): any
 						end,
 					}
 				end
-				addRow(content, nextOrder(), L("rod." .. rodId), subtitle, { button })
+				addRow(
+					content,
+					nextOrder(),
+					L("rod." .. rodId),
+					subtitle,
+					{ button },
+					{ key = "rod_" .. rodId, icon = "Rods", done = equipped }
+				)
 			end
 
 			addHeader(content, nextOrder(), L("zones.header"))
@@ -201,7 +299,8 @@ function Menus.start(ctx: any): any
 					nextOrder(),
 					L("zone." .. zoneId .. ".name"),
 					L("zone." .. zoneId .. ".desc"),
-					{ button }
+					{ button },
+					{ key = "zone_" .. zoneId, icon = "Cast", done = state.zone == zoneId }
 				)
 			end
 
@@ -223,7 +322,8 @@ function Menus.start(ctx: any): any
 							net:fire("BuySlotsWithPearls")
 						end,
 					},
-				}
+				},
+				{ key = "bag", icon = "Bag", done = maxed }
 			)
 			if state.passes.vip then
 				addRow(content, nextOrder(), L("pass.vip.name"), L("vip.daily", { pearls = balance.vip.dailyPearls }), {
@@ -234,7 +334,7 @@ function Menus.start(ctx: any): any
 							net:fire("ClaimDaily")
 						end,
 					},
-				})
+				}, { key = "vip", icon = "Pearl", done = state.dailyAvailable ~= true })
 			end
 		end)
 	end
@@ -258,7 +358,7 @@ function Menus.start(ctx: any): any
 	-- Bestiario
 	----------------------------------------------------------------------------
 	local function openBestiary()
-		openPanel("BestiaryPanel", L("bestiary.title"), function(content: any, state: any)
+		openPanel("BestiaryPanel", L("bestiary.title"), "Bestiary", function(content: any, state: any)
 			local order = 0
 			local function nextOrder(): number
 				order += 1
@@ -281,12 +381,10 @@ function Menus.start(ctx: any): any
 							rarity = { key = "rarity." .. creature.rarity },
 						})
 						else L("bestiary.unknown")
-					UI.label({
-						text = text,
-						colorName = if found then UI.rarityColorName(creature.rarity) else "textMuted",
-						bold = found,
-						layoutOrder = nextOrder(),
-						parent = content,
+					addRow(content, nextOrder(), text, nil, {}, {
+						key = "creature_" .. creature.id,
+						accent = if found then creature.rarity else "disabled",
+						titleColor = if found then UI.rarityColorName(creature.rarity) else "textMuted",
 					})
 				end
 			end
@@ -315,7 +413,7 @@ function Menus.start(ctx: any): any
 							net:fire("ClaimBestiary", reward.id)
 						end,
 					},
-				})
+				}, { key = "reward_" .. reward.id, icon = "Bestiary", done = claimed })
 			end
 		end)
 	end
@@ -324,7 +422,7 @@ function Menus.start(ctx: any): any
 	-- Temporada
 	----------------------------------------------------------------------------
 	local function openSeason()
-		openPanel("SeasonPanel", L("menu.season"), function(content: any, state: any)
+		openPanel("SeasonPanel", L("menu.season"), "Season", function(content: any, state: any)
 			local season = state.season
 			local order = 0
 			local function nextOrder(): number
@@ -361,7 +459,7 @@ function Menus.start(ctx: any): any
 							net:fire("RequestPurchase", "pass", "season_pass")
 						end,
 					},
-				})
+				}, { key = "premium", icon = "Season" })
 			end
 			for _, tier in balance.season.tiers do
 				local reached = season.points >= tier.points
@@ -392,7 +490,7 @@ function Menus.start(ctx: any): any
 							net:fire("ClaimSeason", tier.tier, "premium")
 						end,
 					},
-				})
+				}, { key = "tier_" .. key, icon = "Season", done = freeClaimed and premiumClaimed })
 			end
 		end)
 	end
@@ -402,9 +500,11 @@ function Menus.start(ctx: any): any
 	----------------------------------------------------------------------------
 	local function openCodes()
 		close()
-		local root, content = UI.panel(gui, { name = "CodesPanel", title = L("menu.codes"), onClose = close })
+		local root, content =
+			UI.panel(gui, { name = "CodesPanel", title = L("menu.codes"), icon = "Codes", onClose = close })
 		UI.label({
 			text = L("codes.intro"),
+			colorName = "textMuted",
 			layoutOrder = 1,
 			parent = content,
 		})
@@ -414,16 +514,18 @@ function Menus.start(ctx: any): any
 		box.Text = ""
 		box.ClearTextOnFocus = false
 		box.Size = UDim2.new(1, 0, 0, UI.theme.minTouchHeight)
-		box.BackgroundColor3 = rgb(UI.theme.colors.row)
-		box.TextColor3 = rgb(UI.theme.colors.text)
+		box.BackgroundColor3 = rgb(UI.theme.colors.ink)
+		box.TextColor3 = rgb(UI.theme.colors.gold)
 		box.PlaceholderColor3 = rgb(UI.theme.colors.textMuted)
-		box.Font = Enum.Font.GothamBold
+		box.Font = (Enum.Font :: any)[UI.theme.fonts.display]
 		box.TextSize = 22
 		box.LayoutOrder = 2
 		box.Parent = content
-		UI.create("UICorner", { CornerRadius = UDim.new(0, 12), Parent = box })
+		UI.create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = box })
+		UI.create("UIStroke", { Color = rgb(UI.theme.colors.woodDark), Thickness = 4, Parent = box })
 		UI.button({
 			text = L("codes.redeem"),
+			colorName = "positive",
 			layoutOrder = 3,
 			parent = content,
 			onActivated = function()
@@ -440,12 +542,12 @@ function Menus.start(ctx: any): any
 	----------------------------------------------------------------------------
 	-- Probabilidades (cumplimiento: TODOS los resultados, suma 100 %, base y suerte visibles)
 	----------------------------------------------------------------------------
-	local function openOdds(zoneId: string?)
+	local function openOdds(zoneId: string?, refresh: boolean?)
 		local state = store:get()
 		if state == nil then
 			return
 		end
-		close()
+		close(refresh == true)
 		local zone = zoneId or selectedOddsZone or state.zone
 		selectedOddsZone = zone
 		-- Mismas cifras en todos los idiomas: solo cambian el nombre de las filas y los separadores decimales.
@@ -458,6 +560,7 @@ function Menus.start(ctx: any): any
 			title = L("odds.title", { zone = L("zone." .. zone .. ".name") }),
 			view = view,
 			onClose = close,
+			animate = refresh ~= true,
 			luckExplanation = L("odds.luck_explanation", { perfect = balance.minigame.perfectLuck }),
 		})
 		local content = handle.root:FindFirstChild("Content")
@@ -477,16 +580,20 @@ function Menus.start(ctx: any): any
 				}),
 			})
 			for index, id in balance.zoneOrder do
-				UI.button({
+				local tab = UI.button({
 					text = L("zone." .. id .. ".name"),
-					colorName = if id == zone then "accent" else "row",
+					colorName = if id == zone then "gold" else "row",
 					size = UDim2.new(1 / #balance.zoneOrder, -6, 1, 0),
 					layoutOrder = index,
 					parent = tabs,
 					onActivated = function()
-						openOdds(id)
+						openOdds(id, true)
 					end,
 				})
+				if id == zone then
+					tab.TextColor3 = rgb(UI.theme.colors.ink)
+					tab.TextStrokeTransparency = 1
+				end
 			end
 			-- desglose de la suerte activa
 			local lines = { L("odds.luck_total", { luck = state.luck, cap = balance.limits.maxLuck }) }
@@ -529,7 +636,7 @@ function Menus.start(ctx: any): any
 			unsubscribe = store:subscribe(function(newState: any)
 				if newState.luck ~= lastLuck then
 					lastLuck = newState.luck
-					openOdds(zone)
+					openOdds(zone, true)
 				end
 			end),
 		}

@@ -643,15 +643,19 @@ export type PanelOptions = {
 	onClose: (() -> ())?,
 	closeText: string?,
 	maxSize: any?,
+	icon: string?, -- icono de la pestana del titulo (UI.theme.icons)
+	animate: boolean?, -- false: sin velo animado ni aparicion (redibujos)
 }
 
--- Panel centrado con titulo, boton "Cerrar" grande y zona con scroll. Devuelve (raiz, contenido).
-function UI.panel(parent: any, options: PanelOptions): (any, any)
+-- Panel centrado: pestana de madera oscura con icono y titulo, "X" coral, boton "Cerrar" grande y zona con scroll.
+-- Devuelve (raiz, contenido). Detras va un velo oscuro (Frame "Veil", no termina en "Panel").
+function UI.panel(parent: any, options: PanelOptions): (any, any, any)
 	local e = env()
+	local animate = options.animate ~= false
 	local content = UI.create("ScrollingFrame", {
 		Name = "Content",
 		Size = e.UDim2.new(1, 0, 1, -(UI.theme.minTouchHeight + 56)),
-		Position = e.UDim2.new(0, 0, 0, 48),
+		Position = e.UDim2.new(0, 0, 0, 40),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 6,
@@ -661,12 +665,30 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 
 	local title = UI.label({
 		text = options.title,
-		size = e.UDim2.new(1, 0, 0, 40),
-		textSize = UI.theme.titleSize + 6,
+		size = e.UDim2.new(1, -66, 1, -14),
 		display = true,
 		alignX = e.Enum.TextXAlignment.Center,
 	})
 	title.Name = "Title"
+	title.TextScaled = true
+	title.Position = e.UDim2.new(0, 58, 0, 7)
+	title.ZIndex = 4
+	local tab = UI.create("Frame", {
+		Name = "TitleTab",
+		AnchorPoint = e.Vector2.new(0.5, 0),
+		Position = e.UDim2.new(0.5, 0, 0, -40),
+		Size = e.UDim2.new(0.62, 0, 0, 62),
+		BackgroundColor3 = color("ink"),
+		BorderSizePixel = 0,
+		ZIndex = 3,
+	}, {
+		corner(16),
+		outline(color("woodDark"), 4),
+		UI.create("UISizeConstraint", { MaxSize = e.Vector2.new(340, 62) }),
+		title,
+	})
+	UI.icon(options.icon or "Shop", 44, { Position = e.UDim2.new(0, 10, 0.5, -22), ZIndex = 4, Parent = tab })
+
 	-- Vetas de las tablas (lineas finas detras del contenido)
 	local planks = UI.create("Frame", { Name = "Planks", Size = e.UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 0 })
 	for i = 1, 9 do
@@ -690,6 +712,35 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 	closeButton.AnchorPoint = e.Vector2.new(0, 1)
 	closeButton.Position = e.UDim2.new(0, 0, 1, 0)
 
+	-- "X" redonda coral en la esquina (atajo; el boton Close de abajo sigue siendo el principal)
+	local closeX = UI.button({
+		text = "X",
+		colorName = "coral",
+		size = e.UDim2.fromOffset(UI.theme.minTouchHeight, UI.theme.minTouchHeight),
+		onActivated = options.onClose,
+	})
+	closeX.Name = "CloseX"
+	closeX.AnchorPoint = e.Vector2.new(1, 0)
+	closeX.Position = e.UDim2.new(1, 22, 0, -34)
+	closeX.ZIndex = 4
+	local xCorner = if closeX.FindFirstChild then closeX:FindFirstChild("UICorner") else nil
+	if xCorner ~= nil then
+		xCorner.CornerRadius = e.UDim.new(0.5, 0)
+	end
+
+	local veil = UI.create("Frame", {
+		Name = "Veil",
+		Size = e.UDim2.fromScale(1, 1),
+		BackgroundColor3 = color("ink"),
+		BackgroundTransparency = if animate and not UI.motion.reduced then 1 else 0.45,
+		BorderSizePixel = 0,
+		Active = false,
+	})
+	veil.Parent = parent
+	if animate then
+		UI.motion.tween(veil, { BackgroundTransparency = 0.45 }, 0.2)
+	end
+
 	local root = UI.create("Frame", {
 		Name = options.name,
 		AnchorPoint = e.Vector2.new(0.5, 0.5),
@@ -706,43 +757,121 @@ function UI.panel(parent: any, options: PanelOptions): (any, any)
 		planks,
 		-- limite en pantallas grandes (tablet / PC)
 		UI.create("UISizeConstraint", { MaxSize = options.maxSize or e.Vector2.new(560, 720) }),
-		title,
+		tab,
 		content,
 		closeButton,
+		closeX,
 	})
 	root.Parent = parent
-	return root, content
+	if animate then
+		UI.motion.appear(root, 0.9, 0.24)
+	end
+	return root, content, veil
 end
 
--- Fila de oferta de la tienda.
+-- Estilo de fila: madera oscura con borde; `done` = comprado / equipado / reclamado (borde verde).
+local function rowStyle(done: boolean): { any }
+	return { corner(), outline(color(if done then "positive" else "woodDark"), if done then 2 else 3) }
+end
+
+-- Icono de la oferta segun su clave (auto-pesca/canas, perlas, monedas, mochila, vender en cualquier sitio).
+local function offerIconName(key: string): string
+	local k = string.lower(key)
+	if string.find(k, "auto", 1, true) or string.find(k, "rod", 1, true) then
+		return "Rods"
+	elseif string.find(k, "trail", 1, true) or string.find(k, "pearl", 1, true) or string.find(k, "vip", 1, true) then
+		return "Pearl"
+	elseif string.find(k, "coin", 1, true) or string.find(k, "double", 1, true) or string.find(k, "boost", 1, true) then
+		return "Coin"
+	elseif string.find(k, "bag", 1, true) or string.find(k, "slot", 1, true) then
+		return "Bag"
+	elseif string.find(k, "sell", 1, true) then
+		return "Sell"
+	elseif string.find(k, "season", 1, true) then
+		return "Season"
+	end
+	return "Shop"
+end
+
+-- Aparicion escalonada de las primeras 8 filas (solo en la primera apertura; con movimiento reducido no hace nada).
+local function staggerIn(rows: { any })
+	if UI.motion.reduced or env().task == nil then
+		return
+	end
+	for index, row in rows do
+		if index > 8 then
+			break
+		end
+		local scale = UI.motion.scaleOf(row)
+		scale.Scale = 0.9
+		env().task.delay((index - 1) * 0.03, function()
+			UI.motion.tween(scale, { Scale = 1 }, 0.18)
+		end)
+	end
+end
+
+-- Borde verde grueso que se afina (algo paso a "hecho") y pop de la fila.
+local function flashDone(row: any)
+	local stroke = if row.FindFirstChild then row:FindFirstChild("UIStroke") else nil
+	if stroke ~= nil then
+		stroke.Thickness = 5
+		UI.motion.tween(stroke, { Thickness = 2 }, 0.45)
+	end
+	UI.motion.pop(row, 1.05)
+end
+
+-- Fila de oferta de la tienda: icono, nombre, descripcion, precio y boton verde.
 local function offerRow(offer: OfferView, onBuy: (kind: string, key: string) -> (), order: number): any
 	local e = env()
 	local buyText = UI.buyButtonText(offer)
 	local interactive = offer.available and not offer.owned
-	return UI.create("Frame", {
+	local textColumn = UI.create("Frame", {
+		Size = e.UDim2.new(1, -76, 0, 0),
+		AutomaticSize = e.Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		LayoutOrder = 2,
+	}, {
+		listLayout(2),
+		UI.label({ text = offerText(offer, "name"), display = true, textSize = 22, layoutOrder = 1 }),
+		UI.label({ text = offerText(offer, "description"), colorName = "textMuted", textSize = 16, layoutOrder = 2 }),
+		UI.label({ text = UI.priceText(offer), colorName = "gold", bold = true, layoutOrder = 3 }),
+	})
+	local head = UI.create("Frame", {
+		Size = e.UDim2.new(1, 0, 0, 0),
+		AutomaticSize = e.Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		LayoutOrder = 1,
+	}, {
+		UI.create("UIListLayout", {
+			FillDirection = e.Enum.FillDirection.Horizontal,
+			SortOrder = e.Enum.SortOrder.LayoutOrder,
+			Padding = e.UDim.new(0, 10),
+		}),
+		UI.icon(offerIconName(offer.key), 64, { LayoutOrder = 1 }),
+		textColumn,
+	})
+	local button = UI.button({
+		text = buyText,
+		enabled = interactive,
+		colorName = "positive",
+		layoutOrder = 2,
+		onActivated = function()
+			onBuy(offer.kind, offer.key)
+		end,
+	})
+	local row = UI.create("Frame", {
 		Name = offer.kind .. "_" .. offer.key,
 		Size = e.UDim2.new(1, 0, 0, 0),
 		AutomaticSize = e.Enum.AutomaticSize.Y,
 		BackgroundColor3 = color("row"),
 		BorderSizePixel = 0,
 		LayoutOrder = order,
-	}, {
-		corner(),
-		outline(color("water"), 1.5),
-		padding(),
-		listLayout(6),
-		UI.label({ text = offerText(offer, "name"), bold = true, layoutOrder = 1 }),
-		UI.label({ text = offerText(offer, "description"), colorName = "textMuted", layoutOrder = 2 }),
-		UI.label({ text = UI.priceText(offer), colorName = "positive", bold = true, layoutOrder = 3 }),
-		UI.button({
-			text = buyText,
-			enabled = interactive,
-			layoutOrder = 4,
-			onActivated = function()
-				onBuy(offer.kind, offer.key)
-			end,
-		}),
-	})
+	}, rowStyle(offer.owned))
+	padding(10).Parent = row
+	listLayout(8).Parent = row
+	head.Parent = row
+	button.Parent = row
+	return row
 end
 
 export type ShopPanelOptions = {
@@ -754,20 +883,34 @@ export type ShopPanelOptions = {
 
 -- Panel de tienda reutilizable. handle.update(offers) refresca la lista.
 function UI.shopPanel(parent: any, options: ShopPanelOptions): Handle
-	local root, content = UI.panel(parent, {
+	local root, content, veil = UI.panel(parent, {
 		name = "ShopPanel",
 		title = options.title or tr("shop.title"),
+		icon = "Shop",
 		onClose = options.onClose,
 	})
+	local owned: { [string]: boolean } = {}
+	local first = true
 	local function render(offers: { OfferView })
 		for _, child in content:GetChildren() do
 			if child:IsA("Frame") then
 				child:Destroy()
 			end
 		end
+		local rows = {}
 		for index, offer in offers do
 			local row = offerRow(offer, options.onBuy, index)
 			row.Parent = content
+			table.insert(rows, row)
+			if owned[row.Name] == false and offer.owned then
+				flashDone(row)
+			end
+			owned[row.Name] = offer.owned
+		end
+		-- La primera lista suele llegar vacia (las ofertas llegan despues): se escalona cuando hay filas.
+		if first and #rows > 0 then
+			first = false
+			staggerIn(rows)
 		end
 	end
 	render(options.offers)
@@ -778,6 +921,7 @@ function UI.shopPanel(parent: any, options: ShopPanelOptions): Handle
 		end,
 		destroy = function()
 			root:Destroy()
+			veil:Destroy()
 		end,
 	}
 end
@@ -787,16 +931,20 @@ export type OddsPanelOptions = {
 	view: OddsView,
 	onClose: (() -> ())?,
 	luckExplanation: string?, -- texto que explica el efecto numerico de la suerte (obligatorio si hay suerte activa)
+	animate: boolean?, -- false al redibujar (cambio de zona o de suerte)
 }
 
 -- Panel de probabilidades: TODOS los resultados con su porcentaje, total 100 % y nota de pity.
 function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 	local e = env()
-	local root, content = UI.panel(parent, {
+	local root, content, veil = UI.panel(parent, {
 		name = "OddsPanel",
 		title = options.title or tr("ui.odds_title"),
+		icon = "Odds",
+		animate = options.animate,
 		onClose = options.onClose,
 	})
+	local first = options.animate ~= false
 	local function render(view: OddsView)
 		for _, child in content:GetChildren() do
 			if child:IsA("Frame") or child:IsA("TextLabel") then
@@ -815,21 +963,34 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 				colorName = "textMuted",
 			}))
 		end
+		local oddsRows = {}
 		for _, row in view.rows do
+			local rarityName = UI.rarityColorName(row.rarity)
 			local frame = UI.create("Frame", {
 				Name = "Odds_" .. row.id,
-				Size = e.UDim2.new(1, 0, 0, 44),
+				Size = e.UDim2.new(1, 0, 0, 48),
 				BackgroundColor3 = color("row"),
 				BorderSizePixel = 0,
-			}, { corner(8) })
+			}, {
+				corner(10),
+				outline(color("woodDark"), 2.5),
+				UI.create("Frame", {
+					Name = "Accent",
+					Size = e.UDim2.new(0, 6, 1, -14),
+					Position = e.UDim2.new(0, 6, 0, 7),
+					BackgroundColor3 = color(rarityName),
+					BorderSizePixel = 0,
+				}, { corner(3) }),
+			})
 			local name = UI.label({
 				text = row.label,
-				size = e.UDim2.new(0.5, 0, 1, 0),
-				colorName = UI.rarityColorName(row.rarity),
-				bold = true,
+				size = e.UDim2.new(0.5, -22, 1, 0),
+				colorName = rarityName,
+				display = true,
+				textSize = 20,
 				parent = frame,
 			})
-			name.Position = e.UDim2.new(0, 10, 0, 0)
+			name.Position = e.UDim2.new(0, 20, 0, 0)
 			local value = UI.label({
 				text = if view.luckActive
 					then tr("ui.odds_with_base", { percent = row.percentText, base = row.basePercentText })
@@ -841,6 +1002,11 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 			})
 			value.Position = e.UDim2.new(0.5, 0, 0, 0)
 			add(frame)
+			table.insert(oddsRows, frame)
+		end
+		if first then
+			first = false
+			staggerIn(oddsRows)
 		end
 		add(UI.label({ text = tr("ui.odds_total", { total = view.totalPercentText }), bold = true }))
 		add(UI.label({
@@ -860,6 +1026,7 @@ function UI.oddsPanel(parent: any, options: OddsPanelOptions): Handle
 		end,
 		destroy = function()
 			root:Destroy()
+			veil:Destroy()
 		end,
 	}
 end
