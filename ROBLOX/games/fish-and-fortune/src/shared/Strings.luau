@@ -156,7 +156,7 @@ local entries: { [string]: Entry } = {
 		es = "Ve al muelle o a la orilla para pescar.",
 		en = "Go to the pier or the shore to fish.",
 	},
-	["hint.wait_bite"] = { es = "Espera a que pique...", en = "Wait for a bite..." },
+	["hint.wait_bite"] = { es = "Espera a que salga el ! (pica)", en = "Wait for the ! to Appear (a Bite)" },
 	["hint.bite"] = { es = "¡PICA! ¡Recoge en la zona verde!", en = "BITE! Reel in on the green zone!" },
 	["minigame.perfect"] = { es = "¡PERFECTO!", en = "Perfect!" },
 	["minigame.great"] = { es = "¡BIEN!", en = "Great!" },

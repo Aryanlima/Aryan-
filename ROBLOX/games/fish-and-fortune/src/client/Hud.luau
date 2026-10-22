@@ -400,6 +400,30 @@ function Hud.start(ctx: any): any
 	}
 
 	----------------------------------------------------------------------------
+	-- Pantallas pequenas: escala 0.7-1 segun el alto, solo al cambiar el tamano de la vista (sin trabajo por cuadro)
+	----------------------------------------------------------------------------
+	local scaled = {
+		UI.create("UIScale", { Name = "FitScale", Parent = menuColumn }),
+		UI.create("UIScale", { Name = "FitScale", Parent = eventsHolder }),
+		UI.create("UIScale", { Name = "FitScale", Parent = actionBar }),
+	}
+	local function fitScreen(camera: any)
+		local scale = math.clamp(camera.ViewportSize.Y / 720, 0.7, 1)
+		for _, item in scaled do
+			item.Scale = scale
+		end
+	end
+	local okCamera, camera = pcall(function(): any
+		return game:GetService("Workspace").CurrentCamera
+	end)
+	if okCamera and camera ~= nil then
+		fitScreen(camera)
+		camera:GetPropertyChangedSignal("ViewportSize"):Connect(function()
+			fitScreen(camera)
+		end)
+	end
+
+	----------------------------------------------------------------------------
 	-- Refresco
 	----------------------------------------------------------------------------
 	local function modifiersText(modifiers: { [string]: number }): string

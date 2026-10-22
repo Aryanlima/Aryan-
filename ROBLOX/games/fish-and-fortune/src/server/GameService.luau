@@ -113,14 +113,15 @@ function GameService.start(m: any)
 			return DataStoreService:GetDataStore(DATASTORE_NAME)
 		end)
 		if RunService:IsStudio() then
-			local reachable = gotStore and pcall(function()
-				realStore:GetAsync("__studio_probe")
+			-- Studio nunca toca el DataStore real por accidente (mismo nombre que produccion): hay que pedirlo con el atributo.
+			local optedIn, flag = pcall(function()
+				return ReplicatedStorage:GetAttribute("UseRealDataStore")
 			end)
-			if not reachable then
-				warn("[Data] Studio sin acceso a DataStores: se usa un almacen en MEMORIA (no se guarda nada).")
+			if not (gotStore and optedIn and flag == true) then
+				warn("[Data] Studio: se usa un almacen en MEMORIA (no se guarda nada). Para el DataStore real: atributo ReplicatedStorage.UseRealDataStore = true, solo en un lugar de pruebas.")
 				return m.StudioMemoryStore.new()
 			end
-			warn("[Data] Studio con acceso a la API: se escribe en el DataStore REAL. Usa un lugar de pruebas.")
+			warn("[Data] Studio con UseRealDataStore: se escribe en el DataStore REAL. Usa un lugar de pruebas.")
 		elseif not gotStore then
 			error(realStore, 0) -- un servidor real sin DataStores no debe arrancar con datos en memoria
 		end

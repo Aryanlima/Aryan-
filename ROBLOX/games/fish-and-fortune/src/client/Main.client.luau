@@ -47,6 +47,10 @@ local gui = Instance.new("ScreenGui")
 gui.Name = "FishFortune"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = false
+-- Muescas del movil: los botones quedan dentro del area segura (pcall por si el arnes no tiene la propiedad).
+pcall(function()
+	gui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+end)
 gui.DisplayOrder = 5
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 -- Los textos los localiza el juego (Strings); la traduccion automatica de Roblox no debe volver a tocarlos.
@@ -156,6 +160,17 @@ ctx.feedback = Feedback.start(ctx)
 ctx.menus = Menus.start(ctx)
 ctx.minigame = Minigame.start(ctx)
 ctx.hud = Hud.start(ctx)
+
+-- Chat de Roblox pequeno, arriba a la izquierda y semitransparente: no tapa la cartera ni el pez. TextChatService no
+-- existe en el arnes de pruebas: todo va en pcall.
+pcall(function()
+	local chatWindow = (game:GetService("TextChatService") :: any).ChatWindowConfiguration
+	local camera = Workspace.CurrentCamera :: Camera
+	chatWindow.HorizontalAlignment = Enum.HorizontalAlignment.Left
+	chatWindow.VerticalAlignment = Enum.VerticalAlignment.Top
+	chatWindow.Size = UDim2.fromOffset(math.min(280, camera.ViewportSize.X * 0.4), 120)
+	chatWindow.BackgroundTransparency = 0.5
+end)
 
 -- Servidor -> cliente (solo informacion para mostrar)
 net:onEvent("State", function(state: any)
