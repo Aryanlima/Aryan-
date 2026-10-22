@@ -152,7 +152,12 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Vector3.new(60, 6, 170),
 			Enum.Material.Water
 		)
-		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -9, 0)), Vector3.new(66, 8, 180), Enum.Material.Sand) -- lecho solido
+		callTerrain(
+			"FillBlock",
+			CFrame.new(center + Vector3.new(0, -9, 0)),
+			Vector3.new(66, 8, 180),
+			Enum.Material.Sand
+		) -- lecho solido
 		-- calzada de tierra por el centro del rio hasta el muelle (el aparicion esta dentro del rio)
 		callTerrain(
 			"FillBlock",
@@ -187,7 +192,12 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 			Vector3.new(540, 6, 360),
 			Enum.Material.Water
 		)
-		callTerrain("FillBlock", CFrame.new(center + Vector3.new(0, -9, 0)), Vector3.new(560, 8, 380), Enum.Material.Sand) -- lecho solido
+		callTerrain(
+			"FillBlock",
+			CFrame.new(center + Vector3.new(0, -9, 0)),
+			Vector3.new(560, 8, 380),
+			Enum.Material.Sand
+		) -- lecho solido
 	end
 	local _ = folder
 end
@@ -1274,8 +1284,35 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		local part = deco(folder, "Rope", Vector3.new(0.12, 0.12, (b - a).Magnitude), mid, rope)
 		part.CFrame = CFrame.lookAt(mid, b)
 	end
+	-- Pieza suave de Ropilot (Workspace.Extras.Kit.Kit_<nombre>, ver world/Extras): sin ella (pruebas) se usa la de bloques.
+	local function kitProp(name: string, instanceName: string, rel: Vector3, scale: number, yaw: number): boolean
+		local extras = Workspace:FindFirstChild("Extras")
+		local kitFolder = extras and extras:FindFirstChild("Kit")
+		local template = kitFolder and kitFolder:FindFirstChild("Kit_" .. name)
+		if template == nil or not template:IsA("Model") then
+			return false
+		end
+		local clone = template:Clone()
+		clone.Name = instanceName
+		clone:ScaleTo(scale)
+		local box, size = clone:GetBoundingBox()
+		local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
+		clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
+		for _, part in clone:GetDescendants() do
+			if part:IsA("BasePart") then
+				part.Anchored = true
+				part.CanCollide = false
+				part.CastShadow = false
+			end
+		end
+		clone.Parent = folder
+		return true
+	end
 	-- muelle: barriles, cajas, rollos de cuerda (a un lado, el centro queda libre)
 	for i, z in { -5, -9 } do
+		if kitProp("Barrel", "DockBarrel" .. i, Vector3.new(3, deck, z), 0.7, i) then
+			continue
+		end
 		upright(
 			pt(
 				"DockBarrel" .. i,
@@ -1287,19 +1324,24 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			)
 		)
 	end
-	upright(
-		pt(
-			"DockBarrel3",
-			Vector3.new(1.9, 1.5, 1.5),
-			Vector3.new(7.4, 1, 5),
-			wood,
-			Enum.Material.Wood,
-			Enum.PartType.Cylinder
+	if not kitProp("Barrel", "DockBarrel3", Vector3.new(7.4, deck, 5), 0.7, 2) then
+		upright(
+			pt(
+				"DockBarrel3",
+				Vector3.new(1.9, 1.5, 1.5),
+				Vector3.new(7.4, 1, 5),
+				wood,
+				Enum.Material.Wood,
+				Enum.PartType.Cylinder
+			)
 		)
-	)
+	end
 	for i, rel in
 		{ Vector3.new(-3, deck + 0.8, -11), Vector3.new(-3, deck + 0.8, -13.2), Vector3.new(-3.1, deck + 2.4, -12) }
 	do
+		if kitProp("Crate", "DockCrate" .. i, rel - Vector3.new(0, 0.8, 0), 0.8, i * 0.4) then
+			continue
+		end
 		pt("DockCrate" .. i, Vector3.new(1.8, 1.6, 1.8), rel, Color3.fromRGB(152, 112, 70), Enum.Material.WoodPlanks)
 	end
 	for i, z in { -20, -31 } do
