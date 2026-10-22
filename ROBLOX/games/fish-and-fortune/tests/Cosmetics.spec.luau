@@ -115,4 +115,35 @@ describe("Cosmetics", function()
 		expect(data.wallet.coins).toBe(199999)
 		expect(data.rod).toBe("driftwood")
 	end)
+
+	it("equipar y quitar skins requiere propiedad y conserva caña base y monedas", function()
+		local logic = GameLogic.new({
+			balance = Balance,
+			rules = FishingRules.new(Balance, Odds),
+			economy = Economy,
+			rng = function()
+				return 0.5
+			end,
+			clock = function()
+				return 0
+			end,
+			onTransaction = function() end,
+		})
+		local data = GameLogic.template()
+		data.wallet.coins = 123
+		local ok = logic:equipRod(data, "cane_sunset")
+		expect(ok).toBe(false)
+		expect(data.cosmeticRod).toBe("")
+		data.ownedRods.cane_sunset = true
+		local equipped = logic:equipRod(data, "cane_sunset")
+		expect(equipped).toBe(true)
+		expect(data.cosmeticRod).toBe("cane_sunset")
+		local baseRod = data.rod
+		local coins = data.wallet.coins
+		local unequipped = logic:equipRod(data, baseRod)
+		expect(unequipped).toBe(true)
+		expect(data.cosmeticRod).toBe(nil)
+		expect(data.rod).toBe(baseRod)
+		expect(data.wallet.coins).toBe(coins)
+	end)
 end)

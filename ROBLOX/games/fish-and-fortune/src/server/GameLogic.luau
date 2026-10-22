@@ -528,7 +528,17 @@ function GameLogic.buyRod(self: Logic, data: any, rodId: string, player: any?): 
 	return true, nil
 end
 
+-- REVIEW(money): cambia únicamente la caña equipada y el cosmético persistido.
 function GameLogic.equipRod(self: Logic, data: any, rodId: string): (boolean, string?)
+	for _, cosmetic in self.balance.cosmeticRods do
+		if cosmetic.id == rodId then
+			if not data.ownedRods[rodId] then
+				return false, "not-owned"
+			end
+			data.cosmeticRod = rodId
+			return true, nil
+		end
+	end
 	if self.balance.rods[rodId] == nil then
 		return false, "unknown"
 	end
@@ -536,6 +546,7 @@ function GameLogic.equipRod(self: Logic, data: any, rodId: string): (boolean, st
 		return false, "not-owned"
 	end
 	data.rod = rodId
+	data.cosmeticRod = nil
 	return true, nil
 end
 

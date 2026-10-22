@@ -270,6 +270,12 @@ function GameService.start(m: any)
 		local luck, luckSources = logic:luck(data, c)
 		local now = c.now
 		local season = liveOps:getSeason(now)
+		local cosmeticRods = {}
+		for _, skin in balance.cosmeticRods do
+			if data.ownedRods[skin.id] then
+				cosmeticRods[skin.id] = true
+			end
+		end
 		local events = {}
 		for _, event in liveOps:getActiveEvents(now) do
 			table.insert(events, {
@@ -289,6 +295,8 @@ function GameService.start(m: any)
 			capacity = logic:capacity(data),
 			rod = data.rod,
 			ownedRods = data.ownedRods,
+			cosmeticRods = cosmeticRods,
+			cosmeticRod = data.cosmeticRod ~= "" and data.cosmeticRod or nil,
 			zone = data.zone,
 			unlockedZones = data.unlockedZones,
 			luck = luck,
@@ -742,7 +750,15 @@ function GameService.start(m: any)
 
 	simpleAction(
 		"EquipRod",
-		{ t.oneOf(balance.rodOrder) },
+		{
+			t.oneOf((function()
+				local ids = table.clone(balance.rodOrder)
+				for _, skin in balance.cosmeticRods do
+					table.insert(ids, skin.id)
+				end
+				return ids
+			end)()),
+		},
 		slowRate,
 		function(player: Player, profile: any, rodId: string)
 			local ok, reason = logic:equipRod(profile.data, rodId)
