@@ -168,7 +168,8 @@ function Hud.start(ctx: any): any
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
 		}),
 	})
-	local plaques: { [string]: { frame: Frame, stroke: UIStroke, time: TextLabel, effects: TextLabel, name: TextLabel } } = {}
+	local plaques: { [string]: { frame: Frame, stroke: UIStroke, time: TextLabel, effects: TextLabel, name: TextLabel } } =
+		{}
 	local plaqueOrder = 0
 
 	-- Bienvenida (una vez por sesion, ver refresh).
@@ -186,7 +187,10 @@ function Hud.start(ctx: any): any
 			Parent = gui,
 		}, {
 			UI.create("UICorner", { CornerRadius = UDim.new(0, 16) }),
-			UI.create("UIStroke", { Color = rgb(colors.gold), Thickness = 3, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }),
+			UI.create(
+				"UIStroke",
+				{ Color = rgb(colors.gold), Thickness = 3, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }
+			),
 			UI.create("UISizeConstraint", { MaxSize = Vector2.new(520, 200) }),
 			UI.create("UIPadding", {
 				PaddingTop = UDim.new(0, 8),
@@ -328,7 +332,8 @@ function Hud.start(ctx: any): any
 
 	local menuButtons: { [string]: TextButton } = {}
 	local menuKeys: { [string]: string } = {}
-	local menuIcons = { shop = "Shop", rods = "Rods", bestiary = "Bestiary", season = "Season", odds = "Odds", codes = "Codes" }
+	local menuIcons =
+		{ shop = "Shop", rods = "Rods", bestiary = "Bestiary", season = "Season", odds = "Odds", codes = "Codes" }
 	local function addMenu(order: number, id: string, key: string)
 		menuKeys[id] = key
 		menuButtons[id] = menuButton(order, menuIcons[id], L(key), function()
@@ -605,15 +610,10 @@ function Hud.start(ctx: any): any
 		shownPearls = state.pearls
 		bagLabel.Text = string.format("%d / %d", state.inventoryCount, state.capacity)
 		local full = state.capacity > 0 and state.inventoryCount >= state.capacity
-		motion.tween(
-			bagFill,
-			{
-				Size = UDim2.new(math.clamp(state.inventoryCount / math.max(1, state.capacity), 0, 1), 0, 1, 0),
-				BackgroundColor3 = rgb(if full then colors.coral else colors.positive),
-			},
-			0.3,
-			"Quad"
-		)
+		motion.tween(bagFill, {
+			Size = UDim2.new(math.clamp(state.inventoryCount / math.max(1, state.capacity), 0, 1), 0, 1, 0),
+			BackgroundColor3 = rgb(if full then colors.coral else colors.positive),
+		}, 0.3, "Quad")
 		if full ~= bagFull then
 			bagFull = full
 			if full and not motion.reduced then

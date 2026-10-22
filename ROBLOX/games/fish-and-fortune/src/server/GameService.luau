@@ -118,7 +118,8 @@ function GameService.start(m: any)
 				return ReplicatedStorage:GetAttribute("UseRealDataStore")
 			end)
 			if not (gotStore and optedIn and flag == true) then
-				warn("[Data] Studio: se usa un almacen en MEMORIA (no se guarda nada). Para el DataStore real: atributo ReplicatedStorage.UseRealDataStore = true, solo en un lugar de pruebas.")
+				warn("[Data] Studio: almacen en MEMORIA, no se guarda nada.")
+				warn("[Data] DataStore real: ReplicatedStorage.UseRealDataStore = true (solo lugar de pruebas).")
 				return m.StudioMemoryStore.new()
 			end
 			warn("[Data] Studio con UseRealDataStore: se escribe en el DataStore REAL. Usa un lugar de pruebas.")

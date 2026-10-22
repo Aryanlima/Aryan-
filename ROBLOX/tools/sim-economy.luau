@@ -38,7 +38,8 @@ local function run(profile, seed)
 		end,
 	})
 	local data = GameLogic.template()
-	local ctx = { player = nil, passes = { auto_fish = profile.auto }, events = {}, paidRandomAllowed = true, now = NOW }
+	local ctx =
+		{ player = nil, passes = { auto_fish = profile.auto }, events = {}, paidRandomAllowed = true, now = NOW }
 	local r = { rod = {}, zone = {}, full = 0, top = 0, catches = 0, lastBuy = 0, maxGap = 0, gapAt = 0 }
 
 	local function bought(t)
@@ -119,7 +120,13 @@ end
 
 print(`SIMULADO (no medido con jugadores) - {SEEDS} semillas, {SESSION // 60} min por perfil, medias`)
 local keys = { "reed", "fiberglass", "carbon", "golden", "river", "coast" }
-print(string.format("%-7s %s | coins/h | especies | %%leg+myt | llenos | hueco max(min) | slots", "perfil", "min->: reed fibra carbon golden rio costa"))
+print(
+	string.format(
+		"%-7s %s | coins/h | especies | %%leg+myt | llenos | hueco max(min) | slots",
+		"perfil",
+		"min->: reed fibra carbon golden rio costa"
+	)
+)
 for _, p in profiles do
 	local sums, counts = {}, {}
 	local coins, disc, top, catches, full, gap, slots = 0, 0, 0, 0, 0, 0, 0

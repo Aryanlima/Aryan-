@@ -555,17 +555,22 @@ function Menus.start(ctx: any): any
 				end
 			end,
 		})
-		for index, setting in { { "MuteMusic", "sound.music" }, { "MuteSFX", "sound.sfx" } } do
-			local attribute, prefix = setting[1], setting[2]
+		local function soundText(attribute: string): string
+			if attribute == "MuteMusic" then
+				return if muted[attribute] then L("sound.music_off") else L("sound.music_on")
+			end
+			return if muted[attribute] then L("sound.sfx_off") else L("sound.sfx_on")
+		end
+		for index, attribute in { "MuteMusic", "MuteSFX" } do
 			local toggle: any
 			toggle = UI.button({
-				text = L(if muted[attribute] then prefix .. "_off" else prefix .. "_on"),
+				text = soundText(attribute),
 				colorName = "row",
 				layoutOrder = 3 + index,
 				parent = content,
 				onActivated = function()
 					muted[attribute] = not muted[attribute]
-					toggle.Text = L(if muted[attribute] then prefix .. "_off" else prefix .. "_on")
+					toggle.Text = soundText(attribute)
 					pcall(function()
 						game:GetService("SoundService"):SetAttribute(attribute, muted[attribute])
 					end)
@@ -766,16 +771,24 @@ function Menus.start(ctx: any): any
 
 	-- B del mando cierra el panel abierto; sin panel, el boton pasa de largo.
 	pcall(function()
-		game:GetService("ContextActionService"):BindAction("FF_Back", function(_name: string, state: Enum.UserInputState)
-			if state == Enum.UserInputState.Begin and current ~= nil then
-				close()
-				return Enum.ContextActionResult.Sink
-			end
-			return Enum.ContextActionResult.Pass
-		end, false, Enum.KeyCode.ButtonB)
+		game:GetService("ContextActionService")
+			:BindAction("FF_Back", function(_name: string, state: Enum.UserInputState)
+				if state == Enum.UserInputState.Begin and current ~= nil then
+					close()
+					return Enum.ContextActionResult.Sink
+				end
+				return Enum.ContextActionResult.Pass
+			end, false, Enum.KeyCode.ButtonB)
 	end)
 
-	return { open = open, close = close, onOffers = onOffers, isOpen = function(): boolean return current ~= nil end }
+	return {
+		open = open,
+		close = close,
+		onOffers = onOffers,
+		isOpen = function(): boolean
+			return current ~= nil
+		end,
+	}
 end
 
 return Menus

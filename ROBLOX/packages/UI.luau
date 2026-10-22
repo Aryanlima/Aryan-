@@ -382,7 +382,15 @@ end
 
 -- Interpola `props` en `seconds`; cancela la animacion anterior de esa instancia. Sin TweenService o con movimiento
 -- reducido, asigna los valores al momento.
-function UI.motion.tween(instance: any, props: { [string]: any }, seconds: number, style: string?, direction: string?, repeats: number?, reverses: boolean?)
+function UI.motion.tween(
+	instance: any,
+	props: { [string]: any },
+	seconds: number,
+	style: string?,
+	direction: string?,
+	repeats: number?,
+	reverses: boolean?
+)
 	local e = env()
 	local previous = activeTweens[instance]
 	if previous ~= nil then
@@ -397,7 +405,13 @@ function UI.motion.tween(instance: any, props: { [string]: any }, seconds: numbe
 		end
 		return
 	end
-	local info = e.TweenInfo.new(seconds, easing(style), (e.Enum.EasingDirection :: any)[direction or "Out"], repeats or 0, reverses or false)
+	local info = e.TweenInfo.new(
+		seconds,
+		easing(style),
+		(e.Enum.EasingDirection :: any)[direction or "Out"],
+		repeats or 0,
+		reverses or false
+	)
 	local tween = e.TweenService:Create(instance, info, props)
 	activeTweens[instance] = tween
 	tween:Play()
@@ -690,7 +704,8 @@ function UI.panel(parent: any, options: PanelOptions): (any, any, any)
 	UI.icon(options.icon or "Shop", 44, { Position = e.UDim2.new(0, 10, 0.5, -22), ZIndex = 4, Parent = tab })
 
 	-- Vetas de las tablas (lineas finas detras del contenido)
-	local planks = UI.create("Frame", { Name = "Planks", Size = e.UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 0 })
+	local planks =
+		UI.create("Frame", { Name = "Planks", Size = e.UDim2.fromScale(1, 1), BackgroundTransparency = 1, ZIndex = 0 })
 	for i = 1, 9 do
 		UI.create("Frame", {
 			Position = e.UDim2.new(0, -UI.theme.padding, i / 10, 0),
@@ -1060,7 +1075,13 @@ function UI.toast(parent: any, text: string, seconds: number?): any
 	if scheduler ~= nil then
 		local life = seconds or 3
 		scheduler.delay(math.max(0, life - 0.2), function()
-			UI.motion.tween(toast, { BackgroundTransparency = 1, TextTransparency = 1, TextStrokeTransparency = 1 }, 0.18, "Quad", "In")
+			UI.motion.tween(
+				toast,
+				{ BackgroundTransparency = 1, TextTransparency = 1, TextStrokeTransparency = 1 },
+				0.18,
+				"Quad",
+				"In"
+			)
 		end)
 		scheduler.delay(life, function()
 			toast:Destroy()

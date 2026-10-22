@@ -495,7 +495,14 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 		local at = style.origin + Vector3.new(12 + side * 4.6, 4.3, 7.6)
 		detail(newPart(folder, "SignPost", Vector3.new(0.9, 8.6, 0.9), at, woodColor, Enum.Material.Wood))
 		detail(
-			newPart(folder, "SignRope", Vector3.new(1.2, 0.25, 1.2), at + Vector3.new(0, 1.2, 0), ropeColor, Enum.Material.Fabric)
+			newPart(
+				folder,
+				"SignRope",
+				Vector3.new(1.2, 0.25, 1.2),
+				at + Vector3.new(0, 1.2, 0),
+				ropeColor,
+				Enum.Material.Fabric
+			)
 		)
 		local roof = detail(
 			newPart(
@@ -777,7 +784,8 @@ local function buildRiverTheme(folder: Folder, style: ZoneStyle)
 	}
 	for i, spec in crystalSpecs do
 		local base = crystalBase + Vector3.new(spec[1], 0, spec[2])
-		local crystal = deco(folder, "FallsCrystal" .. i, Vector3.new(spec[4], spec[3], spec[4]), base, spec[6], Enum.Material.Neon)
+		local crystal =
+			deco(folder, "FallsCrystal" .. i, Vector3.new(spec[4], spec[3], spec[4]), base, spec[6], Enum.Material.Neon)
 		crystal.Transparency = 0.25
 		crystal.CFrame = CFrame.new(base) * CFrame.Angles(0, i, math.rad(spec[5])) * CFrame.new(0, spec[3] / 2 - 1, 0)
 		if i == 1 then
@@ -927,7 +935,14 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 		rockBall(folder, "IslandRock" .. i, at, r, Color3.fromRGB(150, 145, 140), Enum.Material.Rock)
 	end
 	-- vida de playa (~110 partes decorativas, sin colision): fuera del muelle (|x| < 11) y de la orilla de pesca
-	local function d(name: string, size: Vector3, rel: Vector3, color: Color3, mat: Enum.Material?, shape: Enum.PartType?): Part
+	local function d(
+		name: string,
+		size: Vector3,
+		rel: Vector3,
+		color: Color3,
+		mat: Enum.Material?,
+		shape: Enum.PartType?
+	): Part
 		return deco(folder, name, size, o + rel, color, mat, shape)
 	end
 	local RED, CREAM, SUN = Color3.fromRGB(235, 70, 60), Color3.fromRGB(255, 244, 225), Color3.fromRGB(255, 190, 40)
@@ -939,12 +954,27 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	-- sombrilla a rayas, toallas y pelotas
 	d("UmbrellaPole", Vector3.new(0.3, 8, 0.3), Vector3.new(24, 4, 8), CREAM, WOOD)
 	for i = 0, 5 do
-		local panel = d("UmbrellaPanel" .. i, Vector3.new(2, 0.2, 5.4), Vector3.new(24, 8, 8), if i % 2 == 0 then RED else CREAM, PLASTIC)
-		panel.CFrame = CFrame.new(o + Vector3.new(24, 8, 8)) * CFrame.Angles(0, i * math.pi / 3, 0) * CFrame.Angles(math.rad(14), 0, 0) * CFrame.new(0, 0, -2.6)
+		local panel = d(
+			"UmbrellaPanel" .. i,
+			Vector3.new(2, 0.2, 5.4),
+			Vector3.new(24, 8, 8),
+			if i % 2 == 0 then RED else CREAM,
+			PLASTIC
+		)
+		panel.CFrame = CFrame.new(o + Vector3.new(24, 8, 8))
+			* CFrame.Angles(0, i * math.pi / 3, 0)
+			* CFrame.Angles(math.rad(14), 0, 0)
+			* CFrame.new(0, 0, -2.6)
 	end
 	for i, spec in { { 20, 6, TEAL }, { 28, 11, SUN } } do
 		d("Towel" .. i, Vector3.new(3.2, 0.12, 6), Vector3.new(spec[1], 0.08, spec[2]), spec[3], Enum.Material.Fabric)
-		d("TowelStripe" .. i, Vector3.new(3.3, 0.14, 1), Vector3.new(spec[1], 0.1, spec[2]), CREAM, Enum.Material.Fabric)
+		d(
+			"TowelStripe" .. i,
+			Vector3.new(3.3, 0.14, 1),
+			Vector3.new(spec[1], 0.1, spec[2]),
+			CREAM,
+			Enum.Material.Fabric
+		)
 	end
 	for i, spec in { { 32, 4, RED }, { 15, 12, SUN }, { -14, 8, TEAL } } do
 		d("BeachBall" .. i, Vector3.one * 2.2, Vector3.new(spec[1], 1.1, spec[2]), spec[3], PLASTIC, Enum.PartType.Ball)
@@ -953,10 +983,30 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	local castle = Vector3.new(16, 0, 24)
 	local sand = Color3.fromRGB(232, 200, 130)
 	d("CastleBase", Vector3.new(7, 2, 7), castle + Vector3.new(0, 1, 0), sand, Enum.Material.Sand)
-	for i, c in { Vector3.new(-3.5, 0, -3.5), Vector3.new(3.5, 0, -3.5), Vector3.new(-3.5, 0, 3.5), Vector3.new(3.5, 0, 3.5) } do
-		upright(d("CastleTower" .. i, Vector3.new(3.4, 2, 2), castle + c + Vector3.new(0, 2, 0), sand, Enum.Material.Sand, Enum.PartType.Cylinder))
+	for i, c in
+		{ Vector3.new(-3.5, 0, -3.5), Vector3.new(3.5, 0, -3.5), Vector3.new(-3.5, 0, 3.5), Vector3.new(3.5, 0, 3.5) }
+	do
+		upright(
+			d(
+				"CastleTower" .. i,
+				Vector3.new(3.4, 2, 2),
+				castle + c + Vector3.new(0, 2, 0),
+				sand,
+				Enum.Material.Sand,
+				Enum.PartType.Cylinder
+			)
+		)
 	end
-	upright(d("CastleKeep", Vector3.new(4, 3, 3), castle + Vector3.new(0, 3.5, 0), sand, Enum.Material.Sand, Enum.PartType.Cylinder))
+	upright(
+		d(
+			"CastleKeep",
+			Vector3.new(4, 3, 3),
+			castle + Vector3.new(0, 3.5, 0),
+			sand,
+			Enum.Material.Sand,
+			Enum.PartType.Cylinder
+		)
+	)
 	d("CastleFlagPole", Vector3.new(0.12, 3, 0.12), castle + Vector3.new(0, 6.5, 0), CREAM)
 	d("CastleFlag", Vector3.new(1.4, 0.9, 0.08), castle + Vector3.new(0.7, 7.5, 0), RED, Enum.Material.Fabric)
 	-- chiringuito tiki con farol calido
@@ -965,13 +1015,38 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 		d("TikiPost" .. i, Vector3.new(0.6, 6, 0.6), hut + c + Vector3.new(0, 3, 0), DRIFT, WOOD)
 	end
 	for i, side in { -1, 1 } do
-		local roof = d("TikiRoof" .. i, Vector3.new(4.4, 0.4, 7.4), hut + Vector3.new(side * 1.9, 6.5, 0), Color3.fromRGB(205, 170, 80), Enum.Material.Grass)
+		local roof = d(
+			"TikiRoof" .. i,
+			Vector3.new(4.4, 0.4, 7.4),
+			hut + Vector3.new(side * 1.9, 6.5, 0),
+			Color3.fromRGB(205, 170, 80),
+			Enum.Material.Grass
+		)
 		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(24))
-		d("TikiStool" .. i, Vector3.new(1.4, 1.6, 1.4), hut + Vector3.new(side * 1.8, 0.8, -5), RED, PLASTIC, Enum.PartType.Cylinder)
+		d(
+			"TikiStool" .. i,
+			Vector3.new(1.4, 1.6, 1.4),
+			hut + Vector3.new(side * 1.8, 0.8, -5),
+			RED,
+			PLASTIC,
+			Enum.PartType.Cylinder
+		)
 	end
-	d("TikiBar", Vector3.new(7, 2.4, 1.4), hut + Vector3.new(0, 1.2, -2.6), Color3.fromRGB(120, 80, 50), Enum.Material.WoodPlanks)
+	d(
+		"TikiBar",
+		Vector3.new(7, 2.4, 1.4),
+		hut + Vector3.new(0, 1.2, -2.6),
+		Color3.fromRGB(120, 80, 50),
+		Enum.Material.WoodPlanks
+	)
 	d("TikiBarTop", Vector3.new(7.6, 0.3, 2), hut + Vector3.new(0, 2.5, -2.6), SUN, Enum.Material.WoodPlanks)
-	local lantern = d("TikiLantern", Vector3.new(0.9, 1.2, 0.9), hut + Vector3.new(0, 5.2, -2.6), Color3.fromRGB(255, 190, 100), Enum.Material.Neon)
+	local lantern = d(
+		"TikiLantern",
+		Vector3.new(0.9, 1.2, 0.9),
+		hut + Vector3.new(0, 5.2, -2.6),
+		Color3.fromRGB(255, 190, 100),
+		Enum.Material.Neon
+	)
 	pcall(function()
 		local light = Instance.new("PointLight")
 		light.Color = Color3.fromRGB(255, 190, 110)
@@ -987,12 +1062,22 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	local tilt = CFrame.new(o + boat + Vector3.new(0, 0.7, 0)) * CFrame.Angles(0.12, 0.5, 0.18)
 	d("RowboatBottom", Vector3.new(3, 0.3, 7), boat, hullBlue, plank).CFrame = tilt
 	for i, side in { -1, 1 } do
-		d("RowboatSide" .. i, Vector3.new(0.3, 1.1, 7), boat, hullBlue, plank).CFrame = tilt * CFrame.new(side * 1.4, 0.55, 0)
-		d("RowboatEnd" .. i, Vector3.new(3, 1.1, 0.3), boat, CREAM, plank).CFrame = tilt * CFrame.new(0, 0.55, side * 3.4)
+		d("RowboatSide" .. i, Vector3.new(0.3, 1.1, 7), boat, hullBlue, plank).CFrame = tilt
+			* CFrame.new(side * 1.4, 0.55, 0)
+		d("RowboatEnd" .. i, Vector3.new(3, 1.1, 0.3), boat, CREAM, plank).CFrame = tilt
+			* CFrame.new(0, 0.55, side * 3.4)
 	end
-	d("RowboatOar", Vector3.new(0.2, 0.2, 5), boat, DRIFT, WOOD).CFrame = CFrame.new(o + boat + Vector3.new(3, 0.4, 3)) * CFrame.Angles(0, 0.9, 0.1)
+	d("RowboatOar", Vector3.new(0.2, 0.2, 5), boat, DRIFT, WOOD).CFrame = CFrame.new(o + boat + Vector3.new(3, 0.4, 3))
+		* CFrame.Angles(0, 0.9, 0.1)
 	for i, spec in { { -30, -6, 0.4 }, { 30, -8, -0.6 }, { -52, 14, 1.2 }, { 50, 20, 2 } } do
-		local log = d("Driftwood" .. i, Vector3.new(6 - i * 0.6, 1, 1), Vector3.new(spec[1], 0.5, spec[2]), DRIFT, WOOD, Enum.PartType.Cylinder)
+		local log = d(
+			"Driftwood" .. i,
+			Vector3.new(6 - i * 0.6, 1, 1),
+			Vector3.new(spec[1], 0.5, spec[2]),
+			DRIFT,
+			WOOD,
+			Enum.PartType.Cylinder
+		)
 		log.CFrame = CFrame.new(log.Position) * CFrame.Angles(0, spec[3], 0)
 	end
 	local wreck = Vector3.new(-66, 0, -6)
@@ -1001,34 +1086,75 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	for i = 1, 6 do
 		for _, side in { -1, 1 } do
 			if i % 2 == 1 or side == 1 then
-				d("WreckRib" .. i, Vector3.new(0.5, 6 - math.abs(i - 3.5), 0.5), wreck, Color3.fromRGB(105, 78, 55), WOOD).CFrame =
-					hull * CFrame.new(side * 1.8, 2, (i - 3.5) * 3) * CFrame.Angles(0, 0, side * math.rad(-28))
+				d(
+					"WreckRib" .. i,
+					Vector3.new(0.5, 6 - math.abs(i - 3.5), 0.5),
+					wreck,
+					Color3.fromRGB(105, 78, 55),
+					WOOD
+				).CFrame = hull
+					* CFrame.new(side * 1.8, 2, (i - 3.5) * 3)
+					* CFrame.Angles(0, 0, side * math.rad(-28))
 			end
 		end
 	end
-	d("WreckMast", Vector3.new(0.6, 9, 0.6), wreck, Color3.fromRGB(95, 70, 48), WOOD).CFrame = hull * CFrame.new(0, 4, 2) * CFrame.Angles(0, 0, math.rad(-18))
+	d("WreckMast", Vector3.new(0.6, 9, 0.6), wreck, Color3.fromRGB(95, 70, 48), WOOD).CFrame = hull
+		* CFrame.new(0, 4, 2)
+		* CFrame.Angles(0, 0, math.rad(-18))
 	-- boyas y banderas a lo largo de la orilla (fuera del carril del muelle y de la pesca)
 	for i = 1, 6 do
 		local x = (if i % 2 == 0 then 1 else -1) * (14 + math.floor((i - 1) / 2) * 14)
-		d("Buoy" .. i, Vector3.new(1.6, 1.6, 1.6), Vector3.new(x, 0.8, -8), if i % 2 == 0 then RED else SUN, PLASTIC, Enum.PartType.Ball)
+		d(
+			"Buoy" .. i,
+			Vector3.new(1.6, 1.6, 1.6),
+			Vector3.new(x, 0.8, -8),
+			if i % 2 == 0 then RED else SUN,
+			PLASTIC,
+			Enum.PartType.Ball
+		)
 		if i <= 4 then
 			d("BuoyBand" .. i, Vector3.new(1.7, 0.4, 1.7), Vector3.new(x, 0.9, -8), CREAM, PLASTIC, Enum.PartType.Ball)
 			d("ShoreFlagPole" .. i, Vector3.new(0.15, 4, 0.15), Vector3.new(x + 4, 2, -6), CREAM)
-			d("ShoreFlag" .. i, Vector3.new(1.8, 1.1, 0.08), Vector3.new(x + 4.9, 3.5, -6), if i % 2 == 0 then TEAL else RED, Enum.Material.Fabric)
+			d(
+				"ShoreFlag" .. i,
+				Vector3.new(1.8, 1.1, 0.08),
+				Vector3.new(x + 4.9, 3.5, -6),
+				if i % 2 == 0 then TEAL else RED,
+				Enum.Material.Fabric
+			)
 		end
 	end
 	-- pozas de marea con estrellas de mar
 	for i, spec in { { 30, -2 }, { -34, 22 } } do
 		local pool = Vector3.new(spec[1], 0.06, spec[2])
-		local water = d("TidePool" .. i, Vector3.new(0.1, 7, 5), pool, Color3.fromRGB(60, 200, 215), PLASTIC, Enum.PartType.Cylinder)
+		local water = d(
+			"TidePool" .. i,
+			Vector3.new(0.1, 7, 5),
+			pool,
+			Color3.fromRGB(60, 200, 215),
+			PLASTIC,
+			Enum.PartType.Cylinder
+		)
 		water.Transparency = 0.35
 		upright(water)
 		for r = 1, 3 do
 			local a = r * 2.1
-			d("PoolStone" .. i, Vector3.one * 1.5, pool + Vector3.new(math.cos(a) * 3.6, 0.4, math.sin(a) * 2.8), Color3.fromRGB(150, 145, 140), Enum.Material.Rock, Enum.PartType.Ball)
+			d(
+				"PoolStone" .. i,
+				Vector3.one * 1.5,
+				pool + Vector3.new(math.cos(a) * 3.6, 0.4, math.sin(a) * 2.8),
+				Color3.fromRGB(150, 145, 140),
+				Enum.Material.Rock,
+				Enum.PartType.Ball
+			)
 		end
 		for arm = 0, 2 do
-			local bar = d("PoolStar" .. i, Vector3.new(1.8, 0.2, 0.5), pool + Vector3.new(0.4, 0.2, 0), Color3.fromRGB(255, 110, 70))
+			local bar = d(
+				"PoolStar" .. i,
+				Vector3.new(1.8, 0.2, 0.5),
+				pool + Vector3.new(0.4, 0.2, 0),
+				Color3.fromRGB(255, 110, 70)
+			)
 			bar.CFrame = CFrame.new(bar.Position) * CFrame.Angles(0, arm * math.pi / 3, 0)
 		end
 	end
@@ -1038,7 +1164,13 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	end
 	-- 2 cangrejos que van de lado a lado (Tween en bucle, en pcall)
 	for i = 1, 2 do
-		local crab = d("Crab" .. i, Vector3.new(1.4, 0.7, 1), Vector3.new(-20 + i * 46, 0.4, 14 - i * 6), Color3.fromRGB(240, 90, 60), PLASTIC)
+		local crab = d(
+			"Crab" .. i,
+			Vector3.new(1.4, 0.7, 1),
+			Vector3.new(-20 + i * 46, 0.4, 14 - i * 6),
+			Color3.fromRGB(240, 90, 60),
+			PLASTIC
+		)
 		pcall(function()
 			local info = TweenInfo.new(5 + i * 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
 			TweenService:Create(crab, info, { CFrame = crab.CFrame * CFrame.new(8, 0, 0) }):Play()
@@ -1049,12 +1181,39 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	local hinge = o + Vector3.new(-23, 0.4, 17) -- delante-izquierda del spawn (mira hacia -z)
 	for i = 1, 9 do
 		local yaw = math.rad((i - 5) * 15)
-		local slab = deco(folder, "GiantShell" .. i, Vector3.new(3.4, 0.7, 26), hinge, if i % 2 == 0 then Color3.fromRGB(255, 255, 245) else Color3.fromRGB(255, 120, 170), Enum.Material.SmoothPlastic)
-		slab.CFrame = CFrame.new(hinge) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(math.rad(52), 0, 0) * CFrame.new(0, 0, -13)
+		local slab = deco(
+			folder,
+			"GiantShell" .. i,
+			Vector3.new(3.4, 0.7, 26),
+			hinge,
+			if i % 2 == 0 then Color3.fromRGB(255, 255, 245) else Color3.fromRGB(255, 120, 170),
+			Enum.Material.SmoothPlastic
+		)
+		slab.CFrame = CFrame.new(hinge)
+			* CFrame.Angles(0, yaw, 0)
+			* CFrame.Angles(math.rad(52), 0, 0)
+			* CFrame.new(0, 0, -13)
 	end
-	deco(folder, "GiantShellBase", Vector3.new(12, 1, 8), hinge + Vector3.new(0, 0.1, -2), Color3.fromRGB(255, 190, 200), Enum.Material.SmoothPlastic, Enum.PartType.Cylinder).CFrame =
-		CFrame.new(hinge + Vector3.new(0, 0.1, -2)) * CFrame.Angles(0, 0, math.rad(90))
-	local pearl = deco(folder, "GiantPearl", Vector3.new(5, 5, 5), hinge + Vector3.new(0, 3, -9), Color3.fromRGB(255, 250, 240), Enum.Material.Neon, Enum.PartType.Ball)
+	deco(
+		folder,
+		"GiantShellBase",
+		Vector3.new(12, 1, 8),
+		hinge + Vector3.new(0, 0.1, -2),
+		Color3.fromRGB(255, 190, 200),
+		Enum.Material.SmoothPlastic,
+		Enum.PartType.Cylinder
+	).CFrame = CFrame.new(
+		hinge + Vector3.new(0, 0.1, -2)
+	) * CFrame.Angles(0, 0, math.rad(90))
+	local pearl = deco(
+		folder,
+		"GiantPearl",
+		Vector3.new(5, 5, 5),
+		hinge + Vector3.new(0, 3, -9),
+		Color3.fromRGB(255, 250, 240),
+		Enum.Material.Neon,
+		Enum.PartType.Ball
+	)
 	pcall(function()
 		local light = Instance.new("PointLight")
 		light.Color = Color3.fromRGB(255, 220, 200)
@@ -1117,22 +1276,59 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	-- muelle: barriles, cajas, rollos de cuerda (a un lado, el centro queda libre)
 	for i, z in { -5, -9 } do
 		upright(
-			pt("DockBarrel" .. i, Vector3.new(1.9, 1.5, 1.5), Vector3.new(3, deck + 0.95, z), wood, Enum.Material.Wood, Enum.PartType.Cylinder)
+			pt(
+				"DockBarrel" .. i,
+				Vector3.new(1.9, 1.5, 1.5),
+				Vector3.new(3, deck + 0.95, z),
+				wood,
+				Enum.Material.Wood,
+				Enum.PartType.Cylinder
+			)
 		)
 	end
-	upright(pt("DockBarrel3", Vector3.new(1.9, 1.5, 1.5), Vector3.new(7.4, 1, 5), wood, Enum.Material.Wood, Enum.PartType.Cylinder))
-	for i, rel in { Vector3.new(-3, deck + 0.8, -11), Vector3.new(-3, deck + 0.8, -13.2), Vector3.new(-3.1, deck + 2.4, -12) } do
+	upright(
+		pt(
+			"DockBarrel3",
+			Vector3.new(1.9, 1.5, 1.5),
+			Vector3.new(7.4, 1, 5),
+			wood,
+			Enum.Material.Wood,
+			Enum.PartType.Cylinder
+		)
+	)
+	for i, rel in
+		{ Vector3.new(-3, deck + 0.8, -11), Vector3.new(-3, deck + 0.8, -13.2), Vector3.new(-3.1, deck + 2.4, -12) }
+	do
 		pt("DockCrate" .. i, Vector3.new(1.8, 1.6, 1.8), rel, Color3.fromRGB(152, 112, 70), Enum.Material.WoodPlanks)
 	end
 	for i, z in { -20, -31 } do
 		upright(
-			pt("RopeCoil" .. i, Vector3.new(0.4, 1.4, 1.4), Vector3.new(-3.1, deck + 0.2, z), rope, Enum.Material.Fabric, Enum.PartType.Cylinder)
+			pt(
+				"RopeCoil" .. i,
+				Vector3.new(0.4, 1.4, 1.4),
+				Vector3.new(-3.1, deck + 0.2, z),
+				rope,
+				Enum.Material.Fabric,
+				Enum.PartType.Cylinder
+			)
 		)
 	end
 	-- faroles colgantes al final del muelle: brillo calido de alcance corto
 	for i, side in { -1, 1 } do
-		pt("DockLampPole" .. i, Vector3.new(0.3, 4.4, 0.3), Vector3.new(side * 3.4, deck + 2.2, -39), wood, Enum.Material.Wood)
-		pt("DockLampArm" .. i, Vector3.new(0.9, 0.25, 0.25), Vector3.new(side * 3, deck + 4.3, -39), wood, Enum.Material.Wood)
+		pt(
+			"DockLampPole" .. i,
+			Vector3.new(0.3, 4.4, 0.3),
+			Vector3.new(side * 3.4, deck + 2.2, -39),
+			wood,
+			Enum.Material.Wood
+		)
+		pt(
+			"DockLampArm" .. i,
+			Vector3.new(0.9, 0.25, 0.25),
+			Vector3.new(side * 3, deck + 4.3, -39),
+			wood,
+			Enum.Material.Wood
+		)
 		local lamp = pt(
 			"DockLamp" .. i,
 			Vector3.new(0.8, 1.1, 0.8),
@@ -1150,10 +1346,28 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	-- barca amarrada junto al muelle (lado +x, fuera del carril)
 	local bx, bz = 6.6, -22.5
 	local red = Color3.fromRGB(176, 66, 52)
-	pt("BoatBottom", Vector3.new(2.4, 0.3, 6), Vector3.new(bx, 0.1, bz), Color3.fromRGB(150, 96, 58), Enum.Material.WoodPlanks)
+	pt(
+		"BoatBottom",
+		Vector3.new(2.4, 0.3, 6),
+		Vector3.new(bx, 0.1, bz),
+		Color3.fromRGB(150, 96, 58),
+		Enum.Material.WoodPlanks
+	)
 	for i, side in { -1, 1 } do
-		pt("BoatSide" .. i, Vector3.new(0.3, 1, 6), Vector3.new(bx + side * 1.05, 0.6, bz), red, Enum.Material.WoodPlanks)
-		pt("BoatEnd" .. i, Vector3.new(2.4, 1, 0.3), Vector3.new(bx, 0.6, bz + side * 2.85), red, Enum.Material.WoodPlanks)
+		pt(
+			"BoatSide" .. i,
+			Vector3.new(0.3, 1, 6),
+			Vector3.new(bx + side * 1.05, 0.6, bz),
+			red,
+			Enum.Material.WoodPlanks
+		)
+		pt(
+			"BoatEnd" .. i,
+			Vector3.new(2.4, 1, 0.3),
+			Vector3.new(bx, 0.6, bz + side * 2.85),
+			red,
+			Enum.Material.WoodPlanks
+		)
 	end
 	pt("BoatSeat", Vector3.new(2.2, 0.2, 0.7), Vector3.new(bx, 0.95, bz), wood, Enum.Material.Wood)
 	link(o + Vector3.new(bx - 1, 1.2, bz + 2.85), o + Vector3.new(3.6, 1.8, -18))
@@ -1170,17 +1384,38 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	pt("BaitBack", Vector3.new(8, 5, 0.4), Vector3.new(hx, 2.9, hz + 2.8), hutWall, planks).CanCollide = true
 	pt("BaitLintel", Vector3.new(2.4, 1.6, 0.4), Vector3.new(hx, 4.6, hz - 2.8), hutWall, planks).CanCollide = true
 	for i, side in { -1, 1 } do
-		pt("BaitSide" .. i, Vector3.new(0.4, 5, 6), Vector3.new(hx + side * 3.8, 2.9, hz), hutWall, planks).CanCollide = true
+		pt("BaitSide" .. i, Vector3.new(0.4, 5, 6), Vector3.new(hx + side * 3.8, 2.9, hz), hutWall, planks).CanCollide =
+			true
 		pt("BaitFront" .. i, Vector3.new(2.8, 5, 0.4), Vector3.new(hx + side * 2.6, 2.9, hz - 2.8), hutWall, planks).CanCollide =
 			true
-		local roof =
-			pt("BaitRoof" .. i, Vector3.new(5.6, 0.4, 7.4), Vector3.new(hx + side * 2.3, 6.3, hz), Color3.fromRGB(112, 62, 48), Enum.Material.Wood)
+		local roof = pt(
+			"BaitRoof" .. i,
+			Vector3.new(5.6, 0.4, 7.4),
+			Vector3.new(hx + side * 2.3, 6.3, hz),
+			Color3.fromRGB(112, 62, 48),
+			Enum.Material.Wood
+		)
 		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(28))
 	end
 	-- aguas someras: discos finos y translucidos apilados (radio decreciente) que siguen la orilla circular sin aristas;
 	-- el borde acumula opacidad (turquesa claro) y el centro queda profundo. Solo decoran (sin colision ni consulta).
-	for i, spec in { { 55.6, 0.74, WHITE }, { 55, 0.8, Color3.fromRGB(70, 240, 215) }, { 52, 0.82, Color3.fromRGB(40, 225, 215) }, { 49, 0.86, Color3.fromRGB(20, 200, 220) }, { 46, 0.9, Color3.fromRGB(10, 170, 225) } } do
-		local disc = pt("ShallowRing" .. i, Vector3.new(0.04, spec[1] * 2, spec[1] * 2), Vector3.new(0, 0.06 + i * 0.01, -45), spec[3], nil, Enum.PartType.Cylinder)
+	for i, spec in
+		{
+			{ 55.6, 0.74, WHITE },
+			{ 55, 0.8, Color3.fromRGB(70, 240, 215) },
+			{ 52, 0.82, Color3.fromRGB(40, 225, 215) },
+			{ 49, 0.86, Color3.fromRGB(20, 200, 220) },
+			{ 46, 0.9, Color3.fromRGB(10, 170, 225) },
+		}
+	do
+		local disc = pt(
+			"ShallowRing" .. i,
+			Vector3.new(0.04, spec[1] * 2, spec[1] * 2),
+			Vector3.new(0, 0.06 + i * 0.01, -45),
+			spec[3],
+			nil,
+			Enum.PartType.Cylinder
+		)
 		upright(disc)
 		disc.Transparency = spec[2]
 	end
@@ -1191,13 +1426,21 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			local h = rng:NextNumber(2.2, 3.4)
 			local at = shore(deg + rng:NextNumber(-4, 4), rng:NextNumber(54, 57), h / 2)
 			local blade = pt("Reed" .. i, Vector3.new(0.15, h, 0.15), at, reedColors[(b % 2) + 1], Enum.Material.Grass)
-			blade.CFrame = CFrame.new(o + at) * CFrame.Angles(rng:NextNumber(-0.15, 0.15), 0, rng:NextNumber(-0.15, 0.15))
+			blade.CFrame = CFrame.new(o + at)
+				* CFrame.Angles(rng:NextNumber(-0.15, 0.15), 0, rng:NextNumber(-0.15, 0.15))
 		end
 		if i % 4 == 2 then
 			local at = shore(deg + 3, 55.5, 1.9)
 			pt("CattailStem" .. i, Vector3.new(0.12, 3.8, 0.12), at, reedColors[1], Enum.Material.Grass)
 			upright(
-				pt("Cattail" .. i, Vector3.new(0.9, 0.35, 0.35), at + Vector3.new(0, 2.1, 0), Color3.fromRGB(96, 62, 40), nil, Enum.PartType.Cylinder)
+				pt(
+					"Cattail" .. i,
+					Vector3.new(0.9, 0.35, 0.35),
+					at + Vector3.new(0, 2.1, 0),
+					Color3.fromRGB(96, 62, 40),
+					nil,
+					Enum.PartType.Cylinder
+				)
 			)
 		end
 	end
@@ -1205,9 +1448,25 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	for i = 1, 8 do
 		local deg = if i % 2 == 0 then rng:NextNumber(20, 55) else 180 - rng:NextNumber(20, 55)
 		local at = shore(deg, rng:NextNumber(30, 47), 0.12)
-		upright(pt("LilyPad" .. i, Vector3.new(0.12, 2.2, 2.2), at, Color3.fromRGB(70, 150, 82), Enum.Material.Grass, Enum.PartType.Cylinder))
+		upright(
+			pt(
+				"LilyPad" .. i,
+				Vector3.new(0.12, 2.2, 2.2),
+				at,
+				Color3.fromRGB(70, 150, 82),
+				Enum.Material.Grass,
+				Enum.PartType.Cylinder
+			)
+		)
 		if i % 2 == 0 then
-			pt("LilyFlower" .. i, Vector3.new(0.8, 0.6, 0.8), at + Vector3.new(0, 0.35, 0), Color3.fromRGB(255, 150, 190), nil, Enum.PartType.Ball)
+			pt(
+				"LilyFlower" .. i,
+				Vector3.new(0.8, 0.6, 0.8),
+				at + Vector3.new(0, 0.35, 0),
+				Color3.fromRGB(255, 150, 190),
+				nil,
+				Enum.PartType.Ball
+			)
 		end
 	end
 	-- flores silvestres en tierra y rocas de orilla (las rocas de Terrain no cuentan como partes)
@@ -1225,31 +1484,71 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		local deg = rng:NextNumber(10, 170)
 		deg = if nearPier(deg) then deg + 60 else deg
 		local r = rng:NextNumber(1.6, 2.8)
-		rockBall(folder, "LakeBoulder" .. i, o + shore(deg, rng:NextNumber(62, 72), r * 0.3), r, Color3.fromRGB(122, 126, 124), Enum.Material.Rock)
+		rockBall(
+			folder,
+			"LakeBoulder" .. i,
+			o + shore(deg, rng:NextNumber(62, 72), r * 0.3),
+			r,
+			Color3.fromRGB(122, 126, 124),
+			Enum.Material.Rock
+		)
 	end
 	-- tres grupos de arboles altos que enmarcan el lago por detras de las colinas
 	for c, center in { Vector3.new(-58, 0, 70), Vector3.new(62, 0, 74), Vector3.new(-74, 0, -12) } do
 		for t = 1, 3 do
 			local h = rng:NextNumber(16, 22)
 			local at = center + Vector3.new(rng:NextNumber(-7, 7), 0, rng:NextNumber(-7, 7))
-			pt("TallTrunk" .. c, Vector3.new(1.6, h, 1.6), at + Vector3.new(0, h / 2, 0), Color3.fromRGB(94, 70, 52), Enum.Material.Wood)
+			pt(
+				"TallTrunk" .. c,
+				Vector3.new(1.6, h, 1.6),
+				at + Vector3.new(0, h / 2, 0),
+				Color3.fromRGB(94, 70, 52),
+				Enum.Material.Wood
+			)
 			local crown = if t % 2 == 0 then style.treeColor else Color3.fromRGB(70, 138, 74)
-			pt("TallCrown" .. c, Vector3.one * rng:NextNumber(10, 13), at + Vector3.new(0, h + 2, 0), crown, Enum.Material.Grass, Enum.PartType.Ball)
+			pt(
+				"TallCrown" .. c,
+				Vector3.one * rng:NextNumber(10, 13),
+				at + Vector3.new(0, h + 2, 0),
+				crown,
+				Enum.Material.Grass,
+				Enum.PartType.Ball
+			)
 		end
 	end
 	-- piedras para cruzar (pisables, hacia el este) y tronco caido en la orilla oeste
 	for i = 0, 5 do
-		local stone = pt("StepStone" .. i, Vector3.new(3, 2.6, 2.6), shore(15 + i * 1.5, 53 - i * 3.2, -0.9), Color3.fromRGB(128, 132, 128), Enum.Material.Slate, Enum.PartType.Cylinder)
+		local stone = pt(
+			"StepStone" .. i,
+			Vector3.new(3, 2.6, 2.6),
+			shore(15 + i * 1.5, 53 - i * 3.2, -0.9),
+			Color3.fromRGB(128, 132, 128),
+			Enum.Material.Slate,
+			Enum.PartType.Cylinder
+		)
 		upright(stone)
 		stone.CanCollide = true
 	end
 	local logAt = shore(165, 58, 0.9)
-	local trunk = pt("FallenLog", Vector3.new(9, 1.7, 1.7), logAt, Color3.fromRGB(92, 66, 46), Enum.Material.Wood, Enum.PartType.Cylinder)
+	local trunk = pt(
+		"FallenLog",
+		Vector3.new(9, 1.7, 1.7),
+		logAt,
+		Color3.fromRGB(92, 66, 46),
+		Enum.Material.Wood,
+		Enum.PartType.Cylinder
+	)
 	trunk.CFrame = CFrame.lookAt(o + logAt, o + logAt + Vector3.new(0.3, 0, 1)) * CFrame.Angles(0, math.rad(90), 0)
 	trunk.CanCollide = true
 	-- mariposas (3 Tweens en bucle, en pcall como las gaviotas) y luciernagas (2 emisores lentos)
 	for i = 1, 3 do
-		local fly = pt("Butterfly" .. i, Vector3.new(0.6, 0.06, 0.5), shore(20 + i * 50, 64, 2.2), flowerColors[i], Enum.Material.Neon)
+		local fly = pt(
+			"Butterfly" .. i,
+			Vector3.new(0.6, 0.06, 0.5),
+			shore(20 + i * 50, 64, 2.2),
+			flowerColors[i],
+			Enum.Material.Neon
+		)
 		pcall(function()
 			local info = TweenInfo.new(6 + i * 1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
 			local goal = fly.CFrame * CFrame.new(5 - i, 1.2, 4) * CFrame.Angles(0, math.rad(40 * i), 0)
@@ -1275,16 +1574,46 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	-- lejos del muelle (|x| > 4.5) y de los puntos de pesca; 10 partes, sin colision
 	do
 		local bx, bz = -34, -72
-		upright(deco(folder, "BuoyFloatBase", Vector3.new(2, 10, 10), o + Vector3.new(bx, 0.3, bz), Color3.fromRGB(255, 70, 60), Enum.Material.SmoothPlastic, Enum.PartType.Cylinder))
+		upright(
+			deco(
+				folder,
+				"BuoyFloatBase",
+				Vector3.new(2, 10, 10),
+				o + Vector3.new(bx, 0.3, bz),
+				Color3.fromRGB(255, 70, 60),
+				Enum.Material.SmoothPlastic,
+				Enum.PartType.Cylinder
+			)
+		)
 		local rainbow = {
-			Color3.fromRGB(255, 50, 60), Color3.fromRGB(255, 140, 20), Color3.fromRGB(255, 220, 40), Color3.fromRGB(60, 210, 80),
-			Color3.fromRGB(40, 170, 255), Color3.fromRGB(120, 80, 255),
+			Color3.fromRGB(255, 50, 60),
+			Color3.fromRGB(255, 140, 20),
+			Color3.fromRGB(255, 220, 40),
+			Color3.fromRGB(60, 210, 80),
+			Color3.fromRGB(40, 170, 255),
+			Color3.fromRGB(120, 80, 255),
 		}
 		for i, color in rainbow do
 			local d = 7 - i * 0.7
-			upright(pt("BuoyStripe" .. i, Vector3.new(5, d, d), Vector3.new(bx, 1.5 + i * 5, bz), color, Enum.Material.SmoothPlastic, Enum.PartType.Cylinder))
+			upright(
+				pt(
+					"BuoyStripe" .. i,
+					Vector3.new(5, d, d),
+					Vector3.new(bx, 1.5 + i * 5, bz),
+					color,
+					Enum.Material.SmoothPlastic,
+					Enum.PartType.Cylinder
+				)
+			)
 		end
-		local lamp = pt("BuoyLamp", Vector3.new(4.5, 4.5, 4.5), Vector3.new(bx, 36, bz), Color3.fromRGB(255, 240, 150), Enum.Material.Neon, Enum.PartType.Ball)
+		local lamp = pt(
+			"BuoyLamp",
+			Vector3.new(4.5, 4.5, 4.5),
+			Vector3.new(bx, 36, bz),
+			Color3.fromRGB(255, 240, 150),
+			Enum.Material.Neon,
+			Enum.PartType.Ball
+		)
 		pcall(function()
 			local light = Instance.new("PointLight")
 			light.Color = Color3.fromRGB(255, 230, 140)
@@ -1298,9 +1627,11 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	if scheduler == nil then
 		return
 	end
-	local spots = { Vector3.new(-22, 0, -62), Vector3.new(18, 0, -72), Vector3.new(-30, 0, -36), Vector3.new(27, 0, -32) }
+	local spots =
+		{ Vector3.new(-22, 0, -62), Vector3.new(18, 0, -72), Vector3.new(-30, 0, -36), Vector3.new(27, 0, -32) }
 	local function ripple(at: Vector3)
-		local ring = pt("FishRipple", Vector3.new(0.08, 1, 1), at + Vector3.new(0, 0.14, 0), WHITE, nil, Enum.PartType.Cylinder)
+		local ring =
+			pt("FishRipple", Vector3.new(0.08, 1, 1), at + Vector3.new(0, 0.14, 0), WHITE, nil, Enum.PartType.Cylinder)
 		ring.CFrame = CFrame.new(ring.Position) * CFrame.Angles(0, 0, math.rad(90))
 		ring.Transparency = 0.3
 		pcall(function()
@@ -1318,11 +1649,14 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			n = n % #spots + 1
 			local at = spots[n]
 			pcall(function()
-				local fish = pt("LakeFish", Vector3.new(1.5, 0.5, 0.5), at, Color3.fromRGB(205, 215, 225), Enum.Material.Metal)
+				local fish =
+					pt("LakeFish", Vector3.new(1.5, 0.5, 0.5), at, Color3.fromRGB(205, 215, 225), Enum.Material.Metal)
 				ripple(at)
 				local start = fish.CFrame
 				local up = TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-				TweenService:Create(fish, up, { CFrame = start * CFrame.new(0, 3.2, 0) * CFrame.Angles(0, 0, math.rad(-35)) }):Play()
+				TweenService
+					:Create(fish, up, { CFrame = start * CFrame.new(0, 3.2, 0) * CFrame.Angles(0, 0, math.rad(-35)) })
+					:Play()
 				scheduler.wait(0.45)
 				local down = TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
 				TweenService:Create(fish, down, { CFrame = start * CFrame.Angles(0, 0, math.rad(-80)) }):Play()
