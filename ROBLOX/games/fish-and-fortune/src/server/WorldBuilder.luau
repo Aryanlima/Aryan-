@@ -1294,16 +1294,22 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		end
 		local clone = template:Clone()
 		clone.Name = instanceName
-		clone:ScaleTo(scale)
-		local box, size = clone:GetBoundingBox()
-		local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
-		clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
-		for _, part in clone:GetDescendants() do
-			if part:IsA("BasePart") then
-				part.Anchored = true
-				part.CanCollide = false
-				part.CastShadow = false
+		local placed = pcall(function()
+			clone:ScaleTo(scale)
+			local box, size = clone:GetBoundingBox()
+			local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
+			clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
+			for _, part in clone:GetDescendants() do
+				if part:IsA("BasePart") then
+					part.Anchored = true
+					part.CanCollide = false
+					part.CastShadow = false
+				end
 			end
+		end)
+		if not placed then
+			clone:Destroy()
+			return false
 		end
 		clone.Parent = folder
 		return true
