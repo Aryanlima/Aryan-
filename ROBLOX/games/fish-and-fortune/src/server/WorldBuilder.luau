@@ -1258,7 +1258,7 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	end
 	-- hito de la costa: concha gigante (abanico de 9 losas rosas y blancas, ~21 studs) con una perla brillante, en la playa
 	-- cerca de la aparicion; fuera del muelle (|x| < 9) y de la linea de pesca; 11 partes, sin colision
-	local hinge = o + Vector3.new(-23, 0.4, 17) -- delante-izquierda del spawn (mira hacia -z)
+	local hinge = o + Vector3.new(-52, 0.4, -2) -- a un lado de la playa, fuera del encuadre inicial de la camara
 	for i = 1, 9 do
 		local yaw = math.rad((i - 5) * 15)
 		local slab = deco(
