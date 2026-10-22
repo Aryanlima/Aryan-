@@ -529,7 +529,8 @@ function UI.icon(name: string, size: number, props: { [string]: any }?): any
 		BackgroundTransparency = 1,
 		ScaleType = e.Enum.ScaleType.Fit,
 	})
-	for key, value in props or {} do
+	local extra: { [string]: any } = props or {}
+	for key, value in extra do
 		if key ~= "Parent" then
 			image[key] = value
 		end
@@ -819,7 +820,7 @@ local function staggerIn(rows: { any })
 		end
 		local scale = UI.motion.scaleOf(row)
 		scale.Scale = 0.9
-		env().task.delay((index - 1) * 0.03, function()
+		later((index - 1) * 0.03, function()
 			UI.motion.tween(scale, { Scale = 1 }, 0.18)
 		end)
 	end

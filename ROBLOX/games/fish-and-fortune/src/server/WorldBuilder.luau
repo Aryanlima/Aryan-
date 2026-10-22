@@ -773,7 +773,7 @@ local function buildRiverTheme(folder: Folder, style: ZoneStyle)
 	end
 	-- hito del rio: racimo de cristales gigantes y brillantes sobre la cascada (7 cristales, 1 luz); sobre el risco, sin colision
 	local crystalBase = o + Vector3.new(0, 20, -134)
-	local crystalSpecs = { -- { x, z, alto, ancho, inclinacion (grados), color }
+	local crystalSpecs: { { any } } = { -- { x, z, alto, ancho, inclinacion (grados), color }
 		{ 0, 0, 50, 7, 0, Color3.fromRGB(176, 108, 255) },
 		{ -9, 3, 30, 5, 18, Color3.fromRGB(125, 249, 255) },
 		{ 9, 2, 34, 5.5, -16, Color3.fromRGB(150, 120, 255) },
@@ -966,7 +966,7 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 			* CFrame.Angles(math.rad(14), 0, 0)
 			* CFrame.new(0, 0, -2.6)
 	end
-	for i, spec in { { 20, 6, TEAL }, { 28, 11, SUN } } do
+	for i, spec in { { 20, 6, TEAL }, { 28, 11, SUN } } :: { { any } } do
 		d("Towel" .. i, Vector3.new(3.2, 0.12, 6), Vector3.new(spec[1], 0.08, spec[2]), spec[3], Enum.Material.Fabric)
 		d(
 			"TowelStripe" .. i,
@@ -976,7 +976,7 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 			Enum.Material.Fabric
 		)
 	end
-	for i, spec in { { 32, 4, RED }, { 15, 12, SUN }, { -14, 8, TEAL } } do
+	for i, spec in { { 32, 4, RED }, { 15, 12, SUN }, { -14, 8, TEAL } } :: { { any } } do
 		d("BeachBall" .. i, Vector3.one * 2.2, Vector3.new(spec[1], 1.1, spec[2]), spec[3], PLASTIC, Enum.PartType.Ball)
 	end
 	-- castillo de arena con banderita
@@ -1265,9 +1265,6 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	local function nearPier(deg: number): boolean -- el muelle y el cartel salen por deg ~ 90
 		return deg > 62 and deg < 118
 	end
-	local function tangent(deg: number): Vector3
-		return Vector3.new(-math.sin(math.rad(deg)), 0, math.cos(math.rad(deg)))
-	end
 	local function link(a: Vector3, b: Vector3) -- cuerda fina entre dos puntos
 		local mid = (a + b) / 2
 		local part = deco(folder, "Rope", Vector3.new(0.12, 0.12, (b - a).Magnitude), mid, rope)
@@ -1406,7 +1403,7 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			{ 52, 0.82, Color3.fromRGB(40, 225, 215) },
 			{ 49, 0.86, Color3.fromRGB(20, 200, 220) },
 			{ 46, 0.9, Color3.fromRGB(10, 170, 225) },
-		}
+		} :: { { any } }
 	do
 		local disc = pt(
 			"ShallowRing" .. i,
@@ -1573,13 +1570,13 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	-- hito del lago: boya-faro de rayas arcoiris (~35 studs) sobre el agua, a la vista desde la aparicion;
 	-- lejos del muelle (|x| > 4.5) y de los puntos de pesca; 10 partes, sin colision
 	do
-		local bx, bz = -34, -72
+		local lx, lz = -34, -72
 		upright(
 			deco(
 				folder,
 				"BuoyFloatBase",
 				Vector3.new(2, 10, 10),
-				o + Vector3.new(bx, 0.3, bz),
+				o + Vector3.new(lx, 0.3, lz),
 				Color3.fromRGB(255, 70, 60),
 				Enum.Material.SmoothPlastic,
 				Enum.PartType.Cylinder
@@ -1599,7 +1596,7 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 				pt(
 					"BuoyStripe" .. i,
 					Vector3.new(5, d, d),
-					Vector3.new(bx, 1.5 + i * 5, bz),
+					Vector3.new(lx, 1.5 + i * 5, lz),
 					color,
 					Enum.Material.SmoothPlastic,
 					Enum.PartType.Cylinder
@@ -1609,7 +1606,7 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		local lamp = pt(
 			"BuoyLamp",
 			Vector3.new(4.5, 4.5, 4.5),
-			Vector3.new(bx, 36, bz),
+			Vector3.new(lx, 36, lz),
 			Color3.fromRGB(255, 240, 150),
 			Enum.Material.Neon,
 			Enum.PartType.Ball
@@ -1643,7 +1640,7 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		local n = 0
 		while folder.Parent ~= nil do
 			scheduler.wait(3.5 + rng:NextNumber(0, 2))
-			if folder.Parent == nil then
+			if not folder.Parent then
 				break
 			end
 			n = n % #spots + 1

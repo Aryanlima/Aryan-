@@ -40,7 +40,7 @@ return {
 			cycle = { anchor = ANCHOR, slotSeconds = WEEK, slotCount = 2, slot = 1 },
 			modifiers = { luck = 3 } :: { [string]: number },
 		},
-	},
+	} :: { any },
 	codes = {
 		WELCOME = { reward = { coins = 1000, pearls = 5 } },
 	},

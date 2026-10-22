@@ -455,7 +455,7 @@ describe("GameLogic", function()
 			expect(reason).toBe("need-discoveries")
 			expect(data.wallet.coins).toBe(initialCoins)
 
-			for index = 1, Balance.rods.carbon.requiresDiscoveries do
+			for index = 1, Balance.rods.carbon.requiresDiscoveries or 0 do
 				data.bestiary[Balance.creatures[index].id] = 1
 			end
 			expect(logic:buyRod(data, "carbon")).toBe(true)

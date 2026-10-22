@@ -118,7 +118,7 @@ function Menus.start(ctx: any): any
 
 	-- Fila de madera oscura: icono, nombre (letra de cartel), descripcion y botones verdes (apagados = gris).
 	local function addRow(
-		content: any,
+		_content: any,
 		order: number,
 		title: string,
 		subtitle: string?,
