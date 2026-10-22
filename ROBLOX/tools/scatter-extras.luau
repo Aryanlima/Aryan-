@@ -63,7 +63,7 @@ for zone, plan in PLAN do
 			end
 			if flat and farFromOthers(Vector3.new(x, y, z), name == "Kit_Rocks" and 14 or 11) then
 				local clone = template:Clone()
-				clone.Name = name:gsub("^Kit_", "") .. made
+				clone.Name = zone .. "_" .. name:gsub("^Kit_", "") .. made -- unico en todo el arbol (ProjectStructure.spec)
 				local s = rng:NextNumber(SCALE[name][1], SCALE[name][2])
 				clone:ScaleTo(s)
 				local bbcf, bbsize = clone:GetBoundingBox()
