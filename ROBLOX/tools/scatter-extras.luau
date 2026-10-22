@@ -54,7 +54,7 @@ for zone, plan in PLAN do
 			local x = rng:NextNumber(Z.x[1], Z.x[2])
 			local z = rng:NextNumber(Z.z[1], Z.z[2])
 			local inPier = x > Z.pier[1] - 6 and x < Z.pier[2] + 6 and z > Z.pier[3] - 6 and z < Z.pier[4] + 10
-			local y = not inPier and (Vector3.new(x, 0, z) - Z.spawn).Magnitude > 26 and ground(x, z) or nil
+			local y = not inPier and (Vector3.new(x, 0, z) - Z.spawn).Magnitude > 48 and not (math.abs(x - Z.spawn.X) < 55 and z > -14) and ground(x, z) or nil
 			local flat = false
 			if y and y > 1.2 and y < 16 then -- sin cimas de montana (los arboles flotarian vistos desde abajo)
 				-- evita laderas muy empinadas: el suelo cercano no debe diferir mucho
