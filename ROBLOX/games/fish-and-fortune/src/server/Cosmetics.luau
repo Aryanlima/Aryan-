@@ -6,6 +6,18 @@
 
 local Cosmetics = {}
 
+function Cosmetics.colorRod(rod: Instance, color: { number })
+	local value = Color3.fromRGB(color[1], color[2], color[3])
+	if rod:IsA("BasePart") then
+		rod.Color = value
+	end
+	for _, part in rod:GetDescendants() do
+		if part:IsA("BasePart") then
+			part.Color = value
+		end
+	end
+end
+
 Cosmetics.GOLD = Color3.fromRGB(255, 200, 61)
 Cosmetics.TRAIL_NAME = "BubbleTrail"
 

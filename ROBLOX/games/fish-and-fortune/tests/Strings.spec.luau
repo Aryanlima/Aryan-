@@ -155,6 +155,9 @@ local function expectedFamilyKeys()
 	for _, id in Balance.rodOrder do
 		expected["rod." .. id] = true
 	end
+	for _, skin in Balance.cosmeticRods do
+		expected["rod." .. skin.id] = true
+	end
 	for _, rarity in Balance.rarityOrder do
 		expected["rarity." .. rarity] = true
 	end

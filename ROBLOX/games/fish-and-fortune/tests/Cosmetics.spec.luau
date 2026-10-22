@@ -89,4 +89,30 @@ describe("Cosmetics", function()
 		expect(logic:coinMultiplier(data, with)).toBe(logic:coinMultiplier(data, without))
 		expect((logic:luck(data, with))).toBe((logic:luck(data, without)))
 	end)
+
+	it("compra skin con monedas una sola vez y rechaza saldo insuficiente", function()
+		local logic = GameLogic.new({
+			balance = Balance,
+			rules = FishingRules.new(Balance, Odds),
+			economy = Economy,
+			rng = function()
+				return 0.5
+			end,
+			clock = function()
+				return 0
+			end,
+			onTransaction = function() end,
+		})
+		local data = GameLogic.template()
+		data.wallet.coins = 200000
+		local ok = logic:buyRod(data, "cane_sunset")
+		expect(ok).toBe(true)
+		expect(data.wallet.coins).toBe(0)
+		expect(data.ownedRods.cane_sunset).toBe(true)
+		expect(logic:buyRod(data, "cane_sunset")).toBe(false)
+		data.wallet.coins = 199999
+		expect(logic:buyRod(data, "cane_jade")).toBe(false)
+		expect(data.wallet.coins).toBe(199999)
+		expect(data.rod).toBe("driftwood")
+	end)
 end)

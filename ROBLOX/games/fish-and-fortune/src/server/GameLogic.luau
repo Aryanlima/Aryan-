@@ -6,7 +6,7 @@
 	Autoridad del servidor: ninguna cantidad viene del cliente. El cliente solo pide ("lanza", "vende",
 	"compra esta cana") y aqui se valida contra el estado.
 
-	// REVIEW(money): grantProduct / grantReward / sellAll / buyRod mueven moneda del jugador.
+	// REVIEW(money): grantProduct / grantReward / sellAll / buyRod (tambien skins) mueven moneda del jugador.
 ]]
 
 export type Context = {
@@ -87,6 +87,7 @@ function GameLogic.template(): { [string]: any }
 	return {
 		wallet = { coins = 0, pearls = 0 },
 		rod = "driftwood",
+		cosmeticRod = "",
 		ownedRods = { driftwood = true },
 		zone = "lake",
 		unlockedZones = { lake = true },
@@ -479,6 +480,25 @@ function GameLogic.sellAll(self: Logic, data: any, ctx: Context): (number, numbe
 end
 
 function GameLogic.buyRod(self: Logic, data: any, rodId: string, player: any?): (boolean, string?)
+	for _, cosmetic in self.balance.cosmeticRods do
+		if cosmetic.id == rodId then
+			if data.ownedRods[rodId] then
+				return false, "owned"
+			end
+			if
+				not self.ledger:spend(data.wallet, "coins", cosmetic.price, {
+					reason = "Shop",
+					sku = "cosmetic_" .. rodId,
+					player = player,
+				})
+			then
+				return false, "not-enough-coins"
+			end
+			data.ownedRods[rodId] = true
+			data.cosmeticRod = rodId
+			return true, nil
+		end
+	end
 	local rod = self.balance.rods[rodId]
 	if rod == nil then
 		return false, "unknown"

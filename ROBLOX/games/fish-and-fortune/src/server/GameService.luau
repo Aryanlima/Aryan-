@@ -551,6 +551,17 @@ function GameService.start(m: any)
 			return
 		end
 		if art ~= nil and art.attachRod(rodId, hand, character) then
+			if profile and profile.data.cosmeticRod ~= "" then
+				for _, skin in balance.cosmeticRods do
+					if skin.id == profile.data.cosmeticRod then
+						local fishingRod = character:FindFirstChild("FishingRod")
+						if fishingRod then
+							m.Cosmetics.colorRod(fishingRod, skin.color)
+						end
+						break
+					end
+				end
+			end
 			applyCosmetics(player, character)
 			return -- cana de arte generado; si no hay (o se rechaza), sigue el respaldo procedural
 		end
@@ -567,6 +578,14 @@ function GameService.start(m: any)
 		weld.Part1 = part
 		weld.Parent = part
 		part.Parent = character
+		if profile and profile.data.cosmeticRod ~= "" then
+			for _, skin in balance.cosmeticRods do
+				if skin.id == profile.data.cosmeticRod then
+					m.Cosmetics.colorRod(part, skin.color)
+					break
+				end
+			end
+		end
 		applyCosmetics(player, character)
 	end
 
@@ -700,7 +719,15 @@ function GameService.start(m: any)
 
 	simpleAction(
 		"BuyRod",
-		{ t.oneOf(balance.rodOrder) },
+		{
+			t.oneOf((function()
+				local ids = table.clone(balance.rodOrder)
+				for _, skin in balance.cosmeticRods do
+					table.insert(ids, skin.id)
+				end
+				return ids
+			end)()),
+		},
 		slowRate,
 		function(player: Player, profile: any, rodId: string)
 			local ok, reason = logic:buyRod(profile.data, rodId, player)

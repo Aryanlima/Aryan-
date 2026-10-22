@@ -400,6 +400,11 @@ local entries: { [string]: Entry } = {
 	["rod.golden"] = { es = "Caña Dorada", en = "Golden Rod" },
 
 	----------------------------------------------------------------------------
+	["rod.cane_sunset"] = { es = "Caña Atardecer", en = "Sunset Rod" },
+	["rod.cane_jade"] = { es = "Caña de Jade", en = "Jade Rod" },
+	["rod.cane_aurora"] = { es = "Caña Aurora", en = "Aurora Rod" },
+
+	----------------------------------------------------------------------------
 	-- Criaturas
 	----------------------------------------------------------------------------
 	["creature.minnow"] = { es = "Pececillo", en = "Minnow" },

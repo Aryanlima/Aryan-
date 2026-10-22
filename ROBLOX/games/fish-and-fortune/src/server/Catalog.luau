@@ -69,6 +69,7 @@ function Catalog.build(
 	local paidLuckEnabled = flags ~= nil and flags.paidLuckEnabled == true -- por defecto APAGADO (v1)
 	local catalog = {
 		priceLadder = Catalog.ladder,
+		cosmetics = {},
 		passes = {
 			auto_fish = withText(text, "pass.auto_fish", { hours = balance.offline.autoFishCapSeconds / 3600 }, {
 				key = "auto_fish",
@@ -188,6 +189,18 @@ function Catalog.build(
 			}),
 		},
 	}
+
+	for _, cosmetic in balance.cosmeticRods do
+		local nameKey = "rod." .. cosmetic.id
+		table.insert(catalog.cosmetics, {
+			key = cosmetic.id,
+			nameKey = nameKey,
+			name = if text ~= nil then text(nameKey) else nameKey,
+			price = cosmetic.price,
+			currency = "coins",
+			cosmetic = true,
+		})
+	end
 
 	-- REVIEW(money): alias opcional por pase (ProductIds.passAssetIds): el assetId del pase cuando difiere de su TargetId.
 	-- Solo sirve para reconocer PromptGamePassPurchaseFinished y como respaldo de precios; nunca para vender ni conceder.

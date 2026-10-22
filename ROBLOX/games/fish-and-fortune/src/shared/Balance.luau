@@ -173,6 +173,12 @@ Balance.creatures = {
 
 Balance.rodOrder = { "driftwood", "reed", "fiberglass", "carbon", "golden" }
 
+Balance.cosmeticRods = {
+	{ id = "cane_sunset", price = 200000, color = { 230, 120, 70 } },
+	{ id = "cane_jade", price = 1000000, color = { 70, 180, 135 } },
+	{ id = "cane_aurora", price = 5000000, color = { 150, 120, 230 } },
+}
+
 Balance.rods = {
 	driftwood = {
 		id = "driftwood",
