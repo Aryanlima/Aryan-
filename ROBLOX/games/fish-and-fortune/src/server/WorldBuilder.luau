@@ -1364,6 +1364,19 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 	end
 	-- faroles colgantes al final del muelle: brillo calido de alcance corto
 	for i, side in { -1, 1 } do
+		if kitProp("Lantern", "DockLamp" .. i, Vector3.new(side * 3.4, deck, -39), 0.8, 0) then
+			local placedLamp = folder:FindFirstChild("DockLamp" .. i)
+			local lampPart = placedLamp and placedLamp:FindFirstChildWhichIsA("BasePart", true)
+			if lampPart ~= nil then
+				local light = Instance.new("PointLight")
+				light.Color = Color3.fromRGB(255, 190, 110)
+				light.Range = 12
+				light.Brightness = 1.2
+				light.Shadows = false
+				light.Parent = lampPart
+			end
+			continue
+		end
 		pt(
 			"DockLampPole" .. i,
 			Vector3.new(0.3, 4.4, 0.3),
