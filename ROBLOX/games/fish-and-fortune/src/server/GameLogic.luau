@@ -486,6 +486,9 @@ function GameLogic.buyRod(self: Logic, data: any, rodId: string, player: any?): 
 	if data.ownedRods[rodId] then
 		return false, "owned"
 	end
+	if rod.requiresDiscoveries ~= nil and self:discoveries(data) < rod.requiresDiscoveries then
+		return false, "need-discoveries"
+	end
 	if
 		not self.ledger:spend(
 			data.wallet,

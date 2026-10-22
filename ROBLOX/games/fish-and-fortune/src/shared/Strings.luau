@@ -162,6 +162,7 @@ local entries: { [string]: Entry } = {
 	["minigame.great"] = { es = "¡BIEN!", en = "Great!" },
 	["minigame.escaped"] = { es = "¡Se escapó!", en = "Escaped!" },
 	["fail.not-enough-coins"] = { es = "No tienes monedas suficientes.", en = "You don't have enough coins." },
+	["fail.need-discoveries"] = { es = "Descubre más especies para comprar esta caña.", en = "Discover more species to buy this rod." },
 	["fail.not-enough-pearls"] = { es = "No tienes perlas suficientes.", en = "You don't have enough pearls." },
 	["fail.locked"] = { es = "Esa zona todavía está bloqueada.", en = "That zone is still locked." },
 	["fail.not-reached"] = { es = "Todavía no has llegado a ese objetivo.", en = "You haven't reached that goal yet." },

@@ -198,7 +198,7 @@ describe("Balance: progresion y recompensas", function()
 			for _ = 1, 40 do
 				local active = 0
 				for _, event in cfg.events do
-					if LiveOps.eventWindow(event, now) then
+					if event.cycle ~= nil and LiveOps.eventWindow(event, now) then -- los eventos de ventana fija (Halloween) se suman a la rotacion
 						active += 1
 					end
 				end

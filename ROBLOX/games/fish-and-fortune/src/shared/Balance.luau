@@ -39,6 +39,7 @@ export type Rod = {
 	sweetSpot: number, -- anchura de la zona perfecta del minijuego (fraccion de la barra)
 	autoInterval: number, -- segundos entre lanzamientos automaticos
 	offlinePerHour: number, -- monedas/hora acumulables offline
+	requiresDiscoveries: number?,
 	color: { number },
 }
 
@@ -207,6 +208,7 @@ Balance.rods = {
 		sweetSpot = 0.2,
 		autoInterval = 7,
 		offlinePerHour = 7000,
+		requiresDiscoveries = 8,
 		color = { 60, 60, 75 },
 	},
 	golden = {
@@ -216,6 +218,7 @@ Balance.rods = {
 		sweetSpot = 0.22,
 		autoInterval = 6,
 		offlinePerHour = 55000,
+		requiresDiscoveries = 14,
 		color = { 255, 200, 70 },
 	},
 } :: { [string]: Rod }

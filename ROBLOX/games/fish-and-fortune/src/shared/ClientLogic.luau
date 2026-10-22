@@ -88,6 +88,7 @@ ClientLogic.FAILURE_REASONS = {
 	"not-reached",
 	"needs-pass",
 	"needs-vip",
+	"need-discoveries",
 	"claimed",
 	"restricted",
 	"owned",

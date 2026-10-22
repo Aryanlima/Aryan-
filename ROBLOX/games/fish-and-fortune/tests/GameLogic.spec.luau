@@ -447,6 +447,21 @@ describe("GameLogic", function()
 			expect(select(2, logic:equipRod(data, "carbon"))).toBe("not-owned")
 		end)
 
+		it("comprar caña de gama alta requiere descubrir especies antes de gastar", function()
+			data.wallet.coins = Balance.rods.carbon.price
+			local initialCoins = data.wallet.coins
+			local ok, reason = logic:buyRod(data, "carbon")
+			expect(ok).toBe(false)
+			expect(reason).toBe("need-discoveries")
+			expect(data.wallet.coins).toBe(initialCoins)
+
+			for index = 1, Balance.rods.carbon.requiresDiscoveries do
+				data.bestiary[Balance.creatures[index].id] = 1
+			end
+			expect(logic:buyRod(data, "carbon")).toBe(true)
+			expect(data.wallet.coins).toBe(initialCoins - Balance.rods.carbon.price)
+		end)
+
 		it("zonas: desbloqueo con monedas y viaje solo a zonas desbloqueadas", function()
 			expect(select(2, logic:travel(data, "river"))).toBe("locked")
 			expect(select(2, logic:unlockZone(data, "river"))).toBe("not-enough-coins")
