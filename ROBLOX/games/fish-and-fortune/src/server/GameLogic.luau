@@ -27,6 +27,7 @@ export type Runtime = {
 export type CatchResult = {
 	creatureId: string,
 	rarity: string,
+	kg: number,
 	value: number,
 	isNew: boolean,
 	stored: boolean, -- false si el inventario estaba lleno y se vendio solo
@@ -90,6 +91,7 @@ function GameLogic.template(): { [string]: any }
 		zone = "lake",
 		unlockedZones = { lake = true },
 		inventory = {},
+		records = {},
 		extraSlots = 0,
 		bestiary = {},
 		bestiaryClaimed = {},
@@ -369,6 +371,13 @@ function GameLogic.resolveCatch(self: Logic, data: any, ctx: Context, quality: s
 	end
 	local isNew = data.bestiary[creatureId] == nil
 	data.bestiary[creatureId] = (data.bestiary[creatureId] or 0) + 1
+	-- Peso (solo muestra y record: el precio de venta no cambia, el inventario guarda cantidades).
+	local range = self.balance.weightRanges[creature.rarity]
+	local kg = math.floor((range.min + (range.max - range.min) * self.rng() ^ 2) * 100 + 0.5) / 100
+	local record = data.records[creatureId]
+	if record == nil or kg > record.kg then
+		data.records[creatureId] = { kg = kg }
+	end
 
 	-- puntos de temporada
 	if data.season.id ~= 0 then
@@ -395,6 +404,7 @@ function GameLogic.resolveCatch(self: Logic, data: any, ctx: Context, quality: s
 	return {
 		creatureId = creatureId,
 		rarity = creature.rarity,
+		kg = kg,
 		value = creature.value,
 		isNew = isNew,
 		stored = stored,

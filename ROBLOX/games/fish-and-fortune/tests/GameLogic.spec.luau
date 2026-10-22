@@ -72,6 +72,23 @@ describe("GameLogic", function()
 		setup()
 	end)
 
+	describe("peso por pez", function()
+		it("cada captura trae kg dentro del rango de su rareza y solo sube el record", function()
+			setup(lcg(7))
+			data.stats.casts = 10
+			local range
+			local best = 0
+			for _ = 1, 30 do
+				local result = catchOnce(ctx(), "perfect")
+				range = Balance.weightRanges[result.rarity]
+				expect(result.kg >= range.min and result.kg <= range.max).toBe(true)
+				best = math.max(best, data.records[result.creatureId].kg)
+				expect(data.records[result.creatureId].kg >= result.kg).toBe(true)
+			end
+			expect(best > 0).toBe(true)
+		end)
+	end)
+
 	describe("plantilla de datos", function()
 		it("es serializable (DataStore) y no usa claves numericas", function()
 			local ok, why = Data.validate(GameLogic.template())

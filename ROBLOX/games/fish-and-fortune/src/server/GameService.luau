@@ -461,6 +461,7 @@ function GameService.start(m: any)
 			rarity = result.rarity,
 			value = result.value,
 			isNew = result.isNew,
+			kg = result.kg,
 			stored = result.stored,
 			autoSoldFor = result.autoSoldFor,
 			quality = result.quality,

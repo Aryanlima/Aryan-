@@ -198,6 +198,7 @@ function Feedback.start(ctx: any): any
 		local lines: { { text: string, size: number, color: { number }, order: number, display: boolean } } = {
 			{ text = L("creature." .. payload.id), size = 30, color = color, order = 1, display = true },
 			{ text = L("rarity." .. payload.rarity), size = 20, color = color, order = 2, display = true },
+			{ text = L("catch.kg", { kg = payload.kg }), size = 18, color = UI.theme.colors.text, order = 2, display = false },
 			{
 				text = L("catch.value", { amount = fmt.compact(payload.value) }),
 				size = 18,

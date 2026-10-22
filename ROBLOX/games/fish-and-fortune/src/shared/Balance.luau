@@ -76,6 +76,15 @@ Balance.rarities = {
 	Mythic = { order = 6, luckFactor = 1.45, seasonPoints = 200 },
 } :: { [string]: RarityInfo }
 
+Balance.weightRanges = {
+	Common = { min = 0.1, max = 1.5 },
+	Uncommon = { min = 0.5, max = 3 },
+	Rare = { min = 1, max = 8 },
+	Epic = { min = 3, max = 20 },
+	Legendary = { min = 8, max = 50 },
+	Mythic = { min = 20, max = 100 },
+}
+
 ----------------------------------------------------------------------------
 -- Limites
 ----------------------------------------------------------------------------

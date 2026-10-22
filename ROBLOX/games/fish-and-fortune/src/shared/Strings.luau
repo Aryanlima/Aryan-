@@ -71,6 +71,7 @@ local entries: { [string]: Entry } = {
 	----------------------------------------------------------------------------
 	-- Capturas y banner global de Mítico
 	----------------------------------------------------------------------------
+	["catch.kg"] = { es = "Peso: {kg} kg", en = "Weight: {kg} kg" },
 	["catch.value"] = { es = "Valor: {amount} monedas", en = "Value: {amount} coins" },
 	["catch.new"] = { es = "NUEVO en tu bestiario", en = "NEW in your bestiary" },
 	["catch.autosold"] = { es = "Mochila llena: vendida por {amount}", en = "Bag full: sold for {amount}" },
