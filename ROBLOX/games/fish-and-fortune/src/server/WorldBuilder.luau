@@ -532,7 +532,7 @@ local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local rng = Random.new(style.seed)
 	local artRng = Random.new(style.seed + 1000)
 	local origin = style.origin
-	for index = 1, 16 do
+	for index = 1, 4 do -- el kit de Extras (Scatter) pone el resto de arboles
 		-- arboles en la parte de tierra (z > 20) y a los lados
 		local x = rng:NextNumber(-80, 80)
 		local z = rng:NextNumber(20, 85)

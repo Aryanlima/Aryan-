@@ -193,7 +193,7 @@ describe("WorldBuilder con arte generado", function()
 	end)
 
 	it(
-		"CON arboles: pine_tree en Lago y Rio, palm_tree en Costa; las 16 posiciones, sin troncos procedurales",
+		"CON arboles: pine_tree en Lago y Rio, palm_tree en Costa; las 4 posiciones, sin troncos procedurales",
 		function()
 			local game, artRoot = newPlace()
 			addArt(artRoot, "props", "pine_tree", Vector3.new(5, 10, 5))
@@ -201,7 +201,7 @@ describe("WorldBuilder con arte generado", function()
 			build(game, provider(artRoot))
 			local world = game:GetService("Workspace").World
 			for _, zoneId in { "lake", "river", "coast" } do
-				expect(countNamed(world[zoneId], "Tree")).toBe(16)
+				expect(countNamed(world[zoneId], "Tree")).toBe(4)
 				expect(countNamed(world[zoneId], "TreeTrunk")).toBe(0)
 				expect(countNamed(world[zoneId], "TreeCrown")).toBe(0)
 			end
@@ -274,7 +274,7 @@ describe("WorldBuilder con arte generado", function()
 		local lake = game:GetService("Workspace").World.lake
 		expect(lake:FindFirstChild("PierArt") ~= nil).toBe(true)
 		expect(lake:FindFirstChild("Rowboat")).toBeNil() -- la barca rota se descarta (y no tiene respaldo)
-		expect(countNamed(lake, "TreeTrunk")).toBe(16)
+		expect(countNamed(lake, "TreeTrunk")).toBe(4)
 	end)
 
 	it("materiales generados: el suelo usa el MaterialVariant FF_ground_<zona> con su material base", function()
