@@ -209,7 +209,7 @@ function Hud.start(ctx: any): any
 			ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual,
 			Parent = button,
 		})
-		UI.create("UIPadding", { PaddingLeft = UDim.new(0, 56), Parent = button })
+		UI.create("UIPadding", { PaddingLeft = UDim.new(0, 72), Parent = button })
 		UI.icon(iconName, 52, {
 			AnchorPoint = Vector2.new(0, 0.5),
 			Position = UDim2.new(0, 10, 0.5, -2),
@@ -247,8 +247,8 @@ function Hud.start(ctx: any): any
 	}, {
 		UI.create("UIGridLayout", {
 			SortOrder = Enum.SortOrder.LayoutOrder,
-			CellSize = UDim2.fromOffset(88, 84),
-			CellPadding = UDim2.fromOffset(6, 8),
+			CellSize = UDim2.fromOffset(72, 64),
+			CellPadding = UDim2.fromOffset(6, 6),
 			HorizontalAlignment = Enum.HorizontalAlignment.Right,
 		}),
 		UI.create("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingRight = UDim.new(0, 6) }),
@@ -257,7 +257,7 @@ function Hud.start(ctx: any): any
 	-- El rotulo va en el Text del boton (abajo); el tamano baja si el texto es largo (ES: "Probabilidades").
 	local function setMenuText(button: TextButton, text: string)
 		button.Text = text
-		button.TextSize = math.clamp(math.floor(80 / (utf8.len(text) or #text) / 0.62), 10, 15)
+		button.TextSize = math.clamp(math.floor(68 / (utf8.len(text) or #text) / 0.62), 10, 15)
 	end
 
 	local function menuButton(order: number, iconName: string, text: string, onActivated: () -> ()): TextButton
@@ -277,9 +277,9 @@ function Hud.start(ctx: any): any
 			Parent = button,
 		})
 		UI.create("UIPadding", { PaddingBottom = UDim.new(0, 5), Parent = button })
-		UI.icon(iconName, 46, {
+		UI.icon(iconName, 36, {
 			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 6),
+			Position = UDim2.new(0.5, 0, 0, 4),
 			Parent = button,
 		})
 		setMenuText(button, text)

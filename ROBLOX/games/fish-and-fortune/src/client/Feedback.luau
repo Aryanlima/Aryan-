@@ -207,6 +207,15 @@ function Feedback.start(ctx: any): any
 				display = false,
 			},
 		}
+		if balance.rarities[payload.rarity].order >= balance.rarities.Rare.order then
+			table.insert(lines, {
+				text = L("catch.one_in", { n = fmt.number(payload.oneIn) }),
+				size = 18,
+				color = UI.theme.colors.text,
+				order = 4,
+				display = true,
+			})
+		end
 		if payload.stored == false then
 			table.insert(lines, {
 				text = L("catch.autosold", { amount = fmt.compact(payload.autoSoldFor or 0) }),

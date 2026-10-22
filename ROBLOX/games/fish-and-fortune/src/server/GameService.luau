@@ -456,6 +456,8 @@ function GameService.start(m: any)
 	local function onCatch(player: Player, profile: any, result: any, isAuto: boolean?)
 		profile:markDirty()
 		local data = profile.data
+		local luck = logic:luck(data, context(player))
+		local probability = rules:oddsFor(result.zone):probabilityOf(result.creatureId, luck)
 		net:fireClient("Catch", player, {
 			id = result.creatureId,
 			rarity = result.rarity,
@@ -466,6 +468,7 @@ function GameService.start(m: any)
 			autoSoldFor = result.autoSoldFor,
 			quality = result.quality,
 			tutorial = result.tutorial,
+			oneIn = math.floor(1 / probability + 0.5),
 		})
 		analytics:custom(player, "catch", 1, { CustomField01 = result.rarity })
 		ftue(player, data, 3, "first_catch")
