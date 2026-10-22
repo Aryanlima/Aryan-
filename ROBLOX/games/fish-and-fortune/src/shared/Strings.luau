@@ -29,16 +29,13 @@ local entries: { [string]: Entry } = {
 	----------------------------------------------------------------------------
 	-- HUD
 	----------------------------------------------------------------------------
-	["hud.coins"] = { es = "Monedas: {amount}", en = "Coins: {amount}" },
-	["hud.pearls"] = { es = "Perlas: {amount}", en = "Pearls: {amount}" },
-	["hud.bag"] = { es = "Mochila: {used} / {capacity}", en = "Bag: {used} / {capacity}" },
 	["hud.zone_private"] = { es = "{zone} - Servidor privado", en = "{zone} - Private server" },
 	["hud.cast"] = { es = "LANZAR", en = "CAST" },
 	["hud.reel"] = { es = "RECOGER", en = "REEL IN" },
 	["hud.sell"] = { es = "VENDER", en = "SELL" },
 	["hud.sell_count"] = { es = "VENDER ({count})", en = "SELL ({count})" },
-	["hud.auto_on"] = { es = "Auto-pesca: SÍ", en = "Auto-fishing: ON" },
-	["hud.auto_off"] = { es = "Auto-pesca: NO", en = "Auto-fishing: OFF" },
+	["hud.auto_on_short"] = { es = "Auto: Sí", en = "Auto: On" },
+	["hud.auto_off_short"] = { es = "Auto: No", en = "Auto: Off" },
 	["hud.event_line"] = { es = "{name} ({effects}): {time}", en = "{name} ({effects}): {time}" },
 	["hud.effect_coins"] = { es = "monedas x{value}", en = "coins x{value}" },
 	["hud.effect_luck"] = { es = "suerte +{value}", en = "luck +{value}" },
@@ -155,6 +152,9 @@ local entries: { [string]: Entry } = {
 	},
 	["hint.wait_bite"] = { es = "Espera a que pique...", en = "Wait for a bite..." },
 	["hint.bite"] = { es = "¡PICA! ¡Recoge en la zona verde!", en = "BITE! Reel in on the green zone!" },
+	["minigame.perfect"] = { es = "¡PERFECTO!", en = "Perfect!" },
+	["minigame.great"] = { es = "¡BIEN!", en = "Great!" },
+	["minigame.escaped"] = { es = "¡Se escapó!", en = "Escaped!" },
 	["fail.not-enough-coins"] = { es = "No tienes monedas suficientes.", en = "You don't have enough coins." },
 	["fail.not-enough-pearls"] = { es = "No tienes perlas suficientes.", en = "You don't have enough pearls." },
 	["fail.locked"] = { es = "Esa zona todavía está bloqueada.", en = "That zone is still locked." },

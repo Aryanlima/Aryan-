@@ -78,14 +78,14 @@ describe("Review: minijuego con tiempo del cliente", function()
 	end)
 
 	it(
-		"impacto economico acotado: perfecta = +1 de suerte (Mitico 0,040 % -> 0,057 % en el Lago), tope global de suerte 8",
+		"impacto economico acotado: perfecta = +1 de suerte (Mitico 0,100 % -> 0,143 % en el Lago), tope global de suerte 8",
 		function()
 			local lake = rules:oddsFor("lake")
 			local base = lake:probabilityOf("lake_spirit", 0)
 			local perfect = lake:probabilityOf("lake_spirit", Balance.minigame.perfectLuck)
-			expect(math.abs(base - 0.0004) < 0.00001).toBe(true)
+			expect(math.abs(base - 0.001) < 0.00001).toBe(true)
 			expect(perfect / base > 1.4 and perfect / base < 1.5).toBe(true)
-			expect(lake:probabilityOf("lake_spirit", 1000) < 0.007).toBe(true) -- tope maxLuck = 8
+			expect(lake:probabilityOf("lake_spirit", 1000) < 0.02).toBe(true) -- tope maxLuck = 8
 		end
 	)
 

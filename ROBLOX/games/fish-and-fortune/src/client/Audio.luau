@@ -52,6 +52,7 @@ function Audio.play(key: string)
 	sound.Name = key
 	sound.SoundId = soundId
 	sound.SoundGroup = groups.SFX
+	sound.PlaybackSpeed = 0.96 + math.random() * 0.1 -- variacion minima: no suena igual dos veces
 	sound.Parent = soundService
 	sound.Ended:Once(function()
 		sound:Destroy()
