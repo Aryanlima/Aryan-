@@ -34,6 +34,21 @@ local function startLoop(key: string, groupName: string, volume: number)
 	sound:Play()
 end
 
+-- Silencio desde el menu: Menus pone el atributo MuteMusic / MuteSFX en SoundService (sin DataStore: dura la sesion).
+local function applyMute(name: string, attribute: string, also: string?)
+	local volume = if soundService:GetAttribute(attribute) == true then 0 else GROUP_VOLUMES[name]
+	groups[name].Volume = volume
+	if also ~= nil then
+		groups[also].Volume = if volume == 0 then 0 else GROUP_VOLUMES[also]
+	end
+end
+soundService:GetAttributeChangedSignal("MuteMusic"):Connect(function()
+	applyMute("Music", "MuteMusic", "Ambience")
+end)
+soundService:GetAttributeChangedSignal("MuteSFX"):Connect(function()
+	applyMute("SFX", "MuteSFX")
+end)
+
 local Audio = {}
 
 function Audio.init(ids: { [string]: string })

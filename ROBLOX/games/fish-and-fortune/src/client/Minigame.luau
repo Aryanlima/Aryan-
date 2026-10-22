@@ -472,6 +472,10 @@ function Minigame.start(ctx: any): any
 	end
 
 	ContextActionService:BindAction("FF_Action", function(_name: string, state: Enum.UserInputState)
+		-- con un panel abierto, A/Espacio son del panel (seleccion del mando), no del anzuelo
+		if ctx.menus ~= nil and ctx.menus.isOpen() then
+			return Enum.ContextActionResult.Pass
+		end
 		if state == Enum.UserInputState.Begin then
 			action()
 		end

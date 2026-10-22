@@ -115,12 +115,12 @@ Balance.zones = {
 	river = {
 		id = "river",
 		order = 2,
-		unlockCost = 1500,
+		unlockCost = 8000,
 	},
 	coast = {
 		id = "coast",
 		order = 3,
-		unlockCost = 15000,
+		unlockCost = 150000,
 	},
 } :: { [string]: Zone }
 
@@ -194,7 +194,7 @@ Balance.rods = {
 	},
 	fiberglass = {
 		id = "fiberglass",
-		price = 1500,
+		price = 6000,
 		luck = 1,
 		sweetSpot = 0.18,
 		autoInterval = 8,
@@ -203,7 +203,7 @@ Balance.rods = {
 	},
 	carbon = {
 		id = "carbon",
-		price = 12000,
+		price = 90000,
 		luck = 1.8,
 		sweetSpot = 0.2,
 		autoInterval = 7,
@@ -213,12 +213,12 @@ Balance.rods = {
 	},
 	golden = {
 		id = "golden",
-		price = 80000,
+		price = 800000,
 		luck = 2.6,
 		sweetSpot = 0.22,
 		autoInterval = 6,
 		offlinePerHour = 55000,
-		requiresDiscoveries = 14,
+		requiresDiscoveries = 18,
 		color = { 255, 200, 70 },
 	},
 } :: { [string]: Rod }

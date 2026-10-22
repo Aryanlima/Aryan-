@@ -33,6 +33,24 @@ function Menus.start(ctx: any): any
 	local gui: ScreenGui = ctx.gui
 
 	local current: { name: string, root: any, unsubscribe: (() -> ())? }? = nil
+	local muted = { MuteMusic = false, MuteSFX = false }
+
+	-- Mando: al abrir un panel se selecciona su primer boton (si el entorno no tiene GuiService o mando, no hace nada).
+	local function selectFirst(root: any)
+		pcall(function()
+			if not game:GetService("UserInputService").GamepadEnabled then
+				return
+			end
+			local guiService = game:GetService("GuiService")
+			local selected = guiService.SelectedObject
+			if selected ~= nil and selected:IsDescendantOf(root) then
+				return
+			end
+			local content = root:FindFirstChild("Content")
+			local target = if content ~= nil then content:FindFirstChildWhichIsA("GuiButton", true) else nil
+			guiService.SelectedObject = target or root:FindFirstChild("Close")
+		end)
+	end
 	local latestOffers: any = nil
 	local shopHandle: any = nil
 	local selectedOddsZone: string? = nil
@@ -216,6 +234,7 @@ function Menus.start(ctx: any): any
 				build(content, state)
 			end
 			animateRows = false
+			selectFirst(root)
 		end
 		animateRows = true
 		render()
@@ -536,7 +555,25 @@ function Menus.start(ctx: any): any
 				end
 			end,
 		})
+		for index, setting in { { "MuteMusic", "sound.music" }, { "MuteSFX", "sound.sfx" } } do
+			local attribute, prefix = setting[1], setting[2]
+			local toggle: any
+			toggle = UI.button({
+				text = L(if muted[attribute] then prefix .. "_off" else prefix .. "_on"),
+				colorName = "row",
+				layoutOrder = 3 + index,
+				parent = content,
+				onActivated = function()
+					muted[attribute] = not muted[attribute]
+					toggle.Text = L(if muted[attribute] then prefix .. "_off" else prefix .. "_on")
+					pcall(function()
+						game:GetService("SoundService"):SetAttribute(attribute, muted[attribute])
+					end)
+				end,
+			})
+		end
 		current = { name = "codes", root = root, unsubscribe = nil }
+		selectFirst(root)
 	end
 
 	----------------------------------------------------------------------------
@@ -630,6 +667,7 @@ function Menus.start(ctx: any): any
 			end
 		end
 		local lastLuck = state.luck
+		selectFirst(handle.root)
 		current = {
 			name = "odds",
 			root = handle.root,
@@ -668,6 +706,7 @@ function Menus.start(ctx: any): any
 		end
 		shopHandle = handle
 		current = { name = "shop", root = handle.root, unsubscribe = nil }
+		selectFirst(handle.root)
 	end
 
 	local function open(name: string)
@@ -725,7 +764,18 @@ function Menus.start(ctx: any): any
 		end
 	end
 
-	return { open = open, close = close, onOffers = onOffers }
+	-- B del mando cierra el panel abierto; sin panel, el boton pasa de largo.
+	pcall(function()
+		game:GetService("ContextActionService"):BindAction("FF_Back", function(_name: string, state: Enum.UserInputState)
+			if state == Enum.UserInputState.Begin and current ~= nil then
+				close()
+				return Enum.ContextActionResult.Sink
+			end
+			return Enum.ContextActionResult.Pass
+		end, false, Enum.KeyCode.ButtonB)
+	end)
+
+	return { open = open, close = close, onOffers = onOffers, isOpen = function(): boolean return current ~= nil end }
 end
 
 return Menus

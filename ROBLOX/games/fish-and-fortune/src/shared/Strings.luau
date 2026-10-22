@@ -294,6 +294,10 @@ local entries: { [string]: Entry } = {
 		en = "Type a code and press Redeem. Each code can be used once.",
 	},
 	["codes.placeholder"] = { es = "CÓDIGO", en = "CODE" },
+	["sound.music_on"] = { es = "Música: Sí", en = "Music: On" },
+	["sound.music_off"] = { es = "Música: No", en = "Music: Off" },
+	["sound.sfx_on"] = { es = "Efectos: Sí", en = "Effects: On" },
+	["sound.sfx_off"] = { es = "Efectos: No", en = "Effects: Off" },
 	["codes.redeem"] = { es = "Canjear", en = "Redeem" },
 
 	----------------------------------------------------------------------------
