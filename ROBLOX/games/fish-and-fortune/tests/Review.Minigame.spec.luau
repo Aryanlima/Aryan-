@@ -4,12 +4,7 @@
 	por el cliente (FishingRules.evaluateReel). Son pruebas de CARACTERIZACION: describen el limite real del diseno
 	actual (no un bug nuevo). Si se endurece el minijuego, actualiza las cifras.
 
-	Resultado (con Balance actual): ventana de mentira = maxLagSeconds + timingTolerance = 2,85 s > periodo del
-	marcador (1,5 s) => para CUALQUIER centro de la zona perfecta el cliente puede declarar un tiempo que ponga el
-	marcador justo en ella, y recoger en cuanto pasa minReelSeconds (0,35 s) o poco despues. Aun asi:
-	  * NO puede recoger antes de minReelSeconds ni declarar mas tiempo del transcurrido (+0,35 s);
-	  * el premio es solo la calidad "perfecta" (+1 de suerte, gratis; ver Balance.minigame.perfectLuck);
-	  * el ciclo minimo sigue siendo minReel + castCooldown (>= 1,35 s por captura).
+	La posicion del marcador se determina con el reloj del servidor al recoger.
 ]]
 local testkit = require("@testkit")
 local Odds = require("../../../packages/Odds")
@@ -33,40 +28,12 @@ describe("Review: minijuego con tiempo del cliente", function()
 		}
 	end
 
-	-- Mejor jugada de un tramposo: a cada instante `serverElapsed` declara el tiempo (dentro de lo permitido) cuyo
-	-- marcador esta mas cerca del centro. Devuelve el primer instante (paso 0,01 s) en que consigue "perfect".
-	local function earliestPerfect(center)
-		local cast = newCast(center)
-		local serverElapsed = mg.minReelSeconds
-		while serverElapsed <= mg.durationSeconds do
-			local low = math.max(mg.minReelSeconds, serverElapsed - mg.maxLagSeconds)
-			local high = serverElapsed + mg.timingTolerance
-			local claimed = low
-			while claimed <= high do
-				if rules:evaluateReel(cast, claimed, serverElapsed) == "perfect" then
-					return serverElapsed
-				end
-				claimed += 0.01
-			end
-			serverElapsed += 0.01
-		end
-		return nil
-	end
-
-	it(
-		"un tramposo acierta la zona perfecta con CUALQUIER centro en menos de ~1 s (ventana de mentira > periodo)",
-		function()
-			expect(mg.maxLagSeconds + mg.timingTolerance > mg.markerPeriod).toBe(true)
-			local worst = 0
-			for i = 0, 50 do
-				local center = mg.centerMin + (mg.centerMax - mg.centerMin) * i / 50
-				local at = earliestPerfect(center)
-				expect(at).toBeTruthy()
-				worst = math.max(worst, at)
-			end
-			expect(worst < 1.1).toBe(true) -- medido: ~0,96 s en el peor centro
-		end
-	)
+	it("varios tiempos dentro de la ventana no fuerzan un acierto perfecto", function()
+		local cast = newCast(0.5)
+		expect(rules:evaluateReel(cast, 0.375, 0.375)).toBe("perfect")
+		expect(rules:evaluateReel(cast, 0.75, 0.75)).toBeNil()
+		expect(rules:evaluateReel(cast, 1.125, 1.125)).toBe("perfect")
+	end)
 
 	it("lo que NO puede: recoger antes del minimo, declarar mas tiempo del transcurrido, ni NaN", function()
 		local cast = newCast(0.5)

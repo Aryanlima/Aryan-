@@ -199,7 +199,10 @@ function FishingRules.evaluateReel(
 	if clientElapsed > minigame.durationSeconds + minigame.graceSeconds then
 		return nil, "expired"
 	end
-	local distance = math.abs(self:markerPosition(clientElapsed) - cast.center)
+	-- REVIEW(money): la calidad determina la suerte extra de la captura; el marcador usa el reloj del servidor.
+	-- shortcut: tolerancia fija de 0,35 s al retraso de red (un bot gana como mucho esa ventana); ajustar con mediciones de ping reales.
+	local seen = if math.abs(clientElapsed - serverElapsed) <= 0.35 then clientElapsed else serverElapsed
+	local distance = math.abs(self:markerPosition(seen) - cast.center)
 	local half = cast.width / 2
 	if distance <= half then
 		return "perfect", nil
