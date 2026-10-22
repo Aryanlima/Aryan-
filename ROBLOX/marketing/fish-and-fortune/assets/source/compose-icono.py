@@ -5,18 +5,20 @@ RENDERS = os.path.expanduser('~/Documents/Ropilot/Renders/FishFortune/')
 OUT = os.path.join(os.path.dirname(__file__), '..', '')
 mode = sys.argv[1] if len(sys.argv) > 1 else 'icon'
 lang = sys.argv[2] if len(sys.argv) > 2 else 'en'
+hall = len(sys.argv) > 3 and sys.argv[3] == 'halloween'
+SUF = '-halloween' if hall else ''
 W, H = (1024, 1024) if mode == 'icon' else (1920, 1080)
 WATER, DEEP, GOLD, NIGHT = (46, 196, 241), (20, 120, 200), (255, 200, 61), (30, 42, 68)
 
-img = Image.new('RGB', (W, H), (120, 50, 170))
+img = Image.new('RGB', (W, H), (52, 20, 92) if hall else (120, 50, 170))
 d = ImageDraw.Draw(img)
 cx, cy = (W * .66, H * .32) if mode == 'icon' else (W * .6, H * .36)
 for i in range(24):
     a0, a1 = i * math.tau / 24, (i + .5) * math.tau / 24
-    d.polygon([(cx, cy), (cx + 3000 * math.cos(a0), cy + 3000 * math.sin(a0)), (cx + 3000 * math.cos(a1), cy + 3000 * math.sin(a1))], fill=(255, 140, 40))
+    d.polygon([(cx, cy), (cx + 3000 * math.cos(a0), cy + 3000 * math.sin(a0)), (cx + 3000 * math.cos(a1), cy + 3000 * math.sin(a1))], fill=(255, 106, 0) if hall else (255, 140, 40))
 glow = Image.new('L', (W, H), 0)
 ImageDraw.Draw(glow).ellipse([cx - 330, cy - 330, cx + 330, cy + 330], fill=255)
-img.paste((255, 225, 120), mask=glow.filter(ImageFilter.GaussianBlur(90)))
+img.paste((255, 170, 60) if hall else (255, 225, 120), mask=glow.filter(ImageFilter.GaussianBlur(90)))
 wy = int(H * (.72 if mode == 'icon' else .7))
 d = ImageDraw.Draw(img)
 d.rectangle([0, wy, W, H], fill=WATER)
@@ -42,8 +44,8 @@ def text(s, size, cxy, rot):
     img.paste(sh.filter(ImageFilter.GaussianBlur(6)), (0, 0), sh.filter(ImageFilter.GaussianBlur(6)))
     img.paste(l, (0, 0), l)
 if mode == 'icon':
-    text('LEGENDARY', 132, (W // 2, int(H * .88)), 4)
+    text('HALLOWEEN' if hall else 'LEGENDARY', 132, (W // 2, int(H * .88)), 4)
 else:
-    text('FISH &', 150, (440, 330), 4); text('FORTUNE', 150, (440, 500), 4); text('LEGENDARY!' if lang == 'en' else '¡LEGENDARIO!', 96 if lang == 'en' else 84, (440, 680), 4)
-img.save(OUT + ('icon/icon-ropilot.png' if mode == 'icon' else f'thumbnails/thumb-ropilot-{lang}.png'), optimize=True)
+    text('FISH &', 150, (440, 330), 4); text('FORTUNE', 150, (440, 500), 4); text(('HALLOWEEN EVENT!' if lang == 'en' else '¡EVENTO DE HALLOWEEN!') if hall else ('LEGENDARY!' if lang == 'en' else '¡LEGENDARIO!'), (60 if lang == 'en' else 48) if hall else 84, (440, 680), 4)
+img.save(OUT + (f'icon/icon-ropilot{SUF}.png' if mode == 'icon' else f'thumbnails/thumb-ropilot{SUF}-{lang}.png'), optimize=True)
 print('ok', mode)

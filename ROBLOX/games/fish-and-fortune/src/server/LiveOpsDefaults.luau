@@ -19,6 +19,14 @@ return {
 	version = 1,
 	events = {
 		{
+			id = "halloween_harvest",
+			name = "Cosecha de Halloween",
+			description = "Sube tu suerte en 2 puntos hasta el 2 de noviembre.",
+			startsAt = 1792627200, -- 2026-10-22 00:00 UTC
+			endsAt = 1793577600, -- 2026-11-02 00:00 UTC
+			modifiers = { luck = 2 } :: { [string]: number },
+		},
+		{
 			id = "golden_tide",
 			name = "Marea Dorada",
 			description = "Las monedas por venta se multiplican por 2 durante este evento.",
