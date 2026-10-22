@@ -559,52 +559,55 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 	arrowLabel.TextScaled = true
 	arrowLabel.Parent = arrowGui
 	arrowGui.Parent = arrow
-	detail(
-		newPart(
-			folder,
-			"SignLegs",
-			Vector3.new(1, 4, 1),
-			style.origin + Vector3.new(12, 2, 7.6),
-			Color3.fromRGB(60, 45, 35),
-			Enum.Material.Wood
-		)
-	)
-	-- dos postes laterales, tejadillo a dos aguas y cuerdas: el cartel deja de ser un bloque liso
-	local woodColor, ropeColor = Color3.fromRGB(88, 62, 42), Color3.fromRGB(196, 170, 120)
-	for _, side in { -1, 1 } do
-		local at = style.origin + Vector3.new(12 + side * 4.6, 4.3, 7.6)
-		detail(newPart(folder, "SignPost", Vector3.new(0.9, 8.6, 0.9), at, woodColor, Enum.Material.Wood))
+	-- Cartel suave de Ropilot (postes redondos, arco y cuerdas); sin el, los postes y el tejadillo de bloques de antes.
+	if not kitPlace(folder, style, "Sign", "SignSoft", Vector3.new(12, 0, 7.6), 1, 0) then
 		detail(
 			newPart(
 				folder,
-				"SignRope",
-				Vector3.new(1.2, 0.25, 1.2),
-				at + Vector3.new(0, 1.2, 0),
-				ropeColor,
-				Enum.Material.Fabric
-			)
-		)
-		local roof = detail(
-			newPart(
-				folder,
-				"SignRoof",
-				Vector3.new(9.8, 0.3, 3.2),
-				style.origin + Vector3.new(12, 8.6, 7.6 + side * 1.3),
-				Color3.fromRGB(112, 62, 48),
+				"SignLegs",
+				Vector3.new(1, 4, 1),
+				style.origin + Vector3.new(12, 2, 7.6),
+				Color3.fromRGB(60, 45, 35),
 				Enum.Material.Wood
 			)
 		)
-		roof.CFrame = roof.CFrame * CFrame.Angles(side * math.rad(22), 0, 0)
-		detail(
-			newPart(
-				folder,
-				"SignHanger",
-				Vector3.new(0.12, 1.4, 0.12),
-				style.origin + Vector3.new(12 + side * 2, 7.8, 7.6),
-				ropeColor,
-				Enum.Material.Fabric
+		-- dos postes laterales, tejadillo a dos aguas y cuerdas: el cartel deja de ser un bloque liso
+		local woodColor, ropeColor = Color3.fromRGB(88, 62, 42), Color3.fromRGB(196, 170, 120)
+		for _, side in { -1, 1 } do
+			local at = style.origin + Vector3.new(12 + side * 4.6, 4.3, 7.6)
+			detail(newPart(folder, "SignPost", Vector3.new(0.9, 8.6, 0.9), at, woodColor, Enum.Material.Wood))
+			detail(
+				newPart(
+					folder,
+					"SignRope",
+					Vector3.new(1.2, 0.25, 1.2),
+					at + Vector3.new(0, 1.2, 0),
+					ropeColor,
+					Enum.Material.Fabric
+				)
 			)
-		)
+			local roof = detail(
+				newPart(
+					folder,
+					"SignRoof",
+					Vector3.new(9.8, 0.3, 3.2),
+					style.origin + Vector3.new(12, 8.6, 7.6 + side * 1.3),
+					Color3.fromRGB(112, 62, 48),
+					Enum.Material.Wood
+				)
+			)
+			roof.CFrame = roof.CFrame * CFrame.Angles(side * math.rad(22), 0, 0)
+			detail(
+				newPart(
+					folder,
+					"SignHanger",
+					Vector3.new(0.12, 1.4, 0.12),
+					style.origin + Vector3.new(12 + side * 2, 7.8, 7.6),
+					ropeColor,
+					Enum.Material.Fabric
+				)
+			)
+		end
 	end
 end
 
