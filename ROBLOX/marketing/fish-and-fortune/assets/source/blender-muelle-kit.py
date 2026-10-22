@@ -23,7 +23,7 @@ def fresh(name):
 def fin(o, m, bevel=0.0, smooth=True, sub=0):
     o.data.materials.clear(); o.data.materials.append(mat(m))
     if bevel:
-        b = o.modifiers.new('b', 'BEVEL'); b.width = bevel; b.segments = 4; b.limit_method = 'NONE'
+        b = o.modifiers.new('b', 'BEVEL'); b.width = bevel; b.segments = 2; b.limit_method = 'NONE'
     if sub: o.modifiers.new('s', 'SUBSURF').levels = sub
     if smooth:
         for p in o.data.polygons: p.use_smooth = True
@@ -31,10 +31,10 @@ def fin(o, m, bevel=0.0, smooth=True, sub=0):
 def box(loc, sc, m, rot=(0, 0, 0), bevel=.12, sub=0):
     bpy.ops.mesh.primitive_cube_add(size=1, location=loc, rotation=rot); o = bpy.context.object; o.scale = sc
     bpy.ops.object.transform_apply(scale=True); return fin(o, m, bevel, True, sub)
-def cyl(loc, r, d, m, rot=(0, 0, 0), v=20, bevel=.06):
+def cyl(loc, r, d, m, rot=(0, 0, 0), v=12, bevel=.05):
     bpy.ops.mesh.primitive_cylinder_add(vertices=v, radius=r, depth=d, location=loc, rotation=rot); return fin(bpy.context.object, m, bevel)
 def sph(loc, r, m, sc=(1, 1, 1)):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, radius=r, location=loc); o = bpy.context.object; o.scale = sc; return fin(o, m)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=14, ring_count=8, radius=r, location=loc); o = bpy.context.object; o.scale = sc; return fin(o, m)
 def cone(loc, r1, r2, d, m, v=20, rot=(0, 0, 0)):
     bpy.ops.mesh.primitive_cone_add(vertices=v, radius1=r1, radius2=r2, depth=d, location=loc, rotation=rot); return fin(bpy.context.object, m, .05)
 def finish(name):

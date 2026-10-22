@@ -202,6 +202,46 @@ local function buildWater(folder: Folder, style: ZoneStyle)
 	local _ = folder
 end
 
+-- Pieza suave de Ropilot (Workspace.Extras.Kit.Kit_<nombre>, ver world/Extras): sin ella (pruebas) devuelve false y el
+-- llamador usa la de bloques.
+local function kitPlace(
+	folder: Folder,
+	style: ZoneStyle,
+	name: string,
+	instanceName: string,
+	rel: Vector3,
+	scale: number,
+	yaw: number
+): boolean
+	local extras = Workspace:FindFirstChild("Extras")
+	local kitFolder = extras and extras:FindFirstChild("Kit")
+	local template = kitFolder and kitFolder:FindFirstChild("Kit_" .. name)
+	if template == nil or not template:IsA("Model") then
+		return false
+	end
+	local clone = template:Clone()
+	clone.Name = instanceName
+	local placed = pcall(function()
+		clone:ScaleTo(scale)
+		local box, size = clone:GetBoundingBox()
+		local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
+		clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
+		for _, part in clone:GetDescendants() do
+			if part:IsA("BasePart") then
+				part.Anchored = true
+				part.CanCollide = false
+				part.CastShadow = false
+			end
+		end
+	end)
+	if not placed then
+		clone:Destroy()
+		return false
+	end
+	clone.Parent = folder
+	return true
+end
+
 local PIER_WOOD = Color3.fromRGB(128, 80, 47)
 
 -- Muelle procedural de siempre (respaldo del arte "pier"): cubierta + postes.
@@ -285,6 +325,26 @@ local function buildPier(folder: Folder, style: ZoneStyle, art: ArtLike?)
 	local origin = style.origin
 	if art == nil then
 		buildProceduralPier(folder, style, nil)
+		-- Muelle suave de Ropilot por encima: 4 tramos; la cubierta "Pier" sigue (invisible) para caminar y pescar.
+		local placedAny = false
+		for index, z in { -34.5, -23.1, -11.7, -0.3 } do
+			placedAny = kitPlace(folder, style, "Pier", "PierSoft" .. index, Vector3.new(0, -1.25, z), 1, 0)
+				or placedAny
+		end
+		if placedAny then
+			for _, child in folder:GetChildren() do
+				if
+					child.Name == "PierPost"
+					or child.Name == "DeckPlank"
+					or child.Name == "PierRailPost"
+					or child.Name == "PierRail"
+				then
+					child:Destroy()
+				elseif child.Name == "Pier" and child:IsA("BasePart") then
+					child.Transparency = 1
+				end
+			end
+		end
 	else
 		-- La base del modelo queda donde acaban los postes (y = -2) y centrado en la cubierta; si no hay arte valido, el respaldo.
 		local result = art:place("props", "pier", {
@@ -1284,35 +1344,8 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 		local part = deco(folder, "Rope", Vector3.new(0.12, 0.12, (b - a).Magnitude), mid, rope)
 		part.CFrame = CFrame.lookAt(mid, b)
 	end
-	-- Pieza suave de Ropilot (Workspace.Extras.Kit.Kit_<nombre>, ver world/Extras): sin ella (pruebas) se usa la de bloques.
 	local function kitProp(name: string, instanceName: string, rel: Vector3, scale: number, yaw: number): boolean
-		local extras = Workspace:FindFirstChild("Extras")
-		local kitFolder = extras and extras:FindFirstChild("Kit")
-		local template = kitFolder and kitFolder:FindFirstChild("Kit_" .. name)
-		if template == nil or not template:IsA("Model") then
-			return false
-		end
-		local clone = template:Clone()
-		clone.Name = instanceName
-		local placed = pcall(function()
-			clone:ScaleTo(scale)
-			local box, size = clone:GetBoundingBox()
-			local toBottom = clone:GetPivot().Position.Y - (box.Position.Y - size.Y / 2)
-			clone:PivotTo(CFrame.new(style.origin + rel + Vector3.new(0, toBottom, 0)) * CFrame.Angles(0, yaw, 0))
-			for _, part in clone:GetDescendants() do
-				if part:IsA("BasePart") then
-					part.Anchored = true
-					part.CanCollide = false
-					part.CastShadow = false
-				end
-			end
-		end)
-		if not placed then
-			clone:Destroy()
-			return false
-		end
-		clone.Parent = folder
-		return true
+		return kitPlace(folder, style, name, instanceName, rel, scale, yaw)
 	end
 	-- muelle: barriles, cajas, rollos de cuerda (a un lado, el centro queda libre)
 	for i, z in { -5, -9 } do
