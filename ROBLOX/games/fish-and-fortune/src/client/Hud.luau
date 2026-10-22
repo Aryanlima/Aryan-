@@ -151,35 +151,75 @@ function Hud.start(ctx: any): any
 	zoneLabel.Position = UDim2.new(0, 8, 0, 0)
 	zoneLabel.TextTruncate = Enum.TextTruncate.AtEnd
 
-	local eventsLabel = UI.label({
-		text = "",
-		size = UDim2.new(0, 0, 0, 28),
-		textSize = 15,
-		alignX = Enum.TextXAlignment.Center,
-		colorName = "ink",
-		parent = gui,
+	-- Eventos activos: una tabla de madera por evento en el borde derecho, encima del menu.
+	local eventsHolder = UI.create("Frame", {
+		Name = "Events",
+		AnchorPoint = Vector2.new(1, 0),
+		Position = UDim2.new(1, -8, 0, 8),
+		Size = UDim2.new(0, 212, 0, 0),
+		AutomaticSize = Enum.AutomaticSize.Y,
+		BackgroundTransparency = 1,
+		Visible = false,
+		Parent = gui,
+	}, {
+		UI.create("UIListLayout", {
+			SortOrder = Enum.SortOrder.LayoutOrder,
+			Padding = UDim.new(0, 6),
+			HorizontalAlignment = Enum.HorizontalAlignment.Right,
+		}),
 	})
-	eventsLabel.Name = "Events"
-	eventsLabel.AnchorPoint = Vector2.new(0.5, 0)
-	eventsLabel.Position = UDim2.new(0.5, 0, 0, 66)
-	eventsLabel.AutomaticSize = Enum.AutomaticSize.XY
-	eventsLabel.BackgroundTransparency = 0
-	eventsLabel.BackgroundColor3 = rgb(colors.gold)
-	UI.create("UICorner", { CornerRadius = UDim.new(0, 14), Parent = eventsLabel })
-	UI.create("UIStroke", {
-		Color = rgb(colors.woodDark),
-		Thickness = 2.5,
-		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-		Parent = eventsLabel,
-	})
-	UI.create("UISizeConstraint", { MaxSize = Vector2.new(540, 120), Parent = eventsLabel })
-	UI.create("UIPadding", {
-		PaddingTop = UDim.new(0, 4),
-		PaddingBottom = UDim.new(0, 4),
-		PaddingLeft = UDim.new(0, 12),
-		PaddingRight = UDim.new(0, 12),
-		Parent = eventsLabel,
-	})
+	local plaques: { [string]: { frame: Frame, stroke: UIStroke, time: TextLabel, effects: TextLabel, name: TextLabel } } = {}
+	local plaqueOrder = 0
+
+	-- Bienvenida (una vez por sesion, ver refresh).
+	local welcomed = false
+	local function showWelcome()
+		local banner = UI.create("CanvasGroup", {
+			Name = "Welcome",
+			AnchorPoint = Vector2.new(0.5, 0),
+			Position = UDim2.new(0.5, 0, 0, 70),
+			Size = UDim2.new(0.7, 0, 0, 0),
+			AutomaticSize = Enum.AutomaticSize.Y,
+			BackgroundColor3 = rgb(colors.woodDark),
+			BorderSizePixel = 0,
+			ZIndex = 20,
+			Parent = gui,
+		}, {
+			UI.create("UICorner", { CornerRadius = UDim.new(0, 16) }),
+			UI.create("UIStroke", { Color = rgb(colors.gold), Thickness = 3, ApplyStrokeMode = Enum.ApplyStrokeMode.Border }),
+			UI.create("UISizeConstraint", { MaxSize = Vector2.new(520, 200) }),
+			UI.create("UIPadding", {
+				PaddingTop = UDim.new(0, 8),
+				PaddingBottom = UDim.new(0, 10),
+				PaddingLeft = UDim.new(0, 12),
+				PaddingRight = UDim.new(0, 12),
+			}),
+			UI.create("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 4) }),
+		})
+		UI.label({
+			text = L("hud.welcome_title"),
+			textSize = 30,
+			display = true,
+			alignX = Enum.TextXAlignment.Center,
+			colorName = "gold",
+			layoutOrder = 1,
+			parent = banner,
+		})
+		UI.label({
+			text = L("hud.welcome_hint"),
+			textSize = 18,
+			alignX = Enum.TextXAlignment.Center,
+			layoutOrder = 2,
+			parent = banner,
+		})
+		motion.appear(banner, 0.7, 0.35)
+		task.delay(4, function()
+			motion.tween(banner, { GroupTransparency = 1 }, 0.5)
+			task.delay(0.6, function()
+				banner:Destroy()
+			end)
+		end)
+	end
 
 	----------------------------------------------------------------------------
 	-- Barra de acciones (abajo)
@@ -236,8 +276,8 @@ function Hud.start(ctx: any): any
 	local menuColumn = UI.create("ScrollingFrame", {
 		Name = "Menu",
 		AnchorPoint = Vector2.new(1, 0.5),
-		Position = UDim2.new(1, -8, 0.5, 0),
-		Size = UDim2.new(0, 190, 0.7, 0),
+		Position = UDim2.new(1, -8, 0.5, 78),
+		Size = UDim2.new(0, 190, 0.55, 0),
 		BackgroundTransparency = 1,
 		BorderSizePixel = 0,
 		ScrollBarThickness = 4,
@@ -383,26 +423,85 @@ function Hud.start(ctx: any): any
 		return ctx.serverText(event.name, "?")
 	end
 
+	local function makePlaque(id: string, halloween: boolean)
+		plaqueOrder += 1
+		local base = if halloween then rgb(colors.Epic) else rgb(colors.woodDark)
+		local frame = UI.create("Frame", {
+			Name = "Event_" .. id,
+			Size = UDim2.new(1, 0, 0, 66),
+			BackgroundColor3 = if halloween then rgb(colors.gold):Lerp(rgb(colors.coral), 0.5) else rgb(colors.wood),
+			BorderSizePixel = 0,
+			LayoutOrder = plaqueOrder,
+			Parent = eventsHolder,
+		}, { UI.create("UICorner", { CornerRadius = UDim.new(0, 14) }) })
+		local stroke: UIStroke = UI.create("UIStroke", {
+			Color = base,
+			Thickness = 3,
+			ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+			Parent = frame,
+		})
+		UI.icon("Season", 40, {
+			AnchorPoint = Vector2.new(0, 0.5),
+			Position = UDim2.new(0, -14, 0.5, 0),
+			ZIndex = 3,
+			Parent = frame,
+		})
+		local function line(y: number, h: number, size: number, display: boolean, colorName: string): TextLabel
+			local label = UI.label({
+				text = "",
+				size = UDim2.new(1, -30, 0, h),
+				textSize = size,
+				display = display,
+				colorName = colorName,
+				alignX = Enum.TextXAlignment.Right,
+				parent = frame,
+			})
+			label.Position = UDim2.new(0, 24, 0, y)
+			label.TextTruncate = Enum.TextTruncate.AtEnd
+			label.ZIndex = 4
+			return label
+		end
+		local plaque = {
+			frame = frame,
+			stroke = stroke,
+			name = line(4, 20, 16, true, "text"),
+			time = line(21, 30, 26, true, "gold"),
+			effects = line(50, 14, 12, false, "ink"),
+		}
+		plaques[id] = plaque
+		motion.appear(frame, 0.6, 0.3)
+		-- Brillo que late mientras el evento esta activo.
+		motion.tween(stroke, { Color = rgb(colors.gold) }, 0.9, "Sine", "InOut", -1, true)
+		return plaque
+	end
+
 	local function refreshTimers()
 		local state = store:get()
 		if state == nil then
 			return
 		end
-		local lines = {}
+		local seen: { [string]: boolean } = {}
 		for _, event in state.events do
+			local id = tostring(event.id)
+			seen[id] = true
+			local plaque = plaques[id] or makePlaque(id, id == "halloween_harvest")
 			local remaining =
 				ClientLogic.remainingSeconds(event.endsAt, state.serverNow, store:receivedAt(), os.clock())
-			table.insert(
-				lines,
-				L("hud.event_line", {
-					name = eventName(event),
-					effects = modifiersText(event.modifiers),
-					time = UI.formatDuration(remaining),
-				})
-			)
+			plaque.name.Text = eventName(event)
+			plaque.time.Text = UI.formatDuration(remaining)
+			plaque.effects.Text = modifiersText(event.modifiers)
 		end
-		eventsLabel.Text = table.concat(lines, "\n")
-		eventsLabel.Visible = #lines > 0
+		for id, plaque in plaques do
+			if not seen[id] then
+				plaques[id] = nil
+				motion.tween(plaque.stroke, { Color = rgb(colors.woodDark) }, 0.01)
+				motion.pop(plaque.frame, 1.2)
+				task.delay(0.3, function()
+					plaque.frame:Destroy()
+				end)
+			end
+		end
+		eventsHolder.Visible = next(seen) ~= nil
 	end
 
 	local pulsing = false
@@ -508,6 +607,10 @@ function Hud.start(ctx: any): any
 			else L("hud.sell")
 		refreshTimers()
 		refreshAction()
+		if not welcomed then
+			welcomed = true
+			showWelcome()
+		end
 	end
 
 	store:subscribe(refresh)

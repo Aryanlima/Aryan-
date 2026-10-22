@@ -36,7 +36,11 @@ local entries: { [string]: Entry } = {
 	["hud.sell_count"] = { es = "VENDER ({count})", en = "SELL ({count})" },
 	["hud.auto_on_short"] = { es = "Auto: Sí", en = "Auto: On" },
 	["hud.auto_off_short"] = { es = "Auto: No", en = "Auto: Off" },
-	["hud.event_line"] = { es = "{name} ({effects}): {time}", en = "{name} ({effects}): {time}" },
+	["hud.welcome_title"] = { es = "¡Bienvenido a Fish & Fortune!", en = "Welcome To Fish & Fortune!" },
+	["hud.welcome_hint"] = {
+		es = "Toca Lanzar, espera el ! y recoge en la zona verde",
+		en = "Tap Cast, Wait For The ! And Reel In The Green Zone",
+	},
 	["hud.effect_coins"] = { es = "monedas x{value}", en = "coins x{value}" },
 	["hud.effect_luck"] = { es = "suerte +{value}", en = "luck +{value}" },
 
@@ -277,6 +281,7 @@ local entries: { [string]: Entry } = {
 	----------------------------------------------------------------------------
 	-- Eventos (nombres; los de la configuracion remota sin clave propia usan el nombre configurado)
 	----------------------------------------------------------------------------
+	["event.halloween_harvest.name"] = { es = "Cosecha de Halloween", en = "Halloween Harvest" },
 	["event.golden_tide.name"] = { es = "Marea Dorada", en = "Golden Tide" },
 	["event.mythic_moon.name"] = { es = "Luna Mítica", en = "Mythic Moon" },
 

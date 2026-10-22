@@ -694,7 +694,7 @@ local THEME_WOOD = Color3.fromRGB(104, 76, 52)
 local function buildRiverTheme(folder: Folder, style: ZoneStyle)
 	local o = style.origin
 	local rng = Random.new(style.seed + 500)
-	local rockColor = Color3.fromRGB(96, 108, 118)
+	local rockColor = Color3.fromRGB(88, 110, 176)
 	for i = 1, 12 do -- orillas (|x| > 33, fuera del agua)
 		local r = rng:NextNumber(2.5, 5)
 		local x = (if i % 2 == 0 then 1 else -1) * rng:NextNumber(35, 44)
@@ -738,7 +738,7 @@ local function buildRiverTheme(folder: Folder, style: ZoneStyle)
 			"ConiferCrown" .. i,
 			Vector3.new(7, h * 1.1, 7),
 			o + Vector3.new(x, h + 2, z),
-			if i % 3 == 0 then Color3.fromRGB(32, 98, 92) else Color3.fromRGB(44, 118, 110),
+			if i % 3 == 0 then Color3.fromRGB(24, 124, 112) else Color3.fromRGB(34, 148, 132),
 			Enum.Material.Grass,
 			Enum.PartType.Ball
 		)
@@ -763,6 +763,32 @@ local function buildRiverTheme(folder: Folder, style: ZoneStyle)
 	deco(folder, "FallsPlunge", Vector3.new(26, 0.2, 8), o + Vector3.new(0, 0.2, -121), WHITE).Transparency = 0.35
 	for i, x in { -14, 4, 16 } do -- niebla suave
 		deco(folder, "Mist" .. i, Vector3.new(40, 7, 18), o + Vector3.new(x, 4, -112 + i * 5), WHITE).Transparency = 0.9
+	end
+	-- hito del rio: racimo de cristales gigantes y brillantes sobre la cascada (7 cristales, 1 luz); sobre el risco, sin colision
+	local crystalBase = o + Vector3.new(0, 20, -134)
+	local crystalSpecs = { -- { x, z, alto, ancho, inclinacion (grados), color }
+		{ 0, 0, 50, 7, 0, Color3.fromRGB(176, 108, 255) },
+		{ -9, 3, 30, 5, 18, Color3.fromRGB(125, 249, 255) },
+		{ 9, 2, 34, 5.5, -16, Color3.fromRGB(150, 120, 255) },
+		{ -16, -2, 20, 4, 28, Color3.fromRGB(125, 249, 255) },
+		{ 16, -1, 22, 4, -26, Color3.fromRGB(190, 110, 255) },
+		{ -4, 7, 18, 3.5, 12, Color3.fromRGB(110, 235, 255) },
+		{ 5, 8, 16, 3.5, -14, Color3.fromRGB(210, 130, 255) },
+	}
+	for i, spec in crystalSpecs do
+		local base = crystalBase + Vector3.new(spec[1], 0, spec[2])
+		local crystal = deco(folder, "FallsCrystal" .. i, Vector3.new(spec[4], spec[3], spec[4]), base, spec[6], Enum.Material.Neon)
+		crystal.Transparency = 0.25
+		crystal.CFrame = CFrame.new(base) * CFrame.Angles(0, i, math.rad(spec[5])) * CFrame.new(0, spec[3] / 2 - 1, 0)
+		if i == 1 then
+			pcall(function()
+				local light = Instance.new("PointLight")
+				light.Color = Color3.fromRGB(150, 220, 255)
+				light.Range = 40
+				light.Brightness = 2.5
+				light.Parent = crystal
+			end)
+		end
 	end
 	-- puente de troncos en z = -95 (cubierta baja y pisable, barandas sin colision)
 	for i = 0, 5 do
@@ -866,7 +892,7 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 			"BeachRock" .. i,
 			o + Vector3.new(x, r * 0.3, rng:NextNumber(-4, 30)),
 			r,
-			Color3.fromRGB(165, 156, 142),
+			Color3.fromRGB(190, 160, 120),
 			Enum.Material.Rock
 		)
 	end
@@ -900,6 +926,24 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 		local at = base + Vector3.new(math.cos(a) * 11, r * 0.3, math.sin(a) * 11)
 		rockBall(folder, "IslandRock" .. i, at, r, Color3.fromRGB(150, 145, 140), Enum.Material.Rock)
 	end
+	-- hito de la costa: concha gigante (abanico de 9 losas rosas y blancas, ~21 studs) con una perla brillante, en la playa
+	-- cerca de la aparicion; fuera del muelle (|x| < 9) y de la linea de pesca; 11 partes, sin colision
+	local hinge = o + Vector3.new(-26, 0.4, 40)
+	for i = 1, 9 do
+		local yaw = math.rad((i - 5) * 15)
+		local slab = deco(folder, "GiantShell" .. i, Vector3.new(3.4, 0.7, 26), hinge, if i % 2 == 0 then Color3.fromRGB(255, 255, 245) else Color3.fromRGB(255, 120, 170), Enum.Material.SmoothPlastic)
+		slab.CFrame = CFrame.new(hinge) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(math.rad(52), 0, 0) * CFrame.new(0, 0, -13)
+	end
+	deco(folder, "GiantShellBase", Vector3.new(12, 1, 8), hinge + Vector3.new(0, 0.1, -2), Color3.fromRGB(255, 190, 200), Enum.Material.SmoothPlastic, Enum.PartType.Cylinder).CFrame =
+		CFrame.new(hinge + Vector3.new(0, 0.1, -2)) * CFrame.Angles(0, 0, math.rad(90))
+	local pearl = deco(folder, "GiantPearl", Vector3.new(5, 5, 5), hinge + Vector3.new(0, 3, -9), Color3.fromRGB(255, 250, 240), Enum.Material.Neon, Enum.PartType.Ball)
+	pcall(function()
+		local light = Instance.new("PointLight")
+		light.Color = Color3.fromRGB(255, 220, 200)
+		light.Range = 30
+		light.Brightness = 2
+		light.Parent = pearl
+	end)
 	-- 3 gaviotas lejanas que van y vienen con un Tween infinito (en pcall: sin TweenService real no pasa nada)
 	for i = 1, 3 do
 		local gull = deco(
@@ -1015,18 +1059,12 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			pt("BaitRoof" .. i, Vector3.new(5.6, 0.4, 7.4), Vector3.new(hx + side * 2.3, 6.3, hz), Color3.fromRGB(112, 62, 48), Enum.Material.Wood)
 		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(28))
 	end
-	-- anillo de aguas someras (turquesa) y espuma suave en la orilla; solo decoran, no cambian la zona pescable
-	for deg = 0, 330, 30 do
-		if not nearPier(deg) then
-			local at = shore(deg, 51.5, 0.2)
-			local shallow = pt("ShallowRing", Vector3.new(6, 0.1, 27), at, Color3.fromRGB(120, 218, 206))
-			shallow.CFrame = CFrame.lookAt(o + at, o + at + tangent(deg))
-			shallow.Transparency = 0.55
-			local foamAt = shore(deg, 54.7, 0.24)
-			local foam = pt("ShoreFoam", Vector3.new(0.9, 0.1, 27), foamAt, WHITE)
-			foam.CFrame = CFrame.lookAt(o + foamAt, o + foamAt + tangent(deg))
-			foam.Transparency = 0.5
-		end
+	-- aguas someras: discos finos y translucidos apilados (radio decreciente) que siguen la orilla circular sin aristas;
+	-- el borde acumula opacidad (turquesa claro) y el centro queda profundo. Solo decoran (sin colision ni consulta).
+	for i, spec in { { 55.6, 0.74, WHITE }, { 55, 0.8, Color3.fromRGB(70, 240, 215) }, { 52, 0.82, Color3.fromRGB(40, 225, 215) }, { 49, 0.86, Color3.fromRGB(20, 200, 220) }, { 46, 0.9, Color3.fromRGB(10, 170, 225) } } do
+		local disc = pt("ShallowRing" .. i, Vector3.new(0.04, spec[1] * 2, spec[1] * 2), Vector3.new(0, 0.06 + i * 0.01, -45), spec[3], nil, Enum.PartType.Cylinder)
+		upright(disc)
+		disc.Transparency = spec[2]
 	end
 	-- juncos y espadanas en la orilla (lejos del cartel y del muelle; con tierra detras)
 	local reedColors = { Color3.fromRGB(88, 140, 66), Color3.fromRGB(110, 158, 72) }
@@ -1113,6 +1151,28 @@ local function buildLakeTheme(folder: Folder, style: ZoneStyle)
 			emitter.SpreadAngle = Vector2.new(180, 180)
 			emitter.Size = NumberSequence.new(0.16)
 			emitter.Parent = perch
+		end)
+	end
+	-- hito del lago: boya-faro de rayas arcoiris (~35 studs) sobre el agua, a la vista desde la aparicion;
+	-- lejos del muelle (|x| > 4.5) y de los puntos de pesca; 10 partes, sin colision
+	do
+		local bx, bz = -34, -72
+		upright(deco(folder, "BuoyFloatBase", Vector3.new(2, 10, 10), o + Vector3.new(bx, 0.3, bz), Color3.fromRGB(255, 70, 60), Enum.Material.SmoothPlastic, Enum.PartType.Cylinder))
+		local rainbow = {
+			Color3.fromRGB(255, 50, 60), Color3.fromRGB(255, 140, 20), Color3.fromRGB(255, 220, 40), Color3.fromRGB(60, 210, 80),
+			Color3.fromRGB(40, 170, 255), Color3.fromRGB(120, 80, 255),
+		}
+		for i, color in rainbow do
+			local d = 7 - i * 0.7
+			upright(pt("BuoyStripe" .. i, Vector3.new(5, d, d), Vector3.new(bx, 1.5 + i * 5, bz), color, Enum.Material.SmoothPlastic, Enum.PartType.Cylinder))
+		end
+		local lamp = pt("BuoyLamp", Vector3.new(4.5, 4.5, 4.5), Vector3.new(bx, 36, bz), Color3.fromRGB(255, 240, 150), Enum.Material.Neon, Enum.PartType.Ball)
+		pcall(function()
+			local light = Instance.new("PointLight")
+			light.Color = Color3.fromRGB(255, 230, 140)
+			light.Range = 28
+			light.Brightness = 2
+			light.Parent = lamp
 		end)
 	end
 	-- peces que saltan con anillo de ondas: UN solo hilo que rota entre 4 puntos (sin planificador en pruebas: nada)
@@ -1301,7 +1361,7 @@ end
 
 local function setupLighting()
 	Lighting.ClockTime = 16.3
-	Lighting.Brightness = 2
+	Lighting.Brightness = 2.3
 	Lighting.ExposureCompensation = 0.1
 	Lighting.Ambient = Color3.fromRGB(123, 145, 166)
 	Lighting.OutdoorAmbient = Color3.fromRGB(169, 196, 211)
@@ -1309,8 +1369,8 @@ local function setupLighting()
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(44, 138, 178) -- menos saturado: el lago se ve turquesa, no azul plano
-	terrain.WaterTransparency = 0.5
+	terrain.WaterColor = Color3.fromRGB(30, 178, 218) -- turquesa vivo
+	terrain.WaterTransparency = 0.45
 	terrain.WaterWaveSize = 0.16
 	terrain.WaterWaveSpeed = 7
 	terrain.WaterReflectance = 0.12
@@ -1345,8 +1405,8 @@ local function setupLighting()
 	end
 	local correction = Instance.new("ColorCorrectionEffect")
 	correction.Name = "FishFortuneColorCorrection"
-	correction.Saturation = 0.08
-	correction.Contrast = 0.04
+	correction.Saturation = 0.2
+	correction.Contrast = 0.09
 	correction.TintColor = Color3.fromRGB(255, 239, 215)
 	correction.Parent = Lighting
 
@@ -1356,9 +1416,9 @@ local function setupLighting()
 	end
 	local bloom = Instance.new("BloomEffect")
 	bloom.Name = "FishFortuneBloom"
-	bloom.Intensity = 0.18
+	bloom.Intensity = 0.35
 	bloom.Size = 24
-	bloom.Threshold = 1.4
+	bloom.Threshold = 1.0
 	bloom.Parent = Lighting
 	for _, effectName in { "FishFortuneSunRays", "FishFortuneDepthOfField" } do
 		local oldEffect = Lighting:FindFirstChild(effectName)
@@ -1429,11 +1489,11 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			name = "",
 			nameKey = "",
 			origin = Vector3.new(0, 0, 0),
-			groundColor = Color3.fromRGB(104, 170, 98),
+			groundColor = Color3.fromRGB(96, 198, 84),
 			groundMaterial = Enum.Material.Grass,
-			waterColor = Color3.fromRGB(70, 150, 220),
+			waterColor = Color3.fromRGB(50, 165, 245),
 			waterShape = "disc",
-			treeColor = Color3.fromRGB(70, 140, 70),
+			treeColor = Color3.fromRGB(56, 168, 68),
 			treeArt = "pine_tree",
 			seed = 11,
 		},
@@ -1442,11 +1502,11 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			name = "",
 			nameKey = "",
 			origin = Vector3.new(400, 0, 0),
-			groundColor = Color3.fromRGB(88, 126, 108),
+			groundColor = Color3.fromRGB(72, 164, 134),
 			groundMaterial = Enum.Material.Grass,
-			waterColor = Color3.fromRGB(90, 200, 215),
+			waterColor = Color3.fromRGB(39, 214, 200),
 			waterShape = "river",
-			treeColor = Color3.fromRGB(36, 104, 98),
+			treeColor = Color3.fromRGB(28, 134, 122),
 			treeArt = "pine_tree",
 			seed = 22,
 		},
@@ -1455,11 +1515,11 @@ function WorldBuilder.build(zones: { { id: string, name: string, nameKey: string
 			name = "",
 			nameKey = "",
 			origin = Vector3.new(800, 0, 0),
-			groundColor = Color3.fromRGB(248, 234, 190),
+			groundColor = Color3.fromRGB(246, 222, 154),
 			groundMaterial = Enum.Material.Sand,
-			waterColor = Color3.fromRGB(40, 130, 200),
+			waterColor = Color3.fromRGB(31, 182, 217),
 			waterShape = "sea",
-			treeColor = Color3.fromRGB(120, 190, 70),
+			treeColor = Color3.fromRGB(47, 170, 90),
 			treeArt = "palm_tree",
 			seed = 33,
 		},
