@@ -254,9 +254,13 @@ describe("(a) Servicios y carpetas del lugar construido", function()
 	end
 
 	it(
-		"los Workspace/Lighting de Rojo no traen instancias (el mundo lo crea WorldBuilder en tiempo de ejecucion)",
+		"el Workspace de Rojo solo trae Extras (piezas hechas a mano con Ropilot, world/Extras) y Lighting nada: el mundo lo crea WorldBuilder en tiempo de ejecucion",
 		function()
-			expect(#find("Workspace"):GetChildren()).toBe(0)
+			local names = {}
+			for _, child in find("Workspace"):GetChildren() do
+				table.insert(names, child.Name)
+			end
+			expect(table.concat(names, ",")).toBe("Extras")
 			expect(#find("Lighting"):GetChildren()).toBe(0)
 		end
 	)

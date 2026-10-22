@@ -489,6 +489,36 @@ local function buildSign(folder: Folder, style: ZoneStyle)
 			Enum.Material.Wood
 		)
 	)
+	-- dos postes laterales, tejadillo a dos aguas y cuerdas: el cartel deja de ser un bloque liso
+	local woodColor, ropeColor = Color3.fromRGB(88, 62, 42), Color3.fromRGB(196, 170, 120)
+	for _, side in { -1, 1 } do
+		local at = style.origin + Vector3.new(12 + side * 4.6, 4.3, 7.6)
+		detail(newPart(folder, "SignPost", Vector3.new(0.9, 8.6, 0.9), at, woodColor, Enum.Material.Wood))
+		detail(
+			newPart(folder, "SignRope", Vector3.new(1.2, 0.25, 1.2), at + Vector3.new(0, 1.2, 0), ropeColor, Enum.Material.Fabric)
+		)
+		local roof = detail(
+			newPart(
+				folder,
+				"SignRoof",
+				Vector3.new(9.8, 0.3, 3.2),
+				style.origin + Vector3.new(12, 8.6, 7.6 + side * 1.3),
+				Color3.fromRGB(112, 62, 48),
+				Enum.Material.Wood
+			)
+		)
+		roof.CFrame = roof.CFrame * CFrame.Angles(side * math.rad(22), 0, 0)
+		detail(
+			newPart(
+				folder,
+				"SignHanger",
+				Vector3.new(0.12, 1.4, 0.12),
+				style.origin + Vector3.new(12 + side * 2, 7.8, 7.6),
+				ropeColor,
+				Enum.Material.Fabric
+			)
+		)
+	end
 end
 
 local function buildDecor(folder: Folder, style: ZoneStyle, art: ArtLike?)
@@ -887,6 +917,245 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 	end
 end
 
+-- Lago tranquilo: muelle vivido (barriles, cajas, faroles, barca, redes), caseta de cebo, juncos, nenufares, flores,
+-- arboles altos, piedras para cruzar, tronco caido, mariposas, luciernagas y peces que saltan (~145 partes).
+-- Todo con CanCollide = false salvo caseta, piedras y tronco (fuera del carril del muelle y de la pesca).
+local function buildLakeTheme(folder: Folder, style: ZoneStyle)
+	local o = style.origin
+	local rng = Random.new(style.seed + 500)
+	local rope, wood, deck = Color3.fromRGB(196, 170, 120), THEME_WOOD, 1.7 -- deck = cara superior del muelle
+	local function pt(
+		name: string,
+		size: Vector3,
+		rel: Vector3,
+		color: Color3,
+		material: Enum.Material?,
+		shape: Enum.PartType?
+	): Part
+		return deco(folder, name, size, o + rel, color, material, shape)
+	end
+	local function upright(part: Part) -- los cilindros de Roblox van tumbados: se ponen de pie
+		part.CFrame = CFrame.new(part.Position) * CFrame.Angles(0, 0, math.rad(90))
+	end
+	local function shore(deg: number, r: number, y: number): Vector3 -- centro del lago: (0, -45)
+		local a = math.rad(deg)
+		return Vector3.new(r * math.cos(a), y, -45 + r * math.sin(a))
+	end
+	local function nearPier(deg: number): boolean -- el muelle y el cartel salen por deg ~ 90
+		return deg > 62 and deg < 118
+	end
+	local function tangent(deg: number): Vector3
+		return Vector3.new(-math.sin(math.rad(deg)), 0, math.cos(math.rad(deg)))
+	end
+	local function link(a: Vector3, b: Vector3) -- cuerda fina entre dos puntos
+		local mid = (a + b) / 2
+		local part = deco(folder, "Rope", Vector3.new(0.12, 0.12, (b - a).Magnitude), mid, rope)
+		part.CFrame = CFrame.lookAt(mid, b)
+	end
+	-- muelle: barriles, cajas, rollos de cuerda (a un lado, el centro queda libre)
+	for i, z in { -5, -9 } do
+		upright(
+			pt("DockBarrel" .. i, Vector3.new(1.9, 1.5, 1.5), Vector3.new(3, deck + 0.95, z), wood, Enum.Material.Wood, Enum.PartType.Cylinder)
+		)
+	end
+	upright(pt("DockBarrel3", Vector3.new(1.9, 1.5, 1.5), Vector3.new(7.4, 1, 5), wood, Enum.Material.Wood, Enum.PartType.Cylinder))
+	for i, rel in { Vector3.new(-3, deck + 0.8, -11), Vector3.new(-3, deck + 0.8, -13.2), Vector3.new(-3.1, deck + 2.4, -12) } do
+		pt("DockCrate" .. i, Vector3.new(1.8, 1.6, 1.8), rel, Color3.fromRGB(152, 112, 70), Enum.Material.WoodPlanks)
+	end
+	for i, z in { -20, -31 } do
+		upright(
+			pt("RopeCoil" .. i, Vector3.new(0.4, 1.4, 1.4), Vector3.new(-3.1, deck + 0.2, z), rope, Enum.Material.Fabric, Enum.PartType.Cylinder)
+		)
+	end
+	-- faroles colgantes al final del muelle: brillo calido de alcance corto
+	for i, side in { -1, 1 } do
+		pt("DockLampPole" .. i, Vector3.new(0.3, 4.4, 0.3), Vector3.new(side * 3.4, deck + 2.2, -39), wood, Enum.Material.Wood)
+		pt("DockLampArm" .. i, Vector3.new(0.9, 0.25, 0.25), Vector3.new(side * 3, deck + 4.3, -39), wood, Enum.Material.Wood)
+		local lamp = pt(
+			"DockLamp" .. i,
+			Vector3.new(0.8, 1.1, 0.8),
+			Vector3.new(side * 2.6, deck + 3.6, -39),
+			Color3.fromRGB(255, 196, 110),
+			Enum.Material.Neon
+		)
+		local light = Instance.new("PointLight")
+		light.Color = Color3.fromRGB(255, 190, 110)
+		light.Range = 12
+		light.Brightness = 1.2
+		light.Shadows = false
+		light.Parent = lamp
+	end
+	-- barca amarrada junto al muelle (lado +x, fuera del carril)
+	local bx, bz = 6.6, -22.5
+	local red = Color3.fromRGB(176, 66, 52)
+	pt("BoatBottom", Vector3.new(2.4, 0.3, 6), Vector3.new(bx, 0.1, bz), Color3.fromRGB(150, 96, 58), Enum.Material.WoodPlanks)
+	for i, side in { -1, 1 } do
+		pt("BoatSide" .. i, Vector3.new(0.3, 1, 6), Vector3.new(bx + side * 1.05, 0.6, bz), red, Enum.Material.WoodPlanks)
+		pt("BoatEnd" .. i, Vector3.new(2.4, 1, 0.3), Vector3.new(bx, 0.6, bz + side * 2.85), red, Enum.Material.WoodPlanks)
+	end
+	pt("BoatSeat", Vector3.new(2.2, 0.2, 0.7), Vector3.new(bx, 0.95, bz), wood, Enum.Material.Wood)
+	link(o + Vector3.new(bx - 1, 1.2, bz + 2.85), o + Vector3.new(3.6, 1.8, -18))
+	-- redes colgando del borde del muelle
+	for i, z in { -14, -29 } do
+		pt("DockNet" .. i, Vector3.new(0.15, 2.2, 3.6), Vector3.new(-4.2, deck + 0.4, z), rope, Enum.Material.Fabric).Transparency =
+			0.35
+	end
+	-- caseta de cebo en la orilla (puerta hacia el lago), techo a dos aguas
+	local hx, hz = -20, 16
+	local hutWall = Color3.fromRGB(140, 100, 66)
+	local planks = Enum.Material.WoodPlanks
+	pt("BaitFloor", Vector3.new(8, 0.4, 6), Vector3.new(hx, 0.2, hz), wood, planks).CanCollide = true
+	pt("BaitBack", Vector3.new(8, 5, 0.4), Vector3.new(hx, 2.9, hz + 2.8), hutWall, planks).CanCollide = true
+	pt("BaitLintel", Vector3.new(2.4, 1.6, 0.4), Vector3.new(hx, 4.6, hz - 2.8), hutWall, planks).CanCollide = true
+	for i, side in { -1, 1 } do
+		pt("BaitSide" .. i, Vector3.new(0.4, 5, 6), Vector3.new(hx + side * 3.8, 2.9, hz), hutWall, planks).CanCollide = true
+		pt("BaitFront" .. i, Vector3.new(2.8, 5, 0.4), Vector3.new(hx + side * 2.6, 2.9, hz - 2.8), hutWall, planks).CanCollide =
+			true
+		local roof =
+			pt("BaitRoof" .. i, Vector3.new(5.6, 0.4, 7.4), Vector3.new(hx + side * 2.3, 6.3, hz), Color3.fromRGB(112, 62, 48), Enum.Material.Wood)
+		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(28))
+	end
+	-- anillo de aguas someras (turquesa) y espuma suave en la orilla; solo decoran, no cambian la zona pescable
+	for deg = 0, 330, 30 do
+		if not nearPier(deg) then
+			local at = shore(deg, 51.5, 0.2)
+			local shallow = pt("ShallowRing", Vector3.new(6, 0.1, 27), at, Color3.fromRGB(120, 218, 206))
+			shallow.CFrame = CFrame.lookAt(o + at, o + at + tangent(deg))
+			shallow.Transparency = 0.55
+			local foamAt = shore(deg, 54.7, 0.24)
+			local foam = pt("ShoreFoam", Vector3.new(0.9, 0.1, 27), foamAt, WHITE)
+			foam.CFrame = CFrame.lookAt(o + foamAt, o + foamAt + tangent(deg))
+			foam.Transparency = 0.5
+		end
+	end
+	-- juncos y espadanas en la orilla (lejos del cartel y del muelle; con tierra detras)
+	local reedColors = { Color3.fromRGB(88, 140, 66), Color3.fromRGB(110, 158, 72) }
+	for i, deg in { -15, 5, 30, 50, 130, 150, 172, 195 } do
+		for b = 1, 3 do
+			local h = rng:NextNumber(2.2, 3.4)
+			local at = shore(deg + rng:NextNumber(-4, 4), rng:NextNumber(54, 57), h / 2)
+			local blade = pt("Reed" .. i, Vector3.new(0.15, h, 0.15), at, reedColors[(b % 2) + 1], Enum.Material.Grass)
+			blade.CFrame = CFrame.new(o + at) * CFrame.Angles(rng:NextNumber(-0.15, 0.15), 0, rng:NextNumber(-0.15, 0.15))
+		end
+		if i % 4 == 2 then
+			local at = shore(deg + 3, 55.5, 1.9)
+			pt("CattailStem" .. i, Vector3.new(0.12, 3.8, 0.12), at, reedColors[1], Enum.Material.Grass)
+			upright(
+				pt("Cattail" .. i, Vector3.new(0.9, 0.35, 0.35), at + Vector3.new(0, 2.1, 0), Color3.fromRGB(96, 62, 40), nil, Enum.PartType.Cylinder)
+			)
+		end
+	end
+	-- nenufares con flor rosa sobre el agua (lejos del carril del muelle)
+	for i = 1, 8 do
+		local deg = if i % 2 == 0 then rng:NextNumber(20, 55) else 180 - rng:NextNumber(20, 55)
+		local at = shore(deg, rng:NextNumber(30, 47), 0.12)
+		upright(pt("LilyPad" .. i, Vector3.new(0.12, 2.2, 2.2), at, Color3.fromRGB(70, 150, 82), Enum.Material.Grass, Enum.PartType.Cylinder))
+		if i % 2 == 0 then
+			pt("LilyFlower" .. i, Vector3.new(0.8, 0.6, 0.8), at + Vector3.new(0, 0.35, 0), Color3.fromRGB(255, 150, 190), nil, Enum.PartType.Ball)
+		end
+	end
+	-- flores silvestres en tierra y rocas de orilla (las rocas de Terrain no cuentan como partes)
+	local flowerColors = {
+		Color3.fromRGB(255, 220, 90),
+		Color3.fromRGB(255, 140, 180),
+		Color3.fromRGB(245, 245, 250),
+		Color3.fromRGB(170, 130, 230),
+	}
+	for i = 1, 12 do
+		local at = shore(rng:NextNumber(5, 175), rng:NextNumber(60, 78), 0.4)
+		pt("Wildflower" .. i, Vector3.new(0.6, 0.6, 0.6), at, flowerColors[(i % 4) + 1], nil, Enum.PartType.Ball)
+	end
+	for i = 1, 4 do
+		local deg = rng:NextNumber(10, 170)
+		deg = if nearPier(deg) then deg + 60 else deg
+		local r = rng:NextNumber(1.6, 2.8)
+		rockBall(folder, "LakeBoulder" .. i, o + shore(deg, rng:NextNumber(62, 72), r * 0.3), r, Color3.fromRGB(122, 126, 124), Enum.Material.Rock)
+	end
+	-- tres grupos de arboles altos que enmarcan el lago por detras de las colinas
+	for c, center in { Vector3.new(-58, 0, 70), Vector3.new(62, 0, 74), Vector3.new(-74, 0, -12) } do
+		for t = 1, 3 do
+			local h = rng:NextNumber(16, 22)
+			local at = center + Vector3.new(rng:NextNumber(-7, 7), 0, rng:NextNumber(-7, 7))
+			pt("TallTrunk" .. c, Vector3.new(1.6, h, 1.6), at + Vector3.new(0, h / 2, 0), Color3.fromRGB(94, 70, 52), Enum.Material.Wood)
+			local crown = if t % 2 == 0 then style.treeColor else Color3.fromRGB(70, 138, 74)
+			pt("TallCrown" .. c, Vector3.one * rng:NextNumber(10, 13), at + Vector3.new(0, h + 2, 0), crown, Enum.Material.Grass, Enum.PartType.Ball)
+		end
+	end
+	-- piedras para cruzar (pisables, hacia el este) y tronco caido en la orilla oeste
+	for i = 0, 5 do
+		local stone = pt("StepStone" .. i, Vector3.new(3, 2.6, 2.6), shore(15 + i * 1.5, 53 - i * 3.2, -0.9), Color3.fromRGB(128, 132, 128), Enum.Material.Slate, Enum.PartType.Cylinder)
+		upright(stone)
+		stone.CanCollide = true
+	end
+	local logAt = shore(165, 58, 0.9)
+	local trunk = pt("FallenLog", Vector3.new(9, 1.7, 1.7), logAt, Color3.fromRGB(92, 66, 46), Enum.Material.Wood, Enum.PartType.Cylinder)
+	trunk.CFrame = CFrame.lookAt(o + logAt, o + logAt + Vector3.new(0.3, 0, 1)) * CFrame.Angles(0, math.rad(90), 0)
+	trunk.CanCollide = true
+	-- mariposas (3 Tweens en bucle, en pcall como las gaviotas) y luciernagas (2 emisores lentos)
+	for i = 1, 3 do
+		local fly = pt("Butterfly" .. i, Vector3.new(0.6, 0.06, 0.5), shore(20 + i * 50, 64, 2.2), flowerColors[i], Enum.Material.Neon)
+		pcall(function()
+			local info = TweenInfo.new(6 + i * 1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+			local goal = fly.CFrame * CFrame.new(5 - i, 1.2, 4) * CFrame.Angles(0, math.rad(40 * i), 0)
+			TweenService:Create(fly, info, { CFrame = goal }):Play()
+		end)
+	end
+	for i, deg in { 15, 160 } do
+		local perch = pt("LakeFireflies" .. i, Vector3.new(0.3, 0.3, 0.3), shore(deg, 56, 2.4), WHITE)
+		perch.Transparency = 1
+		pcall(function() -- sin ColorSequence/NumberRange reales (pruebas) no hay luciernagas
+			local emitter = Instance.new("ParticleEmitter")
+			emitter.Color = ColorSequence.new(Color3.fromRGB(255, 230, 140))
+			emitter.LightEmission = 0.6
+			emitter.Rate = 1.2
+			emitter.Lifetime = NumberRange.new(2, 3)
+			emitter.Speed = NumberRange.new(0.3, 0.9)
+			emitter.SpreadAngle = Vector2.new(180, 180)
+			emitter.Size = NumberSequence.new(0.16)
+			emitter.Parent = perch
+		end)
+	end
+	-- peces que saltan con anillo de ondas: UN solo hilo que rota entre 4 puntos (sin planificador en pruebas: nada)
+	local scheduler: any = task
+	if scheduler == nil then
+		return
+	end
+	local spots = { Vector3.new(-22, 0, -62), Vector3.new(18, 0, -72), Vector3.new(-30, 0, -36), Vector3.new(27, 0, -32) }
+	local function ripple(at: Vector3)
+		local ring = pt("FishRipple", Vector3.new(0.08, 1, 1), at + Vector3.new(0, 0.14, 0), WHITE, nil, Enum.PartType.Cylinder)
+		ring.CFrame = CFrame.new(ring.Position) * CFrame.Angles(0, 0, math.rad(90))
+		ring.Transparency = 0.3
+		pcall(function()
+			TweenService:Create(ring, TweenInfo.new(1.4), { Size = Vector3.new(0.08, 8, 8), Transparency = 1 }):Play()
+		end)
+		Debris:AddItem(ring, 1.6)
+	end
+	scheduler.spawn(function()
+		local n = 0
+		while folder.Parent ~= nil do
+			scheduler.wait(3.5 + rng:NextNumber(0, 2))
+			if folder.Parent == nil then
+				break
+			end
+			n = n % #spots + 1
+			local at = spots[n]
+			pcall(function()
+				local fish = pt("LakeFish", Vector3.new(1.5, 0.5, 0.5), at, Color3.fromRGB(205, 215, 225), Enum.Material.Metal)
+				ripple(at)
+				local start = fish.CFrame
+				local up = TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+				TweenService:Create(fish, up, { CFrame = start * CFrame.new(0, 3.2, 0) * CFrame.Angles(0, 0, math.rad(-35)) }):Play()
+				scheduler.wait(0.45)
+				local down = TweenInfo.new(0.45, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+				TweenService:Create(fish, down, { CFrame = start * CFrame.Angles(0, 0, math.rad(-80)) }):Play()
+				Debris:AddItem(fish, 0.6)
+				scheduler.wait(0.45)
+				ripple(at)
+			end)
+		end
+	end)
+end
+
 -- Siluetas frías al horizonte y nubes de bajo coste para ampliar visualmente cada zona.
 local function buildHorizon(folder: Folder, style: ZoneStyle)
 	local origin = style.origin
@@ -1022,6 +1291,8 @@ local function buildZone(world: Folder, style: ZoneStyle, art: ArtLike?)
 		buildRiverTheme(folder, style)
 	elseif style.id == "coast" then
 		buildCoastTheme(folder, style)
+	elseif style.id == "lake" then
+		buildLakeTheme(folder, style)
 	end
 	buildArtOnlyProps(folder, style, art)
 	buildWildlife(folder, style)
@@ -1038,8 +1309,8 @@ local function setupLighting()
 	Lighting.EnvironmentDiffuseScale = 0.6
 	Lighting.EnvironmentSpecularScale = 0.5
 	local terrain = Workspace.Terrain
-	terrain.WaterColor = Color3.fromRGB(28, 116, 178)
-	terrain.WaterTransparency = 0.4
+	terrain.WaterColor = Color3.fromRGB(44, 138, 178) -- menos saturado: el lago se ve turquesa, no azul plano
+	terrain.WaterTransparency = 0.5
 	terrain.WaterWaveSize = 0.16
 	terrain.WaterWaveSpeed = 7
 	terrain.WaterReflectance = 0.12
