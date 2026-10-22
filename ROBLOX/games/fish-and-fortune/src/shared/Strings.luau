@@ -211,6 +211,8 @@ local entries: { [string]: Entry } = {
 		es = "Suerte +{luck} - zona perfecta {sweet}% - auto cada {interval}s",
 		en = "Luck +{luck} - perfect zone {sweet}% - auto every {interval}s",
 	},
+	["rods.skins"] = { es = "Aspectos de caña", en = "Rod Skins" },
+	["rods.owned"] = { es = "Comprada", en = "Owned" },
 	["rods.equipped"] = { es = "Equipada", en = "Equipped" },
 	["rods.equip"] = { es = "Equipar", en = "Equip" },
 	["rods.buy"] = { es = "Comprar - {price} monedas", en = "Buy - {price} coins" },

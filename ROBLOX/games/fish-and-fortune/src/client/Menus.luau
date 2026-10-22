@@ -290,6 +290,31 @@ function Menus.start(ctx: any): any
 				)
 			end
 
+			addHeader(content, nextOrder(), L("rods.skins"))
+			for _, skin in balance.cosmeticRods do
+				local owned = state.ownedRods[skin.id] == true
+				local button: ButtonSpec
+				if owned then
+					button = { text = L("rods.owned"), enabled = false }
+				else
+					button = {
+						text = L("rods.buy", { price = fmt.compact(skin.price) }),
+						enabled = state.coins >= skin.price,
+						onClick = function()
+							net:fire("BuyRod", skin.id)
+						end,
+					}
+				end
+				addRow(
+					content,
+					nextOrder(),
+					L("rod." .. skin.id),
+					nil,
+					{ button },
+					{ key = "skin_" .. skin.id, icon = "Rods", done = owned }
+				)
+			end
+
 			addHeader(content, nextOrder(), L("zones.header"))
 			for _, zoneId in balance.zoneOrder do
 				local zone = balance.zones[zoneId]
