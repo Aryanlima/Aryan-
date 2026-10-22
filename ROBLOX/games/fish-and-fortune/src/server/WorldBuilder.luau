@@ -926,9 +926,127 @@ local function buildCoastTheme(folder: Folder, style: ZoneStyle)
 		local at = base + Vector3.new(math.cos(a) * 11, r * 0.3, math.sin(a) * 11)
 		rockBall(folder, "IslandRock" .. i, at, r, Color3.fromRGB(150, 145, 140), Enum.Material.Rock)
 	end
+	-- vida de playa (~110 partes decorativas, sin colision): fuera del muelle (|x| < 11) y de la orilla de pesca
+	local function d(name: string, size: Vector3, rel: Vector3, color: Color3, mat: Enum.Material?, shape: Enum.PartType?): Part
+		return deco(folder, name, size, o + rel, color, mat, shape)
+	end
+	local RED, CREAM, SUN = Color3.fromRGB(235, 70, 60), Color3.fromRGB(255, 244, 225), Color3.fromRGB(255, 190, 40)
+	local TEAL, DRIFT = Color3.fromRGB(30, 190, 200), Color3.fromRGB(150, 125, 95)
+	local PLASTIC, WOOD = Enum.Material.SmoothPlastic, Enum.Material.Wood
+	local function upright(part: Part)
+		part.CFrame = CFrame.new(part.Position) * CFrame.Angles(0, 0, math.rad(90))
+	end
+	-- sombrilla a rayas, toallas y pelotas
+	d("UmbrellaPole", Vector3.new(0.3, 8, 0.3), Vector3.new(24, 4, 8), CREAM, WOOD)
+	for i = 0, 5 do
+		local panel = d("UmbrellaPanel" .. i, Vector3.new(2, 0.2, 5.4), Vector3.new(24, 8, 8), if i % 2 == 0 then RED else CREAM, PLASTIC)
+		panel.CFrame = CFrame.new(o + Vector3.new(24, 8, 8)) * CFrame.Angles(0, i * math.pi / 3, 0) * CFrame.Angles(math.rad(14), 0, 0) * CFrame.new(0, 0, -2.6)
+	end
+	for i, spec in { { 20, 6, TEAL }, { 28, 11, SUN } } do
+		d("Towel" .. i, Vector3.new(3.2, 0.12, 6), Vector3.new(spec[1], 0.08, spec[2]), spec[3], Enum.Material.Fabric)
+		d("TowelStripe" .. i, Vector3.new(3.3, 0.14, 1), Vector3.new(spec[1], 0.1, spec[2]), CREAM, Enum.Material.Fabric)
+	end
+	for i, spec in { { 32, 4, RED }, { 15, 12, SUN }, { -14, 8, TEAL } } do
+		d("BeachBall" .. i, Vector3.one * 2.2, Vector3.new(spec[1], 1.1, spec[2]), spec[3], PLASTIC, Enum.PartType.Ball)
+	end
+	-- castillo de arena con banderita
+	local castle = Vector3.new(16, 0, 24)
+	local sand = Color3.fromRGB(232, 200, 130)
+	d("CastleBase", Vector3.new(7, 2, 7), castle + Vector3.new(0, 1, 0), sand, Enum.Material.Sand)
+	for i, c in { Vector3.new(-3.5, 0, -3.5), Vector3.new(3.5, 0, -3.5), Vector3.new(-3.5, 0, 3.5), Vector3.new(3.5, 0, 3.5) } do
+		upright(d("CastleTower" .. i, Vector3.new(3.4, 2, 2), castle + c + Vector3.new(0, 2, 0), sand, Enum.Material.Sand, Enum.PartType.Cylinder))
+	end
+	upright(d("CastleKeep", Vector3.new(4, 3, 3), castle + Vector3.new(0, 3.5, 0), sand, Enum.Material.Sand, Enum.PartType.Cylinder))
+	d("CastleFlagPole", Vector3.new(0.12, 3, 0.12), castle + Vector3.new(0, 6.5, 0), CREAM)
+	d("CastleFlag", Vector3.new(1.4, 0.9, 0.08), castle + Vector3.new(0.7, 7.5, 0), RED, Enum.Material.Fabric)
+	-- chiringuito tiki con farol calido
+	local hut = Vector3.new(38, 0, 4)
+	for i, c in { Vector3.new(-3, 0, -2.5), Vector3.new(3, 0, -2.5), Vector3.new(-3, 0, 2.5), Vector3.new(3, 0, 2.5) } do
+		d("TikiPost" .. i, Vector3.new(0.6, 6, 0.6), hut + c + Vector3.new(0, 3, 0), DRIFT, WOOD)
+	end
+	for i, side in { -1, 1 } do
+		local roof = d("TikiRoof" .. i, Vector3.new(4.4, 0.4, 7.4), hut + Vector3.new(side * 1.9, 6.5, 0), Color3.fromRGB(205, 170, 80), Enum.Material.Grass)
+		roof.CFrame = CFrame.new(roof.Position) * CFrame.Angles(0, 0, -side * math.rad(24))
+		d("TikiStool" .. i, Vector3.new(1.4, 1.6, 1.4), hut + Vector3.new(side * 1.8, 0.8, -5), RED, PLASTIC, Enum.PartType.Cylinder)
+	end
+	d("TikiBar", Vector3.new(7, 2.4, 1.4), hut + Vector3.new(0, 1.2, -2.6), Color3.fromRGB(120, 80, 50), Enum.Material.WoodPlanks)
+	d("TikiBarTop", Vector3.new(7.6, 0.3, 2), hut + Vector3.new(0, 2.5, -2.6), SUN, Enum.Material.WoodPlanks)
+	local lantern = d("TikiLantern", Vector3.new(0.9, 1.2, 0.9), hut + Vector3.new(0, 5.2, -2.6), Color3.fromRGB(255, 190, 100), Enum.Material.Neon)
+	pcall(function()
+		local light = Instance.new("PointLight")
+		light.Color = Color3.fromRGB(255, 190, 110)
+		light.Range = 16
+		light.Brightness = 1.4
+		light.Shadows = false
+		light.Parent = lantern
+	end)
+	-- bote varado, troncos de deriva y esqueleto de naufragio
+	local boat = Vector3.new(-44, 0, 2)
+	local plank = Enum.Material.WoodPlanks
+	local hullBlue = Color3.fromRGB(60, 120, 170)
+	local tilt = CFrame.new(o + boat + Vector3.new(0, 0.7, 0)) * CFrame.Angles(0.12, 0.5, 0.18)
+	d("RowboatBottom", Vector3.new(3, 0.3, 7), boat, hullBlue, plank).CFrame = tilt
+	for i, side in { -1, 1 } do
+		d("RowboatSide" .. i, Vector3.new(0.3, 1.1, 7), boat, hullBlue, plank).CFrame = tilt * CFrame.new(side * 1.4, 0.55, 0)
+		d("RowboatEnd" .. i, Vector3.new(3, 1.1, 0.3), boat, CREAM, plank).CFrame = tilt * CFrame.new(0, 0.55, side * 3.4)
+	end
+	d("RowboatOar", Vector3.new(0.2, 0.2, 5), boat, DRIFT, WOOD).CFrame = CFrame.new(o + boat + Vector3.new(3, 0.4, 3)) * CFrame.Angles(0, 0.9, 0.1)
+	for i, spec in { { -30, -6, 0.4 }, { 30, -8, -0.6 }, { -52, 14, 1.2 }, { 50, 20, 2 } } do
+		local log = d("Driftwood" .. i, Vector3.new(6 - i * 0.6, 1, 1), Vector3.new(spec[1], 0.5, spec[2]), DRIFT, WOOD, Enum.PartType.Cylinder)
+		log.CFrame = CFrame.new(log.Position) * CFrame.Angles(0, spec[3], 0)
+	end
+	local wreck = Vector3.new(-66, 0, -6)
+	local hull = CFrame.new(o + wreck + Vector3.new(0, 0.2, 0)) * CFrame.Angles(0.1, 0.35, 0.15)
+	d("WreckKeel", Vector3.new(2, 1, 20), wreck, Color3.fromRGB(90, 65, 45), WOOD).CFrame = hull
+	for i = 1, 6 do
+		for _, side in { -1, 1 } do
+			if i % 2 == 1 or side == 1 then
+				d("WreckRib" .. i, Vector3.new(0.5, 6 - math.abs(i - 3.5), 0.5), wreck, Color3.fromRGB(105, 78, 55), WOOD).CFrame =
+					hull * CFrame.new(side * 1.8, 2, (i - 3.5) * 3) * CFrame.Angles(0, 0, side * math.rad(-28))
+			end
+		end
+	end
+	d("WreckMast", Vector3.new(0.6, 9, 0.6), wreck, Color3.fromRGB(95, 70, 48), WOOD).CFrame = hull * CFrame.new(0, 4, 2) * CFrame.Angles(0, 0, math.rad(-18))
+	-- boyas y banderas a lo largo de la orilla (fuera del carril del muelle y de la pesca)
+	for i = 1, 6 do
+		local x = (if i % 2 == 0 then 1 else -1) * (14 + math.floor((i - 1) / 2) * 14)
+		d("Buoy" .. i, Vector3.new(1.6, 1.6, 1.6), Vector3.new(x, 0.8, -8), if i % 2 == 0 then RED else SUN, PLASTIC, Enum.PartType.Ball)
+		if i <= 4 then
+			d("BuoyBand" .. i, Vector3.new(1.7, 0.4, 1.7), Vector3.new(x, 0.9, -8), CREAM, PLASTIC, Enum.PartType.Ball)
+			d("ShoreFlagPole" .. i, Vector3.new(0.15, 4, 0.15), Vector3.new(x + 4, 2, -6), CREAM)
+			d("ShoreFlag" .. i, Vector3.new(1.8, 1.1, 0.08), Vector3.new(x + 4.9, 3.5, -6), if i % 2 == 0 then TEAL else RED, Enum.Material.Fabric)
+		end
+	end
+	-- pozas de marea con estrellas de mar
+	for i, spec in { { 30, -2 }, { -34, 22 } } do
+		local pool = Vector3.new(spec[1], 0.06, spec[2])
+		local water = d("TidePool" .. i, Vector3.new(0.1, 7, 5), pool, Color3.fromRGB(60, 200, 215), PLASTIC, Enum.PartType.Cylinder)
+		water.Transparency = 0.35
+		upright(water)
+		for r = 1, 3 do
+			local a = r * 2.1
+			d("PoolStone" .. i, Vector3.one * 1.5, pool + Vector3.new(math.cos(a) * 3.6, 0.4, math.sin(a) * 2.8), Color3.fromRGB(150, 145, 140), Enum.Material.Rock, Enum.PartType.Ball)
+		end
+		for arm = 0, 2 do
+			local bar = d("PoolStar" .. i, Vector3.new(1.8, 0.2, 0.5), pool + Vector3.new(0.4, 0.2, 0), Color3.fromRGB(255, 110, 70))
+			bar.CFrame = CFrame.new(bar.Position) * CFrame.Angles(0, arm * math.pi / 3, 0)
+		end
+	end
+	-- palmeras en racimos cerca de los bordes de la playa (buildPalm usa deco: sin sombra)
+	for i, spec in { { -56, 24 }, { -50, 30 }, { -60, 33 }, { 52, 26 }, { 58, 32 }, { 47, 34 } } do
+		buildPalm(folder, 20 + i, o + Vector3.new(spec[1], 0, spec[2]), rng:NextNumber(14, 19), style.treeColor)
+	end
+	-- 2 cangrejos que van de lado a lado (Tween en bucle, en pcall)
+	for i = 1, 2 do
+		local crab = d("Crab" .. i, Vector3.new(1.4, 0.7, 1), Vector3.new(-20 + i * 46, 0.4, 14 - i * 6), Color3.fromRGB(240, 90, 60), PLASTIC)
+		pcall(function()
+			local info = TweenInfo.new(5 + i * 2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+			TweenService:Create(crab, info, { CFrame = crab.CFrame * CFrame.new(8, 0, 0) }):Play()
+		end)
+	end
 	-- hito de la costa: concha gigante (abanico de 9 losas rosas y blancas, ~21 studs) con una perla brillante, en la playa
 	-- cerca de la aparicion; fuera del muelle (|x| < 9) y de la linea de pesca; 11 partes, sin colision
-	local hinge = o + Vector3.new(-26, 0.4, 40)
+	local hinge = o + Vector3.new(-23, 0.4, 17) -- delante-izquierda del spawn (mira hacia -z)
 	for i = 1, 9 do
 		local yaw = math.rad((i - 5) * 15)
 		local slab = deco(folder, "GiantShell" .. i, Vector3.new(3.4, 0.7, 26), hinge, if i % 2 == 0 then Color3.fromRGB(255, 255, 245) else Color3.fromRGB(255, 120, 170), Enum.Material.SmoothPlastic)
