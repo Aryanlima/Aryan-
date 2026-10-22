@@ -22,7 +22,7 @@ local PLAN = {
 	river = { Kit_Pine = 16, Kit_RoundTree = 8, Kit_Rocks = 9, Kit_Crystals = 3 },
 	coast = { Kit_Palm = 16, Kit_Rocks = 7, Kit_Rowboat = 2 },
 }
-local SCALE = { Kit_Palm = { 0.85, 1.35 }, Kit_RoundTree = { 0.8, 1.4 }, Kit_Pine = { 0.8, 1.5 }, Kit_Rocks = { 0.7, 1.5 }, Kit_Crystals = { 0.9, 1.3 }, Kit_Rowboat = { 0.9, 1.1 } }
+local SCALE = { Kit_Palm = { 0.5, 0.75 }, Kit_RoundTree = { 0.42, 0.7 }, Kit_Pine = { 0.45, 0.8 }, Kit_Rocks = { 0.5, 1.0 }, Kit_Crystals = { 0.45, 0.7 }, Kit_Rowboat = { 0.55, 0.7 } } -- el kit se importo grande: factor ~0,5
 
 local function ground(x, z)
 	local hit = ws:Raycast(Vector3.new(x, 400, z), Vector3.new(0, -800, 0), params)
