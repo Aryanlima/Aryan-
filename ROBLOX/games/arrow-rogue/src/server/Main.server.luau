@@ -282,6 +282,10 @@ local function finishRoom(run: Run, room: Chapter.Room, now: number)
 	local reward = Chapter.reward(room.kind, room.index) -- REVIEW(money): oro/xp, aun sin persistir
 	run.gold += reward.gold
 	gainXp(run, reward.xp)
+	local hum = humanoidOf(run.player)
+	if hum and hum.Health > 0 then
+		hum.Health = math.min(hum.MaxHealth, hum.Health + hum.MaxHealth * Balance.healOnClearFrac)
+	end
 	roomState:FireClient(run.player, room.index, room.kind, "cleared")
 	if room.kind == "boss" then
 		return endRun(run, "win")

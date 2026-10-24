@@ -54,10 +54,10 @@ function Chapter.plan(seed: number): { Room }
 		last = t
 		local waves: { Wave } = {}
 		if kind == "combat" then
-			local budget = math.min(CAP, 4 + i * 2) -- dificultad sube con la sala
+			local budget = math.min(CAP, 3 + i) -- dificultad sube con la sala
 			local nWaves = 2 + i // 3
 			for w = 1, nWaves do
-				local count = math.min(budget // nWaves, 3 + i)
+				local count = budget // nWaves + (if w <= budget % nWaves then 1 else 0)
 				table.insert(
 					waves,
 					{ enemyId = ENEMIES[roll(math.min(#ENEMIES, 1 + i))], count = count, delay = (w - 1) * 4 }
