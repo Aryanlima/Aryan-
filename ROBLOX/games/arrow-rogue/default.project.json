@@ -2,46 +2,71 @@
   "name": "ArrowRogue",
   "tree": {
     "$className": "DataModel",
-
     "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
       "Packages": {
         "$className": "Folder",
-        "Odds": { "$path": "../../packages/Odds.luau" },
-        "Net": { "$path": "../../packages/Net.luau" },
-        "UI": { "$path": "../../packages/UI.luau" },
-        "Locale": { "$path": "../../packages/Locale.luau" },
-        "Art": { "$path": "../../packages/Art.luau" }
+        "Odds": {
+          "$path": "../../packages/Odds.luau"
+        },
+        "Net": {
+          "$path": "../../packages/Net.luau"
+        },
+        "UI": {
+          "$path": "../../packages/UI.luau"
+        },
+        "Locale": {
+          "$path": "../../packages/Locale.luau"
+        },
+        "Art": {
+          "$path": "../../packages/Art.luau"
+        }
       },
-      "Shared": { "$path": "src/shared" }
+      "Shared": {
+        "$path": "src/shared"
+      }
     },
-
     "ServerScriptService": {
       "$className": "ServerScriptService",
       "ServerPackages": {
         "$className": "Folder",
-        "Data": { "$path": "../../packages/Data.luau" },
-        "Economy": { "$path": "../../packages/Economy.luau" },
-        "Shop": { "$path": "../../packages/Shop.luau" },
-        "LiveOps": { "$path": "../../packages/LiveOps.luau" },
-        "Analytics": { "$path": "../../packages/Analytics.luau" }
+        "Data": {
+          "$path": "../../packages/Data.luau"
+        },
+        "Economy": {
+          "$path": "../../packages/Economy.luau"
+        },
+        "Shop": {
+          "$path": "../../packages/Shop.luau"
+        },
+        "LiveOps": {
+          "$path": "../../packages/LiveOps.luau"
+        },
+        "Analytics": {
+          "$path": "../../packages/Analytics.luau"
+        }
       },
-      "Server": { "$path": "src/server" }
+      "Server": {
+        "$path": "src/server"
+      }
     },
-
     "StarterPlayer": {
       "$className": "StarterPlayer",
       "StarterPlayerScripts": {
         "$className": "StarterPlayerScripts",
-        "Client": { "$path": "src/client" }
+        "Client": {
+          "$path": "src/client"
+        }
       }
     },
-
     "Workspace": {
       "$className": "Workspace",
-      "$ignoreUnknownInstances": true
+      "$ignoreUnknownInstances": true,
+      "Extras": {
+        "$className": "Folder",
+        "$path": "world/Extras"
+      }
     },
-
     "Lighting": {
       "$className": "Lighting",
       "$ignoreUnknownInstances": true
