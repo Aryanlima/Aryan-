@@ -19,6 +19,7 @@ local Balance = {
 	projectiles = { maxPerPlayer = 24, radius = 1 },
 	chaser = { radius = 2, windup = 0.6, attackRange = 4, recover = 2.8 },
 	enemyLimit = 40,
+	xpPerKill = 4, -- XP por enemigo base; en jefes se multiplica por bossHpMul
 	xpPerLevel = 40, -- XP para subir de nivel (se resta al subir)
 	bossHpMul = { miniboss = 8, boss = 20 } :: { [string]: number }, -- multiplica la vida del chaser en jefes
 	arena = { width = 80, depth = 80 },

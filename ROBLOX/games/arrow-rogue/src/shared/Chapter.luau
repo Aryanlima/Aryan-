@@ -84,6 +84,17 @@ function Chapter.nextRoom(state: State): Room?
 	return nxt
 end
 
+-- Saca de `pending` (muta) y devuelve las oleadas cuyo retraso ya paso desde roomStart (mismo reloj en ambos).
+function Chapter.takeDue(pending: { Wave }, now: number, roomStart: number): { Wave }
+	local due: { Wave } = {}
+	for i = #pending, 1, -1 do
+		if now >= roomStart + pending[i].delay then
+			table.insert(due, table.remove(pending, i) :: Wave)
+		end
+	end
+	return due
+end
+
 function Chapter.isCleared(aliveCount: number, wavesRemaining: number): boolean
 	return aliveCount <= 0 and wavesRemaining <= 0
 end

@@ -63,6 +63,8 @@ local enemyService = EnemyService.new({
 local combatBalance = table.clone(Balance)
 combatBalance.bow = table.clone(Balance.bow)
 
+local awardKill: () -> () = function() end -- se asigna tras definir la run (gainXp)
+
 local combatService = CombatService.new({
 	Combat = Combat,
 	Balance = combatBalance,
@@ -89,6 +91,7 @@ local combatService = CombatService.new({
 	end,
 	killEnemy = function(enemy)
 		enemyService.remove(enemy)
+		awardKill()
 	end,
 })
 
@@ -157,6 +160,28 @@ local function syncXp(run: Run)
 	run.player:SetAttribute("Xp", run.levelXp)
 	run.player:SetAttribute("XpNext", Balance.xpPerLevel)
 	run.player:SetAttribute("Level", run.level)
+end
+
+local function gainXp(run: Run, amount: number)
+	run.xp += amount
+	run.levelXp += amount
+	while run.levelXp >= Balance.xpPerLevel do
+		run.levelXp -= Balance.xpPerLevel
+		run.level += 1
+		run.owedLevels += 1
+	end
+	syncXp(run)
+	if run.owedLevels > 0 and not run.offerOpen then
+		run.owedLevels -= 1
+		run.offerOpen = true
+		skillService.levelUp(run.player)
+	end
+end
+awardKill = function()
+	local run = active
+	if run and not run.ended and run.room then
+		gainXp(run, Balance.xpPerKill * (Balance.bossHpMul[run.room.kind] or 1))
+	end
 end
 
 local function applyStats(run: Run)
@@ -256,19 +281,7 @@ end
 local function finishRoom(run: Run, room: Chapter.Room, now: number)
 	local reward = Chapter.reward(room.kind, room.index) -- REVIEW(money): oro/xp, aun sin persistir
 	run.gold += reward.gold
-	run.xp += reward.xp
-	run.levelXp += reward.xp
-	while run.levelXp >= Balance.xpPerLevel do
-		run.levelXp -= Balance.xpPerLevel
-		run.level += 1
-		run.owedLevels += 1
-	end
-	syncXp(run)
-	if run.owedLevels > 0 and not run.offerOpen then
-		run.owedLevels -= 1
-		run.offerOpen = true
-		skillService.levelUp(run.player)
-	end
+	gainXp(run, reward.xp)
 	roomState:FireClient(run.player, room.index, room.kind, "cleared")
 	if room.kind == "boss" then
 		return endRun(run, "win")
@@ -305,7 +318,7 @@ ready.OnServerEvent:Connect(function(player: Player)
 	end)
 	applyStats(run)
 	syncXp(run)
-	enterRoom(run, Workspace:GetServerTimeNow())
+	enterRoom(run, os.clock())
 end)
 
 skillPick.OnServerEvent:Connect(function(player: Player, index: unknown)
@@ -360,10 +373,11 @@ RunService.Heartbeat:Connect(function(dt)
 			hitDone[enemy] = nil
 		end
 	end
+	local t = os.clock() -- reloj monotono: GetServerTimeNow puede saltar atras al sincronizar y congelar las oleadas
 	if run.nextAt then
-		if now >= run.nextAt then
+		if t >= run.nextAt then
 			run.nextAt = nil
-			enterRoom(run, now)
+			enterRoom(run, t)
 		end
 		return
 	end
@@ -371,14 +385,10 @@ RunService.Heartbeat:Connect(function(dt)
 	if not room then
 		return
 	end
-	for i = #run.pending, 1, -1 do
-		local wave = run.pending[i]
-		if now >= run.roomStart + wave.delay then
-			table.remove(run.pending, i)
-			spawnWave(run, room, wave)
-		end
+	for _, wave in Chapter.takeDue(run.pending, t, run.roomStart) do
+		spawnWave(run, room, wave)
 	end
 	if Chapter.isCleared(#enemyService.list(), #run.pending) then
-		finishRoom(run, room, now)
+		finishRoom(run, room, t)
 	end
 end)
