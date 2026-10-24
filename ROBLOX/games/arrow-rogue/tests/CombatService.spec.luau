@@ -16,6 +16,7 @@ local function vector(x, y, z)
 			if key == "Unit" then
 				return vector(v.X / m, v.Y / m, v.Z / m)
 			end
+			return nil
 		end,
 		__add = function(a, b)
 			return vector(a.X + b.X, a.Y + b.Y, a.Z + b.Z)
@@ -32,6 +33,7 @@ local function vector(x, y, z)
 	})
 	return v
 end
+-- selene: allow(global_usage)
 _G.Vector3 = { new = vector }
 
 describe("CombatService", function()
@@ -43,6 +45,7 @@ describe("CombatService", function()
 				if key == "AssemblyLinearVelocity" then
 					return velocity
 				end
+				return nil
 			end,
 		})
 		local player = { Character = {

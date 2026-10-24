@@ -1,21 +1,22 @@
 --!strict
 local EnemyService = {}
+export type Enemy = { id: number, pos: Vector3, hp: number, part: BasePart, state: string, untilTime: number }
 
-function EnemyService.new(deps)
+function EnemyService.new(deps: any)
 	local Balance = deps.Balance
-	local enemies = {}
+	local enemies: { Enemy } = {}
 	local nextId = 0
 	local service = {}
-	function service.list()
+	function service.list(): { Enemy }
 		return enemies
 	end
-	function service.spawn(id, pos)
+	function service.spawn(id: number?, pos: Vector3): Enemy?
 		if #enemies >= Balance.enemyLimit then
 			return nil
 		end
 		nextId += 1
 		local part = deps.createPart("Chaser", pos)
-		local enemy =
+		local enemy: Enemy =
 			{ id = id or nextId, pos = pos, hp = Balance.enemies.chaser.hp, part = part, state = "Idle", untilTime = 0 }
 		table.insert(enemies, enemy)
 		return enemy
@@ -26,7 +27,7 @@ function EnemyService.new(deps)
 		end
 		table.clear(enemies)
 	end
-	function service.remove(enemy)
+	function service.remove(enemy: Enemy)
 		for i = #enemies, 1, -1 do
 			if enemies[i] == enemy then
 				enemy.part:Destroy()
@@ -35,12 +36,12 @@ function EnemyService.new(deps)
 			end
 		end
 	end
-	function service.step(dt, now, players)
+	function service.step(dt: number, now: number, players: { Player })
 		for _, enemy in enemies do
-			local target, best = nil, math.huge
+			local target: BasePart?, best = nil, math.huge
 			for _, player in players do
 				local character = player.Character
-				local root = character and character:FindFirstChild("HumanoidRootPart")
+				local root = (character and character:FindFirstChild("HumanoidRootPart")) :: BasePart?
 				if root then
 					local d = (root.Position - enemy.part.Position).Magnitude
 					if d < best then

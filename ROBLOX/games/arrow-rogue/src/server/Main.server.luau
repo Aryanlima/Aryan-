@@ -8,7 +8,6 @@ local Combat = require(Shared:WaitForChild("Combat"))
 local Balance = require(Shared:WaitForChild("Balance"))
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
-local ServerStorage = game:GetService("ServerStorage")
 local Workspace = game:GetService("Workspace")
 local shot = ReplicatedStorage:FindFirstChild("Shot") or Instance.new("RemoteEvent")
 shot.Name = "Shot"
@@ -39,7 +38,7 @@ local combatService = CombatService.new({
 	serverTime = function()
 		return Workspace:GetServerTimeNow()
 	end,
-	wallBetween = function(from, to, character)
+	wallBetween = function(from: Vector3, to: Vector3, character: Model?)
 		local params = RaycastParams.new()
 		params.FilterType = Enum.RaycastFilterType.Exclude
 		params.FilterDescendantsInstances = if character then { character, enemiesFolder } else { enemiesFolder }

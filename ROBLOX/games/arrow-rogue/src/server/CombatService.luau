@@ -1,6 +1,16 @@
 --!strict
 local CombatService = {}
-local function segmentDistance2(p, a, b)
+type Arrow = { owner: Player, pos: Vector3, direction: Vector3, damage: number, remaining: number }
+type Enemy = { id: number, hp: number, part: BasePart }
+type Sample = { t: number, speed: number }
+type Target = { id: number, pos: { x: number, z: number }, ref: Enemy }
+type Balance = {
+	bow: { damage: number, cooldown: number, projectileSpeed: number, range: number },
+	standing: { speedThreshold: number, standSeconds: number },
+	projectiles: { maxPerPlayer: number, radius: number },
+	chaser: { radius: number },
+}
+local function segmentDistance2(p: Vector3, a: Vector3, b: Vector3): number
 	local dx, dz = b.X - a.X, b.Z - a.Z
 	local length = dx * dx + dz * dz
 	local t = if length == 0 then 0 else math.clamp(((p.X - a.X) * dx + (p.Z - a.Z) * dz) / length, 0, 1)
@@ -8,13 +18,14 @@ local function segmentDistance2(p, a, b)
 	return (p.X - x) ^ 2 + (p.Z - z) ^ 2
 end
 
-function CombatService.new(deps)
-	local Combat, Balance, Vector3 = deps.Combat, deps.Balance, deps.vector3
-	local arrows, samples, lastShot = {}, {}, {}
+-- deps: any en la frontera de inyeccion (los tests pasan dobles de Vector3).
+function CombatService.new(deps: any)
+	local Combat: any, Balance: Balance, Vector3: any = deps.Combat, deps.Balance, deps.vector3
+	local arrows: { Arrow }, samples: { [Player]: { Sample } }, lastShot: { [Player]: number } = {}, {}, {}
 	local service = {}
-	function service.step(dt, now)
-		local players, enemies = deps.players(), deps.enemies()
-		local targets = {}
+	function service.step(dt: number, now: number)
+		local players: { Player }, enemies: { Enemy } = deps.players(), deps.enemies()
+		local targets: { Target } = {}
 		for _, enemy in enemies do
 			if enemy.hp > 0 then
 				local position = deps.enemyPosition(enemy)
@@ -22,10 +33,10 @@ function CombatService.new(deps)
 			end
 		end
 		for _, player in players do
-			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+			local root = (player.Character and player.Character:FindFirstChild("HumanoidRootPart")) :: BasePart?
 			if root then
-				local velocity = root.AssemblyLinearVelocity
-				local history = samples[player] or {}
+				local velocity: Vector3 = root.AssemblyLinearVelocity
+				local history: { Sample } = samples[player] or {}
 				samples[player] = history
 				table.insert(history, { t = now, speed = Vector3.new(velocity.X, 0, velocity.Z).Magnitude })
 				while #history > 0 and now - history[1].t > Balance.standing.standSeconds + 0.1 do
@@ -35,13 +46,17 @@ function CombatService.new(deps)
 					Combat.isStanding(history, Balance.standing.speedThreshold, Balance.standing.standSeconds)
 					and Combat.canFire(lastShot[player] or -math.huge, now, Balance.bow.cooldown)
 				then
-					local p = root.Position
-					local target = Combat.pickTarget({ x = p.X, z = p.Z }, targets, function(_, to)
-						return deps.wallBetween(p, Vector3.new(to.x, p.Y, to.z), player.Character)
-					end)
+					local p: Vector3 = root.Position
+					local target = Combat.pickTarget(
+						{ x = p.X, z = p.Z },
+						targets,
+						function(_: any, to: { x: number, z: number })
+							return deps.wallBetween(p, Vector3.new(to.x, p.Y, to.z), player.Character)
+						end
+					)
 					if target then
 						lastShot[player] = now
-						local direction = (Vector3.new(target.pos.x, p.Y, target.pos.z) - p).Unit
+						local direction: Vector3 = (Vector3.new(target.pos.x, p.Y, target.pos.z) - p).Unit
 						local live = 0
 						for _, arrow in arrows do
 							if arrow.owner == player then
@@ -70,7 +85,7 @@ function CombatService.new(deps)
 			end
 		end
 		for i = #arrows, 1, -1 do
-			local arrow = arrows[i]
+			local arrow: Arrow = arrows[i]
 			local distance = math.min(arrow.remaining, Balance.bow.projectileSpeed * dt)
 			local finish = arrow.pos + arrow.direction * distance
 			if deps.wallBetween(arrow.pos, finish, arrow.owner.Character) then
