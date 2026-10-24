@@ -91,6 +91,7 @@ type Run = {
 	gold: number,
 	xp: number,
 	levelXp: number,
+	level: number,
 	owedLevels: number,
 	offerOpen: boolean,
 	ended: boolean,
@@ -114,6 +115,36 @@ local skillService = SkillService.new({
 
 local function humanoidOf(player: Player): Humanoid?
 	return player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+end
+
+-- Atributos que lee el cliente (Hud): vida desde el Humanoid de cada personaje.
+local function bindHp(player: Player, character: Model)
+	local hum = character:WaitForChild("Humanoid") :: Humanoid
+	local function sync()
+		player:SetAttribute("Hp", hum.Health)
+		player:SetAttribute("MaxHp", hum.MaxHealth)
+	end
+	hum.HealthChanged:Connect(sync)
+	hum:GetPropertyChangedSignal("MaxHealth"):Connect(sync)
+	sync()
+end
+local function watchHp(player: Player)
+	player.CharacterAdded:Connect(function(character)
+		task.spawn(bindHp, player, character)
+	end)
+	if player.Character then
+		task.spawn(bindHp, player, player.Character)
+	end
+end
+Players.PlayerAdded:Connect(watchHp)
+for _, player in Players:GetPlayers() do
+	watchHp(player)
+end
+
+local function syncXp(run: Run)
+	run.player:SetAttribute("Xp", run.levelXp)
+	run.player:SetAttribute("XpNext", Balance.xpPerLevel)
+	run.player:SetAttribute("Level", run.level)
 end
 
 local function applyStats(run: Run)
@@ -143,7 +174,6 @@ local function endRun(run: Run, result: string)
 	end
 	-- REVIEW(money): derrota paga 50 %; nada persiste aun. Si se guarda, liquidar idempotente por run.
 	local gold = if result == "win" then run.gold else run.gold // 2
-	local xp = if result == "win" then run.xp else run.xp // 2
 	enemyService.clear()
 	table.clear(lastHp)
 	table.clear(hitDone)
@@ -151,7 +181,7 @@ local function endRun(run: Run, result: string)
 		run.arena:Destroy()
 	end
 	table.clear(skillService.owned(run.player))
-	runResult:FireClient(run.player, result, gold, xp)
+	runResult:FireClient(run.player, result == "win", gold)
 	task.delay(3, function() -- vuelta al hub; `active` sigue ocupado hasta aqui
 		if run.player.Parent then
 			run.player:LoadCharacterAsync()
@@ -167,6 +197,8 @@ local function enterRoom(run: Run, now: number)
 		return endRun(run, "win")
 	end
 	run.room, run.pending, run.roomStart = room, table.clone(room.waves), now
+	run.player:SetAttribute("Room", room.index)
+	run.player:SetAttribute("RoomTotal", #run.state.rooms)
 	if run.arena then
 		run.arena:Destroy()
 	end
@@ -216,8 +248,10 @@ local function finishRoom(run: Run, room: Chapter.Room, now: number)
 	run.levelXp += reward.xp
 	while run.levelXp >= Balance.xpPerLevel do
 		run.levelXp -= Balance.xpPerLevel
+		run.level += 1
 		run.owedLevels += 1
 	end
+	syncXp(run)
 	if run.owedLevels > 0 and not run.offerOpen then
 		run.owedLevels -= 1
 		run.offerOpen = true
@@ -248,6 +282,7 @@ ready.OnServerEvent:Connect(function(player: Player)
 		gold = 0,
 		xp = 0,
 		levelXp = 0,
+		level = 1,
 		owedLevels = 0,
 		offerOpen = false,
 		ended = false,
@@ -257,6 +292,7 @@ ready.OnServerEvent:Connect(function(player: Player)
 		endRun(run, "lose")
 	end)
 	applyStats(run)
+	syncXp(run)
 	enterRoom(run, Workspace:GetServerTimeNow())
 end)
 
