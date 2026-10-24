@@ -16,6 +16,9 @@ local Balance = {
 	},
 	-- Dispara solo si el heroe esta parado: velocidad < speedThreshold (studs/s) durante standSeconds.
 	standing = { speedThreshold = 0.5, standSeconds = 0.12 },
+	projectiles = { maxPerPlayer = 24, radius = 1 },
+	chaser = { radius = 2, windup = 0.4, attackRange = 4, recover = 0.6 },
+	enemyLimit = 40,
 	arena = { width = 80, depth = 80 },
 }
 
