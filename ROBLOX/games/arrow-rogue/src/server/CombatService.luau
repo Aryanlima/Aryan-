@@ -100,7 +100,11 @@ function CombatService.new(deps: any)
 							<= (Balance.projectiles.radius + Balance.chaser.radius) ^ 2
 					then
 						-- REVIEW(money): damage is server-owned; persist rewards only after idempotent settlement.
-						enemy.hp = Combat.applyDamage(enemy.hp, arrow.damage)
+						local before = enemy.hp
+						enemy.hp = Combat.applyDamage(before, arrow.damage)
+						if deps.damaged then
+							deps.damaged(enemy, before - enemy.hp, arrow.owner)
+						end
 						if enemy.hp == 0 then
 							deps.killEnemy(enemy)
 						end

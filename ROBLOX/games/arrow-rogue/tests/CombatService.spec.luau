@@ -93,3 +93,96 @@ describe("CombatService", function()
 		expect(shots[1][5]).toBe(99)
 	end)
 end)
+
+describe("CombatService hits", function()
+	local function rig(hp)
+		local root = { Position = vector(0, 3, 0), AssemblyLinearVelocity = vector(0, 0, 0) }
+		local player = { Character = {
+			FindFirstChild = function()
+				return root
+			end,
+		} }
+		local part = { Position = vector(10, 2, 0) }
+		local enemy = { id = 1, hp = hp, part = part }
+		local hits, kills = {}, 0
+		local service = Service.new({
+			Combat = Combat,
+			Balance = Balance,
+			vector3 = { new = vector },
+			players = function()
+				return { player }
+			end,
+			enemies = function()
+				return enemy.hp > 0 and { enemy } or {}
+			end,
+			enemyPosition = function(e)
+				return e.part.Position
+			end,
+			wallBetween = function()
+				return false
+			end,
+			shot = { FireClient = function() end },
+			serverTime = function()
+				return 0
+			end,
+			damaged = function(_, amount)
+				table.insert(hits, amount)
+			end,
+			killEnemy = function()
+				kills += 1
+			end,
+		})
+		return service, enemy, hits, function()
+			return kills
+		end
+	end
+
+	it("una flecha a un enemigo quieto en rango lo daña y avisa; lo mata en 4-6 s", function()
+		local service, enemy, hits, kills = rig(Balance.enemies.chaser.hp)
+		local t, killedAt = 0, nil
+		while t < 8 and not killedAt do
+			service.step(1 / 60, t)
+			t += 1 / 60
+			if kills() > 0 then
+				killedAt = t
+			end
+		end
+		expect(hits[1]).toBe(Balance.bow.damage)
+		expect(enemy.hp).toBe(0)
+		expect(killedAt ~= nil and killedAt >= 3.5 and killedAt <= 6).toBe(true)
+	end)
+end)
+
+describe("EnemyService contact", function()
+	it("ataca solo tras el windup y respeta la recuperacion entre ataques", function()
+		local E = require("../src/server/EnemyService")
+		local service = E.new({
+			Balance = Balance,
+			createPart = function(_, pos)
+				return { Position = pos, Destroy = function() end }
+			end,
+		})
+		local enemy = service.spawn(1, vector(1, 0, 0))
+		local root = { Position = vector(0, 0, 0) }
+		local players = { { Character = {
+			FindFirstChild = function()
+				return root
+			end,
+		} } }
+		local attackTimes = {}
+		local was = false
+		local t = 0
+		while t < 8 do
+			service.step(0.05, t, players)
+			local now = enemy.state == "Attack"
+			if now and not was then
+				table.insert(attackTimes, t)
+			end
+			was = now
+			t += 0.05
+		end
+		expect(#attackTimes).toBe(3)
+		expect(attackTimes[1] >= Balance.chaser.windup).toBe(true)
+		expect(attackTimes[2] - attackTimes[1] >= Balance.chaser.recover + Balance.chaser.windup).toBe(true)
+	end)
+end)

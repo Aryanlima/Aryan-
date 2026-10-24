@@ -39,6 +39,16 @@ end
 local enemiesFolder = Workspace:FindFirstChild("Enemies") or Instance.new("Folder")
 enemiesFolder.Name, enemiesFolder.Parent = "Enemies", Workspace
 
+-- Hub: suelo y spawn para el menu Ready y las reapariciones (sin esto el personaje cae al vacio).
+if not Workspace:FindFirstChild("HubFloor") then
+	local hub = Instance.new("Part")
+	hub.Name, hub.Anchored, hub.Size, hub.Position = "HubFloor", true, Vector3.new(60, 1, 60), Vector3.new(0, -0.5, 0)
+	hub.Parent = Workspace
+	local spawn = Instance.new("SpawnLocation")
+	spawn.Anchored, spawn.Neutral, spawn.Size, spawn.Position = true, true, Vector3.new(6, 1, 6), Vector3.new(0, 0.5, 0)
+	spawn.Parent = Workspace
+end
+
 local enemyService = EnemyService.new({
 	Balance = Balance,
 	createPart = function(name, pos)
@@ -74,6 +84,9 @@ local combatService = CombatService.new({
 	enemyPosition = function(enemy)
 		return enemy.part.Position
 	end,
+	damaged = function(enemy, amount, owner)
+		damageNumber:FireClient(owner, enemy.part.Position, amount)
+	end,
 	killEnemy = function(enemy)
 		enemyService.remove(enemy)
 	end,
@@ -100,7 +113,6 @@ type Run = {
 }
 local ORIGIN = Vector3.new(0, 0, 2000) -- lejos del hub
 local active: Run? = nil
-local lastHp: { [any]: number } = {}
 local hitDone: { [any]: boolean } = {}
 
 local skillService = SkillService.new({
@@ -175,7 +187,6 @@ local function endRun(run: Run, result: string)
 	-- REVIEW(money): derrota paga 50 %; nada persiste aun. Si se guarda, liquidar idempotente por run.
 	local gold = if result == "win" then run.gold else run.gold // 2
 	enemyService.clear()
-	table.clear(lastHp)
 	table.clear(hitDone)
 	if run.arena then
 		run.arena:Destroy()
@@ -218,7 +229,8 @@ local function enterRoom(run: Run, now: number)
 	end
 	arena.Parent, run.arena = Workspace, arena
 	local character = run.player.Character
-	if character then
+	local alive = humanoidOf(run.player)
+	if character and alive and alive.Health > 0 then
 		character:PivotTo(CFrame.new(ORIGIN + Vector3.new(0, 4, 0)))
 	end
 	local hum = humanoidOf(run.player)
@@ -347,12 +359,6 @@ RunService.Heartbeat:Connect(function(dt)
 		elseif enemy.state ~= "Attack" then
 			hitDone[enemy] = nil
 		end
-		-- numeros de dano: diferencia de vida desde el cuadro anterior
-		local before = lastHp[enemy]
-		if before and before > enemy.hp then
-			damageNumber:FireClient(run.player, enemy.part.Position, before - enemy.hp)
-		end
-		lastHp[enemy] = enemy.hp
 	end
 	if run.nextAt then
 		if now >= run.nextAt then

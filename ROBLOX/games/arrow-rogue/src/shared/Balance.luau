@@ -7,9 +7,9 @@ export type Skill = { id: string, extraArrows: number, damageFactor: number }
 
 local Balance = {
 	hero = { maxHp = 100, moveSpeed = 16 },
-	bow = { damage = 10, cooldown = 0.6, projectileSpeed = 80, range = 60 } :: Weapon,
+	bow = { damage = 6, cooldown = 1.0, projectileSpeed = 80, range = 60 } :: Weapon,
 	enemies = {
-		chaser = { hp = 30, speed = 10, contactDamage = 10 } :: Enemy,
+		chaser = { hp = 30, speed = 10, contactDamage = 3 } :: Enemy,
 	},
 	skills = {
 		multishot = { id = "multishot", extraArrows = 2, damageFactor = 0.7 } :: Skill,
@@ -17,7 +17,7 @@ local Balance = {
 	-- Dispara solo si el heroe esta parado: velocidad < speedThreshold (studs/s) durante standSeconds.
 	standing = { speedThreshold = 0.5, standSeconds = 0.12 },
 	projectiles = { maxPerPlayer = 24, radius = 1 },
-	chaser = { radius = 2, windup = 0.4, attackRange = 4, recover = 0.6 },
+	chaser = { radius = 2, windup = 0.6, attackRange = 4, recover = 2.8 },
 	enemyLimit = 40,
 	xpPerLevel = 40, -- XP para subir de nivel (se resta al subir)
 	bossHpMul = { miniboss = 8, boss = 20 } :: { [string]: number }, -- multiplica la vida del chaser en jefes
